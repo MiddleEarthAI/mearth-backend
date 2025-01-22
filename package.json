@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.17.1",
     "@coral-xyz/anchor": "^0.29.0",
     "@prisma/client": "^6.2.1",
     "@solana/web3.js": "^1.90.0",
@@ -24,7 +25,7 @@
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.7",
-    "agent-twitter-client": "^0.0.18",
+    "agent-twitter-client": "^1.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
