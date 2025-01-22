@@ -125,7 +125,7 @@ router.get("/agent/:id/stats", async (req, res, next) => {
         },
         alliancesAsAgent1: {
           where: { dissolvedAt: null },
-        },.
+        },
         alliancesAsAgent2: {
           where: { dissolvedAt: null },
         },

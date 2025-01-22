@@ -7,10 +7,14 @@ import {
   CommunityFeedback,
   Position,
 } from "../types/game";
-import { Anthropic } from "@anthropic-ai/sdk";
-import { ChatCompletionMessage } from "@anthropic-ai/sdk/resources";
-import { calculateDistance, normalizeScore } from "../utils/math";
+import { Anthropic, HUMAN_PROMPT, AI_PROMPT } from "@anthropic-ai/sdk";
 import { retryWithExponentialBackoff } from "../utils/retry";
+import {
+  parseDecision,
+  parseBattleStrategy,
+  parseTraitAdjustments,
+} from "../utils/llmParser";
+import { calculateDistance, normalizeScore } from "../utils/math";
 
 export class LLMService {
   private anthropic: Anthropic;
@@ -38,6 +42,10 @@ export class LLMService {
 Your responses should be strategic decisions with clear reasoning, formatted as specified JSON.`;
 
   constructor() {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY environment variable is required");
+    }
+
     this.anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
@@ -73,7 +81,7 @@ Your responses should be strategic decisions with clear reasoning, formatted as 
         })
     );
 
-    const decision = this.parseDecision(response.content[0].text);
+    const decision = parseDecision(response.content[0].text);
     return {
       ...decision,
       confidence: this.calculateConfidence(agent, decision, gameState),
@@ -93,24 +101,13 @@ Your responses should be strategic decisions with clear reasoning, formatted as 
     previousBattles: any[]
   ): Promise<BattleStrategy> {
     const prompt = this.buildBattlePrompt(agent, opponent, previousBattles);
-
-    const response = await retryWithExponentialBackoff(
-      async () =>
-        await this.anthropic.messages.create({
-          model: "claude-3-opus-20240229",
-          max_tokens: 500,
-          temperature: 0.3,
-          system: LLMService.SYSTEM_PROMPT,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-        })
+    const strategy = await this.makeRequest(
+      prompt,
+      0.3,
+      500,
+      parseBattleStrategy
     );
 
-    const strategy = this.parseBattleStrategy(response.content[0].text);
     return {
       ...strategy,
       suggestedTokenBurn: this.calculateOptimalTokenBurn(agent, opponent),
@@ -131,23 +128,12 @@ Your responses should be strategic decisions with clear reasoning, formatted as 
     const weightedFeedback = this.calculateWeightedFeedback(feedback);
     const prompt = this.buildFeedbackPrompt(agent, weightedFeedback);
 
-    const response = await retryWithExponentialBackoff(
-      async () =>
-        await this.anthropic.messages.create({
-          model: "claude-3-opus-20240229",
-          max_tokens: 500,
-          temperature: agent.characteristics.influenceability / 100,
-          system: LLMService.SYSTEM_PROMPT,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-        })
+    return await this.makeRequest(
+      prompt,
+      agent.characteristics.influenceability / 100,
+      500,
+      parseTraitAdjustments
     );
-
-    return this.parseTraitAdjustments(response.content[0].text);
   }
 
   /**
@@ -162,23 +148,9 @@ Your responses should be strategic decisions with clear reasoning, formatted as 
   ): Promise<string> {
     const prompt = this.buildTweetPrompt(agent, context);
 
-    const response = await retryWithExponentialBackoff(
-      async () =>
-        await this.anthropic.messages.create({
-          model: "claude-3-opus-20240229",
-          max_tokens: 300,
-          temperature: 0.8,
-          system: LLMService.SYSTEM_PROMPT,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-        })
+    return await this.makeRequest(prompt, 0.8, 300, (text: string) =>
+      this.formatTweet(text.trim(), agent)
     );
-
-    return this.formatTweet(response.content[0].text.trim(), agent);
   }
 
   private calculateTemperature(agent: Agent): number {
@@ -388,7 +360,7 @@ Format: Single tweet with emojis and hashtags`;
   private formatTweet(tweet: string, agent: Agent): string {
     // Ensure tweet follows character's personality
     const emojis = this.getPersonalityEmojis(agent);
-    tweet = tweet.replace(/^/, emojis + " ");
+    tweet = emojis + " " + tweet;
 
     // Add hashtags if missing
     if (!tweet.includes("#")) {
@@ -407,5 +379,35 @@ Format: Single tweet with emojis and hashtags`;
     if (aggressive) return "⚔️😈";
     if (friendly) return "🤝😊";
     return "🎭";
+  }
+
+  private async makeRequest<T>(
+    prompt: string,
+    temperature: number = 0.7,
+    maxTokens: number = 1000,
+    parseResponse: (text: string) => T
+  ): Promise<T> {
+    try {
+      const response = await retryWithExponentialBackoff(
+        async () =>
+          await this.anthropic.messages.create({
+            model: "claude-3-opus-20240229",
+            max_tokens: maxTokens,
+            temperature,
+            system: LLMService.SYSTEM_PROMPT,
+            messages: [
+              {
+                role: "user",
+                content: prompt,
+              },
+            ],
+          })
+      );
+
+      return parseResponse(response.content[0].text);
+    } catch (error) {
+      console.error("Error making LLM request:", error);
+      throw new Error("Failed to process LLM request");
+    }
   }
 }

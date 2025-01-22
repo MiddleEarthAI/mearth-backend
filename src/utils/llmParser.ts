@@ -129,7 +129,7 @@ export function extractStructuredData<T extends Record<string, unknown>>(
 
   for (const [key, pattern] of Object.entries(patterns) as [
     keyof T,
-    RegExp
+    RegExp,
   ][]) {
     const match = text.match(pattern);
     if (match && match[1]) {

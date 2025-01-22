@@ -172,7 +172,7 @@ export class AgentBehaviorJob {
       },
     });
 
-    return allAgents.filter((other) => {
+    return allAgents.filter((other: any) => {
       const distance = Math.sqrt(
         Math.pow(other.positionX - agent.positionX, 2) +
           Math.pow(other.positionY - agent.positionY, 2)

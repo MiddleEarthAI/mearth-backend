@@ -1,6 +1,6 @@
 import { Scraper } from "agent-twitter-client";
 import { Agent } from "../types/game";
-import { AgentTwitterClient } from "agent-twitter-client";
+import { Scraper as AgentTwitterClient } from "agent-twitter-client";
 
 export class TwitterService {
   private scraper: Scraper;
