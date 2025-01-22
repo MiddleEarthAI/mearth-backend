@@ -12,9 +12,10 @@ export interface DatabaseConfig {
 
 export interface SolanaConfig {
   rpcUrl: string;
-  programId: string;
   wsEndpoint: string;
   commitment: string;
+  authorityAgentId: string;
+  programId: string;
 }
 
 export interface TwitterConfig {
@@ -40,10 +41,18 @@ export interface SecurityConfig {
   jwtSecret: string;
 }
 
+export interface LLMConfig {
+  model: string;
+  apiKey: string;
+}
+
 export interface AppConfig {
   port: number;
   environment: string;
   logLevel: string;
+}
+
+export interface GameConfig {
   battleCooldownHours: number;
   allianceCooldownHours: number;
   maxTokenBurnPercentage: number;
@@ -56,6 +65,8 @@ export class Config {
   public readonly twitter: TwitterConfig;
   public readonly security: SecurityConfig;
   public readonly app: AppConfig;
+  public readonly llm: LLMConfig;
+  public readonly game: GameConfig;
 
   constructor() {
     // Validate required environment variables
@@ -63,6 +74,10 @@ export class Config {
       "DATABASE_URL",
       "SOLANA_RPC_URL",
       "KEYPAIR_ENCRYPTION_KEY",
+      "JWT_SECRET",
+
+      "LLM_MODEL",
+      "LLM_API_KEY",
 
       "SCOOTLES_TWITTER_USERNAME",
       "SCOOTLES_TWITTER_PASSWORD",
@@ -77,6 +92,11 @@ export class Config {
       "WANDERLEAF_TWITTER_PASSWORD",
     ]);
 
+    this.llm = {
+      model: process.env.LLM_MODEL!,
+      apiKey: process.env.LLM_API_KEY!,
+    };
+
     this.database = {
       url: process.env.DATABASE_URL!,
       maxConnections: parseInt(process.env.DATABASE_MAX_CONNECTIONS || "10"),
@@ -85,10 +105,11 @@ export class Config {
 
     this.solana = {
       rpcUrl: process.env.SOLANA_RPC_URL!,
-      programId: process.env.PROGRAM_ID!,
       wsEndpoint:
         process.env.SOLANA_WS_ENDPOINT || "wss://api.devnet.solana.com",
       commitment: process.env.SOLANA_COMMITMENT || "confirmed",
+      authorityAgentId: process.env.SOLANA_AUTHORITY_AGENT_ID || "",
+      programId: process.env.SOLANA_PROGRAM_ID || "",
     };
 
     this.twitter = {
@@ -111,13 +132,10 @@ export class Config {
 
     this.security = {
       keypairEncryptionKey: process.env.KEYPAIR_ENCRYPTION_KEY!,
-      jwtSecret: process.env.JWT_SECRET || "your-secret-key",
+      jwtSecret: process.env.JWT_SECRET!,
     };
 
-    this.app = {
-      port: parseInt(process.env.PORT || "3000"),
-      environment: process.env.NODE_ENV || "development",
-      logLevel: process.env.LOG_LEVEL || "info",
+    this.game = {
       battleCooldownHours: parseInt(process.env.BATTLE_COOLDOWN_HOURS || "4"),
       allianceCooldownHours: parseInt(
         process.env.ALLIANCE_COOLDOWN_HOURS || "24"
@@ -128,6 +146,12 @@ export class Config {
       minTokenBurnPercentage: parseInt(
         process.env.MIN_TOKEN_BURN_PERCENTAGE || "31"
       ),
+    };
+
+    this.app = {
+      port: parseInt(process.env.PORT || "3000"),
+      environment: process.env.NODE_ENV || "development",
+      logLevel: process.env.LOG_LEVEL || "info",
     };
   }
 

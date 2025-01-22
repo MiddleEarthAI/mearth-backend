@@ -38,9 +38,13 @@ export class Container {
     // Initialize core services
     const keyManager = new KeyManagerService(this.config.security, prisma);
     const solanaService = new SolanaService(this.config.solana, keyManager);
-    const twitterService = new TwitterService(this.config.twitter);
-    const llmService = new LLMService(prisma);
-    const gameService = new GameService(prisma);
+    const twitterService = new TwitterService(this.config.twitter, prisma);
+    const llmService = new LLMService(this.config.llm, prisma);
+    const gameService = new GameService(
+      this.config.game,
+      this.config.twitter,
+      prisma
+    );
 
     // Initialize agent manager
     const agentManager = new AgentManagerService(

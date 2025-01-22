@@ -10,9 +10,22 @@ import {
 } from "../types/game";
 import { logger } from "../utils/logger";
 import { calculateDistance } from "../utils/math";
+import { GameConfig, TwitterConfig } from "@/config";
 
 export class GameService implements IGameService {
-  constructor(private readonly prisma: PrismaClient) {
+  private readonly prisma: PrismaClient;
+  private readonly config: GameConfig;
+  private readonly twitterConfig: TwitterConfig;
+
+  constructor(
+    config: GameConfig,
+    twitterConfig: TwitterConfig,
+    prisma: PrismaClient
+  ) {
+    this.config = config;
+    this.twitterConfig = twitterConfig;
+    this.prisma = prisma;
+
     logger.info("Game service initialized");
   }
 
@@ -23,14 +36,14 @@ export class GameService implements IGameService {
         await this.prisma.agent.createMany({
           data: [
             {
-              type: "SCOOTLES",
+              type: AgentType.SCOOTLES,
               name: "Scootles",
               positionX: 0,
               positionY: 0,
               aggressiveness: 80,
               alliancePropensity: 40,
               influenceability: 50,
-              twitterHandle: process.env.SCOOTLES_TWITTER_HANDLE || "",
+              twitterHandle: this.twitterConfig.SCOOTLES_TWITTER_USERNAME,
               tokenBalance: 1000,
               isAlive: true,
             },
@@ -42,7 +55,7 @@ export class GameService implements IGameService {
               aggressiveness: 60,
               alliancePropensity: 20,
               influenceability: 30,
-              twitterHandle: process.env.PURRLOCK_TWITTER_HANDLE || "",
+              twitterHandle: this.twitterConfig.PURRLOCKPAWS_TWITTER_USERNAME,
               tokenBalance: 1000,
               isAlive: true,
             },
@@ -54,7 +67,7 @@ export class GameService implements IGameService {
               aggressiveness: 30,
               alliancePropensity: 90,
               influenceability: 70,
-              twitterHandle: process.env.GULLIHOP_TWITTER_HANDLE || "",
+              twitterHandle: this.twitterConfig.SIR_GULLIHOP_TWITTER_USERNAME,
               tokenBalance: 1000,
               isAlive: true,
             },
@@ -66,7 +79,7 @@ export class GameService implements IGameService {
               aggressiveness: 40,
               alliancePropensity: 50,
               influenceability: 90,
-              twitterHandle: process.env.WANDERLEAF_TWITTER_HANDLE || "",
+              twitterHandle: this.twitterConfig.WANDERLEAF_TWITTER_USERNAME,
               tokenBalance: 1000,
               isAlive: true,
             },
@@ -348,6 +361,7 @@ export class GameService implements IGameService {
         y: prismaAgent.positionY,
       },
       twitterHandle: prismaAgent.twitterHandle,
+      username: prismaAgent.twitterHandle.split("@")[1],
       characteristics: {
         aggressiveness: prismaAgent.aggressiveness,
         alliancePropensity: prismaAgent.alliancePropensity,
@@ -431,6 +445,7 @@ export class GameService implements IGameService {
         id: prismaAgent.id,
         type: prismaAgent.type as AgentType,
         name: prismaAgent.name,
+        username: prismaAgent.twitterHandle.split("@")[1],
         position: {
           x: prismaAgent.positionX,
           y: prismaAgent.positionY,

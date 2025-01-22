@@ -1,12 +1,4 @@
-import {
-  Connection,
-  PublicKey,
-  Keypair,
-  Transaction,
-  SystemProgram,
-  VersionedTransaction,
-  Commitment,
-} from "@solana/web3.js";
+import { Connection, PublicKey, Keypair, Commitment } from "@solana/web3.js";
 import { Program, AnchorProvider } from "@coral-xyz/anchor";
 
 import { SolanaConfig } from "../config";
@@ -49,8 +41,7 @@ type PositionEvent = {
  */
 export class SolanaService implements ISolanaService {
   private connection: Connection;
-  private program: MearthProgram;
-  private authorityKeypair: Keypair;
+  private program!: MearthProgram;
   private wsConnection: Connection | null = null;
   private subscriptionIds: number[] = [];
 
@@ -59,18 +50,39 @@ export class SolanaService implements ISolanaService {
     private keyManager: IKeyManagerService
   ) {
     this.connection = new Connection(config.rpcUrl);
-    this.authorityKeypair = Keypair.generate();
-    const wallet = new anchor.Wallet(this.authorityKeypair);
 
-    const provider = new AnchorProvider(this.connection, wallet, {
-      commitment: config.commitment as Commitment,
-    });
-
-    anchor.setProvider(provider);
-
-    this.program = new Program<MiddleEarthAiProgram>(
+    // const provider = new anchor.AnchorProvider(this.connection,  {
+    //   commitment: this.config.commitment as Commitment,
+    // });
+    // anchor.setProvider(provider);
+    this.program = new anchor.Program<MiddleEarthAiProgram>(
       mearthIdl as MiddleEarthAiProgram
     );
+  }
+
+  async initialize(): Promise<void> {
+    try {
+      // Initialize provider with authority keypair
+      const authorityKeypair = await this.keyManager.getKeypair(
+        this.config.authorityAgentId
+      );
+      const wallet = new anchor.Wallet(authorityKeypair);
+      const provider = new anchor.AnchorProvider(this.connection, wallet, {
+        commitment: this.config.commitment as Commitment,
+      });
+
+      anchor.setProvider(provider);
+
+      this.program = new anchor.Program<MiddleEarthAiProgram>(
+        mearthIdl as MiddleEarthAiProgram,
+        provider
+      );
+
+      logger.info("Solana service initialized successfully");
+    } catch (error) {
+      logger.error("Failed to initialize Solana service:", error);
+      throw error;
+    }
   }
 
   async startMonitoring(): Promise<void> {
@@ -82,7 +94,8 @@ export class SolanaService implements ISolanaService {
       });
 
       // Subscribe to program account changes
-      const programId = new PublicKey(this.config.programId);
+      const programId = this.program.programId;
+
       const subscription = this.wsConnection.onProgramAccountChange(
         programId,
         (accountInfo, context) => {
@@ -128,13 +141,13 @@ export class SolanaService implements ISolanaService {
     seeds: Buffer[],
     programId: PublicKey
   ): Promise<[PublicKey, number]> {
-    return PublicKey.findProgramAddress(seeds, programId);
+    return PublicKey.findProgramAddressSync(seeds, programId);
   }
 
   private async findAgentPDA(agentId: string): Promise<[PublicKey, number]> {
     return this.findPDA(
       [Buffer.from("agent"), Buffer.from(agentId)],
-      new PublicKey(this.config.programId)
+      this.program.programId
     );
   }
 
@@ -148,7 +161,7 @@ export class SolanaService implements ISolanaService {
         Buffer.from(initiatorId),
         Buffer.from(defenderId),
       ],
-      new PublicKey(this.config.programId)
+      this.program.programId
     );
   }
 
@@ -158,7 +171,7 @@ export class SolanaService implements ISolanaService {
   ): Promise<[PublicKey, number]> {
     return this.findPDA(
       [Buffer.from("alliance"), Buffer.from(agent1Id), Buffer.from(agent2Id)],
-      new PublicKey(this.config.programId)
+      this.program.programId
     );
   }
 
@@ -170,17 +183,20 @@ export class SolanaService implements ISolanaService {
   ): Promise<string> {
     try {
       const [agentPDA] = await this.findAgentPDA(agentId);
-      const agentKeypair = await this.keyManager.generateKeypair(agentId);
+      const agentKeypair = await this.keyManager.getKeypair(agentId);
+      const authorityKeypair = await this.keyManager.getKeypair(
+        this.config.authorityAgentId
+      );
 
       //   const tx = await this.program.methods
       //     .initializeAgent(name, agentType, initialTokens)
       //     .accounts({
       //       agent: agentPDA,
-      //       authority: this.authorityKeypair.publicKey,
+      //       authority: authorityKeypair.publicKey,
       //       agentKey: agentKeypair.publicKey,
       //       systemProgram: SystemProgram.programId,
       //     })
-      //     .signers([this.authorityKeypair])
+      //     .signers([authorityKeypair])
       //     .rpc();
 
       //   logger.info(`Agent ${agentId} initialized with transaction ${tx}`);
@@ -201,6 +217,9 @@ export class SolanaService implements ISolanaService {
       const [initiatorPDA] = await this.findAgentPDA(initiatorId);
       const [defenderPDA] = await this.findAgentPDA(defenderId);
       const [battlePDA] = await this.findBattlePDA(initiatorId, defenderId);
+      const authorityKeypair = await this.keyManager.getKeypair(
+        this.config.authorityAgentId
+      );
 
       //   const tx = await this.program.methods
       //     .processBattle(tokensBurned)
@@ -208,9 +227,9 @@ export class SolanaService implements ISolanaService {
       //       battle: battlePDA,
       //       initiator: initiatorPDA,
       //       defender: defenderPDA,
-      //       authority: this.authorityKeypair.publicKey,
+      //       authority: authorityKeypair.publicKey,
       //     })
-      //     .signers([this.authorityKeypair])
+      //     .signers([authorityKeypair])
       //     .rpc();
 
       //   logger.info(`Battle processed with transaction ${tx}`);

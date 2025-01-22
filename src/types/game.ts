@@ -36,6 +36,7 @@ export interface AgentCharacteristics {
 export interface Agent {
   id: string;
   name: string;
+  username: string;
   type: AgentType;
   position: Position;
   characteristics: AgentCharacteristics;

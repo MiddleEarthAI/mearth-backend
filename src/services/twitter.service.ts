@@ -1,15 +1,18 @@
 import { Scraper } from "agent-twitter-client";
-import { Agent, CommunityFeedback } from "../types/game";
+import { Agent, AgentType } from "../types/game";
 import { logger } from "../utils/logger";
 import { retryWithExponentialBackoff } from "../utils/retry";
 
 import { ITwitterService } from "../types/services";
 import { TwitterConfig } from "@/config";
+import { PrismaClient } from "@prisma/client";
 
 export class TwitterService implements ITwitterService {
   private clients: Map<string, Scraper> = new Map();
+  private prisma: PrismaClient;
 
-  constructor(private readonly config: TwitterConfig) {
+  constructor(private readonly config: TwitterConfig, prisma: PrismaClient) {
+    this.prisma = prisma;
     this.initializeClients();
     logger.info("Twitter service initialized");
   }
@@ -17,25 +20,25 @@ export class TwitterService implements ITwitterService {
   private async initializeClients(): Promise<void> {
     const agents = [
       {
-        type: "SCOOTLES",
+        type: AgentType.SCOOTLES,
         username: this.config.SCOOTLES_TWITTER_USERNAME,
         password: this.config.SCOOTLES_TWITTER_PASSWORD,
         email: this.config.SCOOTLES_TWITTER_EMAIL,
       },
       {
-        type: "PURRLOCK_PAWS",
+        type: AgentType.PURRLOCK_PAWS,
         username: this.config.PURRLOCKPAWS_TWITTER_USERNAME,
         password: this.config.PURRLOCKPAWS_TWITTER_PASSWORD,
         email: this.config.PURRLOCKPAWS_TWITTER_EMAIL,
       },
       {
-        type: "SIR_GULLIHOP",
+        type: AgentType.SIR_GULLIHOP,
         username: this.config.SIR_GULLIHOP_TWITTER_USERNAME,
         password: this.config.SIR_GULLIHOP_TWITTER_PASSWORD,
         email: this.config.SIR_GULLIHOP_TWITTER_EMAIL,
       },
       {
-        type: "WANDERLEAF",
+        type: AgentType.WANDERLEAF,
         username: this.config.WANDERLEAF_TWITTER_USERNAME,
         password: this.config.WANDERLEAF_TWITTER_PASSWORD,
         email: this.config.WANDERLEAF_TWITTER_EMAIL,
@@ -47,7 +50,7 @@ export class TwitterService implements ITwitterService {
         if (agent.username && agent.password && agent.email) {
           await retryWithExponentialBackoff(async () => {
             const scraper = new Scraper();
-            await scraper.login(agent.username!, agent.password!, agent.email!);
+            await scraper.login(agent.username, agent.password, agent.email);
             this.clients.set(agent.type, scraper);
           });
         }
@@ -74,7 +77,10 @@ export class TwitterService implements ITwitterService {
    */
   async postTweet(agent: Agent, content: string): Promise<void> {
     try {
-      // TODO: Implement Twitter API call
+      const client = this.clients.get(agent.type);
+      if (!client) return;
+
+      await client.sendTweet(content);
       logger.info(`Posted tweet for ${agent.name}: ${content}`);
     } catch (error) {
       logger.error(`Failed to post tweet for ${agent.name}:`, error);
@@ -88,6 +94,22 @@ export class TwitterService implements ITwitterService {
   async announceMovement(agentId: string, x: number, y: number): Promise<void> {
     try {
       // TODO: Implement movement announcement
+      const agent = await this.prisma.agent.findUnique({
+        where: {
+          id: agentId,
+        },
+      });
+
+      if (!agent) return;
+
+      const client = this.clients.get(agent.twitterHandle);
+      if (!client) return;
+
+      const tweet = `I'm moving to (${x}, ${y}) in Middle Earth! #MiddleEarthAI`;
+      await retryWithExponentialBackoff(async () => {
+        await client.sendTweet(tweet);
+      });
+
       logger.info(`Announced movement for agent ${agentId} to (${x}, ${y})`);
     } catch (error) {
       logger.error(`Failed to announce movement for agent ${agentId}:`, error);
@@ -120,7 +142,9 @@ export class TwitterService implements ITwitterService {
     tokensBurned: number
   ): Promise<void> {
     try {
-      const message = `⚔️ Battle Report!\n\n${initiator.name} vs ${defender.name}\n${tokensBurned.toLocaleString()} tokens burned!\n\n#MiddleEarthAI #Battle`;
+      const message = `⚔️ Battle Report!\n\n${initiator.name} vs ${
+        defender.name
+      }\n${tokensBurned.toLocaleString()} tokens burned!\n\n#MiddleEarthAI #Battle`;
       await retryWithExponentialBackoff(async () => {
         await this.postTweet(initiator, message);
       });

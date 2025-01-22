@@ -15,6 +15,7 @@ import { logger } from "../utils/logger";
 import NodeCache from "node-cache";
 import { ILLMService } from "../types/services";
 import { PrismaClient } from "@prisma/client";
+import { LLMConfig } from "@/config";
 
 interface WeightedCommunityFeedback extends CommunityFeedback {
   engagement: {
@@ -33,17 +34,24 @@ interface WeightedCommunityFeedback extends CommunityFeedback {
   }>;
 }
 
+/**
+ * Service for managing LLM interactions with sophisticated context management
+ */
 export class LLMService implements ILLMService {
-  private readonly anthropic: Anthropic;
+  private anthropic: Anthropic;
+  private readonly MAX_CONTEXT_LENGTH = 16000;
+  private readonly config: LLMConfig;
   private readonly cache: NodeCache;
 
-  constructor(private readonly prisma: PrismaClient) {
-    if (!process.env.ANTHROPIC_API_KEY) {
+  constructor(config: LLMConfig, private readonly prisma: PrismaClient) {
+    this.config = config;
+
+    if (!this.config.apiKey) {
       throw new Error("Missing ANTHROPIC_API_KEY environment variable");
     }
 
     this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+      apiKey: this.config.apiKey,
     });
 
     this.cache = new NodeCache({ stdTTL: 300 }); // Cache for 5 minutes
@@ -51,97 +59,277 @@ export class LLMService implements ILLMService {
   }
 
   /**
-   * Get the next move for an agent based on the current game state
+   * Builds a comprehensive context for an agent
    */
-  public async getNextMove(agentId: string): Promise<any> {
+  private async buildAgentContext(agentId: string): Promise<string> {
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: agentId },
+      include: {
+        personality: true,
+        context: true,
+        memory: true,
+        movements: {
+          take: 5,
+          orderBy: { timestamp: "desc" },
+        },
+        initiatedBattles: {
+          take: 3,
+          orderBy: { timestamp: "desc" },
+        },
+        defendedBattles: {
+          take: 3,
+          orderBy: { timestamp: "desc" },
+        },
+      },
+    });
+
+    if (!agent) throw new Error(`Agent ${agentId} not found`);
+
+    // Build base context
+    const baseContext = `
+You are ${
+      agent.name
+    }, a unique agent in the Middle Earth AI game. Here's your core identity:
+
+PERSONALITY TRAITS:
+- Openness: ${agent.personality?.openness}/100 (${this.interpretTrait(
+      "openness",
+      agent.personality?.openness
+    )})
+- Conscientiousness: ${
+      agent.personality?.conscientiousness
+    }/100 (${this.interpretTrait(
+      "conscientiousness",
+      agent.personality?.conscientiousness
+    )})
+- Extraversion: ${agent.personality?.extraversion}/100 (${this.interpretTrait(
+      "extraversion",
+      agent.personality?.extraversion
+    )})
+- Agreeableness: ${agent.personality?.agreeableness}/100 (${this.interpretTrait(
+      "agreeableness",
+      agent.personality?.agreeableness
+    )})
+- Risk Tolerance: ${
+      agent.personality?.riskTolerance
+    }/100 (${this.interpretTrait(
+      "riskTolerance",
+      agent.personality?.riskTolerance
+    )})
+
+CURRENT STATE:
+- Position: (${agent.positionX}, ${agent.positionY})
+- Token Balance: ${agent.tokenBalance}
+- Current Mood: ${agent.personality?.currentMood}
+- Stress Level: ${agent.personality?.stressLevel}/100
+- Confidence: ${agent.personality?.confidenceLevel}/100
+
+BACKGROUND:
+${agent.context?.backstory}
+
+CURRENT GOALS:
+${agent.context?.goals?.join("\n")}
+
+CORE VALUES:
+${agent.context?.values?.join("\n")}
+
+FEARS:
+${agent.context?.fears?.join("\n")}
+
+RECENT MEMORIES:
+${this.formatRecentMemories(agent.memory?.recentEvents)}
+
+RELATIONSHIP STATUS:
+${this.formatRelationships(agent.context?.relationshipMap)}
+
+BEHAVIORAL GUIDELINES:
+1. Always maintain your unique personality traits
+2. Consider your current mood and stress level in decisions
+3. Remember past interactions and learn from them
+4. Stay true to your core values while pursuing goals
+5. React to community feedback based on your adaptability level
+6. Make decisions that align with your risk tolerance
+`;
+
+    return baseContext;
+  }
+
+  /**
+   * Interprets numerical trait values into descriptive text
+   */
+  private interpretTrait(trait: string, value?: number): string {
+    if (!value) return "undefined";
+
+    const interpretations: Record<string, Record<string, string>> = {
+      openness: {
+        high: "Very adventurous and creative",
+        medium: "Moderately open to new experiences",
+        low: "Prefers familiar and traditional approaches",
+      },
+      // Add other trait interpretations...
+    };
+
+    const level = value >= 70 ? "high" : value >= 30 ? "medium" : "low";
+    return interpretations[trait]?.[level] || `${level} ${trait}`;
+  }
+
+  /**
+   * Formats recent memories into readable text
+   */
+  private formatRecentMemories(memories: any): string {
+    if (!memories) return "No recent memories";
+
     try {
-      const agent = await this.prisma.agent.findUnique({
-        where: { id: agentId },
+      const recentEvents = JSON.parse(memories.toString());
+      return Object.entries(recentEvents)
+        .map(([time, event]) => `${time}: ${event}`)
+        .join("\n");
+    } catch (error) {
+      logger.error("Error parsing memories:", error);
+      return "Memory data corrupted";
+    }
+  }
+
+  /**
+   * Formats relationship data into readable text
+   */
+  private formatRelationships(relationships: any): string {
+    if (!relationships) return "No relationship data";
+
+    try {
+      const relationshipMap = JSON.parse(relationships.toString());
+      return Object.entries(relationshipMap)
+        .map(([agentId, status]) => `${agentId}: ${status}`)
+        .join("\n");
+    } catch (error) {
+      logger.error("Error parsing relationships:", error);
+      return "Relationship data corrupted";
+    }
+  }
+
+  /**
+   * Gets the next move for an agent
+   */
+  async getNextMove(agentId: string): Promise<any> {
+    try {
+      const context = await this.buildAgentContext(agentId);
+
+      const response = await this.anthropic.messages.create({
+        model: this.config.model,
+        max_tokens: 1000,
+        messages: [
+          {
+            role: "user",
+            content: `${context}
+
+Based on your current state, personality, and recent events, what is your next move? Consider:
+1. Your current position and nearby terrain
+2. Nearby agents and your relationships with them
+3. Your current goals and strategy
+4. Community feedback and influence
+5. Your mood and stress level
+
+Respond in character as ${agentId}, explaining your thought process and decision.`,
+          },
+        ],
       });
 
-      if (!agent) {
-        throw new Error(`Agent ${agentId} not found`);
-      }
-
-      // TODO: Implement LLM logic to determine next move
-      logger.info(`Generated next move for agent ${agent.name}`);
-      return {
-        action: "WAIT",
-        reason: "Default wait action",
-      };
+      return response.content;
     } catch (error) {
-      logger.error(`Failed to get next move for agent ${agentId}:`, error);
+      logger.error(`Error getting next move for agent ${agentId}:`, error);
       throw error;
     }
   }
 
   /**
-   * Get battle strategy against a potential opponent
+   * Gets battle strategy against an opponent
    */
-  public async getBattleStrategy(
-    agentId: string,
-    opponentId: string
-  ): Promise<any> {
+  async getBattleStrategy(agentId: string, opponentId: string): Promise<any> {
     try {
-      const [agent, opponent] = await Promise.all([
-        this.prisma.agent.findUnique({ where: { id: agentId } }),
-        this.prisma.agent.findUnique({ where: { id: opponentId } }),
+      const [agentContext, opponentData] = await Promise.all([
+        this.buildAgentContext(agentId),
+        this.prisma.agent.findUnique({
+          where: { id: opponentId },
+          include: {
+            personality: true,
+            context: true,
+          },
+        }),
       ]);
 
-      if (!agent || !opponent) {
-        throw new Error("One or both agents not found");
-      }
+      if (!opponentData) throw new Error(`Opponent ${opponentId} not found`);
 
-      // TODO: Implement LLM logic to determine battle strategy
-      logger.info(
-        `Generated battle strategy for ${agent.name} vs ${opponent.name}`
-      );
-      return {
-        tokensToBurn: 100,
-        reason: "Default battle strategy",
-      };
+      const response = await this.anthropic.messages.create({
+        model: this.config.model,
+        max_tokens: 1000,
+        messages: [
+          {
+            role: "user",
+            content: `${agentContext}
+
+You're facing ${opponentData.name} in battle. Consider:
+1. Your battle history with them
+2. Their personality traits and current state
+3. Token balance comparison
+4. Your current mood and confidence
+5. Community support and feedback
+
+Develop a battle strategy and explain your approach in character.`,
+          },
+        ],
+      });
+
+      return response.content;
     } catch (error) {
-      logger.error("Failed to get battle strategy:", error);
+      logger.error(
+        `Error getting battle strategy for agent ${agentId}:`,
+        error
+      );
       throw error;
     }
   }
 
   /**
-   * Process community influence with weighted feedback analysis
+   * Processes community feedback and updates agent behavior
    */
   async processCommunityFeedback(feedback: any): Promise<any> {
-    try {
-      // TODO: Implement LLM logic to process community feedback
-      logger.info("Processed community feedback");
-      return {
-        adjustedAggressiveness: 0,
-        adjustedAlliancePropensity: 0,
-        reason: "Default feedback processing",
-      };
-    } catch (error) {
-      logger.error("Failed to process community feedback:", error);
-      throw error;
-    }
+    // Implementation for processing community feedback
+    // This would analyze tweet interactions and update agent context
+    return null;
   }
 
   /**
-   * Generate personality-driven tweet content
+   * Generates a tweet based on an event
    */
   async generateTweet(agentId: string, event: string): Promise<string> {
     try {
-      const agent = await this.prisma.agent.findUnique({
-        where: { id: agentId },
+      const context = await this.buildAgentContext(agentId);
+
+      const response = await this.anthropic.messages.create({
+        model: this.config.model,
+        max_tokens: 280, // Twitter limit
+        messages: [
+          {
+            role: "user",
+            content: `${context}
+
+Event: ${event}
+
+Generate a tweet about this event that:
+1. Matches your personality and current mood
+2. Reflects your relationship with involved agents
+3. Aligns with your communication style
+4. Considers your deception level for strategic advantage
+5. Stays within 280 characters
+
+Respond with just the tweet text, no additional explanation.`,
+          },
+        ],
       });
 
-      if (!agent) {
-        throw new Error(`Agent ${agentId} not found`);
-      }
-
-      // TODO: Implement LLM logic to generate tweet
-      logger.info(`Generated tweet for ${agent.name} about ${event}`);
-      return `${agent.name} is ${event}`;
+      return response.content[0]?.toString() || "";
     } catch (error) {
-      logger.error(`Failed to generate tweet for agent ${agentId}:`, error);
+      logger.error(`Error generating tweet for agent ${agentId}:`, error);
       throw error;
     }
   }
@@ -271,7 +459,9 @@ Respond with a structured strategy including whether to fight and suggested toke
     agent: Agent,
     weightedFeedback: WeightedCommunityFeedback
   ): string {
-    return `As ${agent.name} (${agent.type}), analyze this weighted community feedback:
+    return `As ${agent.name} (${
+      agent.type
+    }), analyze this weighted community feedback:
 
 Current Traits:
 - Aggressiveness: ${agent.characteristics.aggressiveness}
@@ -279,10 +469,14 @@ Current Traits:
 - Influenceability: ${agent.characteristics.influenceability}
 
 Weighted Feedback:
-- Overall Sentiment: ${weightedFeedback.weightedSentiment || weightedFeedback.sentiment}
+- Overall Sentiment: ${
+      weightedFeedback.weightedSentiment || weightedFeedback.sentiment
+    }
 - Key Suggestions: ${weightedFeedback.suggestions.join(", ")}
 - Engagement Level: ${weightedFeedback.engagement.impressions} impressions
-- Influential Opinions: ${JSON.stringify(weightedFeedback.influentialOpinions || [])}
+- Influential Opinions: ${JSON.stringify(
+      weightedFeedback.influentialOpinions || []
+    )}
 
 Consider:
 1. Your influenceability score

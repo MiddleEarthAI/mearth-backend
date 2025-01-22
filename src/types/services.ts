@@ -69,7 +69,6 @@ export interface ISolanaService {
 }
 
 export interface IKeyManagerService {
-  generateKeypair(agentId: string): Promise<Keypair>;
   getKeypair(agentId: string): Promise<Keypair>;
   rotateKeypair(agentId: string): Promise<Keypair>;
 }

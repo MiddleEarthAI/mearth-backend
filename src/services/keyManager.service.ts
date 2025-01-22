@@ -24,55 +24,17 @@ export class KeyManagerService implements IKeyManagerService {
     private readonly config: SecurityConfig,
     private readonly prisma: PrismaClient
   ) {
-    this.cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
+    // Increase cache TTL to 24 hours since keypairs are sensitive
+    this.cache = new NodeCache({
+      stdTTL: 24 * 3600, // 24 hours
+      checkperiod: 600, // Check for expired keys every 10 minutes
+      useClones: false, // Store actual keypair references
+    });
     logger.info("KeyManager service initialized");
   }
 
   /**
-   * Generate a new keypair for an agent
-   */
-  async generateKeypair(agentId: string): Promise<Keypair> {
-    try {
-      // Check cache first
-      const cached = this.cache.get<Keypair>(agentId);
-      if (cached) {
-        return cached;
-      }
-
-      // Generate new keypair
-      const keypair = Keypair.generate();
-      const { encryptedPrivateKey } = await this.encryptPrivateKey(
-        Buffer.from(keypair.secretKey)
-      );
-
-      // Store in database
-      await this.prisma.agentKeypair.upsert({
-        where: { agentId },
-        update: {
-          publicKey: keypair.publicKey.toBase58(),
-          encryptedPrivateKey,
-          rotatedAt: new Date(),
-        },
-        create: {
-          agentId,
-          publicKey: keypair.publicKey.toBase58(),
-          encryptedPrivateKey,
-        },
-      });
-
-      // Cache the keypair
-      this.cache.set(agentId, keypair);
-
-      logger.info(`Generated new keypair for agent ${agentId}`);
-      return keypair;
-    } catch (error) {
-      logger.error(`Failed to generate keypair for agent ${agentId}:`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get an existing keypair for an agent
+   * Get a keypair for an agent, generating one if it doesn't exist
    */
   async getKeypair(agentId: string): Promise<Keypair> {
     try {
@@ -82,27 +44,70 @@ export class KeyManagerService implements IKeyManagerService {
         return cached;
       }
 
-      // Get from database
+      // Check database
       const stored = await this.prisma.agentKeypair.findUnique({
         where: { agentId },
       });
 
-      if (!stored) {
-        throw new Error(`No keypair found for agent ${agentId}`);
+      if (stored) {
+        // Decrypt and reconstruct keypair
+        const decrypted = await this.decryptPrivateKey(
+          stored.encryptedPrivateKey,
+          Buffer.from(stored.iv),
+          Buffer.from(stored.tag)
+        );
+        const keypair = Keypair.fromSecretKey(decrypted);
+
+        // Cache it
+        this.cache.set(agentId, keypair);
+        return keypair;
       }
 
-      // Decrypt private key
-      const privateKey = await this.decryptPrivateKey(
-        stored.encryptedPrivateKey
-      );
-      const keypair = Keypair.fromSecretKey(privateKey);
+      // Generate new if not found
+      return this.generateKeypair(agentId);
+    } catch (error) {
+      logger.error(`Failed to get keypair for agent ${agentId}:`, error);
+      throw error;
+    }
+  }
 
-      // Cache the keypair
+  /**
+   * Generate a new keypair for an agent
+   */
+  private async generateKeypair(agentId: string): Promise<Keypair> {
+    try {
+      // Generate new keypair
+      const keypair = Keypair.generate();
+      const { encryptedPrivateKey, iv, tag } = await this.encryptPrivateKey(
+        Buffer.from(keypair.secretKey)
+      );
+
+      // Store in database
+      await this.prisma.agentKeypair.upsert({
+        where: { agentId },
+        update: {
+          publicKey: keypair.publicKey.toBase58(),
+          encryptedPrivateKey,
+          iv,
+          tag,
+          updatedAt: new Date(),
+        },
+        create: {
+          agentId,
+          publicKey: keypair.publicKey.toBase58(),
+          encryptedPrivateKey,
+          iv,
+          tag,
+        },
+      });
+
+      // Cache the new keypair
       this.cache.set(agentId, keypair);
+      logger.info(`Generated new keypair for agent ${agentId}`);
 
       return keypair;
     } catch (error) {
-      logger.error(`Failed to get keypair for agent ${agentId}:`, error);
+      logger.error(`Failed to generate keypair for agent ${agentId}:`, error);
       throw error;
     }
   }
@@ -114,7 +119,7 @@ export class KeyManagerService implements IKeyManagerService {
     try {
       // Generate new keypair
       const keypair = Keypair.generate();
-      const { encryptedPrivateKey } = await this.encryptPrivateKey(
+      const { encryptedPrivateKey, iv, tag } = await this.encryptPrivateKey(
         Buffer.from(keypair.secretKey)
       );
 
@@ -124,7 +129,10 @@ export class KeyManagerService implements IKeyManagerService {
         data: {
           publicKey: keypair.publicKey.toBase58(),
           encryptedPrivateKey,
+          iv,
+          tag,
           rotatedAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
@@ -144,7 +152,7 @@ export class KeyManagerService implements IKeyManagerService {
    */
   private async encryptPrivateKey(
     privateKey: Buffer
-  ): Promise<{ encryptedPrivateKey: string; iv: Buffer }> {
+  ): Promise<{ encryptedPrivateKey: string; iv: Buffer; tag: Buffer }> {
     const iv = randomBytes(16);
     const cipher = createCipheriv(
       this.algorithm,
@@ -164,17 +172,18 @@ export class KeyManagerService implements IKeyManagerService {
       encrypted,
     ]).toString("hex");
 
-    return { encryptedPrivateKey, iv };
+    return { encryptedPrivateKey, iv, tag: authTag };
   }
 
   /**
    * Decrypt an encrypted private key
    */
   private async decryptPrivateKey(
-    encryptedPrivateKey: string
+    encryptedPrivateKey: string,
+    iv: Buffer,
+    tag: Buffer
   ): Promise<Buffer> {
     const encryptedBuffer = Buffer.from(encryptedPrivateKey, "hex");
-    const iv = encryptedBuffer.subarray(0, 16);
     const authTag = encryptedBuffer.subarray(16, 32);
     const encrypted = encryptedBuffer.subarray(32);
 
@@ -184,7 +193,7 @@ export class KeyManagerService implements IKeyManagerService {
       iv
     ) as DecipherGCM;
 
-    decipher.setAuthTag(authTag);
+    decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]);
   }
 
