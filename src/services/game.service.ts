@@ -240,13 +240,15 @@ export class GameService {
       },
     });
 
-    return agents.filter((other) => {
-      const distance = calculateDistance(
-        { x: agent.position.x, y: agent.position.y },
-        { x: other.positionX, y: other.positionY }
-      );
-      return distance <= range;
-    });
+    return agents.filter(
+      (other: { id: string; positionX: number; positionY: number }) => {
+        const distance = calculateDistance(
+          { x: agent.position.x, y: agent.position.y },
+          { x: other.positionX, y: other.positionY }
+        );
+        return distance <= range;
+      }
+    );
   }
 
   /**

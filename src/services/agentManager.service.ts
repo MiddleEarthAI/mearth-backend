@@ -3,12 +3,31 @@ import { LLMService } from "./llm.service";
 import { GameService } from "./game.service";
 import { TwitterService } from "./twitter.service";
 import { SolanaService } from "./solana.service";
-import { Agent, AgentDecision } from "../types/game";
+import { Agent, AgentDecision, GameState, Battle } from "../types/game";
 import { EventEmitter } from "events";
 import PQueue from "p-queue";
 import NodeCache from "node-cache";
 import { retryWithExponentialBackoff } from "../utils/retry";
 import { logger } from "../utils/logger";
+
+interface AgentDecisionEvent {
+  agentId: string;
+  decision: AgentDecision;
+  timestamp: Date;
+}
+
+interface AgentErrorEvent {
+  agentId: string;
+  error: Error;
+  timestamp: Date;
+}
+
+interface SystemMetrics {
+  activeAgents: number;
+  pendingDecisions: number;
+  queuePending: number;
+  cacheStats: NodeCache.Stats;
+}
 
 /**
  * Manages the lifecycle and coordination of autonomous agents
@@ -221,20 +240,26 @@ export class AgentManagerService {
   /**
    * Get cached or fresh game state
    */
-  private async getGameState(agent: Agent): Promise<any> {
+  private async getGameState(agent: Agent): Promise<GameState> {
     const cacheKey = `gameState_${agent.id}`;
-    let gameState = this.stateCache.get(cacheKey);
+    const cachedState = this.stateCache.get<GameState>(cacheKey);
 
-    if (!gameState) {
-      gameState = {
-        nearbyAgents: await this.gameService.findNearbyAgents(agent),
-        recentBattles: await this.getPreviousBattles(agent.id),
-        communityFeedback: await this.twitterService.getAgentFeedback(agent),
-        terrain: this.gameService.determineTerrainType(agent.position),
-      };
-      this.stateCache.set(cacheKey, gameState);
+    if (cachedState) {
+      return cachedState;
     }
 
+    const gameState: GameState = {
+      nearbyAgents: await this.gameService.findNearbyAgents(agent),
+      recentBattles: await this.getPreviousBattles(agent.id),
+      communityFeedback: {
+        sentiment: 0,
+        interactions: 0,
+        lastUpdated: new Date(),
+      },
+      terrain: this.gameService.determineTerrainType(agent.position),
+    };
+
+    this.stateCache.set(cacheKey, gameState);
     return gameState;
   }
 
@@ -244,7 +269,7 @@ export class AgentManagerService {
   private async getPreviousBattles(
     agentId: string,
     opponentId?: string
-  ): Promise<any[]> {
+  ): Promise<Battle[]> {
     const where = opponentId
       ? {
           OR: [
@@ -298,7 +323,7 @@ export class AgentManagerService {
     setInterval(
       async () => {
         try {
-          const metrics = {
+          const metrics: SystemMetrics = {
             activeAgents: await this.prisma.agent.count({
               where: { isAlive: true },
             }),

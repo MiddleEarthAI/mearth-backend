@@ -1,14 +1,16 @@
+import { BN } from "@coral-xyz/anchor";
+
+export enum TerrainType {
+  NORMAL = "NORMAL",
+  RIVER = "RIVER",
+  MOUNTAIN = "MOUNTAIN",
+}
+
 export enum AgentType {
   SCOOTLES = "SCOOTLES",
   PURRLOCK_PAWS = "PURRLOCK_PAWS",
   SIR_GULLIHOP = "SIR_GULLIHOP",
   WANDERLEAF = "WANDERLEAF",
-}
-
-export enum TerrainType {
-  NORMAL = "NORMAL",
-  MOUNTAIN = "MOUNTAIN",
-  RIVER = "RIVER",
 }
 
 export enum BattleOutcome {
@@ -23,89 +25,84 @@ export interface Position {
 }
 
 export interface AgentCharacteristics {
-  aggressiveness: number; // 0-100
-  alliancePropensity: number; // 0-100
-  influenceability: number; // 0-100
+  aggressiveness: number;
+  alliancePropensity: number;
+  influenceability: number;
 }
 
 export interface Agent {
   id: string;
   type: AgentType;
   name: string;
-  twitterHandle: string;
   position: Position;
-  tokenBalance: number;
-  isAlive: boolean;
+  twitterHandle: string;
   characteristics: AgentCharacteristics;
-  allianceWith?: string; // ID of allied agent
-  lastBattleTime?: Date;
-  lastAllianceTime?: Date;
+  isAlive: boolean;
+  tokenBalance: number;
+}
+
+export interface GameState {
+  nearbyAgents: Agent[];
+  recentBattles: Battle[];
+  communityFeedback: CommunityFeedback;
+  terrain: TerrainType;
 }
 
 export interface Battle {
   id: string;
   initiatorId: string;
   defenderId: string;
-  outcome: BattleOutcome;
   tokensBurned: number;
+  outcome: "WIN" | "LOSS";
   timestamp: Date;
-  location: Position;
+  positionX: number;
+  positionY: number;
 }
 
 export interface Alliance {
   id: string;
   agent1Id: string;
   agent2Id: string;
-  formedAt: Date;
-  dissolvedAt?: Date;
-}
-
-export interface Movement {
-  id: string;
-  agentId: string;
-  from: Position;
-  to: Position;
-  terrain: TerrainType;
-  speed: number;
   timestamp: Date;
 }
 
 export interface CommunityFeedback {
-  sentiment: number; // 0-100
-  suggestions: string[];
-  engagement: {
-    likes: number;
-    retweets: number;
-    replies: number;
-    impressions: number;
-  };
-  influentialUsers: {
-    handle: string;
-    followerCount: number;
-    sentiment: number;
-  }[];
+  sentiment: number;
+  interactions: number;
+  lastUpdated: Date;
 }
 
-export interface GameState {
-  agents: Agent[];
-  battles: Battle[];
-  alliances: Alliance[];
-  movements: Movement[];
-  communityFeedback: Record<string, CommunityFeedback>; // Keyed by agent ID
+export type AgentDecisionAction = "MOVE" | "BATTLE" | "ALLIANCE" | "WAIT";
+
+export interface AgentDecision {
+  action: AgentDecisionAction;
+  target?: Agent;
+  position?: Position;
+  reason: string;
 }
 
 export interface BattleStrategy {
   shouldFight: boolean;
+  suggestedTokenBurn: number;
   reason: string;
-  estimatedSuccess: number; // 0-100
-  suggestedTokenBurn: number; // Percentage to burn if lost
 }
 
-export interface AgentDecision {
-  action: "MOVE" | "BATTLE" | "ALLIANCE" | "WAIT";
-  target?: Agent;
-  position?: Position;
-  reason: string;
-  confidence: number; // 0-100
-  communityAlignment: number; // How much this aligns with community suggestions (0-100)
+export interface ProgramBattleEvent {
+  initiator: string;
+  defender: string;
+  tokensBurned: BN;
+  timestamp: BN;
+}
+
+export interface ProgramAllianceEvent {
+  agent1: string;
+  agent2: string;
+  timestamp: BN;
+}
+
+export interface ProgramPositionEvent {
+  agentId: string;
+  x: BN;
+  y: BN;
+  timestamp: BN;
 }

@@ -5,11 +5,48 @@ import {
   SystemProgram,
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
-import { Program, AnchorProvider, web3, BN } from "@coral-xyz/anchor";
+import {
+  Program,
+  AnchorProvider,
+  web3,
+  BN,
+  IdlEvents,
+} from "@coral-xyz/anchor";
 import { logger } from "../utils/logger";
 import { retryWithExponentialBackoff } from "../utils/retry";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { Agent } from "../types/game";
+import {
+  Agent,
+  ProgramBattleEvent,
+  ProgramAllianceEvent,
+  ProgramPositionEvent,
+} from "../types/game";
+
+type BattleEvent = {
+  data: {
+    initiator: PublicKey;
+    defender: PublicKey;
+    tokensBurned: BN;
+    timestamp: BN;
+  };
+};
+
+type AllianceEvent = {
+  data: {
+    agent1: PublicKey;
+    agent2: PublicKey;
+    timestamp: BN;
+  };
+};
+
+type PositionEvent = {
+  data: {
+    agentId: PublicKey;
+    x: BN;
+    y: BN;
+    timestamp: BN;
+  };
+};
 
 /**
  * Service for interacting with the Solana program
@@ -276,19 +313,58 @@ export class SolanaService {
    * Subscribe to program events
    */
   public subscribeToEvents(): void {
-    // Battle events
-    this.program.addEventListener("BattleProcessed", (event) => {
-      logger.info("Battle processed event:", event);
+    this.program.addEventListener("BattleProcessed", (event, slot) => {
+      // Type assertion for the event data
+      const data = event as unknown as {
+        initiator: PublicKey;
+        defender: PublicKey;
+        tokensBurned: BN;
+        timestamp: BN;
+      };
+
+      logger.info("Battle processed event:", {
+        initiator: data.initiator.toString(),
+        defender: data.defender.toString(),
+        tokensBurned: data.tokensBurned.toString(),
+        timestamp: new Date(data.timestamp.toNumber() * 1000),
+        slot,
+      });
     });
 
-    // Alliance events
-    this.program.addEventListener("AllianceFormed", (event) => {
-      logger.info("Alliance formed event:", event);
+    this.program.addEventListener("AllianceFormed", (event, slot) => {
+      // Type assertion for the event data
+      const data = event as unknown as {
+        agent1: PublicKey;
+        agent2: PublicKey;
+        timestamp: BN;
+      };
+
+      logger.info("Alliance formed event:", {
+        agent1: data.agent1.toString(),
+        agent2: data.agent2.toString(),
+        timestamp: new Date(data.timestamp.toNumber() * 1000),
+        slot,
+      });
     });
 
-    // Position update events
-    this.program.addEventListener("PositionUpdated", (event) => {
-      logger.info("Position updated event:", event);
+    this.program.addEventListener("PositionUpdated", (event, slot) => {
+      // Type assertion for the event data
+      const data = event as unknown as {
+        agentId: PublicKey;
+        x: BN;
+        y: BN;
+        timestamp: BN;
+      };
+
+      logger.info("Position updated event:", {
+        agentId: data.agentId.toString(),
+        position: {
+          x: data.x.toNumber(),
+          y: data.y.toNumber(),
+        },
+        timestamp: new Date(data.timestamp.toNumber() * 1000),
+        slot,
+      });
     });
 
     logger.info("Subscribed to program events");
