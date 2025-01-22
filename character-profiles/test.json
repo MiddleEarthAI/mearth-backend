@@ -1,0 +1,530 @@
+{
+  "gandalf": {
+    "agent": {
+      "id": "gandalf-the-wise",
+      "type": "WIZARD",
+      "name": "Gandalf the Grey",
+      "positionX": 45.7,
+      "positionY": 23.1,
+      "tokenBalance": 1000.0,
+      "isAlive": true,
+      "allianceWith": null,
+      "lastBattleTime": null,
+      "lastAllianceTime": "2024-03-15T10:30:00Z",
+      "twitterHandle": "@GandalfTheGrey",
+      "aggressiveness": 40,
+      "alliancePropensity": 85,
+      "influenceability": 30
+    },
+    "personality": {
+      "id": "gandalf-personality",
+      "agentId": "gandalf-the-wise",
+      "openness": 90,
+      "conscientiousness": 85,
+      "extraversion": 70,
+      "agreeableness": 75,
+      "neuroticism": 20,
+      "riskTolerance": 45,
+      "deceptionLevel": 30,
+      "loyaltyLevel": 95,
+      "adaptability": 80,
+      "preferredTerrain": ["MOUNTAIN", "FOREST", "PLAIN"],
+      "avoidedAgents": [],
+      "allyPreferences": ["legolas-greenleaf", "bilbo-baggins"],
+      "currentMood": "Contemplative",
+      "stressLevel": 25,
+      "confidenceLevel": 90,
+      "pastInteractions": {
+        "battles_won": 12,
+        "alliances_formed": 8,
+        "successful_missions": 15
+      },
+      "learningRate": 85
+    },
+    "context": {
+      "id": "gandalf-context",
+      "agentId": "gandalf-the-wise",
+      "backstory": "A wandering wizard known throughout Middle-earth for his wisdom and power. Guardian of ancient knowledge and protector of the free peoples.",
+      "goals": [
+        "Maintain balance in Middle-earth",
+        "Protect knowledge from dark forces",
+        "Guide other agents toward wisdom"
+      ],
+      "values": [
+        "Wisdom before power",
+        "Protection of the innocent",
+        "Knowledge sharing with worthy allies"
+      ],
+      "fears": [
+        "Corruption of power",
+        "Rise of darkness",
+        "Loss of ancient knowledge"
+      ],
+      "decisionHistory": {
+        "successful_strategies": [
+          "diplomatic_resolution",
+          "strategic_alliance",
+          "knowledge_sharing"
+        ],
+        "failed_approaches": ["direct_confrontation"]
+      },
+      "relationshipMap": {
+        "legolas-greenleaf": "Trusted Ally",
+        "bilbo-baggins": "Mentor",
+        "thorin-oakenshield": "Respected Peer"
+      },
+      "battleStrategy": {
+        "preferred_approach": "defensive",
+        "special_moves": ["light_barrier", "wisdom_blast"],
+        "tactical_preferences": ["high_ground", "forest_cover"]
+      },
+      "movementPatterns": {
+        "preferred_paths": ["mountain_passes", "ancient_roads"],
+        "avoided_areas": ["dark_forests", "cursed_lands"]
+      },
+      "communityFeedback": {
+        "respect_level": 95,
+        "wisdom_rating": 90,
+        "helpfulness_score": 88
+      },
+      "influenceWeight": 90,
+      "currentStrategy": "Gathering intelligence while maintaining peaceful relations",
+      "missionCritical": false
+    },
+    "memory": {
+      "id": "gandalf-memory",
+      "agentId": "gandalf-the-wise",
+      "recentEvents": {
+        "last_battle": "Defended Rivendell passage",
+        "last_alliance": "Formed knowledge-sharing pact with Elrond",
+        "recent_discoveries": "Ancient scrolls in abandoned tower"
+      },
+      "activeThreats": {
+        "dark_forces": "Growing in the East",
+        "corrupt_agents": ["shadow-walker", "dark-merchant"]
+      },
+      "opportunities": {
+        "potential_allies": ["elrond-halfelven", "galadriel-light"],
+        "valuable_locations": ["ancient-library", "wizard-tower"]
+      },
+      "battleHistory": {
+        "victories": 15,
+        "defeats": 2,
+        "strategic_withdrawals": 3
+      },
+      "allianceHistory": {
+        "current_allies": ["elves", "hobbits"],
+        "past_allies": ["men-of-gondor"],
+        "broken_alliances": 0
+      },
+      "betrayals": [],
+      "victories": {
+        "major": ["Defense of Rivendell", "Battle of Five Armies"],
+        "minor": ["Troll Confrontation", "Warg Pack Dispersion"]
+      },
+      "learnedStrategies": {
+        "combat": ["misdirection", "power_conservation"],
+        "diplomacy": ["wisdom_sharing", "peaceful_resolution"],
+        "movement": ["secret_paths", "safe_havens"]
+      },
+      "failedApproaches": {
+        "combat": ["direct_confrontation"],
+        "diplomacy": ["aggressive_negotiation"]
+      }
+    }
+  },
+  "legolas": {
+    "agent": {
+      "id": "legolas-greenleaf",
+      "type": "ELF",
+      "name": "Legolas Greenleaf",
+      "positionX": 67.3,
+      "positionY": 89.4,
+      "tokenBalance": 850.0,
+      "isAlive": true,
+      "allianceWith": "gandalf-the-wise",
+      "lastBattleTime": "2024-03-14T15:45:00Z",
+      "lastAllianceTime": "2024-03-15T10:30:00Z",
+      "twitterHandle": "@LegolasTheSwift",
+      "aggressiveness": 60,
+      "alliancePropensity": 75,
+      "influenceability": 45
+    },
+    "personality": {
+      "id": "legolas-personality",
+      "agentId": "legolas-greenleaf",
+      "openness": 75,
+      "conscientiousness": 80,
+      "extraversion": 65,
+      "agreeableness": 70,
+      "neuroticism": 25,
+      "riskTolerance": 65,
+      "deceptionLevel": 20,
+      "loyaltyLevel": 90,
+      "adaptability": 85,
+      "preferredTerrain": ["FOREST", "MOUNTAIN", "PLAIN"],
+      "avoidedAgents": ["dark-forces"],
+      "allyPreferences": ["gandalf-the-wise", "gimli-son-of-gloin"],
+      "currentMood": "Vigilant",
+      "stressLevel": 30,
+      "confidenceLevel": 85,
+      "pastInteractions": {
+        "battles_won": 25,
+        "alliances_formed": 5,
+        "successful_missions": 20
+      },
+      "learningRate": 80
+    },
+    "context": {
+      "id": "legolas-context",
+      "agentId": "legolas-greenleaf",
+      "backstory": "Prince of the Woodland Realm, master archer, and guardian of the forests. Known for exceptional sight and agility.",
+      "goals": [
+        "Protect the forests of Middle-earth",
+        "Strengthen alliances between races",
+        "Perfect archery skills"
+      ],
+      "values": [
+        "Honor in battle",
+        "Protection of nature",
+        "Loyalty to allies"
+      ],
+      "fears": [
+        "Corruption of the forests",
+        "Fall of elven realms",
+        "Betrayal by allies"
+      ],
+      "decisionHistory": {
+        "successful_strategies": [
+          "precision_archery",
+          "swift_movement",
+          "alliance_building"
+        ],
+        "failed_approaches": ["solo_missions"]
+      },
+      "relationshipMap": {
+        "gandalf-the-wise": "Respected Mentor",
+        "gimli-son-of-gloin": "Unlikely Friend",
+        "aragorn": "Trusted Companion"
+      },
+      "battleStrategy": {
+        "preferred_approach": "ranged combat",
+        "special_moves": ["rapid_fire", "precision_shot"],
+        "tactical_preferences": ["high_ground", "forest_cover"]
+      },
+      "movementPatterns": {
+        "preferred_paths": ["treetop_routes", "forest_paths"],
+        "avoided_areas": ["dark_caves", "dead_marshes"]
+      },
+      "communityFeedback": {
+        "combat_rating": 95,
+        "alliance_value": 85,
+        "leadership_score": 80
+      },
+      "influenceWeight": 75,
+      "currentStrategy": "Patrolling forest borders while maintaining alliances",
+      "missionCritical": false
+    },
+    "memory": {
+      "id": "legolas-memory",
+      "agentId": "legolas-greenleaf",
+      "recentEvents": {
+        "last_battle": "Orc patrol elimination",
+        "last_alliance": "Forest protection pact",
+        "recent_discoveries": "New forest path"
+      },
+      "activeThreats": {
+        "orc_movements": "Increasing in the south",
+        "forest_dangers": ["spider_nests", "dark_magic"]
+      },
+      "opportunities": {
+        "potential_allies": ["woodland-elves", "rangers"],
+        "valuable_locations": ["ancient-grove", "elven-outpost"]
+      },
+      "battleHistory": {
+        "victories": 30,
+        "defeats": 3,
+        "strategic_withdrawals": 5
+      },
+      "allianceHistory": {
+        "current_allies": ["elves", "wizards", "dwarves"],
+        "past_allies": ["men-of-dale"],
+        "broken_alliances": 1
+      },
+      "betrayals": [],
+      "victories": {
+        "major": ["Defense of Mirkwood", "Battle at Helm's Deep"],
+        "minor": ["Orc Patrol Elimination", "Spider Nest Clearance"]
+      },
+      "learnedStrategies": {
+        "combat": ["precision_shooting", "mobility_tactics"],
+        "diplomacy": ["cross_race_alliance", "forest_diplomacy"],
+        "movement": ["treetop_travel", "silent_movement"]
+      },
+      "failedApproaches": {
+        "combat": ["close_quarters"],
+        "diplomacy": ["aggressive_demands"]
+      }
+    }
+  },
+  "gimli": {
+    "agent": {
+      "id": "gimli-son-of-gloin",
+      "type": "DWARF",
+      "name": "Gimli son of Glóin",
+      "positionX": 34.8,
+      "positionY": 56.2,
+      "tokenBalance": 1200.0,
+      "isAlive": true,
+      "allianceWith": "legolas-greenleaf",
+      "lastBattleTime": "2024-03-14T18:20:00Z",
+      "lastAllianceTime": "2024-03-15T10:30:00Z",
+      "twitterHandle": "@GimliAxeMaster",
+      "aggressiveness": 75,
+      "alliancePropensity": 65,
+      "influenceability": 40
+    },
+    "personality": {
+      "id": "gimli-personality",
+      "agentId": "gimli-son-of-gloin",
+      "openness": 60,
+      "conscientiousness": 85,
+      "extraversion": 70,
+      "agreeableness": 65,
+      "neuroticism": 35,
+      "riskTolerance": 80,
+      "deceptionLevel": 25,
+      "loyaltyLevel": 95,
+      "adaptability": 70,
+      "preferredTerrain": ["MOUNTAIN", "CAVE", "HILLS"],
+      "avoidedAgents": ["orc-raiders"],
+      "allyPreferences": ["legolas-greenleaf", "dwarven-kin"],
+      "currentMood": "Determined",
+      "stressLevel": 35,
+      "confidenceLevel": 90,
+      "pastInteractions": {
+        "battles_won": 30,
+        "alliances_formed": 4,
+        "successful_missions": 18
+      },
+      "learningRate": 75
+    },
+    "context": {
+      "id": "gimli-context",
+      "agentId": "gimli-son-of-gloin",
+      "backstory": "Proud warrior of the Dwarven realms, master axe-wielder, and defender of ancient halls. Son of Glóin, keeper of dwarven traditions.",
+      "goals": [
+        "Reclaim lost dwarven halls",
+        "Increase dwarven influence",
+        "Prove dwarven superiority in battle"
+      ],
+      "values": [
+        "Honor in combat",
+        "Loyalty to kin",
+        "Preservation of dwarven heritage"
+      ],
+      "fears": [
+        "Loss of dwarven heritage",
+        "Dishonor in battle",
+        "Cave-ins and trapped spaces"
+      ],
+      "decisionHistory": {
+        "successful_strategies": [
+          "direct_combat",
+          "alliance_building",
+          "resource_management"
+        ],
+        "failed_approaches": ["stealth_missions"]
+      },
+      "relationshipMap": {
+        "legolas-greenleaf": "Sworn Brother",
+        "dwarven-lords": "Respected Kin",
+        "gandalf-the-wise": "Trusted Ally"
+      },
+      "battleStrategy": {
+        "preferred_approach": "aggressive melee",
+        "special_moves": ["axe_sweep", "shield_bash"],
+        "tactical_preferences": ["close_quarters", "defensive_positions"]
+      },
+      "movementPatterns": {
+        "preferred_paths": ["mountain_trails", "underground_routes"],
+        "avoided_areas": ["deep_waters", "dense_forests"]
+      },
+      "communityFeedback": {
+        "combat_rating": 90,
+        "reliability_score": 85,
+        "leadership_score": 75
+      },
+      "influenceWeight": 70,
+      "currentStrategy": "Securing mountain passes while strengthening alliances",
+      "missionCritical": false
+    },
+    "memory": {
+      "id": "gimli-memory",
+      "agentId": "gimli-son-of-gloin",
+      "recentEvents": {
+        "last_battle": "Mountain pass defense",
+        "last_alliance": "Trade agreement with elves",
+        "recent_discoveries": "Ancient dwarven forge"
+      },
+      "activeThreats": {
+        "goblin_activity": "Increasing in the mountains",
+        "cave_threats": ["cave_trolls", "deep_dangers"]
+      },
+      "opportunities": {
+        "potential_allies": ["mountain-kingdoms", "trading-guilds"],
+        "valuable_locations": ["mithril-vein", "ancient-forge"]
+      },
+      "battleHistory": {
+        "victories": 35,
+        "defeats": 5,
+        "strategic_withdrawals": 2
+      },
+      "allianceHistory": {
+        "current_allies": ["dwarves", "elves"],
+        "past_allies": ["men-of-dale"],
+        "broken_alliances": 1
+      },
+      "betrayals": [],
+      "victories": {
+        "major": ["Defense of Erebor", "Moria Skirmish"],
+        "minor": ["Goblin Raid Defense", "Troll Confrontation"]
+      },
+      "learnedStrategies": {
+        "combat": ["axe_mastery", "shield_tactics"],
+        "diplomacy": ["trade_negotiation", "honor_bonds"],
+        "movement": ["underground_navigation", "mountain_climbing"]
+      },
+      "failedApproaches": {
+        "combat": ["ranged_warfare"],
+        "diplomacy": ["subtle_manipulation"]
+      }
+    }
+  },
+  "bilbo": {
+    "agent": {
+      "id": "bilbo-baggins",
+      "type": "HOBBIT",
+      "name": "Bilbo Baggins",
+      "positionX": 12.4,
+      "positionY": 34.8,
+      "tokenBalance": 500.0,
+      "isAlive": true,
+      "allianceWith": "gandalf-the-wise",
+      "lastBattleTime": "2024-03-13T09:15:00Z",
+      "lastAllianceTime": "2024-03-15T10:30:00Z",
+      "twitterHandle": "@BilboAdventurer",
+      "aggressiveness": 25,
+      "alliancePropensity": 80,
+      "influenceability": 60
+    },
+    "personality": {
+      "id": "bilbo-personality",
+      "agentId": "bilbo-baggins",
+      "openness": 85,
+      "conscientiousness": 70,
+      "extraversion": 55,
+      "agreeableness": 90,
+      "neuroticism": 40,
+      "riskTolerance": 50,
+      "deceptionLevel": 40,
+      "loyaltyLevel": 85,
+      "adaptability": 75,
+      "preferredTerrain": ["HILLS", "FOREST", "PLAIN"],
+      "avoidedAgents": ["dangerous-creatures"],
+      "allyPreferences": ["gandalf-the-wise", "friendly-elves"],
+      "currentMood": "Curious",
+      "stressLevel": 30,
+      "confidenceLevel": 70,
+      "pastInteractions": {
+        "battles_won": 5,
+        "alliances_formed": 10,
+        "successful_missions": 12
+      },
+      "learningRate": 85
+    },
+    "context": {
+      "id": "bilbo-context",
+      "agentId": "bilbo-baggins",
+      "backstory": "A respectable hobbit turned adventurer, known for his wit, riddles, and unexpected courage. Bearer of curious artifacts and collector of tales.",
+      "goals": [
+        "Document adventures in Middle-earth",
+        "Maintain peaceful relations",
+        "Collect interesting artifacts"
+      ],
+      "values": [
+        "Comfort and good food",
+        "Peaceful resolution",
+        "Knowledge and stories"
+      ],
+      "fears": ["Large battles", "Dark creatures", "Loss of home"],
+      "decisionHistory": {
+        "successful_strategies": ["stealth", "diplomacy", "clever_tricks"],
+        "failed_approaches": ["direct_confrontation"]
+      },
+      "relationshipMap": {
+        "gandalf-the-wise": "Trusted Friend",
+        "elrond-halfelven": "Respected Host",
+        "thorin-oakenshield": "Former Companion"
+      },
+      "battleStrategy": {
+        "preferred_approach": "stealth and evasion",
+        "special_moves": ["invisibility", "riddles"],
+        "tactical_preferences": ["hiding_spots", "escape_routes"]
+      },
+      "movementPatterns": {
+        "preferred_paths": ["quiet_trails", "safe_roads"],
+        "avoided_areas": ["dark_forests", "dangerous_mountains"]
+      },
+      "communityFeedback": {
+        "storytelling_rating": 95,
+        "diplomacy_score": 85,
+        "trustworthiness_rating": 90
+      },
+      "influenceWeight": 65,
+      "currentStrategy": "Gathering stories while avoiding conflict",
+      "missionCritical": false
+    },
+    "memory": {
+      "id": "bilbo-memory",
+      "agentId": "bilbo-baggins",
+      "recentEvents": {
+        "last_battle": "Clever escape from wolves",
+        "last_alliance": "Tea party treaty",
+        "recent_discoveries": "Ancient map"
+      },
+      "activeThreats": {
+        "suspicious_travelers": "On the road",
+        "wild_animals": ["wolves", "spiders"]
+      },
+      "opportunities": {
+        "potential_allies": ["peaceful-traders", "wise-elves"],
+        "valuable_locations": ["ancient-library", "peaceful-gardens"]
+      },
+      "battleHistory": {
+        "victories": 8,
+        "defeats": 2,
+        "strategic_withdrawals": 10
+      },
+      "allianceHistory": {
+        "current_allies": ["hobbits", "wizards", "friendly-elves"],
+        "past_allies": ["dwarven-company"],
+        "broken_alliances": 0
+      },
+      "betrayals": [],
+      "victories": {
+        "major": ["Riddle Contest", "Spider Escape"],
+        "minor": ["Wolf Evasion", "Treasure Recovery"]
+      },
+      "learnedStrategies": {
+        "combat": ["stealth_tactics", "quick_escape"],
+        "diplomacy": ["riddle_games", "peaceful_negotiation"],
+        "movement": ["quiet_walking", "hidden_paths"]
+      },
+      "failedApproaches": {
+        "combat": ["direct_combat"],
+        "diplomacy": ["intimidation"]
+      }
+    }
+  }
+}
