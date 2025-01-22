@@ -15,16 +15,16 @@ export function parseDecision(response: string): AgentDecision {
       target: parsed.target || undefined,
       position: parsed.position || undefined,
       reason: parsed.reason,
-      confidence: 70, // Default confidence
-      communityAlignment: 50, // Default alignment
+      //   confidence: 70, // Default confidence
+      //   communityAlignment: 50, // Default alignment
     };
   } catch (error) {
     console.error("Failed to parse LLM decision:", error);
     return {
-      action: "WAIT",
+      action: "IGNORE",
       reason: "Error processing decision",
-      confidence: 0,
-      communityAlignment: 0,
+      //   confidence: 0,
+      //   communityAlignment: 0,
     };
   }
 }
@@ -60,14 +60,14 @@ export function parseBattleStrategy(
     return {
       shouldFight: decision || false,
       reason: reason || "Strategic decision",
-      estimatedSuccess: probability,
+      //   estimatedSuccess: probability,
     };
   } catch (error) {
     console.error("Failed to parse battle strategy:", error);
     return {
       shouldFight: false,
       reason: "Error processing strategy",
-      estimatedSuccess: 0,
+      //   estimatedSuccess: 0,
     };
   }
 }

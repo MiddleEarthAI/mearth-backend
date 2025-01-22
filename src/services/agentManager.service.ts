@@ -72,8 +72,8 @@ export class AgentManagerService {
       // Initialize agents if needed
       await this.initializeAgents();
 
-      // Subscribe to Solana program events
-      this.solanaService.subscribeToEvents();
+      // Start real-time monitoring
+      await this.solanaService.startMonitoring();
 
       // Start the main processing loop
       this.startProcessingLoop();
@@ -94,6 +94,7 @@ export class AgentManagerService {
    */
   public async stop(): Promise<void> {
     this.isRunning = false;
+    await this.solanaService.stopMonitoring();
     await this.decisionQueue.onIdle();
     logger.info("Agent manager stopped");
   }

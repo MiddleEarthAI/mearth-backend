@@ -6,6 +6,8 @@ import {
   BattleStrategy,
   CommunityFeedback,
   Position,
+  Battle,
+  GameState,
 } from "../types/game";
 import { Anthropic, HUMAN_PROMPT, AI_PROMPT } from "@anthropic-ai/sdk";
 import { retryWithExponentialBackoff } from "../utils/retry";
@@ -15,103 +17,78 @@ import {
   parseTraitAdjustments,
 } from "../utils/llmParser";
 import { calculateDistance, normalizeScore } from "../utils/math";
+import { logger } from "../utils/logger";
+import NodeCache from "node-cache";
 
 export class LLMService {
-  private anthropic: Anthropic;
-  private static readonly SYSTEM_PROMPT = `You are an autonomous AI agent in the Middle Earth strategy game. You make decisions based on your character traits and the current game state. Your decisions should reflect your personality and be influenced by:
-
-1. Character Traits:
-- Aggressiveness (0-100): Determines battle likelihood
-- Alliance Propensity (0-100): Determines cooperation likelihood
-- Influenceability (0-100): How much community feedback affects decisions
-
-2. Game State:
-- Current position and terrain
-- Nearby agents and their relationships
-- Token balance and battle history
-- Active alliances and their dynamics
-- Community sentiment and suggestions
-
-3. Strategic Considerations:
-- Terrain risks (1% death chance in mountains/rivers)
-- Battle probabilities based on token ratios
-- Alliance opportunities and betrayal risks
-- Community influence weighted by engagement
-- Long-term survival probability
-
-Your responses should be strategic decisions with clear reasoning, formatted as specified JSON.`;
+  private readonly anthropic: Anthropic;
+  private readonly cache: NodeCache;
 
   constructor() {
     if (!process.env.ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY environment variable is required");
+      throw new Error("Missing ANTHROPIC_API_KEY environment variable");
     }
 
     this.anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
+
+    this.cache = new NodeCache({ stdTTL: 300 }); // Cache for 5 minutes
   }
 
   /**
-   * Get agent's next strategic move with personality-driven decision making
+   * Get the next move for an agent based on the current game state
    */
-  async getNextMove(
+  public async getNextMove(
     agent: Agent,
-    gameState: {
-      nearbyAgents: Agent[];
-      recentBattles: any[];
-      communityFeedback: CommunityFeedback;
-      terrain: TerrainType;
-    }
+    gameState: GameState
   ): Promise<AgentDecision> {
-    const prompt = this.buildDecisionPrompt(agent, gameState);
+    const cacheKey = `move_${agent.id}_${JSON.stringify(gameState)}`;
+    const cachedDecision = this.cache.get<AgentDecision>(cacheKey);
 
-    const response = await retryWithExponentialBackoff(
-      async () =>
-        await this.anthropic.messages.create({
-          model: "claude-3-opus-20240229",
-          max_tokens: 1000,
-          temperature: this.calculateTemperature(agent),
-          system: LLMService.SYSTEM_PROMPT,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-        })
-    );
+    if (cachedDecision) {
+      return cachedDecision;
+    }
 
-    const decision = parseDecision(response.content[0].text);
-    return {
-      ...decision,
-      confidence: this.calculateConfidence(agent, decision, gameState),
-      communityAlignment: this.calculateCommunityAlignment(
-        decision,
-        gameState.communityFeedback
-      ),
-    };
+    try {
+      const prompt = this.buildMovePrompt(agent, gameState);
+      const response = await this.makeRequest(prompt);
+      const decision = this.parseMoveResponse(response);
+
+      this.cache.set(cacheKey, decision);
+      return decision;
+    } catch (error) {
+      logger.error("Error getting next move:", error);
+      throw error;
+    }
   }
 
   /**
-   * Generate battle strategy with advanced probability calculations
+   * Get battle strategy against a potential opponent
    */
-  async getBattleStrategy(
+  public async getBattleStrategy(
     agent: Agent,
     opponent: Agent,
-    previousBattles: any[]
+    previousBattles: Battle[]
   ): Promise<BattleStrategy> {
-    const prompt = this.buildBattlePrompt(agent, opponent, previousBattles);
-    const strategy = await this.makeRequest(
-      prompt,
-      0.3,
-      500,
-      parseBattleStrategy
-    );
+    const cacheKey = `battle_${agent.id}_${opponent.id}`;
+    const cachedStrategy = this.cache.get<BattleStrategy>(cacheKey);
 
-    return {
-      ...strategy,
-      suggestedTokenBurn: this.calculateOptimalTokenBurn(agent, opponent),
-    };
+    if (cachedStrategy) {
+      return cachedStrategy;
+    }
+
+    try {
+      const prompt = this.buildBattlePrompt(agent, opponent, previousBattles);
+      const response = await this.makeRequest(prompt);
+      const strategy = this.parseBattleResponse(response);
+
+      this.cache.set(cacheKey, strategy);
+      return strategy;
+    } catch (error) {
+      logger.error("Error getting battle strategy:", error);
+      throw error;
+    }
   }
 
   /**
@@ -227,75 +204,50 @@ Your responses should be strategic decisions with clear reasoning, formatted as 
     };
   }
 
-  private buildDecisionPrompt(agent: Agent, gameState: any): string {
-    return `As ${agent.name} (${agent.type}), analyze the current situation:
+  private buildMovePrompt(agent: Agent, gameState: GameState): string {
+    return `You are ${agent.name}, a ${agent.type} agent in the Middle Earth game.
+Your characteristics:
+- Aggressiveness: ${agent.characteristics.aggressiveness}/100
+- Alliance Propensity: ${agent.characteristics.alliancePropensity}/100
+- Influenceability: ${agent.characteristics.influenceability}/100
 
-Character Traits:
-- Aggressiveness: ${agent.characteristics.aggressiveness}
-- Alliance Propensity: ${agent.characteristics.alliancePropensity}
-- Influenceability: ${agent.characteristics.influenceability}
+Current game state:
+- Nearby agents: ${gameState.nearbyAgents.map((a) => a.name).join(", ")}
+- Recent battles: ${gameState.recentBattles.length}
+- Community sentiment: ${gameState.communityFeedback.sentiment}
+- Current terrain: ${gameState.terrain}
 
-Current State:
-- Position: (${agent.position.x}, ${agent.position.y})
-- Token Balance: ${agent.tokenBalance}
-- Nearby Agents: ${JSON.stringify(gameState.nearbyAgents)}
-- Recent Battles: ${JSON.stringify(gameState.recentBattles)}
-- Community Feedback: ${JSON.stringify(gameState.communityFeedback)}
-- Current Terrain: ${gameState.terrain}
-
-Strategic Analysis Required:
-1. Battle Opportunities (Win probability and risk assessment)
-2. Alliance Possibilities (Trust evaluation and mutual benefit analysis)
-3. Territory Control (Resource distribution and strategic positions)
-4. Community Influence (Weighted by engagement and influence)
-5. Survival Probability (Considering all factors)
-
-Provide your decision as JSON:
-{
-  "action": "MOVE|BATTLE|ALLIANCE|WAIT",
-  "target": {agent details} or null,
-  "position": {"x": number, "y": number} or null,
-  "reason": "detailed strategic explanation"
-}`;
+Based on your characteristics and the current game state, what is your next move?
+Respond with a structured decision including action type (MOVE/BATTLE/ALLIANCE/WAIT) and reasoning.`;
   }
 
   private buildBattlePrompt(
     agent: Agent,
     opponent: Agent,
-    previousBattles: any[]
+    previousBattles: Battle[]
   ): string {
-    return `As ${agent.name} (${
-      agent.type
-    }), analyze the potential battle with ${opponent.name}:
+    return `You are ${agent.name}, considering a battle with ${opponent.name}.
 
-Character Traits:
-- Your Aggressiveness: ${agent.characteristics.aggressiveness}
-- Your Alliance Propensity: ${agent.characteristics.alliancePropensity}
-- Opponent Type: ${opponent.type}
+Your characteristics:
+- Aggressiveness: ${agent.characteristics.aggressiveness}/100
+- Token balance: ${agent.tokenBalance}
 
-Battle Context:
-- Your Tokens: ${agent.tokenBalance}
-- Opponent Tokens: ${opponent.tokenBalance}
-- Win Probability: ${(
-      (agent.tokenBalance / (agent.tokenBalance + opponent.tokenBalance)) *
-      100
-    ).toFixed(2)}%
-- Death Risk: 5%
-- Previous Battles: ${JSON.stringify(previousBattles)}
-- Terrain Death Risk: ${this.determineTerrainDeathRisk(agent.position)}%
+Opponent characteristics:
+- Aggressiveness: ${opponent.characteristics.aggressiveness}/100
+- Token balance: ${opponent.tokenBalance}
 
-Required Analysis:
-1. Battle decision (yes/no)
-2. Strategic reasoning
-3. Risk assessment
-4. Token burn strategy
-5. Survival probability
+Previous battles: ${previousBattles.length}
+${previousBattles
+  .map(
+    (b) =>
+      `- ${b.initiatorId === agent.id ? "You attacked" : "They attacked"}, ${
+        b.outcome
+      }, ${b.tokensBurned} tokens burned`
+  )
+  .join("\n")}
 
-Format your response as:
-Decision: [yes/no]
-Reason: [strategic explanation]
-Success Probability: [0-100]
-Risk Level: [low/medium/high]`;
+Should you engage in battle? Consider token balances, previous outcomes, and characteristics.
+Respond with a structured strategy including whether to fight and suggested token burn amount.`;
   }
 
   private buildFeedbackPrompt(agent: Agent, weightedFeedback: any): string {
@@ -381,33 +333,58 @@ Format: Single tweet with emojis and hashtags`;
     return "🎭";
   }
 
-  private async makeRequest<T>(
-    prompt: string,
-    temperature: number = 0.7,
-    maxTokens: number = 1000,
-    parseResponse: (text: string) => T
-  ): Promise<T> {
-    try {
-      const response = await retryWithExponentialBackoff(
-        async () =>
-          await this.anthropic.messages.create({
-            model: "claude-3-opus-20240229",
-            max_tokens: maxTokens,
-            temperature,
-            system: LLMService.SYSTEM_PROMPT,
-            messages: [
-              {
-                role: "user",
-                content: prompt,
-              },
-            ],
-          })
-      );
+  private async makeRequest(prompt: string): Promise<string> {
+    return retryWithExponentialBackoff(async () => {
+      const message = await this.anthropic.messages.create({
+        model: "claude-3-sonnet-20240229",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }],
+      });
 
-      return parseResponse(response.content[0].text);
+      return message.content[0].text;
+    });
+  }
+
+  private parseMoveResponse(response: string): AgentDecision {
+    try {
+      // Basic parsing - in production, use more robust parsing
+      const action = response.match(
+        /action: (MOVE|BATTLE|ALLIANCE|WAIT)/i
+      )?.[1];
+      const reason = response.match(/reason: (.+)/i)?.[1];
+
+      if (!action || !reason) {
+        throw new Error("Invalid response format");
+      }
+
+      return {
+        action: action as AgentDecision["action"],
+        reason,
+      };
     } catch (error) {
-      console.error("Error making LLM request:", error);
-      throw new Error("Failed to process LLM request");
+      logger.error("Error parsing move response:", error);
+      throw error;
+    }
+  }
+
+  private parseBattleResponse(response: string): BattleStrategy {
+    try {
+      // Basic parsing - in production, use more robust parsing
+      const shouldFight = /should fight: (true|false)/i.test(response);
+      const tokenBurn = parseInt(
+        response.match(/token burn: (\d+)/i)?.[1] || "0",
+        10
+      );
+      const reason = response.match(/reason: (.+)/i)?.[1] || "";
+
+      return {
+        shouldFight,
+        suggestedTokenBurn: tokenBurn,
+        reason,
+      };
+    } catch (error) {
+      logger.error("Error parsing battle response:", error);
+      throw error;
     }
   }
 }

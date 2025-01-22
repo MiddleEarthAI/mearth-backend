@@ -20,7 +20,9 @@ import {
   ProgramBattleEvent,
   ProgramAllianceEvent,
   ProgramPositionEvent,
+  MearthProgram,
 } from "../types/game";
+import { WebSocketService } from "./websocket.service";
 
 type BattleEvent = {
   data: {
@@ -54,8 +56,9 @@ type PositionEvent = {
 export class SolanaService {
   private connection: Connection;
   private provider: AnchorProvider;
-  private program: Program;
+  private program: MearthProgram;
   private authorityKeypair: Keypair;
+  private webSocketService: WebSocketService;
 
   // PDAs
   private static readonly GAME_SEED = "GAME";
@@ -99,7 +102,143 @@ export class SolanaService {
       this.provider
     );
 
+    // Initialize WebSocket service
+    this.webSocketService = new WebSocketService();
+
     logger.info("Solana service initialized successfully");
+  }
+
+  /**
+   * Start real-time monitoring
+   */
+  public async startMonitoring(): Promise<void> {
+    try {
+      await this.webSocketService.connect();
+
+      // Subscribe to program events
+      await this.webSocketService.subscribeToProgramEvents(
+        this.program.programId.toString()
+      );
+
+      // Set up event handlers
+      this.webSocketService.onProgramUpdate((data) => {
+        this.handleProgramUpdate(data);
+      });
+
+      this.webSocketService.onSignatureUpdate((data) => {
+        this.handleSignatureUpdate(data);
+      });
+
+      this.webSocketService.onAccountUpdate((data) => {
+        this.handleAccountUpdate(data);
+      });
+
+      logger.info("Real-time monitoring started");
+    } catch (error) {
+      logger.error("Failed to start monitoring:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Stop real-time monitoring
+   */
+  public async stopMonitoring(): Promise<void> {
+    await this.webSocketService.disconnect();
+    logger.info("Real-time monitoring stopped");
+  }
+
+  private handleProgramUpdate(data: any): void {
+    try {
+      const { programId, accountId, type } = data;
+      logger.info("Program update received:", {
+        programId,
+        accountId,
+        type,
+      });
+
+      // Handle different update types
+      switch (type) {
+        case "battleProcessed":
+          this.handleBattleUpdate(data);
+          break;
+        case "allianceFormed":
+          this.handleAllianceUpdate(data);
+          break;
+        case "positionUpdated":
+          this.handlePositionUpdate(data);
+          break;
+        default:
+          logger.warn("Unknown program update type:", type);
+      }
+    } catch (error) {
+      logger.error("Error handling program update:", error);
+    }
+  }
+
+  private handleSignatureUpdate(data: any): void {
+    try {
+      const { signature, status } = data;
+      logger.info("Transaction update:", {
+        signature,
+        status,
+      });
+
+      // Handle transaction confirmation
+      if (status.err) {
+        logger.error("Transaction failed:", status.err);
+      } else {
+        logger.info("Transaction confirmed:", signature);
+      }
+    } catch (error) {
+      logger.error("Error handling signature update:", error);
+    }
+  }
+
+  private handleAccountUpdate(data: any): void {
+    try {
+      const { accountId, data: accountData } = data;
+      logger.info("Account update:", {
+        accountId,
+        data: accountData,
+      });
+
+      // Handle account state changes
+      // Implementation depends on account type and data structure
+    } catch (error) {
+      logger.error("Error handling account update:", error);
+    }
+  }
+
+  private handleBattleUpdate(data: any): void {
+    const { initiator, defender, tokensBurned, timestamp } = data;
+    logger.info("Battle processed:", {
+      initiator: initiator.toString(),
+      defender: defender.toString(),
+      tokensBurned: tokensBurned.toString(),
+      timestamp: new Date(timestamp.toNumber() * 1000),
+    });
+  }
+
+  private handleAllianceUpdate(data: any): void {
+    const { agent1, agent2, timestamp } = data;
+    logger.info("Alliance formed:", {
+      agent1: agent1.toString(),
+      agent2: agent2.toString(),
+      timestamp: new Date(timestamp.toNumber() * 1000),
+    });
+  }
+
+  private handlePositionUpdate(data: any): void {
+    const { agentId, x, y, timestamp } = data;
+    logger.info("Position updated:", {
+      agentId: agentId.toString(),
+      position: {
+        x: x.toNumber(),
+        y: y.toNumber(),
+      },
+      timestamp: new Date(timestamp.toNumber() * 1000),
+    });
   }
 
   /**
@@ -307,66 +446,5 @@ export class SolanaService {
       ],
       this.program.programId
     );
-  }
-
-  /**
-   * Subscribe to program events
-   */
-  public subscribeToEvents(): void {
-    this.program.addEventListener("BattleProcessed", (event, slot) => {
-      // Type assertion for the event data
-      const data = event as unknown as {
-        initiator: PublicKey;
-        defender: PublicKey;
-        tokensBurned: BN;
-        timestamp: BN;
-      };
-
-      logger.info("Battle processed event:", {
-        initiator: data.initiator.toString(),
-        defender: data.defender.toString(),
-        tokensBurned: data.tokensBurned.toString(),
-        timestamp: new Date(data.timestamp.toNumber() * 1000),
-        slot,
-      });
-    });
-
-    this.program.addEventListener("AllianceFormed", (event, slot) => {
-      // Type assertion for the event data
-      const data = event as unknown as {
-        agent1: PublicKey;
-        agent2: PublicKey;
-        timestamp: BN;
-      };
-
-      logger.info("Alliance formed event:", {
-        agent1: data.agent1.toString(),
-        agent2: data.agent2.toString(),
-        timestamp: new Date(data.timestamp.toNumber() * 1000),
-        slot,
-      });
-    });
-
-    this.program.addEventListener("PositionUpdated", (event, slot) => {
-      // Type assertion for the event data
-      const data = event as unknown as {
-        agentId: PublicKey;
-        x: BN;
-        y: BN;
-        timestamp: BN;
-      };
-
-      logger.info("Position updated event:", {
-        agentId: data.agentId.toString(),
-        position: {
-          x: data.x.toNumber(),
-          y: data.y.toNumber(),
-        },
-        timestamp: new Date(data.timestamp.toNumber() * 1000),
-        slot,
-      });
-    });
-
-    logger.info("Subscribed to program events");
   }
 }

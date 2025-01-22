@@ -4,18 +4,20 @@ import { Position } from "../types/game";
  * Calculate Euclidean distance between two positions
  */
 export function calculateDistance(pos1: Position, pos2: Position): number {
-  return Math.sqrt(Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2));
+  const dx = pos2.x - pos1.x;
+  const dy = pos2.y - pos1.y;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 /**
  * Normalize a score to be between 0 and 100
  */
 export function normalizeScore(
-  score: number,
-  min: number,
-  max: number
+  value: number,
+  min: number = 0,
+  max: number = 100
 ): number {
-  return Math.min(100, Math.max(0, ((score - min) / (max - min)) * 100));
+  return Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
 }
 
 /**
@@ -31,14 +33,14 @@ export function weightedAverage(scores: number[], weights: number[]): number {
 }
 
 /**
- * Calculate probability based on token ratio
+ * Calculate win probability based on token balances
  */
 export function calculateWinProbability(
   attackerTokens: number,
   defenderTokens: number
 ): number {
-  const total = attackerTokens + defenderTokens;
-  return (attackerTokens / total) * 100;
+  const totalTokens = attackerTokens + defenderTokens;
+  return totalTokens === 0 ? 0.5 : attackerTokens / totalTokens;
 }
 
 /**
@@ -59,4 +61,27 @@ export function calculateMovementVector(
     x: current.x + (dx / distance) * speed,
     y: current.y + (dy / distance) * speed,
   };
+}
+
+/**
+ * Calculate optimal token burn amount based on token balances
+ */
+export function calculateOptimalTokenBurn(
+  attackerTokens: number,
+  defenderTokens: number
+): number {
+  // Burn between 31-50% of defender's tokens
+  const minBurn = Math.floor(defenderTokens * 0.31);
+  const maxBurn = Math.floor(defenderTokens * 0.5);
+  return Math.floor(Math.random() * (maxBurn - minBurn + 1)) + minBurn;
+}
+
+/**
+ * Calculate terrain death risk based on position
+ */
+export function calculateTerrainRisk(position: Position): number {
+  const distance = Math.sqrt(position.x * position.x + position.y * position.y);
+  if (distance > 50) return 0.02; // 2% death risk in mountains
+  if (distance > 30) return 0.01; // 1% death risk in rivers
+  return 0; // No death risk in normal terrain
 }

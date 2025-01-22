@@ -1,38 +1,47 @@
+import pRetry from "p-retry";
+import { logger } from "./logger";
+
 /**
  * Retry a function with exponential backoff
+ * @param fn Function to retry
+ * @param maxRetries Maximum number of retries (default: 3)
+ * @param minTimeout Minimum timeout between retries in ms (default: 1000)
+ * @param maxTimeout Maximum timeout between retries in ms (default: 10000)
  */
 export async function retryWithExponentialBackoff<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 1000,
-  maxDelay: number = 10000
+  minTimeout: number = 1000,
+  maxTimeout: number = 10000
 ): Promise<T> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
-
-      if (attempt === maxRetries - 1) break;
-
-      // Calculate delay with exponential backoff and jitter
-      const delay = Math.min(
-        maxDelay,
-        baseDelay * Math.pow(2, attempt) * (0.5 + Math.random())
-      );
-
-      console.warn(
-        `Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms:`,
-        error
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, delay));
+  return pRetry(
+    async (attempt) => {
+      try {
+        return await fn();
+      } catch (error) {
+        logger.warn(
+          `Attempt ${attempt} failed, retrying... Error: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+        throw error;
+      }
+    },
+    {
+      retries: maxRetries,
+      minTimeout,
+      maxTimeout,
+      factor: 2,
+      randomize: true,
+      onFailedAttempt: (error) => {
+        logger.error("Retry attempt failed:", {
+          attemptNumber: error.attemptNumber,
+          retriesLeft: error.retriesLeft,
+          error: error.message,
+        });
+      },
     }
-  }
-
-  throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
+  );
 }
 
 /**

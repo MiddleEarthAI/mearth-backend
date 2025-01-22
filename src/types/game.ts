@@ -1,7 +1,7 @@
-import { BN } from "@coral-xyz/anchor";
+import * as anchor from "@coral-xyz/anchor";
 
 export enum TerrainType {
-  NORMAL = "NORMAL",
+  PLAIN = "PLAIN",
   RIVER = "RIVER",
   MOUNTAIN = "MOUNTAIN",
 }
@@ -72,7 +72,12 @@ export interface CommunityFeedback {
   lastUpdated: Date;
 }
 
-export type AgentDecisionAction = "MOVE" | "BATTLE" | "ALLIANCE" | "WAIT";
+export type AgentDecisionAction =
+  | "MOVE"
+  | "BATTLE"
+  | "ALLIANCE"
+  | "WAIT"
+  | "IGNORE";
 
 export interface AgentDecision {
   action: AgentDecisionAction;
@@ -90,19 +95,21 @@ export interface BattleStrategy {
 export interface ProgramBattleEvent {
   initiator: string;
   defender: string;
-  tokensBurned: BN;
-  timestamp: BN;
+  tokensBurned: anchor.BN;
+  timestamp: anchor.BN;
 }
 
 export interface ProgramAllianceEvent {
   agent1: string;
   agent2: string;
-  timestamp: BN;
+  timestamp: anchor.BN;
 }
 
 export interface ProgramPositionEvent {
   agentId: string;
-  x: BN;
-  y: BN;
-  timestamp: BN;
+  x: anchor.BN;
+  y: anchor.BN;
+  timestamp: anchor.BN;
 }
+
+export type MearthProgram = anchor.Program<anchor.Idl>;
