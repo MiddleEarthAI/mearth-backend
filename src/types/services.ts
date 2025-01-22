@@ -6,7 +6,7 @@ import {
   GameState,
   AgentDecision,
 } from "./game";
-import { Keypair, PublicKey } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 
 export interface IGameService {
   initializeDefaultAgents(): Promise<void>;
@@ -17,25 +17,26 @@ export interface IGameService {
   findNearbyAgents(agent: Agent, range?: number): Promise<Agent[]>;
   determineTerrainType(position: Position): TerrainType;
   getGameState(): Promise<any>;
+  initializeAgent(agentId: string, name: string, type: string): Promise<void>;
 }
 
 export interface ILLMService {
-  getNextMove(agent: Agent, gameState: any): Promise<any>;
-  getBattleStrategy(agent: Agent, opponent: Agent): Promise<any>;
+  getNextMove(agentId: string): Promise<any>;
+  getBattleStrategy(agentId: string, opponentId: string): Promise<any>;
   processCommunityFeedback(feedback: any): Promise<any>;
-  generateTweet(agent: Agent, event: string, data: any): Promise<string>;
+  generateTweet(agentId: string, event: string): Promise<string>;
 }
 
 export interface ITwitterService {
   postTweet(agent: Agent, content: string): Promise<void>;
   getAgentFeedback(agent: Agent): Promise<any>;
-  announceMovement(agent: Agent, x: number, y: number): Promise<void>;
+  announceMovement(agentId: string, x: number, y: number): Promise<void>;
   announceBattle(
-    initiator: Agent,
-    defender: Agent,
+    initiatorId: string,
+    defenderId: string,
     outcome: string
   ): Promise<void>;
-  announceAlliance(agent1: Agent, agent2: Agent): Promise<void>;
+  announceAlliance(agent1Id: string, agent2Id: string): Promise<void>;
   fetchCommunityFeedback(): Promise<any>;
 }
 
@@ -45,7 +46,7 @@ export interface ISolanaService {
   initializeAgent(
     agentId: string,
     name: string,
-    agentType: string,
+    type: string,
     initialTokens: number
   ): Promise<string>;
   processBattle(
@@ -61,14 +62,4 @@ export interface IKeyManagerService {
   generateKeypair(agentId: string): Promise<Keypair>;
   getKeypair(agentId: string): Promise<Keypair>;
   rotateKeypair(agentId: string): Promise<Keypair>;
-}
-
-export interface IWebSocketService {
-  connect(): Promise<void>;
-  disconnect(): Promise<void>;
-  startMonitoring(): Promise<void>;
-  subscribeToProgramEvents(programId: string): Promise<void>;
-  onProgramUpdate(callback: (data: any) => void): void;
-  onSignatureUpdate(callback: (data: any) => void): void;
-  onAccountUpdate(callback: (data: any) => void): void;
 }

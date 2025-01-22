@@ -5,6 +5,8 @@ export enum TerrainType {
   PLAIN = "PLAIN",
   RIVER = "RIVER",
   MOUNTAIN = "MOUNTAIN",
+  FOREST = "FOREST",
+  WATER = "WATER",
 }
 
 export enum AgentType {
@@ -33,29 +35,28 @@ export interface AgentCharacteristics {
 
 export interface Agent {
   id: string;
-  type: AgentType;
   name: string;
+  type: AgentType;
   position: Position;
-  twitterHandle: string;
   characteristics: AgentCharacteristics;
-  isAlive: boolean;
   tokenBalance: number;
+  isAlive: boolean;
+  twitterHandle: string;
 }
 
 export interface GameState {
-  nearbyAgents: Agent[];
+  agents: Agent[];
+  alliances: Alliance[];
   recentBattles: Battle[];
-  communityFeedback: CommunityFeedback;
-  terrain: TerrainType;
 }
 
 export interface Battle {
   id: string;
   initiatorId: string;
   defenderId: string;
-  tokensBurned: number;
-  outcome: "WIN" | "LOSS";
   timestamp: Date;
+  outcome: "WIN" | "LOSS";
+  tokensBurned: number;
   positionX: number;
   positionY: number;
 }
@@ -64,7 +65,7 @@ export interface Alliance {
   id: string;
   agent1Id: string;
   agent2Id: string;
-  timestamp: Date;
+  createdAt: Date;
 }
 
 export interface CommunityFeedback {

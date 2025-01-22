@@ -5,7 +5,6 @@ import { LLMService } from "../services/llm.service";
 import { TwitterService } from "../services/twitter.service";
 import { SolanaService } from "../services/solana.service";
 import { KeyManagerService } from "../services/keyManager.service";
-import { WebSocketService } from "../services/websocket.service";
 import { AgentManagerService } from "../services/agentManager.service";
 import { logger } from "../utils/logger";
 
@@ -35,16 +34,11 @@ export class Container {
     });
 
     // Initialize core services
-    const keyManager = new KeyManagerService(this.config.security);
-    const webSocket = new WebSocketService(this.config.solana.wsEndpoint);
-    const solanaService = new SolanaService(
-      this.config.solana,
-      keyManager,
-      webSocket
-    );
+    const keyManager = new KeyManagerService(this.config.security, prisma);
+    const solanaService = new SolanaService(this.config.solana, keyManager);
     const twitterService = new TwitterService(this.config.twitter);
-    const llmService = new LLMService();
-    const gameService = new GameService(prisma, solanaService);
+    const llmService = new LLMService(prisma);
+    const gameService = new GameService(prisma);
 
     // Initialize agent manager
     const agentManager = new AgentManagerService(
@@ -59,7 +53,6 @@ export class Container {
     this.services.set("config", this.config);
     this.services.set("prisma", prisma);
     this.services.set("keyManager", keyManager);
-    this.services.set("webSocket", webSocket);
     this.services.set("solana", solanaService);
     this.services.set("twitter", twitterService);
     this.services.set("llm", llmService);
@@ -80,9 +73,6 @@ export class Container {
   public async dispose(): Promise<void> {
     const prisma = this.get<PrismaClient>("prisma");
     await prisma.$disconnect();
-
-    const webSocket = this.get<WebSocketService>("webSocket");
-    await webSocket.disconnect();
 
     const agentManager = this.get<AgentManagerService>("agentManager");
     await agentManager.stop();

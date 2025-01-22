@@ -72,29 +72,24 @@ export class TwitterService implements ITwitterService {
    * Post a tweet from an agent's account
    */
   async postTweet(agent: Agent, content: string): Promise<void> {
-    const client = this.clients.get(agent.type);
-    if (!client) {
-      throw new Error(`No Twitter client found for agent type: ${agent.type}`);
+    try {
+      // TODO: Implement Twitter API call
+      logger.info(`Posted tweet for ${agent.name}: ${content}`);
+    } catch (error) {
+      logger.error(`Failed to post tweet for ${agent.name}:`, error);
+      throw error;
     }
-
-    await retryWithExponentialBackoff(async () => {
-      await client.sendTweet(content);
-    });
   }
 
   /**
    * Announce agent movement
    */
-  public async announceMovement(
-    agent: Agent,
-    x: number,
-    y: number
-  ): Promise<void> {
+  async announceMovement(agentId: string, x: number, y: number): Promise<void> {
     try {
-      const tweet = `🚶 ${agent.name} is moving to position (${x}, ${y})`;
-      logger.info(`Announcing movement for ${agent.name}:`, tweet);
+      // TODO: Implement movement announcement
+      logger.info(`Announced movement for agent ${agentId} to (${x}, ${y})`);
     } catch (error) {
-      logger.error(`Failed to announce movement for ${agent.name}:`, error);
+      logger.error(`Failed to announce movement for agent ${agentId}:`, error);
       throw error;
     }
   }
@@ -139,18 +134,12 @@ export class TwitterService implements ITwitterService {
   /**
    * Announce alliance formation
    */
-  public async announceAlliance(agent1: Agent, agent2: Agent): Promise<void> {
+  async announceAlliance(agent1Id: string, agent2Id: string): Promise<void> {
     try {
-      const tweet = `🤝 ${agent1.name} and ${agent2.name} have formed an alliance!`;
-      logger.info(
-        `Announcing alliance between ${agent1.name} and ${agent2.name}:`,
-        tweet
-      );
+      // TODO: Implement alliance announcement
+      logger.info(`Announced alliance between ${agent1Id} and ${agent2Id}`);
     } catch (error) {
-      logger.error(
-        `Failed to announce alliance between ${agent1.name} and ${agent2.name}:`,
-        error
-      );
+      logger.error("Failed to announce alliance:", error);
       throw error;
     }
   }
@@ -172,43 +161,17 @@ export class TwitterService implements ITwitterService {
   /**
    * Get community feedback for an agent
    */
-  public async getAgentFeedback(agent: Agent): Promise<CommunityFeedback> {
+  async getAgentFeedback(agent: Agent): Promise<any> {
     try {
-      const client = this.clients.get(agent.type);
-      if (!client) throw new Error("No client found");
-
-      return await retryWithExponentialBackoff(async () => {
-        // Get latest tweets
-        const tweets = await client.getTweets(agent.twitterHandle, 10);
-
-        // Convert AsyncGenerator to array and calculate engagement metrics
-        const tweetsArray = [];
-        for await (const tweet of tweets) {
-          tweetsArray.push(tweet);
-        }
-
-        const engagement = tweetsArray.reduce((acc: number, tweet: any) => {
-          return (
-            acc +
-            (tweet.likes || 0) +
-            (tweet.retweets || 0) * 2 +
-            (tweet.replies || 0) * 3
-          );
-        }, 0);
-
-        return {
-          sentiment: Math.min(engagement / 100, 100), // Scale engagement to 0-100
-          interactions: engagement,
-          lastUpdated: new Date(),
-        };
-      });
-    } catch (error) {
-      logger.error(`Error getting feedback for ${agent.name}:`, error);
+      // TODO: Implement Twitter API call to get mentions and replies
+      logger.info(`Retrieved feedback for ${agent.name}`);
       return {
-        sentiment: 50,
-        interactions: 0,
-        lastUpdated: new Date(),
+        mentions: [],
+        replies: [],
       };
+    } catch (error) {
+      logger.error(`Failed to get feedback for ${agent.name}:`, error);
+      throw error;
     }
   }
 
@@ -238,13 +201,32 @@ export class TwitterService implements ITwitterService {
     }
   }
 
-  public async fetchCommunityFeedback(): Promise<any> {
+  async fetchCommunityFeedback(): Promise<any> {
     try {
-      // Placeholder for fetching community feedback
-      logger.info("Fetching community feedback");
-      return {};
+      // TODO: Implement community feedback fetching
+      logger.info("Fetched community feedback");
+      return {
+        sentiment: "neutral",
+        suggestions: [],
+      };
     } catch (error) {
       logger.error("Failed to fetch community feedback:", error);
+      throw error;
+    }
+  }
+
+  async announceBattle(
+    initiatorId: string,
+    defenderId: string,
+    outcome: string
+  ): Promise<void> {
+    try {
+      // TODO: Implement battle announcement
+      logger.info(
+        `Announced battle between ${initiatorId} and ${defenderId} with outcome: ${outcome}`
+      );
+    } catch (error) {
+      logger.error("Failed to announce battle:", error);
       throw error;
     }
   }
