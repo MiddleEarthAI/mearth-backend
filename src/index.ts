@@ -1,100 +1,69 @@
-import express, { type Express } from "express";
-import dotenv from "dotenv";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { PrismaClient } from "@prisma/client";
+import { AgentManagerService } from "./services/agentManager.service";
+import { gameRoutes } from "./routes/game.routes";
+import { logger } from "./utils/logger";
 
-import { errorHandler } from "./middleware/errorHandler";
-import { notFoundHandler } from "./middleware/notFoundHandler";
-import { routes } from "./routes";
-import { AgentBehaviorJob } from "./jobs/agentBehavior";
-
-dotenv.config();
-
-const app: Express = express();
+const app = express();
 const port = process.env.PORT || 3000;
 const prisma = new PrismaClient();
-const agentBehaviorJob = new AgentBehaviorJob();
+const agentManager = new AgentManagerService();
 
 // Middleware
-app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
-app.use(morgan("dev")); // Request logging
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(morgan("combined"));
 
 // Routes
-app.use("/api", routes);
+app.use("/api/game", gameRoutes);
 
-// Error handling
-app.use(notFoundHandler);
-app.use(errorHandler);
+// Error handling middleware
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    logger.error("Unhandled error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+);
 
-// Initialize agents if needed
-async function initializeAgents() {
-  const agentCount = await prisma.agent.count();
-  if (agentCount === 0) {
-    console.log("Initializing agents...");
-    await prisma.agent.createMany({
-      data: [
-        {
-          type: "SCOOTLES",
-          name: "Scootles",
-          positionX: 0,
-          positionY: 0,
-          twitterHandle: process.env.SCOOTLES_TWITTER_HANDLE || "",
-          aggressiveness: 80,
-          alliancePropensity: 40,
-          influenceability: 50,
-        },
-        {
-          type: "PURRLOCK_PAWS",
-          name: "Purrlock Paws",
-          positionX: 30,
-          positionY: 30,
-          twitterHandle: process.env.PURRLOCK_TWITTER_HANDLE || "",
-          aggressiveness: 60,
-          alliancePropensity: 20,
-          influenceability: 30,
-        },
-        {
-          type: "SIR_GULLIHOP",
-          name: "Sir Gullihop",
-          positionX: -30,
-          positionY: 30,
-          twitterHandle: process.env.GULLIHOP_TWITTER_HANDLE || "",
-          aggressiveness: 30,
-          alliancePropensity: 90,
-          influenceability: 70,
-        },
-        {
-          type: "WANDERLEAF",
-          name: "Wanderleaf",
-          positionX: 0,
-          positionY: -30,
-          twitterHandle: process.env.WANDERLEAF_TWITTER_HANDLE || "",
-          aggressiveness: 40,
-          alliancePropensity: 50,
-          influenceability: 90,
-        },
-      ],
-    });
-    console.log("Agents initialized successfully");
+// Graceful shutdown
+async function shutdown(): Promise<void> {
+  logger.info("Shutting down server...");
+
+  try {
+    await agentManager.stop();
+    await prisma.$disconnect();
+    logger.info("Server shutdown complete");
+    process.exit(0);
+  } catch (error) {
+    logger.error("Error during shutdown:", error);
+    process.exit(1);
   }
 }
 
-// Start server
-async function startServer() {
+// Handle shutdown signals
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+
+// Start server and agent manager
+async function startServer(): Promise<void> {
   try {
-    await initializeAgents();
-    await agentBehaviorJob.start();
+    await prisma.$connect();
+    await agentManager.start();
 
     app.listen(port, () => {
-      console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+      logger.info(`⚡️[server]: Server is running at http://localhost:${port}`);
     });
   } catch (error) {
-    console.error("Failed to start server:", error);
+    logger.error("Failed to start server:", error);
     process.exit(1);
   }
 }
