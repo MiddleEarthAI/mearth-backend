@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { LLMService } from "./llm.service";
 import { GameService } from "./game.service";
 import { TwitterService } from "./twitter.service";
+import { SolanaService } from "./solana.service";
 import { Agent, AgentDecision } from "../types/game";
 import { EventEmitter } from "events";
 import PQueue from "p-queue";
@@ -17,6 +18,7 @@ export class AgentManagerService {
   private readonly llmService: LLMService;
   private readonly gameService: GameService;
   private readonly twitterService: TwitterService;
+  private readonly solanaService: SolanaService;
   private readonly eventEmitter: EventEmitter;
   private readonly decisionQueue: PQueue;
   private readonly stateCache: NodeCache;
@@ -27,6 +29,7 @@ export class AgentManagerService {
     this.llmService = new LLMService();
     this.gameService = new GameService();
     this.twitterService = new TwitterService();
+    this.solanaService = new SolanaService();
     this.eventEmitter = new EventEmitter();
     this.decisionQueue = new PQueue({ concurrency: 3 }); // Process 3 agent decisions concurrently
     this.stateCache = new NodeCache({ stdTTL: 60 }); // Cache game state for 1 minute
@@ -49,6 +52,9 @@ export class AgentManagerService {
 
       // Initialize agents if needed
       await this.initializeAgents();
+
+      // Subscribe to Solana program events
+      this.solanaService.subscribeToEvents();
 
       // Start the main processing loop
       this.startProcessingLoop();
@@ -99,7 +105,7 @@ export class AgentManagerService {
 
         // Process each agent's decision in parallel with rate limiting
         await Promise.all(
-          agents.map((agent) =>
+          agents.map((agent: Agent) =>
             this.decisionQueue.add(() => this.processAgentDecision(agent))
           )
         );
@@ -156,7 +162,14 @@ export class AgentManagerService {
       switch (decision.action) {
         case "MOVE":
           if (decision.position) {
-            await this.gameService.moveAgent(agent.id, decision.position);
+            const terrain = this.gameService.determineTerrainType(
+              decision.position
+            );
+            await this.gameService.moveAgent(
+              agent.id,
+              decision.position,
+              terrain
+            );
             await this.twitterService.announceMovement(agent, decision.reason);
           }
           break;
@@ -217,7 +230,7 @@ export class AgentManagerService {
         nearbyAgents: await this.gameService.findNearbyAgents(agent),
         recentBattles: await this.getPreviousBattles(agent.id),
         communityFeedback: await this.twitterService.getAgentFeedback(agent),
-        terrain: await this.gameService.determineTerrainType(agent.position),
+        terrain: this.gameService.determineTerrainType(agent.position),
       };
       this.stateCache.set(cacheKey, gameState);
     }
@@ -254,12 +267,27 @@ export class AgentManagerService {
    * Setup event listeners for monitoring
    */
   private setupEventListeners(): void {
+    // Agent decision events
     this.eventEmitter.on("agentDecision", (event) => {
       logger.info("Agent decision:", event);
     });
 
+    // Agent error events
     this.eventEmitter.on("agentError", (event) => {
       logger.error("Agent error:", event);
+    });
+
+    // Solana program events
+    this.eventEmitter.on("battleProcessed", (event) => {
+      logger.info("Battle processed on-chain:", event);
+    });
+
+    this.eventEmitter.on("allianceFormed", (event) => {
+      logger.info("Alliance formed on-chain:", event);
+    });
+
+    this.eventEmitter.on("positionUpdated", (event) => {
+      logger.info("Position updated on-chain:", event);
     });
   }
 

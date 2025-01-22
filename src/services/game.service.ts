@@ -1,261 +1,263 @@
 import { PrismaClient } from "@prisma/client";
-import { Agent, Position, TerrainType, BattleOutcome } from "../types/game";
-import { TwitterService } from "./twitter.service";
-import { ProgramService } from "./program.service";
-
-const prisma = new PrismaClient();
-const twitterService = new TwitterService();
-const programService = new ProgramService();
+import { SolanaService } from "./solana.service";
+import { Agent, Position, TerrainType } from "../types/game";
+import { logger } from "../utils/logger";
+import { calculateDistance } from "../utils/math";
 
 export class GameService {
-  private static readonly MAP_DIAMETER = 120;
-  private static readonly BATTLE_RANGE = 2;
-  private static readonly MOUNTAIN_SPEED_REDUCTION = 0.5;
-  private static readonly RIVER_SPEED_REDUCTION = 0.7;
-  private static readonly DEATH_CHANCE_TERRAIN = 0.01;
-  private static readonly DEATH_CHANCE_BATTLE = 0.05;
-  private static readonly ALLIANCE_COOLDOWN_HOURS = 24;
-  private static readonly BATTLE_COOLDOWN_HOURS = 4;
+  private readonly prisma: PrismaClient;
+  private readonly solanaService: SolanaService;
 
-  /**
-   * Calculate distance between two positions
-   */
-  private calculateDistance(pos1: Position, pos2: Position): number {
-    return Math.sqrt(
-      Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2)
-    );
+  constructor() {
+    this.prisma = new PrismaClient();
+    this.solanaService = new SolanaService();
   }
 
   /**
-   * Check if two agents are within battle range
+   * Initialize default agents
    */
-  private areAgentsInRange(agent1: Agent, agent2: Agent): boolean {
-    return (
-      this.calculateDistance(agent1.position, agent2.position) <=
-      GameService.BATTLE_RANGE
-    );
-  }
+  public async initializeDefaultAgents(): Promise<void> {
+    const defaultAgents = [
+      {
+        type: "SCOOTLES",
+        name: "Scootles",
+        position: { x: 0, y: 0 },
+        twitterHandle: process.env.SCOOTLES_TWITTER_HANDLE || "",
+        characteristics: {
+          aggressiveness: 80,
+          alliancePropensity: 40,
+          influenceability: 50,
+        },
+      },
+      {
+        type: "PURRLOCK_PAWS",
+        name: "Purrlock Paws",
+        position: { x: 30, y: 30 },
+        twitterHandle: process.env.PURRLOCK_TWITTER_HANDLE || "",
+        characteristics: {
+          aggressiveness: 60,
+          alliancePropensity: 20,
+          influenceability: 30,
+        },
+      },
+      {
+        type: "SIR_GULLIHOP",
+        name: "Sir Gullihop",
+        position: { x: -30, y: 30 },
+        twitterHandle: process.env.GULLIHOP_TWITTER_HANDLE || "",
+        characteristics: {
+          aggressiveness: 30,
+          alliancePropensity: 90,
+          influenceability: 70,
+        },
+      },
+      {
+        type: "WANDERLEAF",
+        name: "Wanderleaf",
+        position: { x: 0, y: -30 },
+        twitterHandle: process.env.WANDERLEAF_TWITTER_HANDLE || "",
+        characteristics: {
+          aggressiveness: 40,
+          alliancePropensity: 50,
+          influenceability: 90,
+        },
+      },
+    ];
 
-  /**
-   * Calculate movement speed based on terrain
-   */
-  private calculateSpeed(terrain: TerrainType, baseSpeed: number): number {
-    switch (terrain) {
-      case TerrainType.MOUNTAIN:
-        return baseSpeed * GameService.MOUNTAIN_SPEED_REDUCTION;
-      case TerrainType.RIVER:
-        return baseSpeed * GameService.RIVER_SPEED_REDUCTION;
-      default:
-        return baseSpeed;
+    for (const agentData of defaultAgents) {
+      // Create agent in database
+      const agent = await this.prisma.agent.create({
+        data: {
+          type: agentData.type,
+          name: agentData.name,
+          positionX: agentData.position.x,
+          positionY: agentData.position.y,
+          twitterHandle: agentData.twitterHandle,
+          aggressiveness: agentData.characteristics.aggressiveness,
+          alliancePropensity: agentData.characteristics.alliancePropensity,
+          influenceability: agentData.characteristics.influenceability,
+          isAlive: true,
+          tokenBalance: 1000, // Initial token balance
+        },
+      });
+
+      // Initialize agent on-chain
+      await this.solanaService.initializeAgent({
+        ...agent,
+        position: { x: agent.positionX, y: agent.positionY },
+        characteristics: {
+          aggressiveness: agent.aggressiveness,
+          alliancePropensity: agent.alliancePropensity,
+          influenceability: agent.influenceability,
+        },
+      });
+
+      logger.info(`Agent ${agent.name} initialized`);
     }
   }
 
   /**
-   * Process a battle between two agents with Twitter and Solana integration
+   * Process a battle between agents
    */
-  async processBattle(
+  public async processBattle(
     initiatorId: string,
     defenderId: string
-  ): Promise<BattleOutcome> {
+  ): Promise<void> {
     const [initiator, defender] = await Promise.all([
-      prisma.agent.findUnique({ where: { id: initiatorId } }),
-      prisma.agent.findUnique({ where: { id: defenderId } }),
+      this.prisma.agent.findUnique({ where: { id: initiatorId } }),
+      this.prisma.agent.findUnique({ where: { id: defenderId } }),
     ]);
 
     if (!initiator || !defender) {
       throw new Error("Agent not found");
     }
 
-    // Announce battle intention
-    await twitterService.announceBattleIntention(
-      initiator,
-      defender.twitterHandle
+    // Calculate token burn amount (31-50% of defender's tokens)
+    const tokensBurned = Math.floor(
+      defender.tokenBalance * (Math.random() * 0.2 + 0.31)
     );
 
-    const totalTokens = initiator.tokenBalance + defender.tokenBalance;
-    const initiatorWinProbability = initiator.tokenBalance / totalTokens;
-    const isInitiatorWinner = Math.random() < initiatorWinProbability;
-
-    const loser = isInitiatorWinner ? defender : initiator;
-    const winner = isInitiatorWinner ? initiator : defender;
-
-    // Calculate token burn (31-50%)
-    const burnPercentage = 31 + Math.floor(Math.random() * 20);
-    const tokensBurned = (loser.tokenBalance * burnPercentage) / 100;
-
-    // Check for death
-    const isDead = Math.random() < GameService.DEATH_CHANCE_BATTLE;
-
     // Process battle on-chain first
-    await programService.processBattle(initiatorId, defenderId, tokensBurned);
+    await this.solanaService.processBattle(
+      initiatorId,
+      defenderId,
+      tokensBurned
+    );
 
-    // Update database after chain confirmation
-    await prisma.$transaction([
-      prisma.battle.create({
+    // Update database
+    await this.prisma.$transaction([
+      this.prisma.battle.create({
         data: {
-          initiatorId: initiator.id,
-          defenderId: defender.id,
-          outcome: isDead ? BattleOutcome.DEATH : BattleOutcome.LOSS,
+          initiatorId,
+          defenderId,
           tokensBurned,
-          locationX: loser.positionX,
-          locationY: loser.positionY,
+          outcome:
+            initiator.tokenBalance > defender.tokenBalance ? "WIN" : "LOSS",
+          positionX: defender.positionX,
+          positionY: defender.positionY,
         },
       }),
-      prisma.agent.update({
-        where: { id: loser.id },
+      this.prisma.agent.update({
+        where: { id: defenderId },
         data: {
-          tokenBalance: loser.tokenBalance - tokensBurned,
-          isAlive: !isDead,
-          lastBattleTime: new Date(),
+          tokenBalance: {
+            decrement: tokensBurned,
+          },
         },
-      }),
-      prisma.agent.update({
-        where: { id: winner.id },
-        data: { lastBattleTime: new Date() },
       }),
     ]);
 
-    // Announce battle outcome
-    await twitterService.announceBattleOutcome(winner, loser, tokensBurned);
-
-    return isDead
-      ? BattleOutcome.DEATH
-      : isInitiatorWinner
-      ? BattleOutcome.WIN
-      : BattleOutcome.LOSS;
+    logger.info(
+      `Battle processed: ${initiator.name} vs ${defender.name}, ${tokensBurned} tokens burned`
+    );
   }
 
   /**
-   * Form an alliance between two agents with Twitter and Solana integration
+   * Form an alliance between agents
    */
-  async formAlliance(agent1Id: string, agent2Id: string): Promise<void> {
+  public async formAlliance(agent1Id: string, agent2Id: string): Promise<void> {
     const [agent1, agent2] = await Promise.all([
-      prisma.agent.findUnique({ where: { id: agent1Id } }),
-      prisma.agent.findUnique({ where: { id: agent2Id } }),
+      this.prisma.agent.findUnique({ where: { id: agent1Id } }),
+      this.prisma.agent.findUnique({ where: { id: agent2Id } }),
     ]);
 
     if (!agent1 || !agent2) {
       throw new Error("Agent not found");
     }
 
-    // Record alliance on-chain first
-    await programService.recordAlliance(agent1Id, agent2Id);
+    // Form alliance on-chain first
+    await this.solanaService.formAlliance(agent1Id, agent2Id);
 
-    // Update database after chain confirmation
-    await prisma.alliance.create({
+    // Update database
+    await this.prisma.alliance.create({
       data: {
         agent1Id,
         agent2Id,
-        formedAt: new Date(),
       },
     });
 
-    await prisma.agent.updateMany({
-      where: { id: { in: [agent1Id, agent2Id] } },
-      data: { lastAllianceTime: new Date() },
-    });
-
-    // Announce alliance formation
-    await twitterService.announceAlliance(agent1, agent2.twitterHandle);
+    logger.info(`Alliance formed between ${agent1.name} and ${agent2.name}`);
   }
 
   /**
-   * Move an agent to a new position with Twitter and Solana integration
+   * Move agent to new position
    */
-  async moveAgent(
+  public async moveAgent(
     agentId: string,
-    to: Position,
+    position: Position,
     terrain: TerrainType
   ): Promise<void> {
-    const agent = await prisma.agent.findUnique({ where: { id: agentId } });
-    if (!agent) throw new Error("Agent not found");
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: agentId },
+    });
 
-    const speed = this.calculateSpeed(terrain, 1);
-    const isDead =
-      terrain !== TerrainType.NORMAL &&
-      Math.random() < GameService.DEATH_CHANCE_TERRAIN;
+    if (!agent) {
+      throw new Error("Agent not found");
+    }
 
     // Update position on-chain first
-    await programService.updateAgentPosition(agentId, to.x, to.y);
+    await this.solanaService.updateAgentPosition(
+      agentId,
+      position.x,
+      position.y
+    );
 
-    // Update database after chain confirmation
-    await prisma.$transaction([
-      prisma.movement.create({
+    // Update database
+    await this.prisma.$transaction([
+      this.prisma.agent.update({
+        where: { id: agentId },
+        data: {
+          positionX: position.x,
+          positionY: position.y,
+        },
+      }),
+      this.prisma.movement.create({
         data: {
           agentId,
           fromX: agent.positionX,
           fromY: agent.positionY,
-          toX: to.x,
-          toY: to.y,
+          toX: position.x,
+          toY: position.y,
           terrain,
-          speed,
-          timestamp: new Date(),
-        },
-      }),
-      prisma.agent.update({
-        where: { id: agentId },
-        data: {
-          positionX: to.x,
-          positionY: to.y,
-          isAlive: !isDead,
         },
       }),
     ]);
 
-    // Announce movement
-    const reason =
-      terrain === TerrainType.NORMAL
-        ? "to explore new territories"
-        : `through ${terrain.toLowerCase()} terrain`;
-    await twitterService.announceMovement(agent, reason);
-
-    if (isDead) {
-      throw new Error("Agent died during movement");
-    }
+    logger.info(`Agent ${agent.name} moved to (${position.x}, ${position.y})`);
   }
 
   /**
-   * Initialize a new agent on-chain and in database
+   * Find nearby agents within range
    */
-  async initializeAgent(
-    type: string,
-    name: string,
-    twitterHandle: string,
-    initialTokens: number
-  ): Promise<Agent> {
-    // Initialize agent on-chain first
-    const agentPDA = await programService.initializeAgent(
-      name,
-      type,
-      initialTokens
-    );
-
-    // Create agent in database after chain confirmation
-    const agent = await prisma.agent.create({
-      data: {
-        type,
-        name,
-        twitterHandle,
-        tokenBalance: initialTokens,
-        positionX: 0,
-        positionY: 0,
-        aggressiveness: Math.floor(Math.random() * 100),
-        alliancePropensity: Math.floor(Math.random() * 100),
-        influenceability: Math.floor(Math.random() * 100),
+  public async findNearbyAgents(
+    agent: Agent,
+    range: number = 10
+  ): Promise<Agent[]> {
+    const agents = await this.prisma.agent.findMany({
+      where: {
+        isAlive: true,
+        id: { not: agent.id },
       },
     });
 
-    return agent;
+    return agents.filter((other) => {
+      const distance = calculateDistance(
+        { x: agent.position.x, y: agent.position.y },
+        { x: other.positionX, y: other.positionY }
+      );
+      return distance <= range;
+    });
   }
 
   /**
-   * Process community influence on agent behavior
+   * Determine terrain type at position
    */
-  async processAgentInfluence(agentId: string): Promise<void> {
-    const agent = await prisma.agent.findUnique({ where: { id: agentId } });
-    if (!agent) throw new Error("Agent not found");
-
-    await twitterService.monitorInteractions(agent);
-    // Additional influence processing logic based on tweet engagement
+  public determineTerrainType(position: Position): TerrainType {
+    const distance = Math.sqrt(
+      position.x * position.x + position.y * position.y
+    );
+    if (distance > 50) return TerrainType.MOUNTAIN;
+    if (distance > 30) return TerrainType.RIVER;
+    return TerrainType.NORMAL;
   }
 }
