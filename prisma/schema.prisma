@@ -1,0 +1,88 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Agent {
+    id                 String    @id @default(uuid())
+    type               String // AgentType enum
+    name               String
+    positionX          Float
+    positionY          Float
+    tokenBalance       Float     @default(0)
+    isAlive            Boolean   @default(true)
+    allianceWith       String?
+    lastBattleTime     DateTime?
+    lastAllianceTime   DateTime?
+    twitterHandle      String    @unique
+    aggressiveness     Int // 0-100
+    alliancePropensity Int // 0-100
+    influenceability   Int // 0-100
+    createdAt          DateTime  @default(now())
+    updatedAt          DateTime  @updatedAt
+
+    // Relations
+    initiatedBattles  Battle[]   @relation("BattleInitiator")
+    defendedBattles   Battle[]   @relation("BattleDefender")
+    movements         Movement[]
+    alliancesAsAgent1 Alliance[] @relation("AllianceAgent1")
+    alliancesAsAgent2 Alliance[] @relation("AllianceAgent2")
+
+    @@index([isAlive])
+    @@index([twitterHandle])
+}
+
+model Battle {
+    id           String   @id @default(uuid())
+    initiator    Agent    @relation("BattleInitiator", fields: [initiatorId], references: [id])
+    initiatorId  String
+    defender     Agent    @relation("BattleDefender", fields: [defenderId], references: [id])
+    defenderId   String
+    timestamp    DateTime @default(now())
+    outcome      String // BattleOutcome enum
+    tokensBurned Float
+    locationX    Float
+    locationY    Float
+    createdAt    DateTime @default(now())
+
+    @@index([initiatorId])
+    @@index([defenderId])
+    @@index([timestamp])
+}
+
+model Alliance {
+    id          String    @id @default(uuid())
+    agent1      Agent     @relation("AllianceAgent1", fields: [agent1Id], references: [id])
+    agent1Id    String
+    agent2      Agent     @relation("AllianceAgent2", fields: [agent2Id], references: [id])
+    agent2Id    String
+    formedAt    DateTime  @default(now())
+    dissolvedAt DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    @@index([agent1Id])
+    @@index([agent2Id])
+    @@index([formedAt])
+}
+
+model Movement {
+    id        String   @id @default(uuid())
+    agent     Agent    @relation(fields: [agentId], references: [id])
+    agentId   String
+    fromX     Float
+    fromY     Float
+    toX       Float
+    toY       Float
+    terrain   String // TerrainType enum
+    timestamp DateTime @default(now())
+    speed     Float
+    createdAt DateTime @default(now())
+
+    @@index([agentId])
+    @@index([timestamp])
+}

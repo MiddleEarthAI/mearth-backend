@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { gameRoutes } from "./game.routes";
 
 const router = Router();
 
@@ -10,5 +11,8 @@ router.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Game routes
+router.use("/game", gameRoutes);
 
 export { router as routes };
