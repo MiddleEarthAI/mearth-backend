@@ -1,11 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { Program } from "@coral-xyz/anchor";
-import type { MiddleEarthAiProgram } from "../types/program";
-import idl from "../constants/middle_earth_ai_program.json";
+
+import mearthIdl from "../constants/middle_earth_ai_program.json";
+import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
+import { MearthProgram } from "@/types/game";
 
 export class ProgramService {
-  private program: Program<MiddleEarthAiProgram>;
+  private program: MearthProgram;
   private connection: Connection;
   private wallet: anchor.Wallet;
 
@@ -27,8 +28,7 @@ export class ProgramService {
 
     // Initialize program
     this.program = new anchor.Program<MiddleEarthAiProgram>(
-      idl as any,
-      new PublicKey(process.env.PROGRAM_ID || "")
+      mearthIdl as MiddleEarthAiProgram
     );
   }
 
@@ -167,3 +167,5 @@ export class ProgramService {
       .rpc();
   }
 }
+
+// openssl rand -hex 32

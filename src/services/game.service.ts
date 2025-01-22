@@ -260,6 +260,6 @@ export class GameService {
     );
     if (distance > 50) return TerrainType.MOUNTAIN;
     if (distance > 30) return TerrainType.RIVER;
-    return TerrainType.NORMAL;
+    return TerrainType.PLAIN;
   }
 }

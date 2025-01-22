@@ -8,22 +8,23 @@ datasource db {
 }
 
 model Agent {
-    id                 String    @id @default(uuid())
+    id                 String        @id @default(uuid())
     type               String // AgentType enum
     name               String
     positionX          Float
     positionY          Float
-    tokenBalance       Float     @default(0)
-    isAlive            Boolean   @default(true)
+    tokenBalance       Float         @default(0)
+    isAlive            Boolean       @default(true)
     allianceWith       String?
     lastBattleTime     DateTime?
     lastAllianceTime   DateTime?
-    twitterHandle      String    @unique
+    twitterHandle      String        @unique
     aggressiveness     Int // 0-100
     alliancePropensity Int // 0-100
     influenceability   Int // 0-100
-    createdAt          DateTime  @default(now())
-    updatedAt          DateTime  @updatedAt
+    createdAt          DateTime      @default(now())
+    updatedAt          DateTime      @updatedAt
+    keypair            AgentKeypair?
 
     // Relations
     initiatedBattles  Battle[]   @relation("BattleInitiator")
@@ -85,4 +86,16 @@ model Movement {
 
     @@index([agentId])
     @@index([timestamp])
+}
+
+model AgentKeypair {
+    id                  String    @id @default(uuid())
+    agentId             String    @unique
+    publicKey           String
+    encryptedPrivateKey String
+    createdAt           DateTime  @default(now())
+    rotatedAt           DateTime?
+    agent               Agent     @relation(fields: [agentId], references: [id])
+
+    @@index([agentId])
 }

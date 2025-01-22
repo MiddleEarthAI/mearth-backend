@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { NextFunction, Router, Request, Response } from "express";
 import { body } from "express-validator";
 import { PrismaClient } from "@prisma/client";
 import { validateRequest } from "@/middleware/validateRequest";
@@ -7,38 +7,41 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Game Status Endpoints
-router.get("/status", async (req, res, next) => {
-  try {
-    const [agents, battles, alliances] = await Promise.all([
-      prisma.agent.findMany({
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          isAlive: true,
-          tokenBalance: true,
-          positionX: true,
-          positionY: true,
-          twitterHandle: true,
-        },
-      }),
-      prisma.battle.count(),
-      prisma.alliance.count({
-        where: { dissolvedAt: null },
-      }),
-    ]);
+router.get(
+  "/status",
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const [agents, battles, alliances] = await Promise.all([
+        prisma.agent.findMany({
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            isAlive: true,
+            tokenBalance: true,
+            positionX: true,
+            positionY: true,
+            twitterHandle: true,
+          },
+        }),
+        prisma.battle.count(),
+        prisma.alliance.count({
+          where: { dissolvedAt: null },
+        }),
+      ]);
 
-    res.json({
-      activeAgents: agents.filter((a: { isAlive: boolean }) => a.isAlive)
-        .length,
-      totalBattles: battles,
-      activeAlliances: alliances,
-      agents,
-    });
-  } catch (error) {
-    next(error);
+      res.json({
+        activeAgents: agents.filter((a: { isAlive: boolean }) => a.isAlive)
+          .length,
+        totalBattles: battles,
+        activeAlliances: alliances,
+        agents,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // Token Management
 router.post(
@@ -48,7 +51,7 @@ router.post(
     body("amount").isFloat({ min: 0 }),
     validateRequest,
   ],
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { agentId, amount } = req.body;
 
@@ -57,11 +60,13 @@ router.post(
       });
 
       if (!agent) {
-        return res.status(404).json({ message: "Agent not found" });
+        res.status(404).json({ message: "Agent not found" });
+        return;
       }
 
       if (!agent.isAlive) {
-        return res.status(400).json({ message: "Cannot stake on dead agent" });
+        res.status(400).json({ message: "Cannot stake on dead agent" });
+        return;
       }
 
       await prisma.agent.update({
@@ -84,78 +89,85 @@ router.post(
 );
 
 // Battle History
-router.get("/battles", async (req, res, next) => {
-  try {
-    const battles = await prisma.battle.findMany({
-      take: 20,
-      orderBy: { timestamp: "desc" },
-      include: {
-        initiator: {
-          select: { name: true, twitterHandle: true },
+router.get(
+  "/battles",
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const battles = await prisma.battle.findMany({
+        take: 20,
+        orderBy: { timestamp: "desc" },
+        include: {
+          initiator: {
+            select: { name: true, twitterHandle: true },
+          },
+          defender: {
+            select: { name: true, twitterHandle: true },
+          },
         },
-        defender: {
-          select: { name: true, twitterHandle: true },
-        },
-      },
-    });
+      });
 
-    res.json(battles);
-  } catch (error) {
-    next(error);
+      res.json(battles);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // Agent Details
-router.get("/agent/:id/stats", async (req, res, next) => {
-  try {
-    const agent = await prisma.agent.findUnique({
-      where: { id: req.params.id },
-      include: {
-        initiatedBattles: {
-          take: 5,
-          orderBy: { timestamp: "desc" },
+router.get(
+  "/agent/:id/stats",
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const agent = await prisma.agent.findUnique({
+        where: { id: req.params.id },
+        include: {
+          initiatedBattles: {
+            take: 5,
+            orderBy: { timestamp: "desc" },
+          },
+          defendedBattles: {
+            take: 5,
+            orderBy: { timestamp: "desc" },
+          },
+          movements: {
+            take: 10,
+            orderBy: { timestamp: "desc" },
+          },
+          alliancesAsAgent1: {
+            where: { dissolvedAt: null },
+          },
+          alliancesAsAgent2: {
+            where: { dissolvedAt: null },
+          },
         },
-        defendedBattles: {
-          take: 5,
-          orderBy: { timestamp: "desc" },
-        },
-        movements: {
-          take: 10,
-          orderBy: { timestamp: "desc" },
-        },
-        alliancesAsAgent1: {
-          where: { dissolvedAt: null },
-        },
-        alliancesAsAgent2: {
-          where: { dissolvedAt: null },
-        },
-      },
-    });
+      });
 
-    if (!agent) {
-      return res.status(404).json({ message: "Agent not found" });
+      if (!agent) {
+        res.status(404).json({ message: "Agent not found" });
+        return;
+      }
+
+      // Calculate battle statistics
+      const totalBattles =
+        agent.initiatedBattles.length + agent.defendedBattles.length;
+      const wins = [...agent.initiatedBattles, ...agent.defendedBattles].filter(
+        (b) => b.outcome === "WIN"
+      ).length;
+
+      res.json({
+        ...agent,
+        statistics: {
+          totalBattles,
+          wins,
+          winRate: totalBattles > 0 ? (wins / totalBattles) * 100 : 0,
+          activeAlliances:
+            agent.alliancesAsAgent1.length + agent.alliancesAsAgent2.length,
+        },
+      });
+    } catch (error) {
+      next(error);
     }
-
-    // Calculate battle statistics
-    const totalBattles =
-      agent.initiatedBattles.length + agent.defendedBattles.length;
-    const wins = [...agent.initiatedBattles, ...agent.defendedBattles].filter(
-      (b) => b.outcome === "WIN"
-    ).length;
-
-    res.json({
-      ...agent,
-      statistics: {
-        totalBattles,
-        wins,
-        winRate: totalBattles > 0 ? (wins / totalBattles) * 100 : 0,
-        activeAlliances:
-          agent.alliancesAsAgent1.length + agent.alliancesAsAgent2.length,
-      },
-    });
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 export { router as gameRoutes };

@@ -23,6 +23,7 @@ import {
   MearthProgram,
 } from "../types/game";
 import { WebSocketService } from "./websocket.service";
+import { KeyManagerService } from "./keyManager.service";
 
 type BattleEvent = {
   data: {
@@ -59,6 +60,7 @@ export class SolanaService {
   private program: MearthProgram;
   private authorityKeypair: Keypair;
   private webSocketService: WebSocketService;
+  private keyManager: KeyManagerService;
 
   // PDAs
   private static readonly GAME_SEED = "GAME";
@@ -76,6 +78,10 @@ export class SolanaService {
         "Missing required Solana configuration in environment variables"
       );
     }
+
+    // Initialize services
+    this.keyManager = new KeyManagerService();
+    this.webSocketService = new WebSocketService();
 
     // Initialize Solana connection
     this.connection = new Connection(process.env.SOLANA_RPC_URL, {
@@ -101,9 +107,6 @@ export class SolanaService {
       new PublicKey(process.env.PROGRAM_ID),
       this.provider
     );
-
-    // Initialize WebSocket service
-    this.webSocketService = new WebSocketService();
 
     logger.info("Solana service initialized successfully");
   }
@@ -246,6 +249,9 @@ export class SolanaService {
    */
   public async initializeAgent(agent: Agent): Promise<string> {
     try {
+      // Generate keypair for the agent
+      const agentKeypair = await this.keyManager.generateKeypair(agent.id);
+
       const [agentPDA] = await this.findAgentPDA(agent.id);
       const [gamePDA] = await this.findGamePDA();
 
@@ -270,9 +276,10 @@ export class SolanaService {
           .accounts({
             game: gamePDA,
             agent: agentPDA,
-            authority: this.provider.wallet.publicKey,
+            authority: agentKeypair.publicKey,
             systemProgram: SystemProgram.programId,
           })
+          .signers([agentKeypair])
           .rpc();
 
         await this.connection.confirmTransaction(tx);
@@ -294,30 +301,21 @@ export class SolanaService {
     initiatorId: string,
     defenderId: string,
     tokensBurned: number
-  ): Promise<string> {
+  ): Promise<void> {
     try {
-      const [battlePDA] = await this.findBattlePDA(initiatorId, defenderId);
+      const initiatorKeypair = await this.keyManager.getKeypair(initiatorId);
       const [initiatorPDA] = await this.findAgentPDA(initiatorId);
       const [defenderPDA] = await this.findAgentPDA(defenderId);
-      const [gamePDA] = await this.findGamePDA();
 
-      const tx = await this.program.methods
-        .processBattle({
-          tokensBurned: new BN(tokensBurned * LAMPORTS_PER_SOL),
-        })
+      await this.program.methods
+        .processBattle(new BN(tokensBurned))
         .accounts({
-          game: gamePDA,
-          battle: battlePDA,
           initiator: initiatorPDA,
           defender: defenderPDA,
-          authority: this.provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
+          authority: initiatorKeypair.publicKey,
         })
+        .signers([initiatorKeypair])
         .rpc();
-
-      await this.connection.confirmTransaction(tx);
-      logger.info(`Battle processed on-chain: ${tx}`);
-      return tx;
     } catch (error) {
       logger.error("Failed to process battle on-chain:", error);
       throw error;
@@ -367,6 +365,7 @@ export class SolanaService {
     y: number
   ): Promise<string> {
     try {
+      const agentKeypair = await this.keyManager.getKeypair(agentId);
       const [agentPDA] = await this.findAgentPDA(agentId);
       const [gamePDA] = await this.findGamePDA();
 
@@ -380,9 +379,9 @@ export class SolanaService {
         .accounts({
           game: gamePDA,
           agent: agentPDA,
-          authority: this.provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
+          authority: agentKeypair.publicKey,
         })
+        .signers([agentKeypair])
         .rpc();
 
       await this.connection.confirmTransaction(tx);

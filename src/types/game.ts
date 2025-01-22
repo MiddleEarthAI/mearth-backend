@@ -1,3 +1,4 @@
+import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
 import * as anchor from "@coral-xyz/anchor";
 
 export enum TerrainType {
@@ -112,4 +113,4 @@ export interface ProgramPositionEvent {
   timestamp: anchor.BN;
 }
 
-export type MearthProgram = anchor.Program<anchor.Idl>;
+export type MearthProgram = anchor.Program<MiddleEarthAiProgram>;
