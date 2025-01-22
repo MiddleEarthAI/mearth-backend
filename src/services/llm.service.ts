@@ -1,5 +1,16 @@
-import { Agent, TerrainType, BattleOutcome } from "../types/game";
-import Anthropic from "@anthropic-ai/sdk";
+import {
+  Agent,
+  TerrainType,
+  BattleOutcome,
+  AgentDecision,
+  BattleStrategy,
+  CommunityFeedback,
+  Position,
+} from "../types/game";
+import { Anthropic } from "@anthropic-ai/sdk";
+import { ChatCompletionMessage } from "@anthropic-ai/sdk/resources";
+import { calculateDistance, normalizeScore } from "../utils/math";
+import { retryWithExponentialBackoff } from "../utils/retry";
 
 export class LLMService {
   private anthropic: Anthropic;
@@ -11,14 +22,20 @@ export class LLMService {
 - Influenceability (0-100): How much community feedback affects decisions
 
 2. Game State:
-- Current position
-- Nearby agents
-- Token balance
-- Active alliances
-- Battle history
-- Community sentiment
+- Current position and terrain
+- Nearby agents and their relationships
+- Token balance and battle history
+- Active alliances and their dynamics
+- Community sentiment and suggestions
 
-Your responses should be strategic decisions with clear reasoning.`;
+3. Strategic Considerations:
+- Terrain risks (1% death chance in mountains/rivers)
+- Battle probabilities based on token ratios
+- Alliance opportunities and betrayal risks
+- Community influence weighted by engagement
+- Long-term survival probability
+
+Your responses should be strategic decisions with clear reasoning, formatted as specified JSON.`;
 
   constructor() {
     this.anthropic = new Anthropic({
@@ -27,135 +44,114 @@ Your responses should be strategic decisions with clear reasoning.`;
   }
 
   /**
-   * Get agent's next strategic move
+   * Get agent's next strategic move with personality-driven decision making
    */
   async getNextMove(
     agent: Agent,
     gameState: {
       nearbyAgents: Agent[];
       recentBattles: any[];
-      communityFeedback: any[];
+      communityFeedback: CommunityFeedback;
       terrain: TerrainType;
     }
-  ): Promise<{
-    action: "MOVE" | "BATTLE" | "ALLIANCE" | "WAIT";
-    target?: Agent;
-    position?: { x: number; y: number };
-    reason: string;
-  }> {
+  ): Promise<AgentDecision> {
     const prompt = this.buildDecisionPrompt(agent, gameState);
 
-    const response = await this.anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 1000,
-      temperature: 0.7,
-      system: LLMService.SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+    const response = await retryWithExponentialBackoff(
+      async () =>
+        await this.anthropic.messages.create({
+          model: "claude-3-opus-20240229",
+          max_tokens: 1000,
+          temperature: this.calculateTemperature(agent),
+          system: LLMService.SYSTEM_PROMPT,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+        })
+    );
 
-    return this.parseDecision(response.content[0].text);
+    const decision = this.parseDecision(response.content[0].text);
+    return {
+      ...decision,
+      confidence: this.calculateConfidence(agent, decision, gameState),
+      communityAlignment: this.calculateCommunityAlignment(
+        decision,
+        gameState.communityFeedback
+      ),
+    };
   }
 
   /**
-   * Generate battle strategy
+   * Generate battle strategy with advanced probability calculations
    */
   async getBattleStrategy(
     agent: Agent,
     opponent: Agent,
     previousBattles: any[]
-  ): Promise<{
-    shouldFight: boolean;
-    reason: string;
-    estimatedSuccess: number;
-  }> {
-    const prompt = `As ${agent.name} (${
-      agent.type
-    }), analyze the potential battle with ${opponent.name}:
+  ): Promise<BattleStrategy> {
+    const prompt = this.buildBattlePrompt(agent, opponent, previousBattles);
 
-Character Traits:
-- Aggressiveness: ${agent.characteristics.aggressiveness}
-- Alliance Propensity: ${agent.characteristics.alliancePropensity}
+    const response = await retryWithExponentialBackoff(
+      async () =>
+        await this.anthropic.messages.create({
+          model: "claude-3-opus-20240229",
+          max_tokens: 500,
+          temperature: 0.3,
+          system: LLMService.SYSTEM_PROMPT,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+        })
+    );
 
-Battle Context:
-- Your tokens: ${agent.tokenBalance}
-- Opponent tokens: ${opponent.tokenBalance}
-- Previous battles: ${JSON.stringify(previousBattles)}
-
-Should you engage in battle? Consider your traits, token balance, and battle history. Provide:
-1. Battle decision (yes/no)
-2. Strategic reasoning
-3. Estimated success probability (0-100)`;
-
-    const response = await this.anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 500,
-      temperature: 0.3,
-      system: LLMService.SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
-
-    return this.parseBattleStrategy(response.content[0].text);
+    const strategy = this.parseBattleStrategy(response.content[0].text);
+    return {
+      ...strategy,
+      suggestedTokenBurn: this.calculateOptimalTokenBurn(agent, opponent),
+    };
   }
 
   /**
-   * Process community influence
+   * Process community influence with weighted feedback analysis
    */
   async processCommunityFeedback(
     agent: Agent,
-    feedback: {
-      sentiment: number;
-      suggestions: string[];
-      engagement: number;
-    }
+    feedback: CommunityFeedback
   ): Promise<{
     adjustedAggressiveness: number;
     adjustedAlliancePropensity: number;
     reason: string;
   }> {
-    const prompt = `As ${agent.name} (${
-      agent.type
-    }), analyze community feedback:
+    const weightedFeedback = this.calculateWeightedFeedback(feedback);
+    const prompt = this.buildFeedbackPrompt(agent, weightedFeedback);
 
-Current Traits:
-- Aggressiveness: ${agent.characteristics.aggressiveness}
-- Alliance Propensity: ${agent.characteristics.alliancePropensity}
-- Influenceability: ${agent.characteristics.influenceability}
-
-Community Feedback:
-- Sentiment: ${feedback.sentiment}
-- Suggestions: ${feedback.suggestions.join(", ")}
-- Engagement Level: ${feedback.engagement}
-
-How should your traits be adjusted based on this feedback? Consider your influenceability score.`;
-
-    const response = await this.anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 500,
-      temperature: 0.5,
-      system: LLMService.SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+    const response = await retryWithExponentialBackoff(
+      async () =>
+        await this.anthropic.messages.create({
+          model: "claude-3-opus-20240229",
+          max_tokens: 500,
+          temperature: agent.characteristics.influenceability / 100,
+          system: LLMService.SYSTEM_PROMPT,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+        })
+    );
 
     return this.parseTraitAdjustments(response.content[0].text);
   }
 
   /**
-   * Generate tweet content
+   * Generate personality-driven tweet content
    */
   async generateTweet(
     agent: Agent,
@@ -164,34 +160,99 @@ How should your traits be adjusted based on this feedback? Consider your influen
       details: any;
     }
   ): Promise<string> {
-    const prompt = `As ${agent.name} (${agent.type}), compose a tweet about:
-${JSON.stringify(context)}
+    const prompt = this.buildTweetPrompt(agent, context);
 
-Your personality traits:
-- Aggressiveness: ${agent.characteristics.aggressiveness}
-- Alliance Propensity: ${agent.characteristics.alliancePropensity}
+    const response = await retryWithExponentialBackoff(
+      async () =>
+        await this.anthropic.messages.create({
+          model: "claude-3-opus-20240229",
+          max_tokens: 300,
+          temperature: 0.8,
+          system: LLMService.SYSTEM_PROMPT,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+        })
+    );
 
-Write a tweet that:
-1. Reflects your character traits
-2. Is engaging and dramatic
-3. Encourages community interaction
-4. Uses appropriate emojis
-5. Maximum 280 characters`;
+    return this.formatTweet(response.content[0].text.trim(), agent);
+  }
 
-    const response = await this.anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 300,
-      temperature: 0.8,
-      system: LLMService.SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+  private calculateTemperature(agent: Agent): number {
+    // More aggressive agents have higher temperature for more unpredictable behavior
+    return 0.3 + agent.characteristics.aggressiveness / 200;
+  }
 
-    return response.content[0].text.trim();
+  private calculateConfidence(
+    agent: Agent,
+    decision: AgentDecision,
+    gameState: any
+  ): number {
+    let confidence = 70; // Base confidence
+
+    // Adjust based on agent characteristics
+    switch (decision.action) {
+      case "BATTLE":
+        confidence += (agent.characteristics.aggressiveness - 50) / 2;
+        break;
+      case "ALLIANCE":
+        confidence += (agent.characteristics.alliancePropensity - 50) / 2;
+        break;
+    }
+
+    // Adjust based on terrain
+    if (gameState.terrain !== TerrainType.NORMAL) {
+      confidence -= 10;
+    }
+
+    // Normalize to 0-100
+    return Math.max(0, Math.min(100, confidence));
+  }
+
+  private calculateCommunityAlignment(
+    decision: AgentDecision,
+    feedback: CommunityFeedback
+  ): number {
+    // Calculate how well the decision aligns with community suggestions
+    const relevantSuggestions = feedback.suggestions.filter((s) =>
+      s.toLowerCase().includes(decision.action.toLowerCase())
+    );
+
+    return (
+      (relevantSuggestions.length / feedback.suggestions.length) * 100 || 0
+    );
+  }
+
+  private calculateOptimalTokenBurn(agent: Agent, opponent: Agent): number {
+    // Calculate optimal token burn percentage based on game theory
+    const tokenRatio = agent.tokenBalance / opponent.tokenBalance;
+    const basePercentage = 40; // Start with middle of range (31-50)
+
+    // Adjust based on token ratio
+    if (tokenRatio > 2) {
+      return basePercentage - 5; // Can afford to burn less
+    } else if (tokenRatio < 0.5) {
+      return basePercentage + 5; // Need to burn more to make impact
+    }
+
+    return basePercentage;
+  }
+
+  private calculateWeightedFeedback(feedback: CommunityFeedback): any {
+    return {
+      ...feedback,
+      weightedSentiment:
+        feedback.sentiment * (feedback.engagement.impressions / 10000),
+      influentialOpinions: feedback.influentialUsers
+        .filter((user) => user.followerCount > 1000)
+        .map((user) => ({
+          ...user,
+          weight: Math.log10(user.followerCount) / 10,
+        })),
+    };
   }
 
   private buildDecisionPrompt(agent: Agent, gameState: any): string {
@@ -210,96 +271,141 @@ Current State:
 - Community Feedback: ${JSON.stringify(gameState.communityFeedback)}
 - Current Terrain: ${gameState.terrain}
 
-What is your next strategic move? Consider:
-1. Battle opportunities
-2. Alliance possibilities
-3. Territory exploration
-4. Community suggestions
-5. Terrain risks/rewards
+Strategic Analysis Required:
+1. Battle Opportunities (Win probability and risk assessment)
+2. Alliance Possibilities (Trust evaluation and mutual benefit analysis)
+3. Territory Control (Resource distribution and strategic positions)
+4. Community Influence (Weighted by engagement and influence)
+5. Survival Probability (Considering all factors)
 
-Provide your decision as:
+Provide your decision as JSON:
 {
   "action": "MOVE|BATTLE|ALLIANCE|WAIT",
-  "target": {agent details if applicable},
-  "position": {"x": number, "y": number} if moving,
-  "reason": "strategic explanation"
+  "target": {agent details} or null,
+  "position": {"x": number, "y": number} or null,
+  "reason": "detailed strategic explanation"
 }`;
   }
 
-  private parseDecision(response: string): any {
-    try {
-      // Extract JSON from response
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No valid JSON found in response");
-      return JSON.parse(jsonMatch[0]);
-    } catch (error) {
-      console.error("Failed to parse LLM decision:", error);
-      return {
-        action: "WAIT",
-        reason: "Error processing decision",
-      };
-    }
+  private buildBattlePrompt(
+    agent: Agent,
+    opponent: Agent,
+    previousBattles: any[]
+  ): string {
+    return `As ${agent.name} (${
+      agent.type
+    }), analyze the potential battle with ${opponent.name}:
+
+Character Traits:
+- Your Aggressiveness: ${agent.characteristics.aggressiveness}
+- Your Alliance Propensity: ${agent.characteristics.alliancePropensity}
+- Opponent Type: ${opponent.type}
+
+Battle Context:
+- Your Tokens: ${agent.tokenBalance}
+- Opponent Tokens: ${opponent.tokenBalance}
+- Win Probability: ${(
+      (agent.tokenBalance / (agent.tokenBalance + opponent.tokenBalance)) *
+      100
+    ).toFixed(2)}%
+- Death Risk: 5%
+- Previous Battles: ${JSON.stringify(previousBattles)}
+- Terrain Death Risk: ${this.determineTerrainDeathRisk(agent.position)}%
+
+Required Analysis:
+1. Battle decision (yes/no)
+2. Strategic reasoning
+3. Risk assessment
+4. Token burn strategy
+5. Survival probability
+
+Format your response as:
+Decision: [yes/no]
+Reason: [strategic explanation]
+Success Probability: [0-100]
+Risk Level: [low/medium/high]`;
   }
 
-  private parseBattleStrategy(response: string): any {
-    try {
-      const lines = response.split("\n");
-      const decision = lines
-        .find((l) => l.toLowerCase().includes("decision"))
-        ?.includes("yes");
-      const probability = parseInt(
-        lines.find((l) => l.includes("%"))?.match(/\d+/)?.[0] || "0"
-      );
-      const reason = lines
-        .find((l) => l.toLowerCase().includes("reason"))
-        ?.split(":")[1]
-        ?.trim();
+  private buildFeedbackPrompt(agent: Agent, weightedFeedback: any): string {
+    return `As ${agent.name} (${
+      agent.type
+    }), analyze this weighted community feedback:
 
-      return {
-        shouldFight: decision,
-        reason: reason || "Strategic decision",
-        estimatedSuccess: probability,
-      };
-    } catch (error) {
-      console.error("Failed to parse battle strategy:", error);
-      return {
-        shouldFight: false,
-        reason: "Error processing strategy",
-        estimatedSuccess: 0,
-      };
-    }
+Current Traits:
+- Aggressiveness: ${agent.characteristics.aggressiveness}
+- Alliance Propensity: ${agent.characteristics.alliancePropensity}
+- Influenceability: ${agent.characteristics.influenceability}
+
+Weighted Feedback:
+- Overall Sentiment: ${weightedFeedback.weightedSentiment}
+- Key Suggestions: ${weightedFeedback.suggestions.join(", ")}
+- Engagement Level: ${weightedFeedback.engagement.impressions} impressions
+- Influential Opinions: ${JSON.stringify(weightedFeedback.influentialOpinions)}
+
+Consider:
+1. Your influenceability score
+2. Engagement metrics
+3. Influential user opinions
+4. Community consensus
+5. Strategic implications
+
+Format response as:
+Aggressiveness: [0-100]
+Alliance Propensity: [0-100]
+Reason: [explanation]`;
   }
 
-  private parseTraitAdjustments(response: string): any {
-    try {
-      const lines = response.split("\n");
-      const aggressiveness = parseInt(
-        lines
-          .find((l) => l.toLowerCase().includes("aggressiveness"))
-          ?.match(/\d+/)?.[0] || "0"
-      );
-      const alliancePropensity = parseInt(
-        lines
-          .find((l) => l.toLowerCase().includes("alliance"))
-          ?.match(/\d+/)?.[0] || "0"
-      );
-      const reason = lines
-        .find((l) => l.toLowerCase().includes("reason"))
-        ?.split(":")[1]
-        ?.trim();
+  private buildTweetPrompt(agent: Agent, context: any): string {
+    return `As ${agent.name} (${agent.type}), compose a tweet about:
+${JSON.stringify(context)}
 
-      return {
-        adjustedAggressiveness: aggressiveness,
-        adjustedAlliancePropensity: alliancePropensity,
-        reason: reason || "Community influence",
-      };
-    } catch (error) {
-      console.error("Failed to parse trait adjustments:", error);
-      return {
-        adjustedAggressiveness: 0,
-        adjustedAlliancePropensity: 0,
-        reason: "Error processing adjustments",
-      };
+Your personality:
+- Aggressiveness: ${agent.characteristics.aggressiveness}
+- Alliance Propensity: ${agent.characteristics.alliancePropensity}
+
+Requirements:
+1. Match your personality traits
+2. Be engaging and dramatic
+3. Encourage community interaction
+4. Use appropriate emojis
+5. Maximum 280 characters
+6. Include relevant hashtags
+7. Maintain strategic ambiguity when needed
+8. Reference your current state/position
+
+Format: Single tweet with emojis and hashtags`;
+  }
+
+  private determineTerrainDeathRisk(position: Position): number {
+    const distance = Math.sqrt(
+      position.x * position.x + position.y * position.y
+    );
+    if (distance > 50) return 1; // Mountain
+    if (distance > 30) return 1; // River
+    return 0; // Normal terrain
+  }
+
+  private formatTweet(tweet: string, agent: Agent): string {
+    // Ensure tweet follows character's personality
+    const emojis = this.getPersonalityEmojis(agent);
+    tweet = tweet.replace(/^/, emojis + " ");
+
+    // Add hashtags if missing
+    if (!tweet.includes("#")) {
+      tweet += " #MiddleEarth #AIBattle";
     }
+
+    // Ensure length limit
+    return tweet.slice(0, 280);
+  }
+
+  private getPersonalityEmojis(agent: Agent): string {
+    const aggressive = agent.characteristics.aggressiveness > 70;
+    const friendly = agent.characteristics.alliancePropensity > 70;
+
+    if (aggressive && friendly) return "⚔️🤝";
+    if (aggressive) return "⚔️😈";
+    if (friendly) return "🤝😊";
+    return "🎭";
   }
 }
