@@ -136,6 +136,7 @@ export class AgentManagerService {
         const agents: Agent[] = prismaAgents.map((prismaAgent) => ({
           ...prismaAgent,
           type: prismaAgent.type as AgentType, // Cast type to AgentType
+          username: prismaAgent.twitterHandle,
           position: {
             x: prismaAgent.positionX,
             y: prismaAgent.positionY,
@@ -359,23 +360,20 @@ export class AgentManagerService {
    * Start monitoring system metrics
    */
   private startMonitoring(): void {
-    setInterval(
-      async () => {
-        try {
-          const metrics: SystemMetrics = {
-            activeAgents: await this.prisma.agent.count({
-              where: { isAlive: true },
-            }),
-            pendingDecisions: this.decisionQueue.size,
-            queuePending: this.decisionQueue.pending,
-            cacheStats: this.stateCache.getStats(),
-          };
-          logger.info("System metrics:", metrics);
-        } catch (error) {
-          logger.error("Error collecting metrics:", error);
-        }
-      },
-      5 * 60 * 1000
-    ); // Every 5 minutes
+    setInterval(async () => {
+      try {
+        const metrics: SystemMetrics = {
+          activeAgents: await this.prisma.agent.count({
+            where: { isAlive: true },
+          }),
+          pendingDecisions: this.decisionQueue.size,
+          queuePending: this.decisionQueue.pending,
+          cacheStats: this.stateCache.getStats(),
+        };
+        logger.info("System metrics:", metrics);
+      } catch (error) {
+        logger.error("Error collecting metrics:", error);
+      }
+    }, 5 * 60 * 1000); // Every 5 minutes
   }
 }
