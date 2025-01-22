@@ -3,12 +3,24 @@ import { LLMService } from "./llm.service";
 import { GameService } from "./game.service";
 import { TwitterService } from "./twitter.service";
 import { SolanaService } from "./solana.service";
-import { Agent, AgentDecision, GameState, Battle } from "../types/game";
+import {
+  Agent,
+  AgentDecision,
+  GameState,
+  Battle,
+  AgentType,
+} from "../types/game";
 import { EventEmitter } from "events";
 import PQueue from "p-queue";
 import NodeCache from "node-cache";
 import { retryWithExponentialBackoff } from "../utils/retry";
 import { logger } from "../utils/logger";
+import {
+  IGameService,
+  ILLMService,
+  ITwitterService,
+  ISolanaService,
+} from "../types/services";
 
 interface AgentDecisionEvent {
   agentId: string;
@@ -43,15 +55,21 @@ export class AgentManagerService {
   private readonly stateCache: NodeCache;
   private isRunning: boolean = false;
 
-  constructor() {
-    this.prisma = new PrismaClient();
+  constructor(
+    prisma: PrismaClient,
+    gameService: IGameService,
+    llmService: ILLMService,
+    twitterService: ITwitterService,
+    solanaService: ISolanaService
+  ) {
+    this.prisma = prisma;
     this.llmService = new LLMService();
     this.gameService = new GameService();
     this.twitterService = new TwitterService();
     this.solanaService = new SolanaService();
     this.eventEmitter = new EventEmitter();
-    this.decisionQueue = new PQueue({ concurrency: 3 }); // Process 3 agent decisions concurrently
-    this.stateCache = new NodeCache({ stdTTL: 60 }); // Cache game state for 1 minute
+    this.decisionQueue = new PQueue({ concurrency: 2 }); // Process 2 agent decisions concurrently
+    this.stateCache = new NodeCache({ stdTTL: 300 }); // Cache game state for 5 minutes
 
     this.setupEventListeners();
   }
@@ -103,11 +121,8 @@ export class AgentManagerService {
    * Initialize the agent system
    */
   private async initializeAgents(): Promise<void> {
-    const agents = await this.prisma.agent.findMany({
-      where: { isAlive: true },
-    });
-
-    if (agents.length === 0) {
+    const agentCount = await this.prisma.agent.count();
+    if (agentCount === 0) {
       logger.info("No active agents found, initializing default agents...");
       await this.gameService.initializeDefaultAgents();
     }
@@ -119,13 +134,28 @@ export class AgentManagerService {
   private async startProcessingLoop(): Promise<void> {
     while (this.isRunning) {
       try {
-        const agents = await this.prisma.agent.findMany({
+        const prismaAgents = await this.prisma.agent.findMany({
           where: { isAlive: true },
         });
 
+        // Transform Prisma agents into our Agent type
+        const agents: Agent[] = prismaAgents.map((prismaAgent) => ({
+          ...prismaAgent,
+          type: prismaAgent.type as AgentType, // Cast type to AgentType
+          position: {
+            x: prismaAgent.positionX,
+            y: prismaAgent.positionY,
+          },
+          characteristics: {
+            aggressiveness: prismaAgent.aggressiveness,
+            alliancePropensity: prismaAgent.alliancePropensity,
+            influenceability: prismaAgent.influenceability,
+          },
+        }));
+
         // Process each agent's decision in parallel with rate limiting
         await Promise.all(
-          agents.map((agent: Agent) =>
+          agents.map((agent) =>
             this.decisionQueue.add(() => this.processAgentDecision(agent))
           )
         );
@@ -282,11 +312,19 @@ export class AgentManagerService {
           OR: [{ initiatorId: agentId }, { defenderId: agentId }],
         };
 
-    return await this.prisma.battle.findMany({
+    const prismaBattles = await this.prisma.battle.findMany({
       where,
       orderBy: { timestamp: "desc" },
       take: 5,
     });
+
+    // Transform battle data to match our Battle type
+    return prismaBattles.map((battle) => ({
+      ...battle,
+      outcome: battle.outcome as "WIN" | "LOSS",
+      positionX: battle.locationX,
+      positionY: battle.locationY,
+    }));
   }
 
   /**

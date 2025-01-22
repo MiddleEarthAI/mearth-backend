@@ -2,16 +2,19 @@ import {
   Connection,
   PublicKey,
   Keypair,
+  Transaction,
   SystemProgram,
   LAMPORTS_PER_SOL,
+  VersionedTransaction,
 } from "@solana/web3.js";
+import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
+import { IDL } from "../types/idl";
+import { SolanaConfig } from "../config";
 import {
-  Program,
-  AnchorProvider,
-  web3,
-  BN,
-  IdlEvents,
-} from "@coral-xyz/anchor";
+  IKeyManagerService,
+  IWebSocketService,
+  ISolanaService,
+} from "../types/services";
 import { logger } from "../utils/logger";
 import { retryWithExponentialBackoff } from "../utils/retry";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
@@ -24,13 +27,16 @@ import {
 } from "../types/game";
 import { WebSocketService } from "./websocket.service";
 import { KeyManagerService } from "./keyManager.service";
+import mearthIdl from "../constants/middle_earth_ai_program.json";
+import { BN } from "@coral-xyz/anchor";
+import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
 
 type BattleEvent = {
   data: {
     initiator: PublicKey;
     defender: PublicKey;
-    tokensBurned: BN;
-    timestamp: BN;
+    tokensBurned: anchor.BN;
+    timestamp: anchor.BN;
   };
 };
 
@@ -38,412 +44,263 @@ type AllianceEvent = {
   data: {
     agent1: PublicKey;
     agent2: PublicKey;
-    timestamp: BN;
+    timestamp: anchor.BN;
   };
 };
 
 type PositionEvent = {
   data: {
     agentId: PublicKey;
-    x: BN;
-    y: BN;
-    timestamp: BN;
+    x: anchor.BN;
+    y: anchor.BN;
+    timestamp: anchor.BN;
   };
 };
 
 /**
- * Service for interacting with the Solana program
+ * Service for interacting with the Solana program and managing real-time updates
  */
-export class SolanaService {
+export class SolanaService implements ISolanaService {
   private connection: Connection;
-  private provider: AnchorProvider;
-  private program: MearthProgram;
+  private program: Program;
   private authorityKeypair: Keypair;
-  private webSocketService: WebSocketService;
-  private keyManager: KeyManagerService;
+  private wsConnection: Connection | null = null;
+  private subscriptionIds: number[] = [];
 
-  // PDAs
-  private static readonly GAME_SEED = "GAME";
-  private static readonly AGENT_SEED = "AGENT";
-  private static readonly BATTLE_SEED = "BATTLE";
-  private static readonly ALLIANCE_SEED = "ALLIANCE";
-
-  constructor() {
-    if (
-      !process.env.SOLANA_RPC_URL ||
-      !process.env.PROGRAM_ID ||
-      !process.env.AUTHORITY_KEYPAIR
-    ) {
-      throw new Error(
-        "Missing required Solana configuration in environment variables"
-      );
-    }
-
-    // Initialize services
-    this.keyManager = new KeyManagerService();
-    this.webSocketService = new WebSocketService();
-
-    // Initialize Solana connection
-    this.connection = new Connection(process.env.SOLANA_RPC_URL, {
-      commitment: "confirmed",
-      confirmTransactionInitialTimeout: 60000,
-    });
-
-    // Load authority keypair
+  constructor(
+    private config: SolanaConfig,
+    private keyManager: IKeyManagerService
+  ) {
+    this.connection = new Connection(config.rpcUrl);
     this.authorityKeypair = Keypair.fromSecretKey(
-      Buffer.from(JSON.parse(process.env.AUTHORITY_KEYPAIR))
+      Buffer.from(config.authoritySecretKey, "hex")
     );
 
-    // Initialize provider
-    const wallet = new NodeWallet(this.authorityKeypair);
-    this.provider = new AnchorProvider(this.connection, wallet, {
-      commitment: "confirmed",
-      preflightCommitment: "confirmed",
-    });
-
-    // Initialize program
-    this.program = new Program(
-      require("../../target/idl/middle_earth_ai_program.json"),
-      new PublicKey(process.env.PROGRAM_ID),
-      this.provider
+    const provider = new AnchorProvider(
+      this.connection,
+      {
+        publicKey: this.authorityKeypair.publicKey,
+        signTransaction: async <T extends Transaction | VersionedTransaction>(
+          tx: T
+        ): Promise<T> => {
+          if (tx instanceof Transaction) {
+            tx.sign(this.authorityKeypair);
+          }
+          return tx;
+        },
+        signAllTransactions: async <
+          T extends Transaction | VersionedTransaction,
+        >(
+          txs: T[]
+        ): Promise<T[]> => {
+          return txs.map((tx) => {
+            if (tx instanceof Transaction) {
+              tx.sign(this.authorityKeypair);
+            }
+            return tx;
+          });
+        },
+      },
+      { commitment: config.commitment }
     );
 
-    logger.info("Solana service initialized successfully");
+    this.program = new Program(IDL, new PublicKey(config.programId), provider);
   }
 
-  /**
-   * Start real-time monitoring
-   */
-  public async startMonitoring(): Promise<void> {
+  async startMonitoring(): Promise<void> {
     try {
-      await this.webSocketService.connect();
+      // Create a new WebSocket connection
+      this.wsConnection = new Connection(this.config.rpcUrl, {
+        commitment: this.config.commitment,
+        wsEndpoint: this.config.rpcUrl.replace("http", "ws"),
+      });
 
-      // Subscribe to program events
-      await this.webSocketService.subscribeToProgramEvents(
-        this.program.programId.toString()
+      // Subscribe to program account changes
+      const programId = new PublicKey(this.config.programId);
+      const subscription = this.wsConnection.onProgramAccountChange(
+        programId,
+        (accountInfo, context) => {
+          try {
+            const eventData = this.program.coder.accounts.decode(
+              accountInfo.accountInfo.data
+            );
+            logger.info("Program account updated:", eventData);
+          } catch (error) {
+            logger.error("Error decoding program account data:", error);
+          }
+        }
       );
 
-      // Set up event handlers
-      this.webSocketService.onProgramUpdate((data) => {
-        this.handleProgramUpdate(data);
-      });
-
-      this.webSocketService.onSignatureUpdate((data) => {
-        this.handleSignatureUpdate(data);
-      });
-
-      this.webSocketService.onAccountUpdate((data) => {
-        this.handleAccountUpdate(data);
-      });
-
-      logger.info("Real-time monitoring started");
+      this.subscriptionIds.push(subscription);
+      logger.info("Started monitoring Solana program events");
     } catch (error) {
       logger.error("Failed to start monitoring:", error);
       throw error;
     }
   }
 
-  /**
-   * Stop real-time monitoring
-   */
-  public async stopMonitoring(): Promise<void> {
-    await this.webSocketService.disconnect();
-    logger.info("Real-time monitoring stopped");
-  }
-
-  private handleProgramUpdate(data: any): void {
+  async stopMonitoring(): Promise<void> {
     try {
-      const { programId, accountId, type } = data;
-      logger.info("Program update received:", {
-        programId,
-        accountId,
-        type,
-      });
-
-      // Handle different update types
-      switch (type) {
-        case "battleProcessed":
-          this.handleBattleUpdate(data);
-          break;
-        case "allianceFormed":
-          this.handleAllianceUpdate(data);
-          break;
-        case "positionUpdated":
-          this.handlePositionUpdate(data);
-          break;
-        default:
-          logger.warn("Unknown program update type:", type);
+      // Unsubscribe from all subscriptions
+      if (this.wsConnection) {
+        await Promise.all(
+          this.subscriptionIds.map((id) =>
+            this.wsConnection!.removeAccountChangeListener(id)
+          )
+        );
+        this.subscriptionIds = [];
+        this.wsConnection = null;
       }
+      logger.info("Stopped monitoring Solana program events");
     } catch (error) {
-      logger.error("Error handling program update:", error);
-    }
-  }
-
-  private handleSignatureUpdate(data: any): void {
-    try {
-      const { signature, status } = data;
-      logger.info("Transaction update:", {
-        signature,
-        status,
-      });
-
-      // Handle transaction confirmation
-      if (status.err) {
-        logger.error("Transaction failed:", status.err);
-      } else {
-        logger.info("Transaction confirmed:", signature);
-      }
-    } catch (error) {
-      logger.error("Error handling signature update:", error);
-    }
-  }
-
-  private handleAccountUpdate(data: any): void {
-    try {
-      const { accountId, data: accountData } = data;
-      logger.info("Account update:", {
-        accountId,
-        data: accountData,
-      });
-
-      // Handle account state changes
-      // Implementation depends on account type and data structure
-    } catch (error) {
-      logger.error("Error handling account update:", error);
-    }
-  }
-
-  private handleBattleUpdate(data: any): void {
-    const { initiator, defender, tokensBurned, timestamp } = data;
-    logger.info("Battle processed:", {
-      initiator: initiator.toString(),
-      defender: defender.toString(),
-      tokensBurned: tokensBurned.toString(),
-      timestamp: new Date(timestamp.toNumber() * 1000),
-    });
-  }
-
-  private handleAllianceUpdate(data: any): void {
-    const { agent1, agent2, timestamp } = data;
-    logger.info("Alliance formed:", {
-      agent1: agent1.toString(),
-      agent2: agent2.toString(),
-      timestamp: new Date(timestamp.toNumber() * 1000),
-    });
-  }
-
-  private handlePositionUpdate(data: any): void {
-    const { agentId, x, y, timestamp } = data;
-    logger.info("Position updated:", {
-      agentId: agentId.toString(),
-      position: {
-        x: x.toNumber(),
-        y: y.toNumber(),
-      },
-      timestamp: new Date(timestamp.toNumber() * 1000),
-    });
-  }
-
-  /**
-   * Initialize a new agent on-chain
-   */
-  public async initializeAgent(agent: Agent): Promise<string> {
-    try {
-      // Generate keypair for the agent
-      const agentKeypair = await this.keyManager.generateKeypair(agent.id);
-
-      const [agentPDA] = await this.findAgentPDA(agent.id);
-      const [gamePDA] = await this.findGamePDA();
-
-      await retryWithExponentialBackoff(async () => {
-        const tx = await this.program.methods
-          .initializeAgent({
-            id: agent.id,
-            agentType: agent.type,
-            name: agent.name,
-            characteristics: {
-              aggressiveness: new BN(agent.characteristics.aggressiveness),
-              alliancePropensity: new BN(
-                agent.characteristics.alliancePropensity
-              ),
-              influenceability: new BN(agent.characteristics.influenceability),
-            },
-            position: {
-              x: new BN(agent.position.x),
-              y: new BN(agent.position.y),
-            },
-          })
-          .accounts({
-            game: gamePDA,
-            agent: agentPDA,
-            authority: agentKeypair.publicKey,
-            systemProgram: SystemProgram.programId,
-          })
-          .signers([agentKeypair])
-          .rpc();
-
-        await this.connection.confirmTransaction(tx);
-        logger.info(`Agent ${agent.id} initialized on-chain: ${tx}`);
-        return tx;
-      });
-
-      return agentPDA.toBase58();
-    } catch (error) {
-      logger.error("Failed to initialize agent on-chain:", error);
+      logger.error("Failed to stop monitoring:", error);
       throw error;
     }
   }
 
-  /**
-   * Process a battle between agents
-   */
-  public async processBattle(
+  private async findPDA(
+    seeds: Buffer[],
+    programId: PublicKey
+  ): Promise<[PublicKey, number]> {
+    return PublicKey.findProgramAddress(seeds, programId);
+  }
+
+  private async findAgentPDA(agentId: string): Promise<[PublicKey, number]> {
+    return this.findPDA(
+      [Buffer.from("agent"), Buffer.from(agentId)],
+      new PublicKey(this.config.programId)
+    );
+  }
+
+  private async findBattlePDA(
+    initiatorId: string,
+    defenderId: string
+  ): Promise<[PublicKey, number]> {
+    return this.findPDA(
+      [
+        Buffer.from("battle"),
+        Buffer.from(initiatorId),
+        Buffer.from(defenderId),
+      ],
+      new PublicKey(this.config.programId)
+    );
+  }
+
+  private async findAlliancePDA(
+    agent1Id: string,
+    agent2Id: string
+  ): Promise<[PublicKey, number]> {
+    return this.findPDA(
+      [Buffer.from("alliance"), Buffer.from(agent1Id), Buffer.from(agent2Id)],
+      new PublicKey(this.config.programId)
+    );
+  }
+
+  async initializeAgent(
+    agentId: string,
+    name: string,
+    agentType: string,
+    initialTokens: number
+  ): Promise<string> {
+    try {
+      const [agentPDA] = await this.findAgentPDA(agentId);
+      const agentKeypair = await this.keyManager.generateKeypair(agentId);
+
+      const tx = await this.program.methods
+        .initializeAgent(name, agentType, initialTokens)
+        .accounts({
+          agent: agentPDA,
+          authority: this.authorityKeypair.publicKey,
+          agentKey: agentKeypair.publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([this.authorityKeypair])
+        .rpc();
+
+      logger.info(`Agent ${agentId} initialized with transaction ${tx}`);
+      return tx;
+    } catch (error) {
+      logger.error(`Failed to initialize agent ${agentId}:`, error);
+      throw error;
+    }
+  }
+
+  async processBattle(
     initiatorId: string,
     defenderId: string,
     tokensBurned: number
-  ): Promise<void> {
+  ): Promise<string> {
     try {
-      const initiatorKeypair = await this.keyManager.getKeypair(initiatorId);
       const [initiatorPDA] = await this.findAgentPDA(initiatorId);
       const [defenderPDA] = await this.findAgentPDA(defenderId);
+      const [battlePDA] = await this.findBattlePDA(initiatorId, defenderId);
 
-      await this.program.methods
-        .processBattle(new BN(tokensBurned))
+      const tx = await this.program.methods
+        .processBattle(tokensBurned)
         .accounts({
+          battle: battlePDA,
           initiator: initiatorPDA,
           defender: defenderPDA,
-          authority: initiatorKeypair.publicKey,
+          authority: this.authorityKeypair.publicKey,
         })
-        .signers([initiatorKeypair])
+        .signers([this.authorityKeypair])
         .rpc();
+
+      logger.info(`Battle processed with transaction ${tx}`);
+      return tx;
     } catch (error) {
-      logger.error("Failed to process battle on-chain:", error);
+      logger.error("Failed to process battle:", error);
       throw error;
     }
   }
 
-  /**
-   * Form an alliance between agents
-   */
-  public async formAlliance(
-    agent1Id: string,
-    agent2Id: string
-  ): Promise<string> {
+  async formAlliance(agent1Id: string, agent2Id: string): Promise<string> {
     try {
-      const [alliancePDA] = await this.findAlliancePDA(agent1Id, agent2Id);
       const [agent1PDA] = await this.findAgentPDA(agent1Id);
       const [agent2PDA] = await this.findAgentPDA(agent2Id);
-      const [gamePDA] = await this.findGamePDA();
+      const [alliancePDA] = await this.findAlliancePDA(agent1Id, agent2Id);
 
       const tx = await this.program.methods
         .formAlliance()
         .accounts({
-          game: gamePDA,
           alliance: alliancePDA,
           agent1: agent1PDA,
           agent2: agent2PDA,
-          authority: this.provider.wallet.publicKey,
-          systemProgram: SystemProgram.programId,
+          authority: this.authorityKeypair.publicKey,
         })
+        .signers([this.authorityKeypair])
         .rpc();
 
-      await this.connection.confirmTransaction(tx);
-      logger.info(`Alliance formed on-chain: ${tx}`);
+      logger.info(`Alliance formed with transaction ${tx}`);
       return tx;
     } catch (error) {
-      logger.error("Failed to form alliance on-chain:", error);
+      logger.error("Failed to form alliance:", error);
       throw error;
     }
   }
 
-  /**
-   * Update agent position
-   */
-  public async updateAgentPosition(
+  async updateAgentPosition(
     agentId: string,
     x: number,
     y: number
   ): Promise<string> {
     try {
-      const agentKeypair = await this.keyManager.getKeypair(agentId);
       const [agentPDA] = await this.findAgentPDA(agentId);
-      const [gamePDA] = await this.findGamePDA();
 
       const tx = await this.program.methods
-        .updatePosition({
-          position: {
-            x: new BN(x),
-            y: new BN(y),
-          },
-        })
+        .updatePosition(x, y)
         .accounts({
-          game: gamePDA,
           agent: agentPDA,
-          authority: agentKeypair.publicKey,
+          authority: this.authorityKeypair.publicKey,
         })
-        .signers([agentKeypair])
+        .signers([this.authorityKeypair])
         .rpc();
 
-      await this.connection.confirmTransaction(tx);
-      logger.info(`Agent ${agentId} position updated on-chain: ${tx}`);
+      logger.info(`Agent position updated with transaction ${tx}`);
       return tx;
     } catch (error) {
-      logger.error("Failed to update agent position on-chain:", error);
+      logger.error("Failed to update agent position:", error);
       throw error;
     }
-  }
-
-  /**
-   * Find Game PDA
-   */
-  private async findGamePDA(): Promise<[PublicKey, number]> {
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from(SolanaService.GAME_SEED)],
-      this.program.programId
-    );
-  }
-
-  /**
-   * Find Agent PDA
-   */
-  private async findAgentPDA(agentId: string): Promise<[PublicKey, number]> {
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from(SolanaService.AGENT_SEED), Buffer.from(agentId)],
-      this.program.programId
-    );
-  }
-
-  /**
-   * Find Battle PDA
-   */
-  private async findBattlePDA(
-    initiatorId: string,
-    defenderId: string
-  ): Promise<[PublicKey, number]> {
-    return PublicKey.findProgramAddressSync(
-      [
-        Buffer.from(SolanaService.BATTLE_SEED),
-        Buffer.from(initiatorId),
-        Buffer.from(defenderId),
-      ],
-      this.program.programId
-    );
-  }
-
-  /**
-   * Find Alliance PDA
-   */
-  private async findAlliancePDA(
-    agent1Id: string,
-    agent2Id: string
-  ): Promise<[PublicKey, number]> {
-    return PublicKey.findProgramAddressSync(
-      [
-        Buffer.from(SolanaService.ALLIANCE_SEED),
-        Buffer.from(agent1Id),
-        Buffer.from(agent2Id),
-      ],
-      this.program.programId
-    );
   }
 }

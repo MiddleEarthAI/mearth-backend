@@ -20,6 +20,33 @@ import { calculateDistance, normalizeScore } from "../utils/math";
 import { logger } from "../utils/logger";
 import NodeCache from "node-cache";
 
+// Define interfaces for community feedback
+interface CommunityEngagement {
+  impressions: number;
+}
+
+interface InfluentialUser {
+  followerCount: number;
+  [key: string]: any;
+}
+
+interface WeightedCommunityFeedback extends CommunityFeedback {
+  engagement: {
+    impressions: number;
+  };
+  suggestions: string[];
+  influentialUsers: {
+    followerCount: number;
+    [key: string]: any;
+  }[];
+  weightedSentiment?: number;
+  influentialOpinions?: Array<{
+    followerCount: number;
+    weight: number;
+    [key: string]: any;
+  }>;
+}
+
 export class LLMService {
   private readonly anthropic: Anthropic;
   private readonly cache: NodeCache;
@@ -102,15 +129,18 @@ export class LLMService {
     adjustedAlliancePropensity: number;
     reason: string;
   }> {
-    const weightedFeedback = this.calculateWeightedFeedback(feedback);
-    const prompt = this.buildFeedbackPrompt(agent, weightedFeedback);
+    // Convert basic feedback to weighted feedback
+    const weightedFeedback: WeightedCommunityFeedback = {
+      ...feedback,
+      engagement: { impressions: 0 }, // Default values
+      suggestions: [],
+      influentialUsers: [],
+    };
 
-    return await this.makeRequest(
-      prompt,
-      agent.characteristics.influenceability / 100,
-      500,
-      parseTraitAdjustments
-    );
+    const enrichedFeedback = this.calculateWeightedFeedback(weightedFeedback);
+    const prompt = this.buildFeedbackPrompt(agent, enrichedFeedback);
+    const response = await this.makeRequest(prompt);
+    return parseTraitAdjustments(response);
   }
 
   /**
@@ -124,10 +154,8 @@ export class LLMService {
     }
   ): Promise<string> {
     const prompt = this.buildTweetPrompt(agent, context);
-
-    return await this.makeRequest(prompt, 0.8, 300, (text: string) =>
-      this.formatTweet(text.trim(), agent)
-    );
+    const response = await this.makeRequest(prompt);
+    return this.formatTweet(response.trim(), agent);
   }
 
   private calculateTemperature(agent: Agent): number {
@@ -138,7 +166,7 @@ export class LLMService {
   private calculateConfidence(
     agent: Agent,
     decision: AgentDecision,
-    gameState: any
+    gameState: GameState
   ): number {
     let confidence = 70; // Base confidence
 
@@ -153,7 +181,7 @@ export class LLMService {
     }
 
     // Adjust based on terrain
-    if (gameState.terrain !== TerrainType.NORMAL) {
+    if (gameState.terrain !== TerrainType.PLAIN) {
       confidence -= 10;
     }
 
@@ -163,7 +191,7 @@ export class LLMService {
 
   private calculateCommunityAlignment(
     decision: AgentDecision,
-    feedback: CommunityFeedback
+    feedback: WeightedCommunityFeedback
   ): number {
     // Calculate how well the decision aligns with community suggestions
     const relevantSuggestions = feedback.suggestions.filter((s) =>
@@ -190,18 +218,19 @@ export class LLMService {
     return basePercentage;
   }
 
-  private calculateWeightedFeedback(feedback: CommunityFeedback): any {
-    return {
+  private calculateWeightedFeedback(
+    feedback: WeightedCommunityFeedback
+  ): WeightedCommunityFeedback {
+    const enrichedFeedback = {
       ...feedback,
       weightedSentiment:
         feedback.sentiment * (feedback.engagement.impressions / 10000),
-      influentialOpinions: feedback.influentialUsers
-        .filter((user) => user.followerCount > 1000)
-        .map((user) => ({
-          ...user,
-          weight: Math.log10(user.followerCount) / 10,
-        })),
+      influentialOpinions: feedback.influentialUsers.map((user) => ({
+        ...user,
+        weight: Math.log10(user.followerCount) / 10,
+      })),
     };
+    return enrichedFeedback;
   }
 
   private buildMovePrompt(agent: Agent, gameState: GameState): string {
@@ -250,10 +279,11 @@ Should you engage in battle? Consider token balances, previous outcomes, and cha
 Respond with a structured strategy including whether to fight and suggested token burn amount.`;
   }
 
-  private buildFeedbackPrompt(agent: Agent, weightedFeedback: any): string {
-    return `As ${agent.name} (${
-      agent.type
-    }), analyze this weighted community feedback:
+  private buildFeedbackPrompt(
+    agent: Agent,
+    weightedFeedback: WeightedCommunityFeedback
+  ): string {
+    return `As ${agent.name} (${agent.type}), analyze this weighted community feedback:
 
 Current Traits:
 - Aggressiveness: ${agent.characteristics.aggressiveness}
@@ -261,10 +291,10 @@ Current Traits:
 - Influenceability: ${agent.characteristics.influenceability}
 
 Weighted Feedback:
-- Overall Sentiment: ${weightedFeedback.weightedSentiment}
+- Overall Sentiment: ${weightedFeedback.weightedSentiment || weightedFeedback.sentiment}
 - Key Suggestions: ${weightedFeedback.suggestions.join(", ")}
 - Engagement Level: ${weightedFeedback.engagement.impressions} impressions
-- Influential Opinions: ${JSON.stringify(weightedFeedback.influentialOpinions)}
+- Influential Opinions: ${JSON.stringify(weightedFeedback.influentialOpinions || [])}
 
 Consider:
 1. Your influenceability score

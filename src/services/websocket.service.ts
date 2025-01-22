@@ -23,8 +23,12 @@ export class WebSocketService {
   private reconnectAttempts: number = 0;
   private readonly maxReconnectAttempts: number = 5;
   private subscriptions: Set<string> = new Set();
+  private programUpdateCallback: ((data: any) => void) | null = null;
+  private signatureUpdateCallback: ((data: any) => void) | null = null;
+  private accountUpdateCallback: ((data: any) => void) | null = null;
+  private readonly reconnectDelay = 1000; // Start with 1 second
 
-  constructor() {
+  constructor(private readonly wsEndpoint: string) {
     if (!process.env.HELIUS_API_KEY) {
       throw new Error("Missing HELIUS_API_KEY environment variable");
     }
@@ -35,25 +39,32 @@ export class WebSocketService {
   }
 
   /**
-   * Connect to the WebSocket server
+   * Connect to WebSocket endpoint
    */
   public async connect(): Promise<void> {
-    if (this.isConnected) {
-      logger.warn("WebSocket is already connected");
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      logger.info("WebSocket already connected");
       return;
     }
 
     try {
-      this.ws = new WebSocket(this.url);
-      this.setupWebSocketHandlers();
-      await this.waitForConnection();
-      this.isConnected = true;
-      this.reconnectAttempts = 0;
-      this.startHeartbeat();
+      await this.establishConnection();
+      this.setupEventHandlers();
       logger.info("WebSocket connected successfully");
     } catch (error) {
-      logger.error("Failed to connect to WebSocket:", error);
+      logger.error("Failed to connect WebSocket:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Disconnect from WebSocket
+   */
+  public async disconnect(): Promise<void> {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+      logger.info("WebSocket disconnected");
     }
   }
 
@@ -61,13 +72,13 @@ export class WebSocketService {
    * Subscribe to program events
    */
   public async subscribeToProgramEvents(programId: string): Promise<void> {
-    if (!this.isConnected) {
-      throw new Error("WebSocket is not connected");
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      throw new Error("WebSocket not connected");
     }
 
-    const request: WebSocketRequest = {
+    const subscribeMessage = {
       jsonrpc: "2.0",
-      id: Date.now(),
+      id: 1,
       method: "programSubscribe",
       params: [
         programId,
@@ -76,151 +87,155 @@ export class WebSocketService {
           commitment: "confirmed",
         },
       ],
-    } as const;
+    };
 
-    try {
-      await this.sendRequest(request);
-      this.subscriptions.add(programId);
-      logger.info(`Subscribed to program events: ${programId}`);
-    } catch (error) {
-      logger.error(
-        `Failed to subscribe to program events: ${programId}`,
-        error
-      );
-      throw error;
-    }
+    await this.sendRequest(subscribeMessage);
+    logger.info(`Subscribed to program events for ${programId}`);
   }
 
   /**
-   * Subscribe to signature/transaction events
+   * Set callback for program updates
    */
-  public async subscribeToSignature(signature: string): Promise<void> {
-    if (!this.isConnected) {
-      throw new Error("WebSocket is not connected");
-    }
-
-    const request: WebSocketRequest = {
-      jsonrpc: "2.0",
-      id: Date.now(),
-      method: "signatureSubscribe",
-      params: [
-        signature,
-        {
-          commitment: "confirmed",
-          enableReceivedNotification: true,
-        },
-      ],
-    } as const;
-
-    try {
-      await this.sendRequest(request);
-      this.subscriptions.add(signature);
-      logger.info(`Subscribed to signature events: ${signature}`);
-    } catch (error) {
-      logger.error(`Failed to subscribe to signature: ${signature}`, error);
-      throw error;
-    }
+  public onProgramUpdate(callback: (data: any) => void): void {
+    this.programUpdateCallback = callback;
   }
 
   /**
-   * Subscribe to account updates
+   * Set callback for signature updates
    */
-  public async subscribeToAccount(accountId: string): Promise<void> {
-    if (!this.isConnected) {
-      throw new Error("WebSocket is not connected");
-    }
-
-    const request: WebSocketRequest = {
-      jsonrpc: "2.0",
-      id: Date.now(),
-      method: "accountSubscribe",
-      params: [
-        accountId,
-        {
-          encoding: "jsonParsed",
-          commitment: "confirmed",
-        },
-      ],
-    } as const;
-
-    try {
-      await this.sendRequest(request);
-      this.subscriptions.add(accountId);
-      logger.info(`Subscribed to account updates: ${accountId}`);
-    } catch (error) {
-      logger.error(`Failed to subscribe to account: ${accountId}`, error);
-      throw error;
-    }
+  public onSignatureUpdate(callback: (data: any) => void): void {
+    this.signatureUpdateCallback = callback;
   }
 
   /**
-   * Disconnect from the WebSocket server
+   * Set callback for account updates
    */
-  public async disconnect(): Promise<void> {
-    if (!this.isConnected || !this.ws) return;
-
-    try {
-      this.ws.close();
-      this.isConnected = false;
-      this.subscriptions.clear();
-      logger.info("WebSocket disconnected");
-    } catch (error) {
-      logger.error("Error disconnecting WebSocket:", error);
-      throw error;
-    }
+  public onAccountUpdate(callback: (data: any) => void): void {
+    this.accountUpdateCallback = callback;
   }
 
-  private setupWebSocketHandlers(): void {
+  /**
+   * Establish WebSocket connection with retry logic
+   */
+  private async establishConnection(): Promise<void> {
+    await retryWithExponentialBackoff(
+      () => {
+        return new Promise((resolve, reject) => {
+          this.ws = new WebSocket(this.wsEndpoint);
+
+          this.ws.once("open", () => {
+            this.reconnectAttempts = 0;
+            resolve();
+          });
+
+          this.ws.once("error", (error) => {
+            reject(error);
+          });
+        });
+      },
+      {
+        maxRetries: this.maxReconnectAttempts,
+        minTimeout: this.reconnectDelay,
+        maxTimeout:
+          this.reconnectDelay * Math.pow(2, this.maxReconnectAttempts),
+      }
+    );
+  }
+
+  /**
+   * Setup WebSocket event handlers
+   */
+  private setupEventHandlers(): void {
     if (!this.ws) return;
-
-    this.ws.on("open", () => {
-      logger.info("WebSocket connection opened");
-      this.eventEmitter.emit("connected");
-    });
 
     this.ws.on("message", (data: WebSocket.Data) => {
       try {
-        const message = JSON.parse(data.toString()) as WebSocketMessage;
+        const message = JSON.parse(data.toString());
         this.handleMessage(message);
       } catch (error) {
         logger.error("Error parsing WebSocket message:", error);
       }
     });
 
-    this.ws.on("error", (error: Error) => {
-      logger.error("WebSocket error:", error);
-      this.eventEmitter.emit("error", error);
+    this.ws.on("close", () => {
+      logger.warn("WebSocket connection closed");
+      this.handleReconnect();
     });
 
-    this.ws.on("close", () => {
-      logger.info("WebSocket connection closed");
-      this.isConnected = false;
+    this.ws.on("error", (error) => {
+      logger.error("WebSocket error:", error);
       this.handleReconnect();
     });
   }
 
-  private async handleReconnect(): Promise<void> {
+  /**
+   * Handle incoming WebSocket messages
+   */
+  private handleMessage(message: any): void {
+    if (
+      message.method === "programNotification" &&
+      this.programUpdateCallback
+    ) {
+      this.programUpdateCallback(message.params);
+    } else if (
+      message.method === "signatureNotification" &&
+      this.signatureUpdateCallback
+    ) {
+      this.signatureUpdateCallback(message.params);
+    } else if (
+      message.method === "accountNotification" &&
+      this.accountUpdateCallback
+    ) {
+      this.accountUpdateCallback(message.params);
+    }
+  }
+
+  /**
+   * Handle WebSocket reconnection
+   */
+  private async handleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       logger.error("Max reconnection attempts reached");
-      this.eventEmitter.emit("maxReconnectAttemptsReached");
       return;
     }
 
     this.reconnectAttempts++;
+    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
+
     logger.info(
-      `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
+      `Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`
     );
 
-    try {
-      await this.connect();
-      // Resubscribe to all previous subscriptions
-      for (const subscription of this.subscriptions) {
-        await this.subscribeToProgramEvents(subscription);
+    setTimeout(async () => {
+      try {
+        await this.connect();
+      } catch (error) {
+        logger.error("Reconnection attempt failed:", error);
       }
-    } catch (error) {
-      logger.error("Reconnection attempt failed:", error);
-      setTimeout(() => this.handleReconnect(), 5000 * this.reconnectAttempts);
+    }, delay);
+  }
+
+  /**
+   * Send a request through WebSocket
+   */
+  private async sendRequest(request: any): Promise<void> {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      throw new Error("WebSocket not connected");
     }
+
+    return new Promise((resolve, reject) => {
+      try {
+        this.ws!.send(JSON.stringify(request), (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   private setupEventEmitter(): void {
@@ -235,75 +250,5 @@ export class WebSocketService {
     this.eventEmitter.on("accountUpdate", (data) => {
       logger.info("Account update received:", data);
     });
-  }
-
-  private handleMessage(message: WebSocketMessage): void {
-    if (message.method === "programNotification") {
-      this.eventEmitter.emit("programUpdate", message.params);
-    } else if (message.method === "signatureNotification") {
-      this.eventEmitter.emit("signatureUpdate", message.params);
-    } else if (message.method === "accountNotification") {
-      this.eventEmitter.emit("accountUpdate", message.params);
-    }
-  }
-
-  private async sendRequest(request: WebSocketRequest): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this.ws) {
-        reject(new Error("WebSocket is not initialized"));
-        return;
-      }
-
-      this.ws.send(JSON.stringify(request), (error?: Error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  private async waitForConnection(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this.ws) {
-        reject(new Error("WebSocket is not initialized"));
-        return;
-      }
-
-      const timeout = setTimeout(() => {
-        reject(new Error("WebSocket connection timeout"));
-      }, 10000);
-
-      this.eventEmitter.once("connected", () => {
-        clearTimeout(timeout);
-        resolve();
-      });
-
-      this.eventEmitter.once("error", (error) => {
-        clearTimeout(timeout);
-        reject(error);
-      });
-    });
-  }
-
-  private startHeartbeat(): void {
-    setInterval(() => {
-      if (this.isConnected && this.ws?.readyState === WebSocket.OPEN) {
-        this.ws.ping();
-      }
-    }, 30000); // Send ping every 30 seconds
-  }
-
-  public onProgramUpdate(callback: (data: any) => void): void {
-    this.eventEmitter.on("programUpdate", callback);
-  }
-
-  public onSignatureUpdate(callback: (data: any) => void): void {
-    this.eventEmitter.on("signatureUpdate", callback);
-  }
-
-  public onAccountUpdate(callback: (data: any) => void): void {
-    this.eventEmitter.on("accountUpdate", callback);
   }
 }

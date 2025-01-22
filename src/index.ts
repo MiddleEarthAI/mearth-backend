@@ -3,23 +3,19 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { PrismaClient } from "@prisma/client";
+import { Container } from "./container";
 import { AgentManagerService } from "./services/agentManager.service";
-import { gameRoutes } from "./routes/game.routes";
 import { logger } from "./utils/logger";
+import { config } from "./config";
 
 const app = express();
-const port = process.env.PORT || 3000;
-const prisma = new PrismaClient();
-const agentManager = new AgentManagerService();
+const container = Container.getInstance();
 
 // Middleware
-app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(helmet());
 app.use(morgan("combined"));
-
-// Routes
-app.use("/api/game", gameRoutes);
+app.use(express.json());
 
 // Error handling middleware
 app.use(
@@ -35,13 +31,10 @@ app.use(
 );
 
 // Graceful shutdown
-async function shutdown(): Promise<void> {
-  logger.info("Shutting down server...");
-
+async function shutdown() {
+  logger.info("Shutting down gracefully...");
   try {
-    await agentManager.stop();
-    await prisma.$disconnect();
-    logger.info("Server shutdown complete");
+    await container.dispose();
     process.exit(0);
   } catch (error) {
     logger.error("Error during shutdown:", error);
@@ -49,18 +42,19 @@ async function shutdown(): Promise<void> {
   }
 }
 
-// Handle shutdown signals
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
-// Start server and agent manager
-async function startServer(): Promise<void> {
+// Start server
+async function startServer() {
   try {
-    await prisma.$connect();
+    const agentManager = container.get<AgentManagerService>("agentManager");
     await agentManager.start();
 
-    app.listen(port, () => {
-      logger.info(`⚡️[server]: Server is running at http://localhost:${port}`);
+    app.listen(config.app.port, () => {
+      logger.info(
+        `⚡️[server]: Server is running at http://localhost:${config.app.port}`
+      );
     });
   } catch (error) {
     logger.error("Failed to start server:", error);

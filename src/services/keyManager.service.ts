@@ -1,51 +1,67 @@
 import { Keypair } from "@solana/web3.js";
-import { PrismaClient } from "@prisma/client";
-import * as crypto from "crypto";
-import { logger } from "../utils/logger";
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  CipherGCM,
+  DecipherGCM,
+} from "crypto";
 import NodeCache from "node-cache";
+import { PrismaClient } from "@prisma/client";
+import { IKeyManagerService } from "../types/services";
+import { SecurityConfig } from "../config";
+import { logger } from "../utils/logger";
+import { retryWithExponentialBackoff } from "../utils/retry";
 
 /**
- * Service for secure management of agent keypairs
+ * Service for managing agent keypairs with secure storage and caching
  */
-export class KeyManagerService {
-  private readonly prisma: PrismaClient;
-  private readonly cache: NodeCache;
-  private readonly encryptionKey: Buffer;
-  private readonly algorithm = "aes-256-gcm";
+export class KeyManagerService implements IKeyManagerService {
+  private cache: NodeCache;
+  private algorithm = "aes-256-gcm";
 
-  constructor() {
-    this.prisma = new PrismaClient();
+  constructor(
+    private readonly config: SecurityConfig,
+    private readonly prisma: PrismaClient
+  ) {
     this.cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
-
-    // Get encryption key from environment or generate one
-    const envKey = process.env.KEYPAIR_ENCRYPTION_KEY;
-    if (!envKey) {
-      throw new Error("Missing KEYPAIR_ENCRYPTION_KEY environment variable");
-    }
-    this.encryptionKey = Buffer.from(envKey, "hex");
+    logger.info("KeyManager service initialized");
   }
 
   /**
    * Generate a new keypair for an agent
    */
-  public async generateKeypair(agentId: string): Promise<Keypair> {
+  async generateKeypair(agentId: string): Promise<Keypair> {
     try {
+      // Check cache first
+      const cached = this.cache.get<Keypair>(agentId);
+      if (cached) {
+        return cached;
+      }
+
       // Generate new keypair
       const keypair = Keypair.generate();
-
-      // Encrypt private key
-      const encryptedPrivateKey = this.encryptData(
-        Buffer.from(keypair.secretKey).toString("hex")
+      const { encryptedPrivateKey } = await this.encryptPrivateKey(
+        Buffer.from(keypair.secretKey)
       );
 
-      // Store encrypted private key
-      await this.prisma.agentKeypair.create({
-        data: {
+      // Store in database
+      await this.prisma.agentKeypair.upsert({
+        where: { agentId },
+        update: {
+          publicKey: keypair.publicKey.toBase58(),
+          encryptedPrivateKey,
+          rotatedAt: new Date(),
+        },
+        create: {
           agentId,
           publicKey: keypair.publicKey.toBase58(),
           encryptedPrivateKey,
         },
       });
+
+      // Cache the keypair
+      this.cache.set(agentId, keypair);
 
       logger.info(`Generated new keypair for agent ${agentId}`);
       return keypair;
@@ -56,38 +72,32 @@ export class KeyManagerService {
   }
 
   /**
-   * Get an agent's keypair
+   * Get an existing keypair for an agent
    */
-  public async getKeypair(agentId: string): Promise<Keypair> {
-    // Check cache first
-    const cachedKeypair = this.cache.get<Keypair>(agentId);
-    if (cachedKeypair) {
-      return cachedKeypair;
-    }
-
+  async getKeypair(agentId: string): Promise<Keypair> {
     try {
-      // Get encrypted keypair from database
-      const storedKeypair = await this.prisma.agentKeypair.findUnique({
+      // Check cache first
+      const cached = this.cache.get<Keypair>(agentId);
+      if (cached) {
+        return cached;
+      }
+
+      // Get from database
+      const stored = await this.prisma.agentKeypair.findUnique({
         where: { agentId },
       });
 
-      if (!storedKeypair) {
+      if (!stored) {
         throw new Error(`No keypair found for agent ${agentId}`);
       }
 
       // Decrypt private key
-      const privateKeyHex = this.decryptData(storedKeypair.encryptedPrivateKey);
-      const privateKey = Buffer.from(privateKeyHex, "hex");
-
-      // Reconstruct keypair
+      const privateKey = await this.decryptPrivateKey(
+        stored.encryptedPrivateKey
+      );
       const keypair = Keypair.fromSecretKey(privateKey);
 
-      // Verify public key matches
-      if (keypair.publicKey.toBase58() !== storedKeypair.publicKey) {
-        throw new Error("Keypair verification failed");
-      }
-
-      // Cache keypair
+      // Cache the keypair
       this.cache.set(agentId, keypair);
 
       return keypair;
@@ -100,30 +110,29 @@ export class KeyManagerService {
   /**
    * Rotate an agent's keypair
    */
-  public async rotateKeypair(agentId: string): Promise<Keypair> {
+  async rotateKeypair(agentId: string): Promise<Keypair> {
     try {
       // Generate new keypair
-      const newKeypair = await this.generateKeypair(agentId);
-
-      // Update database
-      const encryptedPrivateKey = this.encryptData(
-        Buffer.from(newKeypair.secretKey).toString("hex")
+      const keypair = Keypair.generate();
+      const { encryptedPrivateKey } = await this.encryptPrivateKey(
+        Buffer.from(keypair.secretKey)
       );
 
+      // Update in database
       await this.prisma.agentKeypair.update({
         where: { agentId },
         data: {
-          publicKey: newKeypair.publicKey.toBase58(),
+          publicKey: keypair.publicKey.toBase58(),
           encryptedPrivateKey,
           rotatedAt: new Date(),
         },
       });
 
       // Update cache
-      this.cache.set(agentId, newKeypair);
+      this.cache.set(agentId, keypair);
 
       logger.info(`Rotated keypair for agent ${agentId}`);
-      return newKeypair;
+      return keypair;
     } catch (error) {
       logger.error(`Failed to rotate keypair for agent ${agentId}:`, error);
       throw error;
@@ -131,51 +140,63 @@ export class KeyManagerService {
   }
 
   /**
-   * Encrypt data using AES-256-GCM
+   * Encrypt a private key
    */
-  private encryptData(data: string): string {
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv(
+  private async encryptPrivateKey(
+    privateKey: Buffer
+  ): Promise<{ encryptedPrivateKey: string; iv: Buffer }> {
+    const iv = randomBytes(16);
+    const cipher = createCipheriv(
       this.algorithm,
-      this.encryptionKey,
+      Buffer.from(this.config.keypairEncryptionKey, "hex"),
       iv
-    );
+    ) as CipherGCM;
 
-    let encryptedData = cipher.update(data, "utf8", "hex");
-    encryptedData += cipher.final("hex");
+    const encrypted = Buffer.concat([
+      cipher.update(privateKey),
+      cipher.final(),
+    ]);
 
     const authTag = cipher.getAuthTag();
+    const encryptedPrivateKey = Buffer.concat([
+      iv,
+      authTag,
+      encrypted,
+    ]).toString("hex");
 
-    // Combine IV, encrypted data, and auth tag
-    return `${iv.toString("hex")}:${encryptedData}:${authTag.toString("hex")}`;
+    return { encryptedPrivateKey, iv };
   }
 
   /**
-   * Decrypt data using AES-256-GCM
+   * Decrypt an encrypted private key
    */
-  private decryptData(encryptedData: string): string {
-    const [ivHex, data, authTagHex] = encryptedData.split(":");
+  private async decryptPrivateKey(
+    encryptedPrivateKey: string
+  ): Promise<Buffer> {
+    const encryptedBuffer = Buffer.from(encryptedPrivateKey, "hex");
+    const iv = encryptedBuffer.subarray(0, 16);
+    const authTag = encryptedBuffer.subarray(16, 32);
+    const encrypted = encryptedBuffer.subarray(32);
 
-    const iv = Buffer.from(ivHex, "hex");
-    const authTag = Buffer.from(authTagHex, "hex");
-
-    const decipher = crypto.createDecipheriv(
+    const decipher = createDecipheriv(
       this.algorithm,
-      this.encryptionKey,
+      Buffer.from(this.config.keypairEncryptionKey, "hex"),
       iv
-    );
+    ) as DecipherGCM;
+
     decipher.setAuthTag(authTag);
-
-    let decryptedData = decipher.update(data, "hex", "utf8");
-    decryptedData += decipher.final("utf8");
-
-    return decryptedData;
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
   }
 
   /**
    * Clean up expired cache entries
    */
-  public cleanupCache(): void {
-    this.cache.prune();
+  private cleanupCache(): void {
+    const keys = this.cache.keys();
+    for (const key of keys) {
+      if (!this.cache.get(key)) {
+        this.cache.del(key);
+      }
+    }
   }
 }

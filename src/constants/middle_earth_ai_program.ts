@@ -978,6 +978,7 @@ export type MiddleEarthAiProgram = {
             name: "agentId";
             type: "u8";
           },
+
           {
             name: "opponentAgentId";
             type: "u8";

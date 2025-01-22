@@ -2,12 +2,15 @@ import { Scraper } from "agent-twitter-client";
 import { Agent, CommunityFeedback } from "../types/game";
 import { logger } from "../utils/logger";
 import { retryWithExponentialBackoff } from "../utils/retry";
+import { TwitterConfig } from "../config";
+import { ITwitterService } from "../types/services";
 
-export class TwitterService {
+export class TwitterService implements ITwitterService {
   private clients: Map<string, Scraper> = new Map();
 
-  constructor() {
+  constructor(private readonly config: TwitterConfig) {
     this.initializeClients();
+    logger.info("Twitter service initialized");
   }
 
   private async initializeClients(): Promise<void> {
@@ -82,15 +85,17 @@ export class TwitterService {
   /**
    * Announce agent movement
    */
-  public async announceMovement(agent: Agent, reason: string): Promise<void> {
+  public async announceMovement(
+    agent: Agent,
+    x: number,
+    y: number
+  ): Promise<void> {
     try {
-      const message = `🚶 ${agent.name} is on the move!\n\nReason: ${reason}\n\n#MiddleEarthAI #GameUpdate`;
-      await retryWithExponentialBackoff(async () => {
-        await this.postTweet(agent, message);
-      });
-      logger.info(`Movement announced for ${agent.name}`);
+      const tweet = `🚶 ${agent.name} is moving to position (${x}, ${y})`;
+      logger.info(`Announcing movement for ${agent.name}:`, tweet);
     } catch (error) {
-      logger.error(`Error announcing movement for ${agent.name}:`, error);
+      logger.error(`Failed to announce movement for ${agent.name}:`, error);
+      throw error;
     }
   }
 
@@ -134,18 +139,19 @@ export class TwitterService {
   /**
    * Announce alliance formation
    */
-  public async announceAlliance(
-    agent: Agent,
-    allyHandle: string
-  ): Promise<void> {
+  public async announceAlliance(agent1: Agent, agent2: Agent): Promise<void> {
     try {
-      const message = `🤝 Alliance Alert!\n\n${agent.name} has formed an alliance with @${allyHandle}!\n\n#MiddleEarthAI #Alliance`;
-      await retryWithExponentialBackoff(async () => {
-        await this.postTweet(agent, message);
-      });
-      logger.info(`Alliance announced between ${agent.name} and ${allyHandle}`);
+      const tweet = `🤝 ${agent1.name} and ${agent2.name} have formed an alliance!`;
+      logger.info(
+        `Announcing alliance between ${agent1.name} and ${agent2.name}:`,
+        tweet
+      );
     } catch (error) {
-      logger.error("Error announcing alliance:", error);
+      logger.error(
+        `Failed to announce alliance between ${agent1.name} and ${agent2.name}:`,
+        error
+      );
+      throw error;
     }
   }
 
@@ -229,6 +235,17 @@ export class TwitterService {
     } catch (error) {
       logger.error("Error calculating tweet influence:", error);
       return 0;
+    }
+  }
+
+  public async fetchCommunityFeedback(): Promise<any> {
+    try {
+      // Placeholder for fetching community feedback
+      logger.info("Fetching community feedback");
+      return {};
+    } catch (error) {
+      logger.error("Failed to fetch community feedback:", error);
+      throw error;
     }
   }
 }
