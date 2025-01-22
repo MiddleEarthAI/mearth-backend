@@ -9,9 +9,9 @@ import {
 import NodeCache from "node-cache";
 import { PrismaClient } from "@prisma/client";
 import { IKeyManagerService } from "../types/services";
-import { SecurityConfig } from "../config";
+
 import { logger } from "../utils/logger";
-import { retryWithExponentialBackoff } from "../utils/retry";
+import { SecurityConfig } from "@/config";
 
 /**
  * Service for managing agent keypairs with secure storage and caching

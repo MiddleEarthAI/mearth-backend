@@ -1,12 +1,14 @@
 import { PrismaClient } from "@prisma/client";
-import { Config, config } from "../config";
-import { GameService } from "../services/game.service";
-import { LLMService } from "../services/llm.service";
-import { TwitterService } from "../services/twitter.service";
-import { SolanaService } from "../services/solana.service";
-import { KeyManagerService } from "../services/keyManager.service";
-import { AgentManagerService } from "../services/agentManager.service";
-import { logger } from "../utils/logger";
+
+import { GameService } from "../services/game.service.js";
+import { LLMService } from "../services/llm.service.js";
+import { TwitterService } from "../services/twitter.service.js";
+import { SolanaService } from "../services/solana.service.js";
+import { KeyManagerService } from "../services/keyManager.service.js";
+import { AgentManagerService } from "../services/agentManager.service.js";
+import { logger } from "../utils/logger.js";
+import { config } from "@/config";
+import { Config } from "@/config";
 
 export class Container {
   private static instance: Container;

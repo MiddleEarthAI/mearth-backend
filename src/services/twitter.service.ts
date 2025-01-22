@@ -2,8 +2,9 @@ import { Scraper } from "agent-twitter-client";
 import { Agent, CommunityFeedback } from "../types/game";
 import { logger } from "../utils/logger";
 import { retryWithExponentialBackoff } from "../utils/retry";
-import { TwitterConfig } from "../config";
+
 import { ITwitterService } from "../types/services";
+import { TwitterConfig } from "@/config";
 
 export class TwitterService implements ITwitterService {
   private clients: Map<string, Scraper> = new Map();
@@ -17,27 +18,27 @@ export class TwitterService implements ITwitterService {
     const agents = [
       {
         type: "SCOOTLES",
-        username: process.env.SCOOTLES_TWITTER_USERNAME,
-        password: process.env.SCOOTLES_TWITTER_PASSWORD,
-        email: process.env.SCOOTLES_TWITTER_EMAIL,
+        username: this.config.SCOOTLES_TWITTER_USERNAME,
+        password: this.config.SCOOTLES_TWITTER_PASSWORD,
+        email: this.config.SCOOTLES_TWITTER_EMAIL,
       },
       {
         type: "PURRLOCK_PAWS",
-        username: process.env.PURRLOCK_TWITTER_USERNAME,
-        password: process.env.PURRLOCK_TWITTER_PASSWORD,
-        email: process.env.PURRLOCK_TWITTER_EMAIL,
+        username: this.config.PURRLOCKPAWS_TWITTER_USERNAME,
+        password: this.config.PURRLOCKPAWS_TWITTER_PASSWORD,
+        email: this.config.PURRLOCKPAWS_TWITTER_EMAIL,
       },
       {
         type: "SIR_GULLIHOP",
-        username: process.env.GULLIHOP_TWITTER_USERNAME,
-        password: process.env.GULLIHOP_TWITTER_PASSWORD,
-        email: process.env.GULLIHOP_TWITTER_EMAIL,
+        username: this.config.SIR_GULLIHOP_TWITTER_USERNAME,
+        password: this.config.SIR_GULLIHOP_TWITTER_PASSWORD,
+        email: this.config.SIR_GULLIHOP_TWITTER_EMAIL,
       },
       {
         type: "WANDERLEAF",
-        username: process.env.WANDERLEAF_TWITTER_USERNAME,
-        password: process.env.WANDERLEAF_TWITTER_PASSWORD,
-        email: process.env.WANDERLEAF_TWITTER_EMAIL,
+        username: this.config.WANDERLEAF_TWITTER_USERNAME,
+        password: this.config.WANDERLEAF_TWITTER_PASSWORD,
+        email: this.config.WANDERLEAF_TWITTER_EMAIL,
       },
     ];
 

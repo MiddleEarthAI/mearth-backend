@@ -13,15 +13,26 @@ export interface DatabaseConfig {
 export interface SolanaConfig {
   rpcUrl: string;
   programId: string;
-  authorityKeyPath: string;
   wsEndpoint: string;
+  commitment: string;
 }
 
 export interface TwitterConfig {
-  apiKey: string;
-  apiSecret: string;
-  accessToken: string;
-  accessTokenSecret: string;
+  SCOOTLES_TWITTER_USERNAME: string;
+  SCOOTLES_TWITTER_PASSWORD: string;
+  SCOOTLES_TWITTER_EMAIL: string;
+
+  PURRLOCKPAWS_TWITTER_USERNAME: string;
+  PURRLOCKPAWS_TWITTER_PASSWORD: string;
+  PURRLOCKPAWS_TWITTER_EMAIL: string;
+
+  SIR_GULLIHOP_TWITTER_USERNAME: string;
+  SIR_GULLIHOP_TWITTER_PASSWORD: string;
+  SIR_GULLIHOP_TWITTER_EMAIL: string;
+
+  WANDERLEAF_TWITTER_USERNAME: string;
+  WANDERLEAF_TWITTER_PASSWORD: string;
+  WANDERLEAF_TWITTER_EMAIL: string;
 }
 
 export interface SecurityConfig {
@@ -51,10 +62,19 @@ export class Config {
     this.validateEnv([
       "DATABASE_URL",
       "SOLANA_RPC_URL",
-      "PROGRAM_ID",
       "KEYPAIR_ENCRYPTION_KEY",
-      "TWITTER_API_KEY",
-      "TWITTER_API_SECRET",
+
+      "SCOOTLES_TWITTER_USERNAME",
+      "SCOOTLES_TWITTER_PASSWORD",
+
+      "PURRLOCKPAWS_TWITTER_USERNAME",
+      "PURRLOCKPAWS_TWITTER_PASSWORD",
+
+      "SIR_GULLIHOP_TWITTER_USERNAME",
+      "SIR_GULLIHOP_TWITTER_PASSWORD",
+
+      "WANDERLEAF_TWITTER_USERNAME",
+      "WANDERLEAF_TWITTER_PASSWORD",
     ]);
 
     this.database = {
@@ -66,17 +86,27 @@ export class Config {
     this.solana = {
       rpcUrl: process.env.SOLANA_RPC_URL!,
       programId: process.env.PROGRAM_ID!,
-      authorityKeyPath:
-        process.env.AUTHORITY_KEYPAIR_PATH || "./authority-keypair.json",
       wsEndpoint:
         process.env.SOLANA_WS_ENDPOINT || "wss://api.devnet.solana.com",
+      commitment: process.env.SOLANA_COMMITMENT || "confirmed",
     };
 
     this.twitter = {
-      apiKey: process.env.TWITTER_API_KEY!,
-      apiSecret: process.env.TWITTER_API_SECRET!,
-      accessToken: process.env.TWITTER_ACCESS_TOKEN!,
-      accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!,
+      SCOOTLES_TWITTER_USERNAME: process.env.SCOOTLES_TWITTER_USERNAME!,
+      SCOOTLES_TWITTER_PASSWORD: process.env.SCOOTLES_TWITTER_PASSWORD!,
+      SCOOTLES_TWITTER_EMAIL: process.env.SCOOTLES_TWITTER_EMAIL!,
+
+      PURRLOCKPAWS_TWITTER_USERNAME: process.env.PURRLOCKPAWS_TWITTER_USERNAME!,
+      PURRLOCKPAWS_TWITTER_PASSWORD: process.env.PURRLOCKPAWS_TWITTER_PASSWORD!,
+      PURRLOCKPAWS_TWITTER_EMAIL: process.env.PURRLOCKPAWS_TWITTER_EMAIL!,
+
+      SIR_GULLIHOP_TWITTER_USERNAME: process.env.SIR_GULLIHOP_TWITTER_USERNAME!,
+      SIR_GULLIHOP_TWITTER_PASSWORD: process.env.SIR_GULLIHOP_TWITTER_PASSWORD!,
+      SIR_GULLIHOP_TWITTER_EMAIL: process.env.SIR_GULLIHOP_TWITTER_EMAIL!,
+
+      WANDERLEAF_TWITTER_USERNAME: process.env.WANDERLEAF_TWITTER_USERNAME!,
+      WANDERLEAF_TWITTER_PASSWORD: process.env.WANDERLEAF_TWITTER_PASSWORD!,
+      WANDERLEAF_TWITTER_EMAIL: process.env.WANDERLEAF_TWITTER_EMAIL!,
     };
 
     this.security = {
@@ -104,7 +134,9 @@ export class Config {
   private validateEnv(required: string[]): void {
     const missing = required.filter((key) => !process.env[key]);
     if (missing.length > 0) {
-      const error = `Missing required environment variables: ${missing.join(", ")}`;
+      const error = `Missing required environment variables: ${missing.join(
+        ", "
+      )}`;
       logger.error(error);
       throw new Error(error);
     }

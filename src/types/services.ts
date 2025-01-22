@@ -13,11 +13,21 @@ export interface IGameService {
   processBattle(initiatorId: string, defenderId: string): Promise<void>;
   formAlliance(agent1Id: string, agent2Id: string): Promise<void>;
   breakAlliance(agentId: string): Promise<void>;
-  moveAgent(agentId: string, x: number, y: number): Promise<void>;
+  moveAgent(
+    agentId: string,
+    x: number,
+    y: number,
+    terrain: TerrainType
+  ): Promise<void>;
   findNearbyAgents(agent: Agent, range?: number): Promise<Agent[]>;
   determineTerrainType(position: Position): TerrainType;
   getGameState(): Promise<any>;
-  initializeAgent(agentId: string, name: string, type: string): Promise<void>;
+  initializeAgent(
+    agentId: string,
+    name: string,
+    type: string,
+    initialTokens: number
+  ): Promise<void>;
 }
 
 export interface ILLMService {

@@ -4,32 +4,19 @@ import {
   Keypair,
   Transaction,
   SystemProgram,
-  LAMPORTS_PER_SOL,
   VersionedTransaction,
+  Commitment,
 } from "@solana/web3.js";
-import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
-import { IDL } from "../types/idl";
+import { Program, AnchorProvider } from "@coral-xyz/anchor";
+
 import { SolanaConfig } from "../config";
-import {
-  IKeyManagerService,
-  IWebSocketService,
-  ISolanaService,
-} from "../types/services";
+import { IKeyManagerService, ISolanaService } from "../types/services";
 import { logger } from "../utils/logger";
-import { retryWithExponentialBackoff } from "../utils/retry";
-import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import {
-  Agent,
-  ProgramBattleEvent,
-  ProgramAllianceEvent,
-  ProgramPositionEvent,
-  MearthProgram,
-} from "../types/game";
-import { WebSocketService } from "./websocket.service";
-import { KeyManagerService } from "./keyManager.service";
-import mearthIdl from "../constants/middle_earth_ai_program.json";
-import { BN } from "@coral-xyz/anchor";
+
+import * as anchor from "@coral-xyz/anchor";
+import { mearthIdl } from "../constants/middle_earth_ai_program_idl";
 import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
+import { MearthProgram } from "@/types/game";
 
 type BattleEvent = {
   data: {
@@ -62,7 +49,7 @@ type PositionEvent = {
  */
 export class SolanaService implements ISolanaService {
   private connection: Connection;
-  private program: Program;
+  private program: MearthProgram;
   private authorityKeypair: Keypair;
   private wsConnection: Connection | null = null;
   private subscriptionIds: number[] = [];
@@ -72,46 +59,25 @@ export class SolanaService implements ISolanaService {
     private keyManager: IKeyManagerService
   ) {
     this.connection = new Connection(config.rpcUrl);
-    this.authorityKeypair = Keypair.fromSecretKey(
-      Buffer.from(config.authoritySecretKey, "hex")
-    );
+    this.authorityKeypair = Keypair.generate();
+    const wallet = new anchor.Wallet(this.authorityKeypair);
 
-    const provider = new AnchorProvider(
-      this.connection,
-      {
-        publicKey: this.authorityKeypair.publicKey,
-        signTransaction: async <T extends Transaction | VersionedTransaction>(
-          tx: T
-        ): Promise<T> => {
-          if (tx instanceof Transaction) {
-            tx.sign(this.authorityKeypair);
-          }
-          return tx;
-        },
-        signAllTransactions: async <
-          T extends Transaction | VersionedTransaction,
-        >(
-          txs: T[]
-        ): Promise<T[]> => {
-          return txs.map((tx) => {
-            if (tx instanceof Transaction) {
-              tx.sign(this.authorityKeypair);
-            }
-            return tx;
-          });
-        },
-      },
-      { commitment: config.commitment }
-    );
+    const provider = new AnchorProvider(this.connection, wallet, {
+      commitment: config.commitment as Commitment,
+    });
 
-    this.program = new Program(IDL, new PublicKey(config.programId), provider);
+    anchor.setProvider(provider);
+
+    this.program = new Program<MiddleEarthAiProgram>(
+      mearthIdl as MiddleEarthAiProgram
+    );
   }
 
   async startMonitoring(): Promise<void> {
     try {
       // Create a new WebSocket connection
       this.wsConnection = new Connection(this.config.rpcUrl, {
-        commitment: this.config.commitment,
+        commitment: this.config.commitment as Commitment,
         wsEndpoint: this.config.rpcUrl.replace("http", "ws"),
       });
 
@@ -121,10 +87,10 @@ export class SolanaService implements ISolanaService {
         programId,
         (accountInfo, context) => {
           try {
-            const eventData = this.program.coder.accounts.decode(
-              accountInfo.accountInfo.data
-            );
-            logger.info("Program account updated:", eventData);
+            // const eventData = this.program.coder.accounts.decode(
+            //   accountInfo.accountInfo.data
+            // );
+            // logger.info("Program account updated:", eventData);
           } catch (error) {
             logger.error("Error decoding program account data:", error);
           }
@@ -206,19 +172,20 @@ export class SolanaService implements ISolanaService {
       const [agentPDA] = await this.findAgentPDA(agentId);
       const agentKeypair = await this.keyManager.generateKeypair(agentId);
 
-      const tx = await this.program.methods
-        .initializeAgent(name, agentType, initialTokens)
-        .accounts({
-          agent: agentPDA,
-          authority: this.authorityKeypair.publicKey,
-          agentKey: agentKeypair.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .signers([this.authorityKeypair])
-        .rpc();
+      //   const tx = await this.program.methods
+      //     .initializeAgent(name, agentType, initialTokens)
+      //     .accounts({
+      //       agent: agentPDA,
+      //       authority: this.authorityKeypair.publicKey,
+      //       agentKey: agentKeypair.publicKey,
+      //       systemProgram: SystemProgram.programId,
+      //     })
+      //     .signers([this.authorityKeypair])
+      //     .rpc();
 
-      logger.info(`Agent ${agentId} initialized with transaction ${tx}`);
-      return tx;
+      //   logger.info(`Agent ${agentId} initialized with transaction ${tx}`);
+      //   return tx;
+      return "test";
     } catch (error) {
       logger.error(`Failed to initialize agent ${agentId}:`, error);
       throw error;
@@ -235,19 +202,20 @@ export class SolanaService implements ISolanaService {
       const [defenderPDA] = await this.findAgentPDA(defenderId);
       const [battlePDA] = await this.findBattlePDA(initiatorId, defenderId);
 
-      const tx = await this.program.methods
-        .processBattle(tokensBurned)
-        .accounts({
-          battle: battlePDA,
-          initiator: initiatorPDA,
-          defender: defenderPDA,
-          authority: this.authorityKeypair.publicKey,
-        })
-        .signers([this.authorityKeypair])
-        .rpc();
+      //   const tx = await this.program.methods
+      //     .processBattle(tokensBurned)
+      //     .accounts({
+      //       battle: battlePDA,
+      //       initiator: initiatorPDA,
+      //       defender: defenderPDA,
+      //       authority: this.authorityKeypair.publicKey,
+      //     })
+      //     .signers([this.authorityKeypair])
+      //     .rpc();
 
-      logger.info(`Battle processed with transaction ${tx}`);
-      return tx;
+      //   logger.info(`Battle processed with transaction ${tx}`);
+      //   return tx;
+      return "test";
     } catch (error) {
       logger.error("Failed to process battle:", error);
       throw error;
@@ -260,19 +228,20 @@ export class SolanaService implements ISolanaService {
       const [agent2PDA] = await this.findAgentPDA(agent2Id);
       const [alliancePDA] = await this.findAlliancePDA(agent1Id, agent2Id);
 
-      const tx = await this.program.methods
-        .formAlliance()
-        .accounts({
-          alliance: alliancePDA,
-          agent1: agent1PDA,
-          agent2: agent2PDA,
-          authority: this.authorityKeypair.publicKey,
-        })
-        .signers([this.authorityKeypair])
-        .rpc();
+      //   const tx = await this.program.methods
+      //     .formAlliance()
+      //     .accounts({
+      //       //   alliance: alliancePDA,
+      //       //   agent1: agent1PDA,
+      //       //   agent2: agent2PDA,
+      //       //   authority: this.authorityKeypair.publicKey,
+      //     })
+      //     .signers([this.authorityKeypair])
+      //     .rpc();
 
-      logger.info(`Alliance formed with transaction ${tx}`);
-      return tx;
+      //   logger.info(`Alliance formed with transaction ${tx}`);
+      //   return tx;
+      return "test";
     } catch (error) {
       logger.error("Failed to form alliance:", error);
       throw error;
@@ -287,17 +256,18 @@ export class SolanaService implements ISolanaService {
     try {
       const [agentPDA] = await this.findAgentPDA(agentId);
 
-      const tx = await this.program.methods
-        .updatePosition(x, y)
-        .accounts({
-          agent: agentPDA,
-          authority: this.authorityKeypair.publicKey,
-        })
-        .signers([this.authorityKeypair])
-        .rpc();
+      //   const tx = await this.program.methods
+      //     .updatePosition(x, y)
+      //     .accounts({
+      //       agent: agentPDA,
+      //       authority: this.authorityKeypair.publicKey,
+      //     })
+      //     .signers([this.authorityKeypair])
+      //     .rpc();
 
-      logger.info(`Agent position updated with transaction ${tx}`);
-      return tx;
+      //   logger.info(`Agent position updated with transaction ${tx}`);
+      //   return tx;
+      return "test";
     } catch (error) {
       logger.error("Failed to update agent position:", error);
       throw error;

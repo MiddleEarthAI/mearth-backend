@@ -2,8 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import { PrismaClient } from "@prisma/client";
-import { Container } from "./container";
+import { Container } from "./container/index.js";
 import { AgentManagerService } from "./services/agentManager.service";
 import { logger } from "./utils/logger";
 import { config } from "./config";
@@ -21,7 +20,7 @@ app.use(express.json());
 app.use(
   (
     err: Error,
-    req: express.Request,
+    _: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) => {

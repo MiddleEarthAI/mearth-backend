@@ -158,7 +158,12 @@ export class GameService implements IGameService {
     }
   }
 
-  async moveAgent(agentId: string, x: number, y: number): Promise<void> {
+  async moveAgent(
+    agentId: string,
+    x: number,
+    y: number,
+    terrain: TerrainType
+  ): Promise<void> {
     try {
       await this.prisma.agent.update({
         where: { id: agentId },

@@ -1,7 +1,6 @@
 import {
   Agent,
   TerrainType,
-  BattleOutcome,
   AgentDecision,
   BattleStrategy,
   CommunityFeedback,
@@ -9,28 +8,13 @@ import {
   Battle,
   GameState,
 } from "../types/game";
-import { Anthropic, HUMAN_PROMPT, AI_PROMPT } from "@anthropic-ai/sdk";
+import { Anthropic } from "@anthropic-ai/sdk";
 import { retryWithExponentialBackoff } from "../utils/retry";
-import {
-  parseDecision,
-  parseBattleStrategy,
-  parseTraitAdjustments,
-} from "../utils/llmParser";
-import { calculateDistance, normalizeScore } from "../utils/math";
+
 import { logger } from "../utils/logger";
 import NodeCache from "node-cache";
 import { ILLMService } from "../types/services";
 import { PrismaClient } from "@prisma/client";
-
-// Define interfaces for community feedback
-interface CommunityEngagement {
-  impressions: number;
-}
-
-interface InfluentialUser {
-  followerCount: number;
-  [key: string]: any;
-}
 
 interface WeightedCommunityFeedback extends CommunityFeedback {
   engagement: {
@@ -185,9 +169,9 @@ export class LLMService implements ILLMService {
     }
 
     // Adjust based on terrain
-    if (gameState.terrain !== TerrainType.PLAIN) {
-      confidence -= 10;
-    }
+    // if (gameState.terrain !== TerrainType.PLAIN) {
+    //   confidence -= 10;
+    // }
 
     // Normalize to 0-100
     return Math.max(0, Math.min(100, confidence));
@@ -237,22 +221,22 @@ export class LLMService implements ILLMService {
     return enrichedFeedback;
   }
 
-  private buildMovePrompt(agent: Agent, gameState: GameState): string {
-    return `You are ${agent.name}, a ${agent.type} agent in the Middle Earth game.
-Your characteristics:
-- Aggressiveness: ${agent.characteristics.aggressiveness}/100
-- Alliance Propensity: ${agent.characteristics.alliancePropensity}/100
-- Influenceability: ${agent.characteristics.influenceability}/100
+  //   private buildMovePrompt(agent: Agent, gameState: GameState): string {
+  //     return `You are ${agent.name}, a ${agent.type} agent in the Middle Earth game.
+  // Your characteristics:
+  // - Aggressiveness: ${agent.characteristics.aggressiveness}/100
+  // - Alliance Propensity: ${agent.characteristics.alliancePropensity}/100
+  // - Influenceability: ${agent.characteristics.influenceability}/100
 
-Current game state:
-- Nearby agents: ${gameState.nearbyAgents.map((a) => a.name).join(", ")}
-- Recent battles: ${gameState.recentBattles.length}
-- Community sentiment: ${gameState.communityFeedback.sentiment}
-- Current terrain: ${gameState.terrain}
+  // Current game state:
+  // - Nearby agents: ${gameState.nearbyAgents.map((a) => a.name).join(", ")}
+  // - Recent battles: ${gameState.recentBattles.length}
+  // - Community sentiment: ${gameState.communityFeedback.sentiment}
+  // - Current terrain: ${gameState.terrain}
 
-Based on your characteristics and the current game state, what is your next move?
-Respond with a structured decision including action type (MOVE/BATTLE/ALLIANCE/WAIT) and reasoning.`;
-  }
+  // Based on your characteristics and the current game state, what is your next move?
+  // Respond with a structured decision including action type (MOVE/BATTLE/ALLIANCE/WAIT) and reasoning.`;
+  //   }
 
   private buildBattlePrompt(
     agent: Agent,

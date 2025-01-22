@@ -15,12 +15,6 @@ import PQueue from "p-queue";
 import NodeCache from "node-cache";
 import { retryWithExponentialBackoff } from "../utils/retry";
 import { logger } from "../utils/logger";
-import {
-  IGameService,
-  ILLMService,
-  ITwitterService,
-  ISolanaService,
-} from "../types/services";
 
 interface AgentDecisionEvent {
   agentId: string;
@@ -57,16 +51,16 @@ export class AgentManagerService {
 
   constructor(
     prisma: PrismaClient,
-    gameService: IGameService,
-    llmService: ILLMService,
-    twitterService: ITwitterService,
-    solanaService: ISolanaService
+    gameService: GameService,
+    llmService: LLMService,
+    twitterService: TwitterService,
+    solanaService: SolanaService
   ) {
     this.prisma = prisma;
-    this.llmService = new LLMService();
-    this.gameService = new GameService();
-    this.twitterService = new TwitterService();
-    this.solanaService = new SolanaService();
+    this.llmService = llmService;
+    this.gameService = gameService;
+    this.twitterService = twitterService;
+    this.solanaService = solanaService;
     this.eventEmitter = new EventEmitter();
     this.decisionQueue = new PQueue({ concurrency: 2 }); // Process 2 agent decisions concurrently
     this.stateCache = new NodeCache({ stdTTL: 300 }); // Cache game state for 5 minutes
@@ -179,7 +173,7 @@ export class AgentManagerService {
 
       // Get agent's next decision
       const decision = await retryWithExponentialBackoff(
-        async () => await this.llmService.getNextMove(agent, gameState)
+        async () => await this.llmService.getNextMove(agent.id)
       );
 
       // Execute the decision
@@ -217,19 +211,23 @@ export class AgentManagerService {
             );
             await this.gameService.moveAgent(
               agent.id,
-              decision.position,
+              decision.position.x,
+              decision.position.y,
               terrain
             );
-            await this.twitterService.announceMovement(agent, decision.reason);
+            await this.twitterService.announceMovement(
+              agent.id,
+              decision.position.x,
+              decision.position.y
+            );
           }
           break;
 
         case "BATTLE":
           if (decision.target) {
             const strategy = await this.llmService.getBattleStrategy(
-              agent,
-              decision.target,
-              await this.getPreviousBattles(agent.id, decision.target.id)
+              agent.id,
+              decision.target.id
             );
 
             if (strategy.shouldFight) {
@@ -250,8 +248,8 @@ export class AgentManagerService {
           if (decision.target) {
             await this.gameService.formAlliance(agent.id, decision.target.id);
             await this.twitterService.announceAlliance(
-              agent,
-              decision.target.twitterHandle
+              agent.id,
+              decision.target.id
             );
           }
           break;
@@ -280,14 +278,16 @@ export class AgentManagerService {
     }
 
     const gameState: GameState = {
-      nearbyAgents: await this.gameService.findNearbyAgents(agent),
+      //   nearbyAgents: await this.gameService.findNearbyAgents(agent.id),
       recentBattles: await this.getPreviousBattles(agent.id),
-      communityFeedback: {
-        sentiment: 0,
-        interactions: 0,
-        lastUpdated: new Date(),
-      },
-      terrain: this.gameService.determineTerrainType(agent.position),
+      agents: [],
+      alliances: [],
+      //   communityFeedback: {
+      //     sentiment: 0,
+      //     interactions: 0,
+      //     lastUpdated: new Date(),
+      //   },
+      //   terrain: this.gameService.determineTerrainType(agent.position),
     };
 
     this.stateCache.set(cacheKey, gameState);
