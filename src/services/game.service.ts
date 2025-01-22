@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { Agent, Position, TerrainType, BattleOutcome } from "../types/game";
+import { TwitterService } from "./twitter.service";
 
 const prisma = new PrismaClient();
+const twitterService = new TwitterService();
 
 export class GameService {
   private static readonly MAP_DIAMETER = 120;
@@ -47,7 +49,7 @@ export class GameService {
   }
 
   /**
-   * Process a battle between two agents
+   * Process a battle between two agents with Twitter integration
    */
   async processBattle(
     initiatorId: string,
@@ -61,6 +63,12 @@ export class GameService {
     if (!initiator || !defender) {
       throw new Error("Agent not found");
     }
+
+    // Announce battle intention
+    await twitterService.announceBattleIntention(
+      initiator,
+      defender.twitterHandle
+    );
 
     const totalTokens = initiator.tokenBalance + defender.tokenBalance;
     const initiatorWinProbability = initiator.tokenBalance / totalTokens;
@@ -101,6 +109,9 @@ export class GameService {
       }),
     ]);
 
+    // Announce battle outcome
+    await twitterService.announceBattleOutcome(winner, loser, tokensBurned);
+
     return isDead
       ? BattleOutcome.DEATH
       : isInitiatorWinner
@@ -109,9 +120,18 @@ export class GameService {
   }
 
   /**
-   * Form an alliance between two agents
+   * Form an alliance between two agents with Twitter integration
    */
   async formAlliance(agent1Id: string, agent2Id: string): Promise<void> {
+    const [agent1, agent2] = await Promise.all([
+      prisma.agent.findUnique({ where: { id: agent1Id } }),
+      prisma.agent.findUnique({ where: { id: agent2Id } }),
+    ]);
+
+    if (!agent1 || !agent2) {
+      throw new Error("Agent not found");
+    }
+
     await prisma.alliance.create({
       data: {
         agent1Id,
@@ -124,10 +144,13 @@ export class GameService {
       where: { id: { in: [agent1Id, agent2Id] } },
       data: { lastAllianceTime: new Date() },
     });
+
+    // Announce alliance formation
+    await twitterService.announceAlliance(agent1, agent2.twitterHandle);
   }
 
   /**
-   * Move an agent to a new position
+   * Move an agent to a new position with Twitter integration
    */
   async moveAgent(
     agentId: string,
@@ -165,8 +188,26 @@ export class GameService {
       }),
     ]);
 
+    // Announce movement
+    const reason =
+      terrain === TerrainType.NORMAL
+        ? "to explore new territories"
+        : `through ${terrain.toLowerCase()} terrain`;
+    await twitterService.announceMovement(agent, reason);
+
     if (isDead) {
       throw new Error("Agent died during movement");
     }
+  }
+
+  /**
+   * Process community influence on agent behavior
+   */
+  async processAgentInfluence(agentId: string): Promise<void> {
+    const agent = await prisma.agent.findUnique({ where: { id: agentId } });
+    if (!agent) throw new Error("Agent not found");
+
+    await twitterService.monitorInteractions(agent);
+    // Additional influence processing logic based on tweet engagement
   }
 }
