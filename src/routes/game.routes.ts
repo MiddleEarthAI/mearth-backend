@@ -1,89 +1,134 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { GameService } from "../services/game.service";
-import { validateRequest } from "../middleware/validateRequest";
-import { TerrainType } from "../types/game";
+import { PrismaClient } from "@prisma/client";
+import { validateRequest } from "@/middleware/validateRequest";
 
 const router = Router();
-const gameService = new GameService();
+const prisma = new PrismaClient();
 
-// Get all active agents
-router.get("/agents", async (req, res, next) => {
+// Game Status Endpoints
+router.get("/status", async (req, res, next) => {
   try {
-    const agents = await prisma.agent.findMany({
-      where: { isAlive: true },
+    const [agents, battles, alliances] = await Promise.all([
+      prisma.agent.findMany({
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          isAlive: true,
+          tokenBalance: true,
+          positionX: true,
+          positionY: true,
+          twitterHandle: true,
+        },
+      }),
+      prisma.battle.count(),
+      prisma.alliance.count({
+        where: { dissolvedAt: null },
+      }),
+    ]);
+
+    res.json({
+      activeAgents: agents.filter((a: { isAlive: boolean }) => a.isAlive)
+        .length,
+      totalBattles: battles,
+      activeAlliances: alliances,
+      agents,
     });
-    res.json(agents);
   } catch (error) {
     next(error);
   }
 });
 
-// Move agent
+// Token Management
 router.post(
-  "/move",
+  "/stake",
   [
     body("agentId").isUUID(),
-    body("x").isFloat({ min: -60, max: 60 }),
-    body("y").isFloat({ min: -60, max: 60 }),
-    body("terrain").isIn(Object.values(TerrainType)),
+    body("amount").isFloat({ min: 0 }),
     validateRequest,
   ],
   async (req, res, next) => {
     try {
-      const { agentId, x, y, terrain } = req.body;
-      await gameService.moveAgent(agentId, { x, y }, terrain as TerrainType);
-      res.status(200).json({ message: "Movement successful" });
+      const { agentId, amount } = req.body;
+
+      const agent = await prisma.agent.findUnique({
+        where: { id: agentId },
+      });
+
+      if (!agent) {
+        return res.status(404).json({ message: "Agent not found" });
+      }
+
+      if (!agent.isAlive) {
+        return res.status(400).json({ message: "Cannot stake on dead agent" });
+      }
+
+      await prisma.agent.update({
+        where: { id: agentId },
+        data: {
+          tokenBalance: {
+            increment: amount,
+          },
+        },
+      });
+
+      res.json({
+        message: "Tokens staked successfully",
+        newBalance: agent.tokenBalance + amount,
+      });
     } catch (error) {
       next(error);
     }
   }
 );
 
-// Initiate battle
-router.post(
-  "/battle",
-  [body("initiatorId").isUUID(), body("defenderId").isUUID(), validateRequest],
-  async (req, res, next) => {
-    try {
-      const { initiatorId, defenderId } = req.body;
-      const outcome = await gameService.processBattle(initiatorId, defenderId);
-      res.status(200).json({ outcome });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+// Battle History
+router.get("/battles", async (req, res, next) => {
+  try {
+    const battles = await prisma.battle.findMany({
+      take: 20,
+      orderBy: { timestamp: "desc" },
+      include: {
+        initiator: {
+          select: { name: true, twitterHandle: true },
+        },
+        defender: {
+          select: { name: true, twitterHandle: true },
+        },
+      },
+    });
 
-// Form alliance
-router.post(
-  "/alliance",
-  [body("agent1Id").isUUID(), body("agent2Id").isUUID(), validateRequest],
-  async (req, res, next) => {
-    try {
-      const { agent1Id, agent2Id } = req.body;
-      await gameService.formAlliance(agent1Id, agent2Id);
-      res.status(200).json({ message: "Alliance formed successfully" });
-    } catch (error) {
-      next(error);
-    }
+    res.json(battles);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
-// Get agent stats
-router.get("/agent/:id", async (req, res, next) => {
+// Agent Details
+router.get("/agent/:id/stats", async (req, res, next) => {
   try {
     const agent = await prisma.agent.findUnique({
       where: { id: req.params.id },
       include: {
-        initiatedBattles: true,
-        defendedBattles: true,
+        initiatedBattles: {
+          take: 5,
+          orderBy: { timestamp: "desc" },
+        },
+        defendedBattles: {
+          take: 5,
+          orderBy: { timestamp: "desc" },
+        },
         movements: {
           take: 10,
           orderBy: { timestamp: "desc" },
         },
-        alliancesAsAgent1: true,
-        alliancesAsAgent2: true,
+        alliancesAsAgent1: {
+          where: { dissolvedAt: null },
+        },
+        alliancesAsAgent2: {
+          where: { dissolvedAt: null },
+        },
       },
     });
 
@@ -91,7 +136,23 @@ router.get("/agent/:id", async (req, res, next) => {
       return res.status(404).json({ message: "Agent not found" });
     }
 
-    res.json(agent);
+    // Calculate battle statistics
+    const totalBattles =
+      agent.initiatedBattles.length + agent.defendedBattles.length;
+    const wins = [...agent.initiatedBattles, ...agent.defendedBattles].filter(
+      (b) => b.outcome === "WIN"
+    ).length;
+
+    res.json({
+      ...agent,
+      statistics: {
+        totalBattles,
+        wins,
+        winRate: totalBattles > 0 ? (wins / totalBattles) * 100 : 0,
+        activeAlliances:
+          agent.alliancesAsAgent1.length + agent.alliancesAsAgent2.length,
+      },
+    });
   } catch (error) {
     next(error);
   }

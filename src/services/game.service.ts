@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { Agent, Position, TerrainType, BattleOutcome } from "../types/game";
 import { TwitterService } from "./twitter.service";
+import { ProgramService } from "./program.service";
 
 const prisma = new PrismaClient();
 const twitterService = new TwitterService();
+const programService = new ProgramService();
 
 export class GameService {
   private static readonly MAP_DIAMETER = 120;
@@ -49,7 +51,7 @@ export class GameService {
   }
 
   /**
-   * Process a battle between two agents with Twitter integration
+   * Process a battle between two agents with Twitter and Solana integration
    */
   async processBattle(
     initiatorId: string,
@@ -84,6 +86,10 @@ export class GameService {
     // Check for death
     const isDead = Math.random() < GameService.DEATH_CHANCE_BATTLE;
 
+    // Process battle on-chain first
+    await programService.processBattle(initiatorId, defenderId, tokensBurned);
+
+    // Update database after chain confirmation
     await prisma.$transaction([
       prisma.battle.create({
         data: {
@@ -120,7 +126,7 @@ export class GameService {
   }
 
   /**
-   * Form an alliance between two agents with Twitter integration
+   * Form an alliance between two agents with Twitter and Solana integration
    */
   async formAlliance(agent1Id: string, agent2Id: string): Promise<void> {
     const [agent1, agent2] = await Promise.all([
@@ -132,6 +138,10 @@ export class GameService {
       throw new Error("Agent not found");
     }
 
+    // Record alliance on-chain first
+    await programService.recordAlliance(agent1Id, agent2Id);
+
+    // Update database after chain confirmation
     await prisma.alliance.create({
       data: {
         agent1Id,
@@ -150,7 +160,7 @@ export class GameService {
   }
 
   /**
-   * Move an agent to a new position with Twitter integration
+   * Move an agent to a new position with Twitter and Solana integration
    */
   async moveAgent(
     agentId: string,
@@ -165,6 +175,10 @@ export class GameService {
       terrain !== TerrainType.NORMAL &&
       Math.random() < GameService.DEATH_CHANCE_TERRAIN;
 
+    // Update position on-chain first
+    await programService.updateAgentPosition(agentId, to.x, to.y);
+
+    // Update database after chain confirmation
     await prisma.$transaction([
       prisma.movement.create({
         data: {
@@ -198,6 +212,40 @@ export class GameService {
     if (isDead) {
       throw new Error("Agent died during movement");
     }
+  }
+
+  /**
+   * Initialize a new agent on-chain and in database
+   */
+  async initializeAgent(
+    type: string,
+    name: string,
+    twitterHandle: string,
+    initialTokens: number
+  ): Promise<Agent> {
+    // Initialize agent on-chain first
+    const agentPDA = await programService.initializeAgent(
+      name,
+      type,
+      initialTokens
+    );
+
+    // Create agent in database after chain confirmation
+    const agent = await prisma.agent.create({
+      data: {
+        type,
+        name,
+        twitterHandle,
+        tokenBalance: initialTokens,
+        positionX: 0,
+        positionY: 0,
+        aggressiveness: Math.floor(Math.random() * 100),
+        alliancePropensity: Math.floor(Math.random() * 100),
+        influenceability: Math.floor(Math.random() * 100),
+      },
+    });
+
+    return agent;
   }
 
   /**
