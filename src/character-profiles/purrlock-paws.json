@@ -10,14 +10,14 @@
     "allianceWith": null,
     "lastBattleTime": null,
     "lastAllianceTime": null,
-    "twitterHandle": "@PurrlockDetective",
+    "twitterHandle": "purrlockpaws",
     "aggressiveness": 85,
     "alliancePropensity": 30,
     "influenceability": 25
   },
   "personality": {
     "id": "purrlock-personality",
-    "agentId": "purrlock-paws",
+    "agentId": "purrlockpawsai",
     "openness": 65,
     "conscientiousness": 95,
     "extraversion": 35,
@@ -27,9 +27,9 @@
     "deceptionLevel": 60,
     "loyaltyLevel": 40,
     "adaptability": 80,
-    "preferredTerrain": ["FOREST", "URBAN", "SHADOWS"],
-    "avoidedAgents": ["corrupt-officials", "royal-family"],
-    "allyPreferences": ["truth-seekers", "vigilantes"],
+    "preferredTerrain": ["RIVER", "MOUNTAIN", "PLAIN"],
+    "avoidedAgents": [],
+    "allyPreferences": [],
     "currentMood": "Vigilant",
     "stressLevel": 70,
     "confidenceLevel": 90,
@@ -42,7 +42,7 @@
   },
   "context": {
     "id": "purrlock-context",
-    "agentId": "purrlock-paws",
+    "agentId": "purrlockpaws",
     "backstory": "Born to an exiled general in northwestern Middle Earth, Purrlock Paws grew up isolated in a forest cabin. After losing both parents, she discovered her father's past and ventured into the world, becoming a brilliant but ruthless detective. Her unwavering pursuit of justice led to her exile from society.",
     "goals": [
       "Uncover the truth about the missing girl",
@@ -94,7 +94,7 @@
   },
   "memory": {
     "id": "purrlock-memory",
-    "agentId": "purrlock-paws",
+    "agentId": "purrlockpaws",
     "recentEvents": {
       "last_case": "Missing girl investigation",
       "exile_trigger": "Conflict with royal family",

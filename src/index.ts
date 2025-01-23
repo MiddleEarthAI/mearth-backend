@@ -2,13 +2,11 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import { Container } from "./container/index.js";
-import { AgentManagerService } from "./services/agentManager.service";
 import { logger } from "./utils/logger";
 import { config } from "./config";
-
+import { Agent, AgentConfig } from "./agent";
+import { prisma } from "./config/prisma";
 const app = express();
-const container = Container.getInstance();
 
 // Middleware
 app.use(cors());
@@ -29,11 +27,51 @@ app.use(
   }
 );
 
+function createAgent(agentId: string, agentConfig: AgentConfig) {
+  return new Agent(agentConfig, agentId);
+}
+
+const startAgents = async () => {
+  const agents = await prisma.agent.findMany();
+  if (!agents) {
+    logger.error("No agents found");
+    throw new Error("No agents found");
+  }
+
+  const agentRuntimes = await Promise.all(
+    agents.map(async (agent) => {
+      const agentConfig: AgentConfig = {
+        username: agent.twitterHandle,
+        password: process.env[`${agent.twitterHandle.toUpperCase()}_PASSWORD`]!,
+        email: process.env[`${agent.twitterHandle.toUpperCase()}_EMAIL`]!,
+        maxMessagesForSummary: 100,
+      };
+      if (!agentConfig.password || !agentConfig.username) {
+        logger.error(
+          `Agent ${agent.twitterHandle} has no password or username set`
+        );
+        throw new Error(
+          `Agent ${agent.twitterHandle} has no password or username set`
+        );
+      }
+      const agentRuntime = createAgent(agent.id, agentConfig);
+      agentRuntime.start();
+      return agentRuntime;
+    })
+  );
+
+  return agentRuntimes;
+};
+
+let agentRuntimesOutside: Agent[] = [];
+
 // Graceful shutdown
 async function shutdown() {
+  agentRuntimesOutside.forEach((agent) => {
+    agent.stop();
+  });
   logger.info("Shutting down gracefully...");
   try {
-    await container.dispose();
     process.exit(0);
   } catch (error) {
     logger.error("Error during shutdown:", error);
@@ -47,9 +85,9 @@ process.on("SIGINT", shutdown);
 // Start server
 async function startServer() {
   try {
-    const agentManager = container.get<AgentManagerService>("agentManager");
-    await agentManager.start();
-
+    const agentRuntimes = await startAgents();
+    agentRuntimesOutside = agentRuntimes;
+    console.log(agentRuntimes);
     app.listen(config.app.port, () => {
       logger.info(
         `⚡️[server]: Server is running at http://localhost:${config.app.port}`

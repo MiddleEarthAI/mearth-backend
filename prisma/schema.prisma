@@ -36,7 +36,7 @@ model Agent {
     // New relations
     personality AgentPersonality?
     context     AgentContext?
-    memory      AgentMemory?
+    memory      Memory?
 
     @@index([isAlive])
     @@index([twitterHandle])
@@ -174,26 +174,19 @@ model AgentContext {
     updatedAt DateTime @updatedAt
 }
 
-model AgentMemory {
-    id      String @id @default(uuid())
-    agentId String @unique
-    agent   Agent  @relation(fields: [agentId], references: [id])
-
-    // Short-term Memory
-    recentEvents  Json // Last 24 hours of significant events
-    activeThreats Json // Current perceived threats
-    opportunities Json // Potential advantageous situations
-
-    // Long-term Memory
-    battleHistory   Json // Detailed battle records
-    allianceHistory Json // Past alliance experiences
-    betrayals       Json // Record of betrayals
-    victories       Json // Significant wins
-
-    // Strategic Memory
-    learnedStrategies Json // Successful tactics
-    failedApproaches  Json // What didn't work
-
+model Memory {
+    id        String   @id @default(uuid())
+    role      Role
+    agentId   String   @unique
+    agent     Agent    @relation(fields: [agentId], references: [id])
+    content   Json
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+enum Role {
+    System
+    Community
+    Agent
+    Action
 }

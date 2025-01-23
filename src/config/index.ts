@@ -1,63 +1,12 @@
 import dotenv from "dotenv";
 import { logger } from "../utils/logger";
+import { AppConfig, GameConfig, LLMConfig } from "@/types/config";
+import { SecurityConfig } from "@/types/config";
+import { DatabaseConfig, SolanaConfig } from "@/types/config";
+import { TwitterConfig } from "@/types/config";
 
 // Load environment variables
 dotenv.config();
-
-export interface DatabaseConfig {
-  url: string;
-  maxConnections: number;
-  timeout: number;
-}
-
-export interface SolanaConfig {
-  rpcUrl: string;
-  wsEndpoint: string;
-  commitment: string;
-  authorityAgentId: string;
-  programId: string;
-}
-
-export interface TwitterConfig {
-  SCOOTLES_TWITTER_USERNAME: string;
-  SCOOTLES_TWITTER_PASSWORD: string;
-  SCOOTLES_TWITTER_EMAIL: string;
-
-  PURRLOCKPAWS_TWITTER_USERNAME: string;
-  PURRLOCKPAWS_TWITTER_PASSWORD: string;
-  PURRLOCKPAWS_TWITTER_EMAIL: string;
-
-  SIR_GULLIHOP_TWITTER_USERNAME: string;
-  SIR_GULLIHOP_TWITTER_PASSWORD: string;
-  SIR_GULLIHOP_TWITTER_EMAIL: string;
-
-  WANDERLEAF_TWITTER_USERNAME: string;
-  WANDERLEAF_TWITTER_PASSWORD: string;
-  WANDERLEAF_TWITTER_EMAIL: string;
-}
-
-export interface SecurityConfig {
-  keypairEncryptionKey: string;
-  jwtSecret: string;
-}
-
-export interface LLMConfig {
-  model: string;
-  apiKey: string;
-}
-
-export interface AppConfig {
-  port: number;
-  environment: string;
-  logLevel: string;
-}
-
-export interface GameConfig {
-  battleCooldownHours: number;
-  allianceCooldownHours: number;
-  maxTokenBurnPercentage: number;
-  minTokenBurnPercentage: number;
-}
 
 export class Config {
   public readonly database: DatabaseConfig;
@@ -75,6 +24,7 @@ export class Config {
       "SOLANA_RPC_URL",
       "KEYPAIR_ENCRYPTION_KEY",
       "JWT_SECRET",
+      "AUTHORITY_WALLET",
 
       "LLM_MODEL",
       "LLM_API_KEY",
@@ -95,6 +45,9 @@ export class Config {
     this.llm = {
       model: process.env.LLM_MODEL!,
       apiKey: process.env.LLM_API_KEY!,
+      anthropicApiKey: process.env.ANTHROPIC_API_KEY!,
+      maxTokens: parseInt(process.env.MAX_TOKENS || "4096"),
+      temperature: parseFloat(process.env.TEMPERATURE || "0.5"),
     };
 
     this.database = {
@@ -105,11 +58,9 @@ export class Config {
 
     this.solana = {
       rpcUrl: process.env.SOLANA_RPC_URL!,
-      wsEndpoint:
-        process.env.SOLANA_WS_ENDPOINT || "wss://api.devnet.solana.com",
       commitment: process.env.SOLANA_COMMITMENT || "confirmed",
-      authorityAgentId: process.env.SOLANA_AUTHORITY_AGENT_ID || "",
-      programId: process.env.SOLANA_PROGRAM_ID || "",
+      jwtSecret: process.env.JWT_SECRET!,
+      keypairEncryptionKey: process.env.KEYPAIR_ENCRYPTION_KEY!,
     };
 
     this.twitter = {

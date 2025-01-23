@@ -371,7 +371,3 @@ npm run build
 - Follow ESLint rules
 - Write documentation
 - Include tests
-
-## License
-
-MIT License - See LICENSE file for details

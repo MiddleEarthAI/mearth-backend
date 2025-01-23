@@ -1,105 +1,73 @@
-import { Connection, PublicKey, Keypair, Commitment } from "@solana/web3.js";
-import { Program, AnchorProvider } from "@coral-xyz/anchor";
+import { Connection, PublicKey, Commitment } from "@solana/web3.js";
 
-import { SolanaConfig } from "../config";
-import { IKeyManagerService, ISolanaService } from "../types/services";
-import { logger } from "../utils/logger";
+import { ISolana } from "@/types";
+import { logger } from "@/utils/logger";
 
 import * as anchor from "@coral-xyz/anchor";
-import { mearthIdl } from "../constants/middle_earth_ai_program_idl";
+import { mearthIdl } from "@/constants/middle_earth_ai_program_idl";
 import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
-import { MearthProgram } from "@/types/game";
+import { MearthProgram } from "@/types";
 
-type BattleEvent = {
-  data: {
-    initiator: PublicKey;
-    defender: PublicKey;
-    tokensBurned: anchor.BN;
-    timestamp: anchor.BN;
-  };
-};
+import { KeyManager } from "./keyManager";
 
-type AllianceEvent = {
-  data: {
-    agent1: PublicKey;
-    agent2: PublicKey;
-    timestamp: anchor.BN;
-  };
-};
-
-type PositionEvent = {
-  data: {
-    agentId: PublicKey;
-    x: anchor.BN;
-    y: anchor.BN;
-    timestamp: anchor.BN;
-  };
-};
+export class SolanaConfig {
+  rpcUrl: string;
+  commitment: Commitment;
+  constructor(config?: SolanaConfig) {
+    this.rpcUrl =
+      config?.rpcUrl ??
+      process.env.SOLANA_RPC_URL! ??
+      "https://api.devnet.solana.com";
+    this.commitment =
+      config?.commitment ??
+      (process.env.SOLANA_COMMITMENT! as Commitment) ??
+      "confirmed";
+  }
+}
 
 /**
  * Service for interacting with the Solana program and managing real-time updates
  */
-export class SolanaService implements ISolanaService {
+export class Solana implements ISolana {
   private connection: Connection;
-  private program!: MearthProgram;
   private wsConnection: Connection | null = null;
   private subscriptionIds: number[] = [];
+  private keyManager: KeyManager;
 
-  constructor(
-    private config: SolanaConfig,
-    private keyManager: IKeyManagerService
-  ) {
-    this.connection = new Connection(config.rpcUrl);
+  constructor(readonly solanaConfig?: SolanaConfig) {
+    this.solanaConfig = new SolanaConfig(solanaConfig);
 
-    // const provider = new anchor.AnchorProvider(this.connection,  {
-    //   commitment: this.config.commitment as Commitment,
-    // });
-    // anchor.setProvider(provider);
-    this.program = new anchor.Program<MiddleEarthAiProgram>(
+    this.keyManager = new KeyManager();
+    this.connection = new Connection(this.solanaConfig.rpcUrl);
+  }
+
+  async getProgram(): Promise<MearthProgram> {
+    return new anchor.Program<MiddleEarthAiProgram>(
       mearthIdl as MiddleEarthAiProgram
     );
   }
 
-  async initialize(): Promise<void> {
-    try {
-      // Initialize provider with authority keypair
-      const authorityKeypair = await this.keyManager.getKeypair(
-        this.config.authorityAgentId
-      );
-      const wallet = new anchor.Wallet(authorityKeypair);
-      const provider = new anchor.AnchorProvider(this.connection, wallet, {
-        commitment: this.config.commitment as Commitment,
-      });
-
-      anchor.setProvider(provider);
-
-      this.program = new anchor.Program<MiddleEarthAiProgram>(
-        mearthIdl as MiddleEarthAiProgram,
-        provider
-      );
-
-      logger.info("Solana service initialized successfully");
-    } catch (error) {
-      logger.error("Failed to initialize Solana service:", error);
-      throw error;
-    }
-  }
-
   async startMonitoring(): Promise<void> {
+    const rpcUrl = this.solanaConfig?.rpcUrl;
+    const commitment = this.solanaConfig?.commitment;
+    if (!rpcUrl) {
+      throw new Error("RPC URL is not set");
+    }
     try {
       // Create a new WebSocket connection
-      this.wsConnection = new Connection(this.config.rpcUrl, {
-        commitment: this.config.commitment as Commitment,
-        wsEndpoint: this.config.rpcUrl.replace("http", "ws"),
+      this.wsConnection = new Connection(rpcUrl, {
+        commitment: commitment,
+        wsEndpoint: rpcUrl.replace("http", "ws"),
       });
 
       // Subscribe to program account changes
-      const programId = this.program.programId;
+      const programId = (await this.getProgram()).programId;
 
       const subscription = this.wsConnection.onProgramAccountChange(
         programId,
         (accountInfo, context) => {
           try {
+            console.log(accountInfo);
             // const eventData = this.program.coder.accounts.decode(
             //   accountInfo.accountInfo.data
             // );
@@ -118,25 +86,6 @@ export class SolanaService implements ISolanaService {
     }
   }
 
-  async stopMonitoring(): Promise<void> {
-    try {
-      // Unsubscribe from all subscriptions
-      if (this.wsConnection) {
-        await Promise.all(
-          this.subscriptionIds.map((id) =>
-            this.wsConnection!.removeAccountChangeListener(id)
-          )
-        );
-        this.subscriptionIds = [];
-        this.wsConnection = null;
-      }
-      logger.info("Stopped monitoring Solana program events");
-    } catch (error) {
-      logger.error("Failed to stop monitoring:", error);
-      throw error;
-    }
-  }
-
   private async findPDA(
     seeds: Buffer[],
     programId: PublicKey
@@ -147,7 +96,7 @@ export class SolanaService implements ISolanaService {
   private async findAgentPDA(agentId: string): Promise<[PublicKey, number]> {
     return this.findPDA(
       [Buffer.from("agent"), Buffer.from(agentId)],
-      this.program.programId
+      (await this.getProgram()).programId
     );
   }
 
@@ -161,7 +110,7 @@ export class SolanaService implements ISolanaService {
         Buffer.from(initiatorId),
         Buffer.from(defenderId),
       ],
-      this.program.programId
+      (await this.getProgram()).programId
     );
   }
 
@@ -171,41 +120,8 @@ export class SolanaService implements ISolanaService {
   ): Promise<[PublicKey, number]> {
     return this.findPDA(
       [Buffer.from("alliance"), Buffer.from(agent1Id), Buffer.from(agent2Id)],
-      this.program.programId
+      (await this.getProgram()).programId
     );
-  }
-
-  async initializeAgent(
-    agentId: string,
-    name: string,
-    agentType: string,
-    initialTokens: number
-  ): Promise<string> {
-    try {
-      const [agentPDA] = await this.findAgentPDA(agentId);
-      const agentKeypair = await this.keyManager.getKeypair(agentId);
-      const authorityKeypair = await this.keyManager.getKeypair(
-        this.config.authorityAgentId
-      );
-
-      //   const tx = await this.program.methods
-      //     .initializeAgent(name, agentType, initialTokens)
-      //     .accounts({
-      //       agent: agentPDA,
-      //       authority: authorityKeypair.publicKey,
-      //       agentKey: agentKeypair.publicKey,
-      //       systemProgram: SystemProgram.programId,
-      //     })
-      //     .signers([authorityKeypair])
-      //     .rpc();
-
-      //   logger.info(`Agent ${agentId} initialized with transaction ${tx}`);
-      //   return tx;
-      return "test";
-    } catch (error) {
-      logger.error(`Failed to initialize agent ${agentId}:`, error);
-      throw error;
-    }
   }
 
   async processBattle(
@@ -217,9 +133,7 @@ export class SolanaService implements ISolanaService {
       const [initiatorPDA] = await this.findAgentPDA(initiatorId);
       const [defenderPDA] = await this.findAgentPDA(defenderId);
       const [battlePDA] = await this.findBattlePDA(initiatorId, defenderId);
-      const authorityKeypair = await this.keyManager.getKeypair(
-        this.config.authorityAgentId
-      );
+      // const authorityKeypair = await this.getKeypair(this.agentId);
 
       //   const tx = await this.program.methods
       //     .processBattle(tokensBurned)
@@ -289,6 +203,53 @@ export class SolanaService implements ISolanaService {
       return "test";
     } catch (error) {
       logger.error("Failed to update agent position:", error);
+      throw error;
+    }
+  }
+
+  async getTokenBalance(agentId: string): Promise<number> {
+    return 0;
+  }
+
+  async burnTokens(agentId: string, amount: number): Promise<string> {
+    return "test";
+  }
+
+  async transferTokens(
+    fromAgentId: string,
+    toAgentId: string,
+    amount: number
+  ): Promise<string> {
+    return "test";
+  }
+
+  async processAlliance(agentId1: string, agentId2: string): Promise<string> {
+    return "test";
+  }
+
+  async processMovement(
+    agentId: string,
+    x: number,
+    y: number
+  ): Promise<string> {
+    return "test";
+  }
+
+  async stopMonitoring(): Promise<void> {
+    try {
+      // Unsubscribe from all subscriptions
+      if (this.wsConnection) {
+        await Promise.all(
+          this.subscriptionIds.map((id) =>
+            this.wsConnection!.removeAccountChangeListener(id)
+          )
+        );
+        this.subscriptionIds = [];
+        this.wsConnection = null;
+      }
+      logger.info("Stopped monitoring Solana program events");
+    } catch (error) {
+      logger.error("Failed to stop monitoring:", error);
       throw error;
     }
   }

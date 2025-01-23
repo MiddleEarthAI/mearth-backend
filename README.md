@@ -82,20 +82,14 @@ For detailed documentation about the system architecture and components, see [AR
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - Anthropic for Claude AI
 - Solana Foundation
 - Twitter Developer Platform
-- All contributors and community members
+- community members
 
 ## 🔗 Links
 
 - [Documentation](./docs/ARCHITECTURE.md)
 - [API Reference](./docs/API.md)
-- [Contributing Guidelines](./CONTRIBUTING.md)
-- [Code of Conduct](./CODE_OF_CONDUCT.md)
