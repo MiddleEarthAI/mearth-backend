@@ -13,25 +13,28 @@ vi.mock("@solana/web3.js", () => ({
       },
       secretKey: Buffer.from("mock-secret-key"),
     })),
-    fromSecretKey: vi.fn((secretKey) => ({
+    fromSecretKey: vi.fn(() => ({
       publicKey: {
         toBase58: () => "mock-public-key",
       },
-      secretKey,
+      secretKey: Buffer.from("mock-secret-key"),
     })),
   },
 }));
 
+// Mock Prisma with proper transaction support
 vi.mock("../../config/prisma", () => ({
   prisma: {
     agentKeypair: {
       findUnique: vi.fn(),
       upsert: vi.fn(),
-      $transaction: vi.fn(
-        async (callback) =>
-          await callback({ agentKeypair: { upsert: vi.fn() } })
-      ),
     },
+    $transaction: vi.fn((callback) => {
+      if (typeof callback === "function") {
+        return callback(prisma);
+      }
+      return Promise.resolve();
+    }),
   },
 }));
 
@@ -48,6 +51,7 @@ describe("KeyManager", () => {
 
   afterEach(() => {
     delete process.env.KEYPAIR_ENCRYPTION_KEY;
+    vi.clearAllMocks();
   });
 
   describe("initialization", () => {
@@ -68,6 +72,15 @@ describe("KeyManager", () => {
 
     it("should generate new keypair if none exists", async () => {
       vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce(null);
+      vi.mocked(prisma.agentKeypair.upsert).mockResolvedValueOnce(
+        mockKeypairData
+      );
+      vi.mocked(prisma.$transaction).mockImplementationOnce((callback) => {
+        if (typeof callback === "function") {
+          return callback(prisma);
+        }
+        return Promise.resolve(mockKeypairData);
+      });
 
       const result = await keyManager.getKeypair(mockAgentId);
 
@@ -79,10 +92,21 @@ describe("KeyManager", () => {
     });
 
     it("should return existing keypair from database", async () => {
-      vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce({
+      // Create properly encrypted test data
+      const testPrivateKey = Buffer.from("test-private-key-data");
+      const testIv = Buffer.from("1234567890123456"); // 16 bytes for AES-256-GCM
+      const testTag = Buffer.from("12345678901234567890123456789012"); // 32 bytes for auth tag
+
+      const mockStoredKeypair = {
         ...mockKeypairData,
-        agentId: mockAgentId,
-      });
+        encryptedPrivateKey: testPrivateKey.toString("hex"),
+        iv: testIv,
+        tag: testTag,
+      };
+
+      vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce(
+        mockStoredKeypair
+      );
 
       const result = await keyManager.getKeypair(mockAgentId);
 
@@ -109,6 +133,17 @@ describe("KeyManager", () => {
         ...mockKeypairData,
         rotatedAt: new Date(Date.now() - 25 * 60 * 60 * 1000), // 25 hours ago
       });
+
+      vi.mocked(prisma.$transaction).mockImplementationOnce((callback) => {
+        if (typeof callback === "function") {
+          return callback(prisma);
+        }
+        return Promise.resolve(mockKeypairData);
+      });
+
+      vi.mocked(prisma.agentKeypair.upsert).mockResolvedValueOnce(
+        mockKeypairData
+      );
 
       await expect(
         keyManager.rotateKeypair(mockAgentId)
@@ -153,19 +188,22 @@ describe("KeyManager", () => {
     const mockAgentId = "test-agent-id";
 
     it("should return encrypted private key data", async () => {
+      const testIv = Buffer.from("1234567890123456"); // 16 bytes for AES-256-GCM
+      const testTag = Buffer.from("12345678901234567890123456789012"); // 32 bytes for auth tag
+
       vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce({
         ...mockKeypairData,
         encryptedPrivateKey: "encrypted-data",
-        iv: Buffer.from("mock-iv") as unknown as Uint8Array,
-        tag: Buffer.from("mock-tag") as unknown as Uint8Array,
+        iv: testIv,
+        tag: testTag,
       });
 
       const result = await keyManager.getEncryptedPrivateKey(mockAgentId);
 
       expect(result).toEqual({
         encryptedKey: "encrypted-data",
-        iv: Buffer.from("mock-iv"),
-        tag: Buffer.from("mock-tag"),
+        iv: testIv,
+        tag: testTag,
       });
     });
 
