@@ -1,6 +1,8 @@
 import { Scraper, SearchMode, Tweet } from "agent-twitter-client";
 import { logger } from "@/utils/logger";
 import { ITwitter } from "@/types";
+import { AnthropicProvider } from "@ai-sdk/anthropic";
+import { generateText, GenerateTextResult } from "ai";
 
 interface TwitterConfig {
   username: string;
@@ -9,6 +11,8 @@ interface TwitterConfig {
   targetUsers?: string[];
   pollInterval?: number; // in seconds
   dryRun?: boolean;
+  llmClient: AnthropicProvider;
+  agentId: string;
 }
 
 interface TweetInfluence {
@@ -25,6 +29,7 @@ interface CommunityFeedback {
   coordinates?: { x: number; y: number };
   confidence: number;
   influence: TweetInfluence;
+  reasoning?: string;
 }
 
 interface ExtendedTweet extends Tweet {
@@ -33,11 +38,21 @@ interface ExtendedTweet extends Tweet {
   replyCount?: number;
 }
 
+interface TweetAnalysis {
+  suggestedAction: "move" | "battle" | "alliance" | "ignore";
+  targetAgent: string | null;
+  coordinates: { x: number; y: number } | null;
+  confidence: number;
+  reasoning: string;
+}
+
 export class Twitter implements ITwitter {
   private client: Scraper;
   private config: TwitterConfig;
   private lastCheckedTweetId: bigint = 0n;
   private recentInteractions: Map<string, CommunityFeedback[]> = new Map();
+  private llmClient: AnthropicProvider;
+  private agentId: string;
 
   constructor(config: TwitterConfig) {
     this.config = {
@@ -54,8 +69,10 @@ export class Twitter implements ITwitter {
       this.config.email
     );
     this.client = scraper;
+    this.llmClient = config.llmClient;
+    this.agentId = config.agentId;
 
-    logger.info("Twitter service initialized");
+    logger.info("Twitter service initialized for agent:", this.agentId);
     this.startMonitoring();
   }
 
@@ -74,7 +91,7 @@ export class Twitter implements ITwitter {
    * Handle Twitter interactions
    */
   private async handleTwitterInteractions() {
-    logger.info("Checking Twitter interactions");
+    logger.info("Checking Twitter interactions for agent:", this.agentId);
 
     try {
       // Check for mentions and relevant tweets
@@ -192,7 +209,7 @@ export class Twitter implements ITwitter {
   }
 
   /**
-   * Analyze community feedback from a tweet and its context
+   * Analyze community feedback from a tweet and its context using LLM
    */
   private async analyzeCommunityFeedback(
     tweet: ExtendedTweet,
@@ -203,94 +220,121 @@ export class Twitter implements ITwitter {
       impressions: tweet.impressions || 0,
       likes: tweet.likes || 0,
       commentCount: tweet.replyCount || 0,
-      sentiment: await this.analyzeSentiment(tweet.text || ""),
+      sentiment: await this.analyzeSentiment(tweet.text || "", thread),
     };
 
-    // Extract suggested action from tweet content
-    const feedback = this.extractActionFromContent(tweet.text || "", thread);
+    // Use LLM to analyze the tweet content and thread
+    const analysis = await this.analyzeTweetContent(tweet, thread);
 
     return {
-      suggestedAction: feedback.suggestedAction || "move",
-      targetAgent: feedback.targetAgent,
-      coordinates: feedback.coordinates,
-      confidence: feedback.confidence || 0.5,
+      suggestedAction: analysis.suggestedAction || "move",
+      targetAgent: analysis.targetAgent || undefined,
+      coordinates: analysis.coordinates || undefined,
+      confidence: analysis.confidence || 0.5,
+      reasoning: analysis.reasoning,
       influence,
     };
   }
 
   /**
-   * Analyze sentiment of tweet text
+   * Analyze sentiment of tweet text using LLM
    */
   private async analyzeSentiment(
-    text: string
+    text: string,
+    thread: Tweet[]
   ): Promise<"positive" | "negative" | "neutral"> {
-    // Simple sentiment analysis based on keywords
-    const positiveWords = ["alliance", "friend", "support", "help", "together"];
-    const negativeWords = ["battle", "fight", "attack", "kill", "defeat"];
+    const prompt = `
+    Analyze the sentiment of this tweet in the context of a strategy game. Consider the following:
+    - Is it supportive or hostile?
+    - Does it suggest cooperation or conflict?
+    - What is the emotional tone?
 
-    const lowerText = text.toLowerCase();
-    const positiveCount = positiveWords.filter((word) =>
-      lowerText.includes(word)
-    ).length;
-    const negativeCount = negativeWords.filter((word) =>
-      lowerText.includes(word)
-    ).length;
+    Tweet: "${text}"
 
-    if (positiveCount > negativeCount) return "positive";
-    if (negativeCount > positiveCount) return "negative";
-    return "neutral";
+    Context (previous tweets in thread):
+    ${thread.map((t) => `@${t.username}: ${t.text}`).join("\n")}
+
+    Return ONLY ONE of these words: "positive", "negative", or "neutral"
+    `;
+
+    try {
+      const result = await generateText({
+        model: this.llmClient("claude-3-5-sonnet-20240620"),
+        prompt,
+      });
+
+      const sentiment = result.toString().toLowerCase().trim();
+      if (
+        sentiment === "positive" ||
+        sentiment === "negative" ||
+        sentiment === "neutral"
+      ) {
+        return sentiment;
+      }
+      return "neutral";
+    } catch (error) {
+      logger.error("Error analyzing sentiment:", error);
+      return "neutral";
+    }
   }
 
   /**
-   * Extract suggested action from tweet content
+   * Analyze tweet content using LLM to extract actions and context
    */
-  private extractActionFromContent(
-    text: string,
+  private async analyzeTweetContent(
+    tweet: ExtendedTweet,
     thread: Tweet[]
-  ): Partial<CommunityFeedback> {
-    const lowerText = text.toLowerCase();
+  ): Promise<TweetAnalysis> {
+    const prompt = `
+    As an AI agent in a strategy game, analyze this tweet and its context to determine the suggested action.
+    The possible actions are: move, battle, alliance, or ignore.
 
-    // Extract coordinates if present
-    const coordsMatch = text.match(/\b(\d+)\s*,\s*(\d+)\b/);
-    const coordinates = coordsMatch
-      ? {
-          x: parseInt(coordsMatch[1]),
-          y: parseInt(coordsMatch[2]),
-        }
-      : undefined;
+    Tweet from @${tweet.username}: "${tweet.text}"
 
-    // Extract target agent if mentioned
-    const targetMatch = text.match(/@(\w+)/);
-    const targetAgent = targetMatch ? targetMatch[1] : undefined;
+    Thread context:
+    ${thread.map((t) => `@${t.username}: ${t.text}`).join("\n")}
 
-    // Determine suggested action
-    let suggestedAction: CommunityFeedback["suggestedAction"] = "move";
-    let confidence = 0.5;
+    Consider:
+    1. Is there a suggested action? (move/battle/alliance/ignore)
+    2. Is there a target agent? (mentioned with @)
+    3. Are there coordinates mentioned? (x,y format)
+    4. How confident should we be about this interpretation? (0.0-1.0)
+    5. What's the reasoning behind this suggestion?
 
-    if (
-      lowerText.includes("battle") ||
-      lowerText.includes("fight") ||
-      lowerText.includes("attack")
-    ) {
-      suggestedAction = "battle";
-      confidence = 0.8;
-    } else if (
-      lowerText.includes("alliance") ||
-      lowerText.includes("team up")
-    ) {
-      suggestedAction = "alliance";
-      confidence = 0.7;
-    } else if (lowerText.includes("ignore") || lowerText.includes("avoid")) {
-      suggestedAction = "ignore";
-      confidence = 0.6;
+    Return the analysis in this JSON format:
+    {
+      "suggestedAction": "move|battle|alliance|ignore",
+      "targetAgent": "@username or null",
+      "coordinates": {"x": number, "y": number} or null,
+      "confidence": number,
+      "reasoning": "brief explanation"
     }
+    `;
 
-    return {
-      suggestedAction,
-      targetAgent,
-      coordinates,
-      confidence,
-    };
+    try {
+      const result = await generateText({
+        model: this.llmClient("claude-3-5-sonnet-20240620"),
+        prompt,
+      });
+
+      const analysis = JSON.parse(result.toString());
+      return {
+        suggestedAction: analysis.suggestedAction || "move",
+        targetAgent: analysis.targetAgent?.replace("@", "") || null,
+        coordinates: analysis.coordinates || null,
+        confidence: analysis.confidence || 0.5,
+        reasoning: analysis.reasoning || "",
+      };
+    } catch (error) {
+      logger.error("Error analyzing tweet content:", error);
+      return {
+        suggestedAction: "move",
+        targetAgent: null,
+        coordinates: null,
+        confidence: 0.5,
+        reasoning: "Failed to analyze tweet content",
+      };
+    }
   }
 
   /**
