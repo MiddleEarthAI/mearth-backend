@@ -449,3 +449,8 @@
 {"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-24T06:32:00.410Z"}
 {"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-24T06:32:00.413Z"}
 {"level":"error","message":"Encrypted private key retrieval failed for test-agent-id No keypair found for agent test-agent-id","name":"KeyManagementError","service":"middle-earth-agents","stack":"KeyManagementError: No keypair found for agent test-agent-id\n    at KeyManager.getEncryptedPrivateKey (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/src/deps/keyManager.ts:344:15)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-01-24T06:32:00.415Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-24T06:35:09.508Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-24T06:35:09.516Z"}
+{"level":"info","message":"Keypair cached for agent f23305f5-c2d2-4ae0-bf7e-4cce3d4dd752","service":"middle-earth-agents","timestamp":"2025-01-24T06:35:14.761Z"}
+{"level":"info","message":"Generated new keypair for agent f23305f5-c2d2-4ae0-bf7e-4cce3d4dd752","publicKey":"BrtXD9Hu5wS4Gg9xj4cEkMQC4VnSGRNd2Hc6h9EyUQf3","service":"middle-earth-agents","timestamp":"2025-01-24T06:35:14.762Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-24T06:35:30.898Z"}
