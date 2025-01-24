@@ -3,16 +3,35 @@ import { logger } from "@/utils/logger";
 import { ITwitter } from "@/types";
 import { AnthropicProvider } from "@ai-sdk/anthropic";
 import { generateText, GenerateTextResult } from "ai";
+import { prisma } from "@/config/prisma";
 
-interface TwitterConfig {
-  username: string;
-  password: string;
-  email: string;
-  targetUsers?: string[];
-  pollInterval?: number; // in seconds
-  dryRun?: boolean;
-  llmClient: AnthropicProvider;
-  agentId: string;
+class TwitterConfig {
+  readonly username: string;
+  readonly password: string;
+  readonly email: string;
+  readonly targetUsers?: string[];
+  readonly pollInterval?: number; // in seconds
+  readonly dryRun?: boolean;
+  readonly agentId: string;
+  constructor(config?: TwitterConfig) {
+    if (
+      !config?.username ||
+      !config?.password ||
+      !config?.email ||
+      !config?.agentId
+    ) {
+      throw new Error(
+        "TwitterConfig: username, password, email, and agentId are required"
+      );
+    }
+    this.agentId = config.agentId;
+    this.username = config.username;
+    this.password = config.password;
+    this.email = config?.email;
+    this.targetUsers = config?.targetUsers ?? [];
+    this.pollInterval = config?.pollInterval ?? 120;
+    this.dryRun = config?.dryRun ?? false;
+  }
 }
 
 interface TweetInfluence {
@@ -50,30 +69,39 @@ export class Twitter implements ITwitter {
   private client: Scraper;
   private config: TwitterConfig;
   private lastCheckedTweetId: bigint = 0n;
-  private recentInteractions: Map<string, CommunityFeedback[]> = new Map();
-  private llmClient: AnthropicProvider;
+  private anthropic: AnthropicProvider;
   private agentId: string;
 
-  constructor(config: TwitterConfig) {
-    this.config = {
-      ...config,
-      pollInterval: config.pollInterval || 120, // Default 2 minutes
-      dryRun: config.dryRun || false,
-      targetUsers: config.targetUsers || [],
-    };
+  constructor(anthropic: AnthropicProvider, config: TwitterConfig) {
+    this.config = config;
 
     const scraper = new Scraper();
     scraper.login(
-      this.config.username,
-      this.config.password,
-      this.config.email
+      this.config?.username,
+      this.config?.password,
+      this.config?.email
     );
     this.client = scraper;
-    this.llmClient = config.llmClient;
+    this.anthropic = anthropic;
     this.agentId = config.agentId;
 
     logger.info("Twitter service initialized for agent:", this.agentId);
+    this.initializeLastCheckedTweet();
     this.startMonitoring();
+  }
+
+  /**
+   * Initialize last checked tweet from database
+   */
+  private async initializeLastCheckedTweet() {
+    const lastInteraction = await prisma.twitterInteraction.findFirst({
+      where: { agentId: this.agentId },
+      orderBy: { tweetId: "desc" },
+    });
+
+    if (lastInteraction?.tweetId) {
+      this.lastCheckedTweetId = BigInt(lastInteraction.tweetId);
+    }
   }
 
   /**
@@ -163,16 +191,41 @@ export class Twitter implements ITwitter {
       // Analyze community feedback
       const feedback = await this.analyzeCommunityFeedback(tweet, thread);
 
-      // Store feedback for decision making
-      if (!this.recentInteractions.has(tweet.conversationId)) {
-        this.recentInteractions.set(tweet.conversationId, []);
-      }
-      this.recentInteractions.get(tweet.conversationId)?.push(feedback);
+      // Store interaction and feedback in database
+      await prisma.twitterInteraction.create({
+        data: {
+          agentId: this.agentId,
+          tweetId: tweet.id,
+          conversationId: tweet.conversationId,
+          content: tweet.text || "",
+          authorUsername: tweet.username || "",
+          authorId: tweet.userId || "",
+          sentiment: feedback.influence.sentiment,
+          influence: {
+            create: {
+              authorFollowerCount: feedback.influence.authorFollowerCount,
+              impressions: feedback.influence.impressions,
+              likes: feedback.influence.likes,
+              commentCount: feedback.influence.commentCount,
+            },
+          },
+          feedback: {
+            create: {
+              suggestedAction: feedback.suggestedAction,
+              targetAgent: feedback.targetAgent,
+              coordinateX: feedback.coordinates?.x,
+              coordinateY: feedback.coordinates?.y,
+              confidence: feedback.confidence,
+              reasoning: feedback.reasoning,
+            },
+          },
+        },
+      });
 
-      // Clean up old interactions
-      this.cleanupOldInteractions();
-
-      logger.info(`Processed tweet ${tweet.id} with feedback:`, feedback);
+      logger.info(
+        `Processed and stored tweet ${tweet.id} with feedback:`,
+        feedback
+      );
     } catch (error) {
       logger.error(`Error processing tweet ${tweet.id}:`, error);
     }
@@ -259,7 +312,7 @@ export class Twitter implements ITwitter {
 
     try {
       const result = await generateText({
-        model: this.llmClient("claude-3-5-sonnet-20240620"),
+        model: this.anthropic("claude-3-5-sonnet-20240620"),
         prompt,
       });
 
@@ -313,7 +366,7 @@ export class Twitter implements ITwitter {
 
     try {
       const result = await generateText({
-        model: this.llmClient("claude-3-5-sonnet-20240620"),
+        model: this.anthropic("claude-3-5-sonnet-20240620"),
         prompt,
       });
 
@@ -338,31 +391,42 @@ export class Twitter implements ITwitter {
   }
 
   /**
-   * Clean up old interactions (older than 24 hours)
-   */
-  private cleanupOldInteractions() {
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-    this.recentInteractions.forEach((interactions, conversationId) => {
-      const recentInteractions = interactions.filter(
-        (interaction) => interaction.influence.impressions > oneDayAgo
-      );
-      if (recentInteractions.length === 0) {
-        this.recentInteractions.delete(conversationId);
-      } else {
-        this.recentInteractions.set(conversationId, recentInteractions);
-      }
-    });
-  }
-
-  /**
    * Get aggregated community feedback for decision making
    */
   async getCommunityFeedback(): Promise<CommunityFeedback[]> {
-    const allFeedback: CommunityFeedback[] = [];
-    this.recentInteractions.forEach((interactions) => {
-      allFeedback.push(...interactions);
+    const recentInteractions = await prisma.twitterInteraction.findMany({
+      where: {
+        agentId: this.agentId,
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+        },
+      },
+      include: {
+        influence: true,
+        feedback: true,
+      },
     });
-    return allFeedback;
+
+    return recentInteractions.map((interaction: any) => ({
+      suggestedAction: interaction.feedback?.suggestedAction || "move",
+      targetAgent: interaction.feedback?.targetAgent,
+      coordinates:
+        interaction.feedback?.coordinateX && interaction.feedback?.coordinateY
+          ? {
+              x: interaction.feedback.coordinateX,
+              y: interaction.feedback.coordinateY,
+            }
+          : undefined,
+      confidence: interaction.feedback?.confidence || 0.5,
+      influence: {
+        authorFollowerCount: interaction.influence?.authorFollowerCount || 0,
+        impressions: interaction.influence?.impressions || 0,
+        likes: interaction.influence?.likes || 0,
+        commentCount: interaction.influence?.commentCount || 0,
+        sentiment: interaction.sentiment,
+      },
+      reasoning: interaction.feedback?.reasoning,
+    }));
   }
 
   /**

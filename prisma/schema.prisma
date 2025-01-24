@@ -38,6 +38,9 @@ model Agent {
     context     AgentContext?
     memory      Memory?
 
+    // Add Twitter interactions
+    twitterInteractions TwitterInteraction[]
+
     @@index([isAlive])
     @@index([twitterHandle])
 }
@@ -189,4 +192,46 @@ enum Role {
     Community
     Agent
     Action
+}
+
+// Add Twitter interaction models
+model TwitterInteraction {
+    id             String             @id @default(uuid())
+    agentId        String
+    tweetId        String
+    conversationId String
+    content        String
+    authorUsername String
+    authorId       String
+    createdAt      DateTime           @default(now())
+    sentiment      String             @default("neutral") // positive, negative, neutral
+    influence      TwitterInfluence?
+    feedback       CommunityFeedback?
+    agent          Agent              @relation(fields: [agentId], references: [id])
+
+    @@index([agentId])
+    @@index([tweetId])
+    @@index([conversationId])
+}
+
+model TwitterInfluence {
+    id                  String             @id @default(uuid())
+    interactionId       String             @unique
+    authorFollowerCount Int                @default(0)
+    impressions         Int                @default(0)
+    likes               Int                @default(0)
+    commentCount        Int                @default(0)
+    interaction         TwitterInteraction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
+}
+
+model CommunityFeedback {
+    id              String             @id @default(uuid())
+    interactionId   String             @unique
+    suggestedAction String // move, battle, alliance, ignore
+    targetAgent     String?
+    coordinateX     Int?
+    coordinateY     Int?
+    confidence      Float              @default(0.5)
+    reasoning       String?
+    interaction     TwitterInteraction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
 }
