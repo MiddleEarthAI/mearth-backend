@@ -1,5 +1,5 @@
 export const mearthIdl = {
-  address: "FE7WJhRY55XjHcR22ryA3tHLq6fkDNgZBpbh25tto67Q",
+  address: "G3Uq1kV4YiGNBCxA735K3oBHvX6LHQvQbWmAbJSiEKTc",
   metadata: {
     name: "middle_earth_ai_program",
     version: "0.1.0",
@@ -45,16 +45,15 @@ export const mearthIdl = {
       accounts: [
         {
           name: "agent",
-          docs: ["The agent state."],
           writable: true,
         },
         {
           name: "game",
+          writable: true,
           relations: ["agent"],
         },
         {
           name: "stake_info",
-          docs: ["Record for the staker."],
           writable: true,
           pda: {
             seeds: [
@@ -74,13 +73,22 @@ export const mearthIdl = {
           },
         },
         {
-          name: "agent_vault",
-          docs: ["The vault token account associated with the agent."],
+          name: "mint",
+        },
+        {
+          name: "rewards_vault",
+          writable: true,
+        },
+        {
+          name: "rewards_authority",
+          writable: true,
+        },
+        {
+          name: "staker_destination",
           writable: true,
         },
         {
           name: "authority",
-          docs: ["The authority/staker."],
           writable: true,
           signer: true,
           relations: ["agent"],
@@ -92,6 +100,23 @@ export const mearthIdl = {
         {
           name: "token_program",
           address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "end_game",
+      discriminator: [224, 135, 245, 99, 67, 175, 121, 252],
+      accounts: [
+        {
+          name: "game",
+          writable: true,
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+          relations: ["game"],
         },
       ],
       args: [],
@@ -192,6 +217,77 @@ export const mearthIdl = {
         {
           name: "bump",
           type: "u8",
+        },
+      ],
+    },
+    {
+      name: "initialize_stake",
+      discriminator: [33, 175, 216, 4, 116, 130, 164, 177],
+      accounts: [
+        {
+          name: "agent",
+          docs: ["The agent this stake will be associated with"],
+          writable: true,
+        },
+        {
+          name: "game",
+          writable: true,
+          relations: ["agent"],
+        },
+        {
+          name: "stake_info",
+          docs: ["Create the stake_info account (first deposit)"],
+          writable: true,
+          pda: {
+            seeds: [
+              {
+                kind: "const",
+                value: [115, 116, 97, 107, 101],
+              },
+              {
+                kind: "account",
+                path: "agent",
+              },
+              {
+                kind: "account",
+                path: "authority",
+              },
+            ],
+          },
+        },
+        {
+          name: "staker_source",
+          docs: [
+            "It's safe because we manually verify it's owned by the SPL token program.",
+          ],
+          writable: true,
+        },
+        {
+          name: "agent_vault",
+          docs: [
+            "Also safe because we ensure it's owned by the SPL token program.",
+          ],
+          writable: true,
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+          relations: ["agent"],
+        },
+        {
+          name: "system_program",
+          address: "11111111111111111111111111111111",
+        },
+        {
+          name: "token_program",
+          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        },
+      ],
+      args: [
+        {
+          name: "deposit_amount",
+          type: "u64",
         },
       ],
     },
@@ -502,16 +598,16 @@ export const mearthIdl = {
       accounts: [
         {
           name: "agent",
-          docs: ["The agent state."],
           writable: true,
         },
         {
           name: "game",
+          writable: true,
           relations: ["agent"],
         },
         {
           name: "stake_info",
-          docs: ["Record for the staker."],
+          docs: ["Must be initialized"],
           writable: true,
           pda: {
             seeds: [
@@ -533,20 +629,17 @@ export const mearthIdl = {
         {
           name: "staker_source",
           docs: [
-            "The staker's token account (source) from which tokens will be deposited.",
+            "We verify it's owned by the SPL token program to ensure it's a valid token account.",
           ],
           writable: true,
         },
         {
           name: "agent_vault",
-          docs: [
-            "The vault token account associated with the agent (destination).",
-          ],
+          docs: ["We verify it's owned by the SPL token program."],
           writable: true,
         },
         {
           name: "authority",
-          docs: ["The authority/staker."],
           writable: true,
           signer: true,
           relations: ["agent"],
@@ -573,16 +666,15 @@ export const mearthIdl = {
       accounts: [
         {
           name: "agent",
-          docs: ["The agent state."],
           writable: true,
         },
         {
           name: "game",
+          writable: true,
           relations: ["agent"],
         },
         {
           name: "stake_info",
-          docs: ["Record for the staker."],
           writable: true,
           pda: {
             seeds: [
@@ -603,28 +695,32 @@ export const mearthIdl = {
         },
         {
           name: "agent_vault",
-          docs: [
-            "The vault token account associated with the agent (source for withdrawal).",
-          ],
           writable: true,
         },
         {
           name: "agent_authority",
-          docs: [
-            "The authority account for the vault (this PDA signs on behalf of the vault).",
-          ],
-          writable: true,
+          pda: {
+            seeds: [
+              {
+                kind: "const",
+                value: [
+                  97, 103, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105,
+                  116, 121,
+                ],
+              },
+              {
+                kind: "account",
+                path: "agent",
+              },
+            ],
+          },
         },
         {
           name: "staker_destination",
-          docs: [
-            "The staker's token account (destination) for receiving tokens.",
-          ],
           writable: true,
         },
         {
           name: "authority",
-          docs: ["The stake owner."],
           writable: true,
           signer: true,
           relations: ["agent"],
@@ -780,6 +876,21 @@ export const mearthIdl = {
       name: "NameTooLong",
       msg: "Agent name is too long.",
     },
+    {
+      code: 6021,
+      name: "CooldownNotOver",
+      msg: "You must wait until cooldown ends.",
+    },
+    {
+      code: 6022,
+      name: "GameNotActive",
+      msg: "Game is Inactive",
+    },
+    {
+      code: 6023,
+      name: "InvalidAmount",
+      msg: "Invalid amount specified.",
+    },
   ],
   types: [
     {
@@ -859,7 +970,7 @@ export const mearthIdl = {
           },
           {
             name: "total_shares",
-            type: "u64",
+            type: "u128",
           },
           {
             name: "last_attack",
@@ -1060,6 +1171,16 @@ export const mearthIdl = {
               },
             },
           },
+          {
+            name: "total_stake_accounts",
+            type: {
+              vec: {
+                defined: {
+                  name: "StakerStake",
+                },
+              },
+            },
+          },
         ],
       },
     },
@@ -1081,9 +1202,6 @@ export const mearthIdl = {
     },
     {
       name: "StakeInfo",
-      docs: [
-        "A per‑staker record for deposits (staked tokens) and issued shares.",
-      ],
       type: {
         kind: "struct",
         fields: [
@@ -1105,7 +1223,7 @@ export const mearthIdl = {
           {
             name: "shares",
             docs: ["The number of shares the user holds."],
-            type: "u64",
+            type: "u128",
           },
           {
             name: "last_reward_timestamp",
@@ -1115,9 +1233,39 @@ export const mearthIdl = {
             type: "i64",
           },
           {
-            name: "bump",
-            docs: ["Bump value for the PDA."],
-            type: "u8",
+            name: "cooldown_ends_at",
+            docs: ["The Unix timestamp when the cooldown ends."],
+            type: "i64",
+          },
+          {
+            name: "is_initialized",
+            docs: [
+              "Indicates whether the stake_info account has been initialized.",
+            ],
+            type: "bool",
+          },
+          {
+            name: "__padding",
+            docs: ["Padding to align to 8 bytes"],
+            type: {
+              array: ["u8", 7],
+            },
+          },
+        ],
+      },
+    },
+    {
+      name: "StakerStake",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "staker",
+            type: "pubkey",
+          },
+          {
+            name: "total_stake",
+            type: "u64",
           },
         ],
       },

@@ -20,7 +20,7 @@ export type MiddleEarthAiProgram = {
         {
           name: "initiator";
           docs: [
-            "The initiating agent (mutable and signed) that wants to break the alliance.",
+            "The initiating agent (mutable and signed) that wants to break the alliance."
           ];
           writable: true;
         },
@@ -41,7 +41,7 @@ export type MiddleEarthAiProgram = {
           writable: true;
           signer: true;
           relations: ["initiator"];
-        },
+        }
       ];
       args: [];
     },
@@ -51,16 +51,15 @@ export type MiddleEarthAiProgram = {
       accounts: [
         {
           name: "agent";
-          docs: ["The agent state."];
           writable: true;
         },
         {
           name: "game";
+          writable: true;
           relations: ["agent"];
         },
         {
           name: "stakeInfo";
-          docs: ["Record for the staker."];
           writable: true;
           pda: {
             seeds: [
@@ -75,18 +74,27 @@ export type MiddleEarthAiProgram = {
               {
                 kind: "account";
                 path: "authority";
-              },
+              }
             ];
           };
         },
         {
-          name: "agentVault";
-          docs: ["The vault token account associated with the agent."];
+          name: "mint";
+        },
+        {
+          name: "rewardsVault";
+          writable: true;
+        },
+        {
+          name: "rewardsAuthority";
+          writable: true;
+        },
+        {
+          name: "stakerDestination";
           writable: true;
         },
         {
           name: "authority";
-          docs: ["The authority/staker."];
           writable: true;
           signer: true;
           relations: ["agent"];
@@ -98,7 +106,24 @@ export type MiddleEarthAiProgram = {
         {
           name: "tokenProgram";
           address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "endGame";
+      discriminator: [224, 135, 245, 99, 67, 175, 121, 252];
+      accounts: [
+        {
+          name: "game";
+          writable: true;
         },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+          relations: ["game"];
+        }
       ];
       args: [];
     },
@@ -114,7 +139,7 @@ export type MiddleEarthAiProgram = {
         {
           name: "targetAgent";
           docs: [
-            "The target agent that the initiator wants to form an alliance with.",
+            "The target agent that the initiator wants to form an alliance with."
           ];
           writable: true;
         },
@@ -130,7 +155,7 @@ export type MiddleEarthAiProgram = {
           writable: true;
           signer: true;
           relations: ["initiator"];
-        },
+        }
       ];
       args: [];
     },
@@ -151,13 +176,13 @@ export type MiddleEarthAiProgram = {
           writable: true;
           signer: true;
           relations: ["agent"];
-        },
+        }
       ];
       args: [
         {
           name: "targetAgentId";
           type: "u8";
-        },
+        }
       ];
     },
     {
@@ -176,7 +201,7 @@ export type MiddleEarthAiProgram = {
               {
                 kind: "arg";
                 path: "gameId";
-              },
+              }
             ];
           };
         },
@@ -188,7 +213,7 @@ export type MiddleEarthAiProgram = {
         {
           name: "systemProgram";
           address: "11111111111111111111111111111111";
-        },
+        }
       ];
       args: [
         {
@@ -198,14 +223,85 @@ export type MiddleEarthAiProgram = {
         {
           name: "bump";
           type: "u8";
+        }
+      ];
+    },
+    {
+      name: "initializeStake";
+      discriminator: [33, 175, 216, 4, 116, 130, 164, 177];
+      accounts: [
+        {
+          name: "agent";
+          docs: ["The agent this stake will be associated with"];
+          writable: true;
         },
+        {
+          name: "game";
+          writable: true;
+          relations: ["agent"];
+        },
+        {
+          name: "stakeInfo";
+          docs: ["Create the stake_info account (first deposit)"];
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [115, 116, 97, 107, 101];
+              },
+              {
+                kind: "account";
+                path: "agent";
+              },
+              {
+                kind: "account";
+                path: "authority";
+              }
+            ];
+          };
+        },
+        {
+          name: "stakerSource";
+          docs: [
+            "It's safe because we manually verify it's owned by the SPL token program."
+          ];
+          writable: true;
+        },
+        {
+          name: "agentVault";
+          docs: [
+            "Also safe because we ensure it's owned by the SPL token program."
+          ];
+          writable: true;
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+          relations: ["agent"];
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        },
+        {
+          name: "tokenProgram";
+          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+        }
+      ];
+      args: [
+        {
+          name: "depositAmount";
+          type: "u64";
+        }
       ];
     },
     {
       name: "killAgent";
       docs: [
         "Marks an agent as dead.",
-        "**Access Control:** Only the agent's authority (or game authority) may call this function.",
+        "**Access Control:** Only the agent's authority (or game authority) may call this function."
       ];
       discriminator: [152, 243, 180, 237, 215, 248, 160, 57];
       accounts: [
@@ -216,11 +312,11 @@ export type MiddleEarthAiProgram = {
         {
           name: "authority";
           docs: [
-            "The authority that can perform the kill. In many cases this should match agent.authority.",
+            "The authority that can perform the kill. In many cases this should match agent.authority."
           ];
           signer: true;
           relations: ["agent"];
-        },
+        }
       ];
       args: [];
     },
@@ -241,7 +337,7 @@ export type MiddleEarthAiProgram = {
           writable: true;
           signer: true;
           relations: ["agent"];
-        },
+        }
       ];
       args: [
         {
@@ -259,14 +355,14 @@ export type MiddleEarthAiProgram = {
               name: "terrainType";
             };
           };
-        },
+        }
       ];
     },
     {
       name: "registerAgent";
       docs: [
         "Combined function for agent registration.",
-        "This instruction both initializes an Agent account and registers it in the game’s agent list.",
+        "This instruction both initializes an Agent account and registers it in the game’s agent list."
       ];
       discriminator: [135, 157, 66, 195, 2, 113, 175, 30];
       accounts: [
@@ -288,7 +384,7 @@ export type MiddleEarthAiProgram = {
         {
           name: "systemProgram";
           address: "11111111111111111111111111111111";
-        },
+        }
       ];
       args: [
         {
@@ -306,13 +402,13 @@ export type MiddleEarthAiProgram = {
         {
           name: "name";
           type: "string";
-        },
+        }
       ];
     },
     {
       name: "resolveBattleAgentVsAlliance";
       docs: [
-        "Resolves a battle with alliances by updating cooldowns for all allied agents.",
+        "Resolves a battle with alliances by updating cooldowns for all allied agents."
       ];
       discriminator: [59, 240, 150, 171, 245, 203, 23, 134];
       accounts: [
@@ -364,7 +460,7 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-        },
+        }
       ];
       args: [
         {
@@ -374,7 +470,7 @@ export type MiddleEarthAiProgram = {
         {
           name: "agentIsWinner";
           type: "bool";
-        },
+        }
       ];
     },
     {
@@ -441,7 +537,7 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-        },
+        }
       ];
       args: [
         {
@@ -451,13 +547,13 @@ export type MiddleEarthAiProgram = {
         {
           name: "allianceAWins";
           type: "bool";
-        },
+        }
       ];
     },
     {
       name: "resolveBattleSimple";
       docs: [
-        "Resolves a simple battle (without alliances) by updating the winner's and loser's cooldowns.",
+        "Resolves a simple battle (without alliances) by updating the winner's and loser's cooldowns."
       ];
       discriminator: [194, 166, 52, 185, 99, 39, 139, 37];
       accounts: [
@@ -493,13 +589,13 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-        },
+        }
       ];
       args: [
         {
           name: "percentLoss";
           type: "u8";
-        },
+        }
       ];
     },
     {
@@ -508,16 +604,16 @@ export type MiddleEarthAiProgram = {
       accounts: [
         {
           name: "agent";
-          docs: ["The agent state."];
           writable: true;
         },
         {
           name: "game";
+          writable: true;
           relations: ["agent"];
         },
         {
           name: "stakeInfo";
-          docs: ["Record for the staker."];
+          docs: ["Must be initialized"];
           writable: true;
           pda: {
             seeds: [
@@ -532,27 +628,24 @@ export type MiddleEarthAiProgram = {
               {
                 kind: "account";
                 path: "authority";
-              },
+              }
             ];
           };
         },
         {
           name: "stakerSource";
           docs: [
-            "The staker's token account (source) from which tokens will be deposited.",
+            "We verify it's owned by the SPL token program to ensure it's a valid token account."
           ];
           writable: true;
         },
         {
           name: "agentVault";
-          docs: [
-            "The vault token account associated with the agent (destination).",
-          ];
+          docs: ["We verify it's owned by the SPL token program."];
           writable: true;
         },
         {
           name: "authority";
-          docs: ["The authority/staker."];
           writable: true;
           signer: true;
           relations: ["agent"];
@@ -564,13 +657,13 @@ export type MiddleEarthAiProgram = {
         {
           name: "tokenProgram";
           address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-        },
+        }
       ];
       args: [
         {
           name: "amount";
           type: "u64";
-        },
+        }
       ];
     },
     {
@@ -579,16 +672,15 @@ export type MiddleEarthAiProgram = {
       accounts: [
         {
           name: "agent";
-          docs: ["The agent state."];
           writable: true;
         },
         {
           name: "game";
+          writable: true;
           relations: ["agent"];
         },
         {
           name: "stakeInfo";
-          docs: ["Record for the staker."];
           writable: true;
           pda: {
             seeds: [
@@ -603,34 +695,51 @@ export type MiddleEarthAiProgram = {
               {
                 kind: "account";
                 path: "authority";
-              },
+              }
             ];
           };
         },
         {
           name: "agentVault";
-          docs: [
-            "The vault token account associated with the agent (source for withdrawal).",
-          ];
           writable: true;
         },
         {
           name: "agentAuthority";
-          docs: [
-            "The authority account for the vault (this PDA signs on behalf of the vault).",
-          ];
-          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ];
+              },
+              {
+                kind: "account";
+                path: "agent";
+              }
+            ];
+          };
         },
         {
           name: "stakerDestination";
-          docs: [
-            "The staker's token account (destination) for receiving tokens.",
-          ];
           writable: true;
         },
         {
           name: "authority";
-          docs: ["The stake owner."];
           writable: true;
           signer: true;
           relations: ["agent"];
@@ -642,15 +751,15 @@ export type MiddleEarthAiProgram = {
         {
           name: "tokenProgram";
           address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-        },
+        }
       ];
       args: [
         {
           name: "amount";
           type: "u64";
-        },
+        }
       ];
-    },
+    }
   ];
   accounts: [
     {
@@ -664,7 +773,7 @@ export type MiddleEarthAiProgram = {
     {
       name: "stakeInfo";
       discriminator: [66, 62, 68, 70, 108, 179, 183, 235];
-    },
+    }
   ];
   events: [
     {
@@ -678,7 +787,7 @@ export type MiddleEarthAiProgram = {
     {
       name: "battleResolved";
       discriminator: [47, 156, 226, 94, 163, 176, 162, 241];
-    },
+    }
   ];
   errors: [
     {
@@ -786,6 +895,21 @@ export type MiddleEarthAiProgram = {
       name: "nameTooLong";
       msg: "Agent name is too long.";
     },
+    {
+      code: 6021;
+      name: "cooldownNotOver";
+      msg: "You must wait until cooldown ends.";
+    },
+    {
+      code: 6022;
+      name: "gameNotActive";
+      msg: "Game is Inactive";
+    },
+    {
+      code: 6023;
+      name: "invalidAmount";
+      msg: "Invalid amount specified.";
+    }
   ];
   types: [
     {
@@ -865,7 +989,7 @@ export type MiddleEarthAiProgram = {
           },
           {
             name: "totalShares";
-            type: "u64";
+            type: "u128";
           },
           {
             name: "lastAttack";
@@ -896,7 +1020,7 @@ export type MiddleEarthAiProgram = {
           {
             name: "vaultBump";
             type: "u8";
-          },
+          }
         ];
       };
     },
@@ -913,7 +1037,7 @@ export type MiddleEarthAiProgram = {
           {
             name: "name";
             type: "string";
-          },
+          }
         ];
       };
     },
@@ -941,7 +1065,7 @@ export type MiddleEarthAiProgram = {
           {
             name: "newY";
             type: "i32";
-          },
+          }
         ];
       };
     },
@@ -965,7 +1089,7 @@ export type MiddleEarthAiProgram = {
           {
             name: "isActive";
             type: "bool";
-          },
+          }
         ];
       };
     },
@@ -978,11 +1102,10 @@ export type MiddleEarthAiProgram = {
             name: "agentId";
             type: "u8";
           },
-
           {
             name: "opponentAgentId";
             type: "u8";
-          },
+          }
         ];
       };
     },
@@ -1002,7 +1125,7 @@ export type MiddleEarthAiProgram = {
           {
             name: "transferAmount";
             type: "u64";
-          },
+          }
         ];
       };
     },
@@ -1067,6 +1190,16 @@ export type MiddleEarthAiProgram = {
               };
             };
           },
+          {
+            name: "totalStakeAccounts";
+            type: {
+              vec: {
+                defined: {
+                  name: "stakerStake";
+                };
+              };
+            };
+          }
         ];
       };
     },
@@ -1082,15 +1215,12 @@ export type MiddleEarthAiProgram = {
           {
             name: "timestamp";
             type: "i64";
-          },
+          }
         ];
       };
     },
     {
       name: "stakeInfo";
-      docs: [
-        "A per‑staker record for deposits (staked tokens) and issued shares.",
-      ];
       type: {
         kind: "struct";
         fields: [
@@ -1112,20 +1242,50 @@ export type MiddleEarthAiProgram = {
           {
             name: "shares";
             docs: ["The number of shares the user holds."];
-            type: "u64";
+            type: "u128";
           },
           {
             name: "lastRewardTimestamp";
             docs: [
-              "The last time (Unix timestamp) this staker claimed rewards.",
+              "The last time (Unix timestamp) this staker claimed rewards."
             ];
             type: "i64";
           },
           {
-            name: "bump";
-            docs: ["Bump value for the PDA."];
-            type: "u8";
+            name: "cooldownEndsAt";
+            docs: ["The Unix timestamp when the cooldown ends."];
+            type: "i64";
           },
+          {
+            name: "isInitialized";
+            docs: [
+              "Indicates whether the stake_info account has been initialized."
+            ];
+            type: "bool";
+          },
+          {
+            name: "padding";
+            docs: ["Padding to align to 8 bytes"];
+            type: {
+              array: ["u8", 7];
+            };
+          }
+        ];
+      };
+    },
+    {
+      name: "stakerStake";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "staker";
+            type: "pubkey";
+          },
+          {
+            name: "totalStake";
+            type: "u64";
+          }
         ];
       };
     },
@@ -1133,7 +1293,7 @@ export type MiddleEarthAiProgram = {
       name: "terrainType";
       docs: [
         "Define terrain types that affect movement.",
-        "Note: Make sure to declare the enum as public.",
+        "Note: Make sure to declare the enum as public."
       ];
       type: {
         kind: "enum";
@@ -1146,9 +1306,9 @@ export type MiddleEarthAiProgram = {
           },
           {
             name: "river";
-          },
+          }
         ];
       };
-    },
+    }
   ];
 };
