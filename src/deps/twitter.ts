@@ -2,7 +2,7 @@ import { Scraper, SearchMode, Tweet } from "agent-twitter-client";
 import { logger } from "@/utils/logger";
 import { ITwitter } from "@/types";
 import { AnthropicProvider } from "@ai-sdk/anthropic";
-import { generateText, GenerateTextResult } from "ai";
+import { generateText } from "ai";
 import { prisma } from "@/config/prisma";
 
 class TwitterConfig {
@@ -30,7 +30,7 @@ class TwitterConfig {
     this.email = config?.email;
     this.targetUsers = config?.targetUsers ?? [];
     this.pollInterval = config?.pollInterval ?? 120;
-    this.dryRun = config?.dryRun ?? false;
+    this.dryRun = config?.dryRun ?? true;
   }
 }
 
@@ -170,6 +170,7 @@ export class Twitter implements ITwitter {
         uniqueTweets.set(tweet.id, tweet);
       }
     });
+
     return Array.from(uniqueTweets.values()).sort((a, b) =>
       a.id && b.id ? a.id.localeCompare(b.id) : 0
     );
