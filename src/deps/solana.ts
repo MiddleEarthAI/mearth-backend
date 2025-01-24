@@ -9,6 +9,7 @@ import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
 import { MearthProgram } from "@/types";
 
 import { KeyManager } from "./keyManager";
+import { web3 } from "@coral-xyz/anchor";
 
 export class SolanaConfig {
   rpcUrl: string;
@@ -232,7 +233,23 @@ export class Solana implements ISolana {
     x: number,
     y: number
   ): Promise<string> {
-    return "test";
+    const keypair = await this.keyManager.getKeypair(agentId);
+
+    const [agentPDA] = web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("agent"), Buffer.from(agentId)],
+      (await this.getProgram()).programId
+    );
+
+    const program = await this.getProgram();
+    const tx = await program.methods
+      .moveAgent(x, y)
+      .accounts({
+        agent: agentPDA,
+        // authority: this.authorityKeypair.publicKey,
+      })
+      .signers([keypair])
+      .rpc();
+    return tx;
   }
 
   async stopMonitoring(): Promise<void> {

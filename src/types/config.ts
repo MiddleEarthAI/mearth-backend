@@ -34,14 +34,6 @@ export interface SecurityConfig {
   jwtSecret: string;
 }
 
-export interface LLMConfig {
-  model: string;
-  apiKey: string;
-  anthropicApiKey: string;
-  maxTokens: number;
-  temperature: number;
-}
-
 export interface AppConfig {
   port: number;
   environment: string;

@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { logger } from "../utils/logger";
-import { AppConfig, GameConfig, LLMConfig } from "@/types/config";
+import { AppConfig, GameConfig } from "@/types/config";
 import { SecurityConfig } from "@/types/config";
 import { DatabaseConfig, SolanaConfig } from "@/types/config";
 import { TwitterConfig } from "@/types/config";
@@ -14,7 +14,6 @@ export class Config {
   public readonly twitter: TwitterConfig;
   public readonly security: SecurityConfig;
   public readonly app: AppConfig;
-  public readonly llm: LLMConfig;
   public readonly game: GameConfig;
 
   constructor() {
@@ -26,29 +25,8 @@ export class Config {
       "JWT_SECRET",
       "AUTHORITY_WALLET",
 
-      "LLM_MODEL",
-      "LLM_API_KEY",
-
-      "SCOOTLES_TWITTER_USERNAME",
-      "SCOOTLES_TWITTER_PASSWORD",
-
-      "PURRLOCKPAWS_TWITTER_USERNAME",
-      "PURRLOCKPAWS_TWITTER_PASSWORD",
-
-      "SIR_GULLIHOP_TWITTER_USERNAME",
-      "SIR_GULLIHOP_TWITTER_PASSWORD",
-
-      "WANDERLEAF_TWITTER_USERNAME",
-      "WANDERLEAF_TWITTER_PASSWORD",
+      "ANTHROPIC_API_KEY",
     ]);
-
-    this.llm = {
-      model: process.env.LLM_MODEL!,
-      apiKey: process.env.LLM_API_KEY!,
-      anthropicApiKey: process.env.ANTHROPIC_API_KEY!,
-      maxTokens: parseInt(process.env.MAX_TOKENS || "4096"),
-      temperature: parseFloat(process.env.TEMPERATURE || "0.5"),
-    };
 
     this.database = {
       url: process.env.DATABASE_URL!,

@@ -2,6 +2,13 @@ export type Position = {
   x: number;
   y: number;
 };
+
+export enum TerrainType {
+  PLAIN = "PLAIN",
+  MOUNTAIN = "MOUNTAIN",
+  RIVER = "RIVER",
+}
+
 import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
 import * as anchor from "@coral-xyz/anchor";
 

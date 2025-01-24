@@ -3,6 +3,7 @@ import {
   createCipheriv,
   createDecipheriv,
   randomBytes,
+  scryptSync,
   CipherGCM,
   DecipherGCM,
 } from "crypto";
@@ -12,46 +13,97 @@ import { prisma } from "../config/prisma";
 import { SecurityConfig } from "../types/config";
 import { logger } from "../utils/logger";
 
-class KeyManagerConfig {
-  keypairEncryptionKey: string;
-  jwtSecret: string;
-
-  constructor(config?: SecurityConfig) {
-    this.keypairEncryptionKey =
-      config?.keypairEncryptionKey ||
-      process.env.SOLANA_KEYPAIR_ENCRYPTION_KEY!;
-    this.jwtSecret = config?.jwtSecret || process.env.JWT_SECRET!;
+// Custom error classes for more granular error handling
+class KeyManagementError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "KeyManagementError";
   }
 }
 
-/**
- * Service for managing agent keypairs with secure storage and caching
- */
+class EncryptionKeyMissingError extends KeyManagementError {
+  constructor() {
+    super("Encryption key is not configured");
+  }
+}
+
+class KeypairNotFoundError extends KeyManagementError {
+  constructor(agentId: string) {
+    super(`No keypair found for agent ${agentId}`);
+  }
+}
+
+class KeyManagerConfig {
+  keypairEncryptionKey: string;
+  saltPrefix: string;
+
+  constructor(config?: SecurityConfig) {
+    // Validate critical environment variables
+    this.validateEnvironmentVariables();
+
+    this.keypairEncryptionKey =
+      config?.keypairEncryptionKey || process.env.KEYPAIR_ENCRYPTION_KEY!;
+
+    // Add a salt prefix for key derivation
+    this.saltPrefix = "solana-keypair-management-v1";
+  }
+
+  // Validate that critical environment variables are set
+  private validateEnvironmentVariables(): void {
+    const requiredVars = ["KEYPAIR_ENCRYPTION_KEY"];
+
+    for (const variable of requiredVars) {
+      if (!process.env[variable]) {
+        throw new EncryptionKeyMissingError();
+      }
+    }
+  }
+
+  // Derive a secure encryption key using scrypt
+  deriveSecureKey(baseKey: string): Buffer {
+    const salt = `${this.saltPrefix}-${baseKey.slice(0, 16)}`;
+    return scryptSync(baseKey, salt, 32);
+  }
+}
+
 export class KeyManager implements IKeyManager {
   private cache: NodeCache;
   private algorithm = "aes-256-gcm";
+  private config: KeyManagerConfig;
 
-  constructor(private readonly config?: SecurityConfig) {
+  constructor(config?: SecurityConfig) {
     this.config = new KeyManagerConfig(config);
-    // Increase cache TTL to 24 hours since keypairs are sensitive
+
+    // Enhanced cache configuration with more aggressive cleanup
     this.cache = new NodeCache({
       stdTTL: 24 * 3600, // 24 hours
       checkperiod: 600, // Check for expired keys every 10 minutes
-      useClones: false, // Store actual keypair references
+      useClones: false,
+      maxKeys: 1000, // Limit total number of cached keys
     });
-    logger.info("KeyManager service initialized");
+
+    // Set up periodic cache cleanup
+    this.setupCacheCleanup();
+
+    logger.info("KeyManager service initialized with enhanced security");
   }
 
-  /**
-   * Get a keypair for an agent, generating one if it doesn't exist
-   */
+  // Periodic cache cleanup to prevent memory bloat
+  private setupCacheCleanup(): void {
+    setInterval(() => {
+      try {
+        this.cleanupCache();
+      } catch (error) {
+        logger.error("Cache cleanup failed", error);
+      }
+    }, 30 * 60 * 1000); // Every 30 minutes
+  }
+
   async getKeypair(agentId: string): Promise<Keypair> {
     try {
       // Check cache first
       const cached = this.cache.get<Keypair>(agentId);
-      if (cached) {
-        return cached;
-      }
+      if (cached) return cached;
 
       // Check database
       const stored = await prisma.agentKeypair.findUnique({
@@ -59,7 +111,6 @@ export class KeyManager implements IKeyManager {
       });
 
       if (stored) {
-        // Decrypt and reconstruct keypair
         const decrypted = await this.decryptPrivateKey(
           stored.encryptedPrivateKey,
           stored.iv as Buffer,
@@ -67,8 +118,8 @@ export class KeyManager implements IKeyManager {
         );
         const keypair = Keypair.fromSecretKey(decrypted);
 
-        // Cache it
-        this.cache.set(agentId, keypair);
+        // Cache it with event logging
+        this.cacheKeypair(agentId, keypair);
         return keypair;
       }
 
@@ -76,14 +127,33 @@ export class KeyManager implements IKeyManager {
       const { keypair } = await this.generateKeypair(agentId);
       return keypair;
     } catch (error) {
-      logger.error(`Failed to get keypair for agent ${agentId}:`, error);
+      this.handleKeyRetrievalError(agentId, error);
       throw error;
     }
   }
 
-  /**
-   * Generate a new keypair for an agent
-   */
+  // Enhanced error handling for key retrieval
+  private handleKeyRetrievalError(agentId: string, error: unknown): void {
+    if (error instanceof KeypairNotFoundError) {
+      logger.warn(`Keypair retrieval failed for agent ${agentId}`, error);
+    } else {
+      logger.error(
+        `Critical error retrieving keypair for agent ${agentId}`,
+        error
+      );
+    }
+  }
+
+  // Cache keypair with additional logging
+  private cacheKeypair(agentId: string, keypair: Keypair): void {
+    try {
+      this.cache.set(agentId, keypair);
+      logger.info(`Keypair cached for agent ${agentId}`);
+    } catch (error) {
+      logger.error(`Failed to cache keypair for agent ${agentId}`, error);
+    }
+  }
+
   private async generateKeypair(agentId: string): Promise<{
     keypair: Keypair;
     iv: Buffer;
@@ -91,91 +161,103 @@ export class KeyManager implements IKeyManager {
     encryptedPrivateKey: string;
   }> {
     try {
-      // Generate new keypair
       const keypair = Keypair.generate();
       const privateKeyBuffer = keypair.secretKey;
 
-      // Encrypt private key
+      // Enhanced encryption with key derivation
       const { encryptedPrivateKey, iv, tag } = await this.encryptPrivateKey(
         Buffer.from(privateKeyBuffer)
       );
 
-      // Store in database
-      await prisma.agentKeypair.upsert({
-        where: { agentId },
-        update: {
-          publicKey: keypair.publicKey.toBase58(),
-          encryptedPrivateKey,
-          iv: iv as Buffer,
-          tag: tag as Buffer,
-          updatedAt: new Date(),
-        },
-        create: {
-          agentId,
-          publicKey: keypair.publicKey.toBase58(),
-          encryptedPrivateKey,
-          iv: iv as Buffer,
-          tag: tag as Buffer,
-        },
+      // Transactional database update with logging
+      await prisma.$transaction(async (tx) => {
+        await tx.agentKeypair.upsert({
+          where: { agentId },
+          update: {
+            publicKey: keypair.publicKey.toBase58(),
+            encryptedPrivateKey,
+            iv: iv as Buffer,
+            tag: tag as Buffer,
+            rotatedAt: new Date(),
+            updatedAt: new Date(),
+          },
+          create: {
+            agentId,
+            publicKey: keypair.publicKey.toBase58(),
+            encryptedPrivateKey,
+            iv: iv as Buffer,
+            tag: tag as Buffer,
+          },
+        });
       });
 
       // Cache the new keypair
-      this.cache.set(agentId, keypair);
-      logger.info(`Generated new keypair for agent ${agentId}`);
+      this.cacheKeypair(agentId, keypair);
+
+      logger.info(`Generated new keypair for agent ${agentId}`, {
+        publicKey: keypair.publicKey.toBase58(),
+      });
 
       return { keypair, iv, tag, encryptedPrivateKey };
     } catch (error) {
-      logger.error(`Failed to generate keypair for agent ${agentId}:`, error);
-      throw error;
+      logger.error(`Keypair generation failed for agent ${agentId}`, error);
+      throw new KeyManagementError(`Failed to generate keypair: ${error}`);
     }
   }
 
-  /**
-   * Rotate an agent's keypair
-   */
   async rotateKeypair(agentId: string): Promise<void> {
     try {
-      const { keypair, iv, tag, encryptedPrivateKey } =
-        await this.generateKeypair(agentId);
+      // Add a cooldown check to prevent rapid rotations
+      const lastRotation = await this.getLastRotationTime(agentId);
+      this.enforceRotationCooldown(lastRotation);
 
-      await prisma.agentKeypair.update({
-        where: { agentId },
-        data: {
-          publicKey: keypair.publicKey.toBase58(),
-          encryptedPrivateKey,
-          iv: iv as Buffer,
-          tag: tag as Buffer,
-          rotatedAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
+      const { keypair } = await this.generateKeypair(agentId);
 
-      // Update cache
+      // Invalidate cache to force fresh retrieval
       this.cache.del(agentId);
 
-      logger.info(`Rotated keypair for agent ${agentId}`);
+      logger.info(`Keypair rotated successfully for agent ${agentId}`, {
+        newPublicKey: keypair.publicKey.toBase58(),
+      });
     } catch (error) {
-      logger.error(`Failed to rotate keypair for agent ${agentId}:`, error);
+      logger.error(`Keypair rotation failed for agent ${agentId}`, error);
       throw error;
     }
   }
 
-  /**
-   * Encrypt a private key
-   */
+  // Enforce a cooldown period between key rotations
+  private enforceRotationCooldown(lastRotation?: Date): void {
+    if (lastRotation) {
+      const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours
+      const timeSinceLastRotation = Date.now() - lastRotation.getTime();
+
+      if (timeSinceLastRotation < cooldownPeriod) {
+        throw new KeyManagementError("Keypair rotation cooldown not elapsed");
+      }
+    }
+  }
+
+  // Retrieve last rotation time
+  private async getLastRotationTime(
+    agentId: string
+  ): Promise<Date | undefined> {
+    const keypair = await prisma.agentKeypair.findUnique({
+      where: { agentId },
+      select: { rotatedAt: true },
+    });
+    return keypair?.rotatedAt as Date;
+  }
+
   private async encryptPrivateKey(
     privateKey: Buffer
   ): Promise<{ encryptedPrivateKey: string; iv: Buffer; tag: Buffer }> {
-    const key = this.config?.keypairEncryptionKey;
-    if (!key) {
-      throw new Error("Keypair encryption key is not set");
-    }
+    // Use key derivation for enhanced security
+    const derivedKey = this.config.deriveSecureKey(
+      this.config.keypairEncryptionKey
+    );
+
     const iv = randomBytes(16);
-    const cipher = createCipheriv(
-      this.algorithm,
-      Buffer.from(key, "hex"),
-      iv
-    ) as CipherGCM;
+    const cipher = createCipheriv(this.algorithm, derivedKey, iv) as CipherGCM;
 
     const encrypted = Buffer.concat([
       cipher.update(privateKey),
@@ -192,9 +274,6 @@ export class KeyManager implements IKeyManager {
     return { encryptedPrivateKey, iv, tag: authTag };
   }
 
-  /**
-   * Decrypt an encrypted private key
-   */
   private async decryptPrivateKey(
     encryptedPrivateKey: string,
     iv: Buffer,
@@ -203,14 +282,15 @@ export class KeyManager implements IKeyManager {
     const encryptedBuffer = Buffer.from(encryptedPrivateKey, "hex");
     const authTag = encryptedBuffer.subarray(16, 32);
     const encrypted = encryptedBuffer.subarray(32);
-    const key = this.config?.keypairEncryptionKey || "";
-    if (!key) {
-      throw new Error("Keypair encryption key is not set");
-    }
+
+    // Use key derivation for decryption
+    const derivedKey = this.config.deriveSecureKey(
+      this.config.keypairEncryptionKey
+    );
 
     const decipher = createDecipheriv(
       this.algorithm,
-      Buffer.from(key, "hex"),
+      derivedKey,
       iv
     ) as DecipherGCM;
 
@@ -218,41 +298,40 @@ export class KeyManager implements IKeyManager {
     return Buffer.concat([decipher.update(encrypted), decipher.final()]);
   }
 
-  /**
-   * Clean up expired cache entries
-   */
   private cleanupCache(): void {
     const keys = this.cache.keys();
+    let cleanedCount = 0;
+
     for (const key of keys) {
       if (!this.cache.get(key)) {
         this.cache.del(key);
+        cleanedCount++;
       }
+    }
+
+    if (cleanedCount > 0) {
+      logger.info(`Cleaned ${cleanedCount} expired cache entries`);
     }
   }
 
-  /**
-   * Get an agent's public key
-   */
   async getPublicKey(agentId: string): Promise<string> {
     try {
       const keypair = await prisma.agentKeypair.findUnique({
         where: { agentId },
+        select: { publicKey: true },
       });
 
       if (!keypair) {
-        throw new Error(`No keypair found for agent ${agentId}`);
+        throw new KeypairNotFoundError(agentId);
       }
 
       return keypair.publicKey;
     } catch (error) {
-      logger.error(`Failed to get public key for agent ${agentId}:`, error);
+      logger.error(`Failed to retrieve public key for ${agentId}`, error);
       throw error;
     }
   }
 
-  /**
-   * Get an agent's encrypted private key
-   */
   async getEncryptedPrivateKey(
     agentId: string
   ): Promise<{ encryptedKey: string; iv: Buffer; tag: Buffer }> {
@@ -262,7 +341,7 @@ export class KeyManager implements IKeyManager {
       });
 
       if (!keypair) {
-        throw new Error(`No keypair found for agent ${agentId}`);
+        throw new KeypairNotFoundError(agentId);
       }
 
       return {
@@ -272,7 +351,7 @@ export class KeyManager implements IKeyManager {
       };
     } catch (error) {
       logger.error(
-        `Failed to get encrypted private key for agent ${agentId}:`,
+        `Encrypted private key retrieval failed for ${agentId}`,
         error
       );
       throw error;

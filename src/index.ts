@@ -40,18 +40,22 @@ const startAgents = async () => {
 
   const agentRuntimes = await Promise.all(
     agents.map(async (agent) => {
+      const passKey = `${agent.twitterHandle.toUpperCase()}_PASSWORD`;
+      const usernameKey = `${agent.twitterHandle.toUpperCase()}_USERNAME`;
+      const emailKey = `${agent.twitterHandle.toUpperCase()}_EMAIL`;
+
       const agentConfig: AgentConfig = {
         username: agent.twitterHandle,
-        password: process.env[`${agent.twitterHandle.toUpperCase()}_PASSWORD`]!,
-        email: process.env[`${agent.twitterHandle.toUpperCase()}_EMAIL`]!,
+        password: process.env[passKey]!,
+        email: process.env[emailKey]!,
         maxMessagesForSummary: 100,
       };
       if (!agentConfig.password || !agentConfig.username) {
         logger.error(
-          `Agent ${agent.twitterHandle} has no password or username set`
+          `Agent ${agent.twitterHandle} ${passKey} ${usernameKey} ${emailKey} password or username is not set`
         );
         throw new Error(
-          `Agent ${agent.twitterHandle} has no password or username set`
+          `Agent ${agent.twitterHandle} ${passKey} ${usernameKey} ${emailKey} password or username is not set`
         );
       }
       const agentRuntime = createAgent(agent.id, agentConfig);
@@ -87,7 +91,6 @@ async function startServer() {
   try {
     const agentRuntimes = await startAgents();
     agentRuntimesOutside = agentRuntimes;
-    console.log(agentRuntimes);
     app.listen(config.app.port, () => {
       logger.info(
         `⚡️[server]: Server is running at http://localhost:${config.app.port}`

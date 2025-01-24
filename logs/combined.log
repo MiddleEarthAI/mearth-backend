@@ -1,194 +1,208 @@
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:48.418Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:48.529Z"}
-{"level":"info","message":"LLM service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:48.531Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:48.531Z"}
-{"level":"info","message":"Starting agent manager...","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:48.535Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741099280278:-1737567411277:H2I5gHK07SlrsjIhKGLGrGmo:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.509Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741099280278:-1737567411277:H2I5gHK07SlrsjIhKGLGrGmo:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.509Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741098965848:-1737567411276:ha5aFzyLediWkZI1SzY9M1mY:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.555Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741098965848:-1737567411276:ha5aFzyLediWkZI1SzY9M1mY:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.556Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741099657623:-1737567411283:fJnXLSIEp4mxX3d1jZebcoDa:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.565Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741099657623:-1737567411283:fJnXLSIEp4mxX3d1jZebcoDa:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.565Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741098625529:-1737567411324:VtrOGKEgJ02xL1xdEctUreY3:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.708Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741098625529:-1737567411324:VtrOGKEgJ02xL1xdEctUreY3:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:51.708Z"}
-{"level":"info","message":"No active agents found, initializing default agents...","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:53.043Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741319828828:-1737567413471:R17R4SS2FaMd2p31o4Y5igI2:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:53.883Z"}
-{"attemptNumber":2,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741319828828:-1737567413471:R17R4SS2FaMd2p31o4Y5igI2:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:53.883Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741348643129:-1737567413768:fku0lI8Mf0byk8kr2FRbaiik:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:54.071Z"}
-{"attemptNumber":2,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741348643129:-1737567413768:fku0lI8Mf0byk8kr2FRbaiik:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:54.072Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741343814406:-1737567413720:tkTij3bb038Dp8rQ4ShmsYYS:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:54.086Z"}
-{"attemptNumber":2,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756741343814406:-1737567413720:tkTij3bb038Dp8rQ4ShmsYYS:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-22T17:36:54.086Z"}
-{"level":"info","message":"Default agents initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:36:54.157Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:09.510Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:09.582Z"}
-{"level":"info","message":"LLM service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:09.583Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:09.583Z"}
-{"level":"info","message":"Starting agent manager...","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:09.586Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803066746941:-1737568030968:OSduU7kSrNsu7YU3Eezc2cp7:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.279Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803066746941:-1737568030968:OSduU7kSrNsu7YU3Eezc2cp7:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.280Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803065853673:-1737568030996:1WL1cCwkbwapEbIiD4ZKrcIu:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.280Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803065853673:-1737568030996:1WL1cCwkbwapEbIiD4ZKrcIu:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.281Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803067240594:-1737568031017:RykzT0CmTVWGb4B1B7DwNDvn:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.316Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803067240594:-1737568031017:RykzT0CmTVWGb4B1B7DwNDvn:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.316Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803066426889:-1737568031022:vrgYfXsJSW7vqFptBn1dEnxU:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.434Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756803066426889:-1737568031022:vrgYfXsJSW7vqFptBn1dEnxU:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:47:11.435Z"}
-{"level":"error","message":"Failed to start monitoring: Non-base58 character","service":"middle-earth-agents","stack":"Error: Non-base58 character\n    at Object.decode (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/base-x@3.0.10/node_modules/base-x/src/index.js:111:11)\n    at new PublicKey (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@solana+web3.js@1.98.0_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/@solana/web3.js/lib/index.cjs.js:170:47)\n    at SolanaService.startMonitoring (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2151:25)\n    at AgentManagerService.start (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2439:32)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2853:5)","timestamp":"2025-01-22T17:47:12.014Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:09.321Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:09.388Z"}
-{"level":"info","message":"LLM service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:09.389Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:09.389Z"}
-{"level":"info","message":"Starting agent manager...","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:09.391Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756851039650934:-1737568510734:8Tm9l9awkLBpWsTJjHPA5AUC:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:11.050Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756851039650934:-1737568510734:8Tm9l9awkLBpWsTJjHPA5AUC:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:55:11.052Z"}
-{"level":"info","message":"Started monitoring Solana program events","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:12.478Z"}
-{"level":"info","message":"Agent manager started successfully","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:12.479Z"}
-{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:12.484Z"}
-{"level":"info","message":"Generated next move for agent Purrlock Paws","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:13.806Z"}
-{"level":"info","message":"Agent b02dfad2-6c58-485f-bc50-39453bee9e16 executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:13.806Z"}
-{"agentId":"b02dfad2-6c58-485f-bc50-39453bee9e16","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:13.806Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756851351239091:-1737568513795:Hr7IHLMnnJnIfeRYUvXLHlyU:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.072Z"}
-{"attemptNumber":2,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756851351239091:-1737568513795:Hr7IHLMnnJnIfeRYUvXLHlyU:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.073Z"}
-{"level":"info","message":"Generated next move for agent Sir Gullihop","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.232Z"}
-{"level":"info","message":"Agent 236d7e63-76f1-445f-9dc1-c306309e6428 executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.232Z"}
-{"agentId":"236d7e63-76f1-445f-9dc1-c306309e6428","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.232Z"}
-{"level":"info","message":"Generated next move for agent Wanderleaf","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.675Z"}
-{"level":"info","message":"Agent 8d019c13-6422-44d5-b1d3-3d0a9824770b executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.676Z"}
-{"agentId":"8d019c13-6422-44d5-b1d3-3d0a9824770b","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:14.676Z"}
-{"level":"info","message":"Generated next move for agent Scootles","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:15.343Z"}
-{"level":"info","message":"Agent 032c70d8-3b2c-41a3-af5c-d44a8e6a566d executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:15.344Z"}
-{"agentId":"032c70d8-3b2c-41a3-af5c-d44a8e6a566d","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:15.344Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756851667565321:-1737568516953:8t105beNOy9y6LktuZJyNYDf:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:17.380Z"}
-{"attemptNumber":3,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756851667565321:-1737568516953:8t105beNOy9y6LktuZJyNYDf:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-22T17:55:17.381Z"}
-{"level":"warn","message":"Attempt 4 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756852621906077:-1737568526559:nU5mSPK6cl5JGg3BpolWMbox:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:55:27.024Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:29.349Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:29.453Z"}
-{"level":"info","message":"LLM service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:29.456Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:29.457Z"}
-{"level":"info","message":"Starting agent manager...","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:29.465Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756871078555544:-1737568711073:wRsT6Stc4Tc4VUn3dtFC40oO:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:31.482Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756871078555544:-1737568711073:wRsT6Stc4Tc4VUn3dtFC40oO:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-22T17:58:31.483Z"}
-{"level":"info","message":"Started monitoring Solana program events","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:31.821Z"}
-{"level":"info","message":"Agent manager started successfully","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:31.821Z"}
-{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:31.826Z"}
-{"level":"info","message":"Generated next move for agent Scootles","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:33.325Z"}
-{"level":"info","message":"Agent 032c70d8-3b2c-41a3-af5c-d44a8e6a566d executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:33.325Z"}
-{"agentId":"032c70d8-3b2c-41a3-af5c-d44a8e6a566d","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:33.326Z"}
-{"level":"info","message":"Generated next move for agent Sir Gullihop","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:33.790Z"}
-{"level":"info","message":"Agent 236d7e63-76f1-445f-9dc1-c306309e6428 executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:33.790Z"}
-{"agentId":"236d7e63-76f1-445f-9dc1-c306309e6428","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:33.791Z"}
-{"level":"info","message":"Generated next move for agent Wanderleaf","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:34.273Z"}
-{"level":"info","message":"Agent 8d019c13-6422-44d5-b1d3-3d0a9824770b executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:34.273Z"}
-{"agentId":"8d019c13-6422-44d5-b1d3-3d0a9824770b","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:34.274Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756871368660907:-1737568714020:blPXbmirNmAVGilLRFw7bF3T:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:34.454Z"}
-{"attemptNumber":2,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756871368660907:-1737568714020:blPXbmirNmAVGilLRFw7bF3T:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-22T17:58:34.455Z"}
-{"level":"info","message":"Generated next move for agent Purrlock Paws","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:35.042Z"}
-{"level":"info","message":"Agent b02dfad2-6c58-485f-bc50-39453bee9e16 executed decision: WAIT","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:35.043Z"}
-{"agentId":"b02dfad2-6c58-485f-bc50-39453bee9e16","decision":{"action":"WAIT","reason":"Default wait action"},"level":"info","message":"Agent decision:","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:35.043Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756871720142607:-1737568717497:2JkQlBY7USMyLg20bwFfWQ1L:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:37.900Z"}
-{"attemptNumber":3,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756871720142607:-1737568717497:2JkQlBY7USMyLg20bwFfWQ1L:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-22T17:58:37.900Z"}
-{"level":"warn","message":"Attempt 4 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173756872470124767:-1737568725005:kyEDt2h2nRM5VFIO8unX9fyX:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-22T17:58:45.482Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:10:42.008Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:10:42.074Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:10:42.075Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T02:10:42.075Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173759824441001799:-1737598244719:EJbcsqUNGOjUxFgkidCH8zZa:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T02:10:45.217Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173759824441001799:-1737598244719:EJbcsqUNGOjUxFgkidCH8zZa:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T02:10:45.218Z"}
-{"clientVersion":"6.2.1","code":"P2002","level":"error","message":"Failed to initialize default agents: \nInvalid `this.prisma.agent.createMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:33\n\n   99 try {\n  100   const agentCount = await this.prisma.agent.count();\n  101   if (agentCount === 0) {\n→ 102     await this.prisma.agent.createMany(\nUnique constraint failed on the fields: (`twitterHandle`)","meta":{"modelName":"Agent","target":["twitterHandle"]},"name":"PrismaClientKnownRequestError","service":"middle-earth-agents","stack":"PrismaClientKnownRequestError: \nInvalid `this.prisma.agent.createMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:33\n\n   99 try {\n  100   const agentCount = await this.prisma.agent.count();\n  101   if (agentCount === 0) {\n→ 102     await this.prisma.agent.createMany(\nUnique constraint failed on the fields: (`twitterHandle`)\n    at Vn.handleRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:7339)\n    at Vn.handleAndLogRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6663)\n    at Vn.request (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6370)\n    at async l (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:130:9617)\n    at async GameService.initializeDefaultAgents (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:9)\n    at async AgentManagerService.start (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2524:7)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:3254:5)","timestamp":"2025-01-23T02:10:47.623Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:24:36.217Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:24:36.288Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:24:36.289Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T02:24:36.289Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173759907728197109:-1737599077578:Pv9XnbhmkotU3DVAK1EUkX9M:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T02:24:37.983Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173759907728197109:-1737599077578:Pv9XnbhmkotU3DVAK1EUkX9M:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T02:24:37.983Z"}
-{"clientVersion":"6.2.1","code":"P2002","level":"error","message":"Failed to initialize default agents: \nInvalid `this.prisma.agent.createMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:33\n\n   99 try {\n  100   const agentCount = await this.prisma.agent.count();\n  101   if (agentCount === 0) {\n→ 102     await this.prisma.agent.createMany(\nUnique constraint failed on the fields: (`twitterHandle`)","meta":{"modelName":"Agent","target":["twitterHandle"]},"name":"PrismaClientKnownRequestError","service":"middle-earth-agents","stack":"PrismaClientKnownRequestError: \nInvalid `this.prisma.agent.createMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:33\n\n   99 try {\n  100   const agentCount = await this.prisma.agent.count();\n  101   if (agentCount === 0) {\n→ 102     await this.prisma.agent.createMany(\nUnique constraint failed on the fields: (`twitterHandle`)\n    at Vn.handleRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:7339)\n    at Vn.handleAndLogRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6663)\n    at Vn.request (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6370)\n    at async l (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:130:9617)\n    at async GameService.initializeDefaultAgents (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:9)\n    at async AgentManagerService.start (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2524:7)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:3296:5)","timestamp":"2025-01-23T02:24:40.592Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:27:33.884Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:27:33.958Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T02:27:33.959Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T02:27:33.959Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173759925489759254:-1737599255223:0ZaHAKjaLfxRZwmECFkTQDOY:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T02:27:35.631Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173759925489759254:-1737599255223:0ZaHAKjaLfxRZwmECFkTQDOY:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T02:27:35.632Z"}
-{"clientVersion":"6.2.1","code":"P2002","level":"error","message":"Failed to initialize default agents: \nInvalid `this.prisma.agent.createMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:33\n\n   99 try {\n  100   const agentCount = await this.prisma.agent.count();\n  101   if (agentCount === 0) {\n→ 102     await this.prisma.agent.createMany(\nUnique constraint failed on the fields: (`twitterHandle`)","meta":{"modelName":"Agent","target":["twitterHandle"]},"name":"PrismaClientKnownRequestError","service":"middle-earth-agents","stack":"PrismaClientKnownRequestError: \nInvalid `this.prisma.agent.createMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:33\n\n   99 try {\n  100   const agentCount = await this.prisma.agent.count();\n  101   if (agentCount === 0) {\n→ 102     await this.prisma.agent.createMany(\nUnique constraint failed on the fields: (`twitterHandle`)\n    at Vn.handleRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:7339)\n    at Vn.handleAndLogRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6663)\n    at Vn.request (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6370)\n    at async l (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:130:9617)\n    at async GameService.initializeDefaultAgents (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:102:9)\n    at async AgentManagerService.start (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2524:7)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:3296:5)","timestamp":"2025-01-23T02:27:37.082Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:01.046Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:01.129Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:01.130Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:01.131Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760120247406850:-1737601202953:ZPPLj0DH1rQ2HUu7F8YVnhOd:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:03.419Z"}
-{"attemptNumber":1,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760120247406850:-1737601202953:ZPPLj0DH1rQ2HUu7F8YVnhOd:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T03:00:03.420Z"}
-{"level":"info","message":"Started monitoring Solana program events","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:04.406Z"}
-{"level":"info","message":"Agent manager started successfully","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:04.407Z"}
-{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:04.409Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760120532724587:-1737601205667:hiwwMWzRvUolTBtNU74IBqq5:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:06.165Z"}
-{"attemptNumber":2,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760120532724587:-1737601205667:hiwwMWzRvUolTBtNU74IBqq5:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T03:00:06.166Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760120888908971:-1737601209238:YwmilWiuJe1Jv149XC3wVJWj:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:09.897Z"}
-{"attemptNumber":3,"error":"{\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760120888908971:-1737601209238:YwmilWiuJe1Jv149XC3wVJWj:1\"}]}","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T03:00:09.897Z"}
-{"level":"warn","message":"Attempt 4 failed, retrying... Error: {\"errors\":[{\"code\":399,\"message\":\"Sorry, we could not find your account. g;173760121590448383:-1737601216218:vgxDaTdAlN1Ux8skvcsKRQTr:1\"}]}","service":"middle-earth-agents","timestamp":"2025-01-23T03:00:16.698Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:54.043Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:54.106Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:54.107Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:54.107Z"}
-{"level":"info","message":"Started monitoring Solana program events","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:57.353Z"}
-{"level":"info","message":"Agent manager started successfully","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:57.354Z"}
-{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T03:09:57.356Z"}
-{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T03:19:07.343Z"}
-{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T03:19:07.346Z"}
-{"level":"info","message":"Stopped monitoring Solana program events","service":"middle-earth-agents","timestamp":"2025-01-23T03:19:07.362Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:35.961Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:36.091Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:36.094Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:36.096Z"}
-{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:36.128Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.679Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.679Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.739Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.740Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.755Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.755Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.907Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:39.907Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:42.954Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:42.954Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:43.263Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:43.263Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:43.600Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:43.600Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:43.959Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:43.959Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:47.315Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:47.315Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:47.451Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:47.451Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:48.408Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:48.410Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:49.773Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:11:49.773Z"}
-{"level":"warn","message":"Attempt 4 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:11:56.045Z"}
-{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:01.498Z"}
-{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:01.612Z"}
-{"level":"info","message":"Game service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:01.614Z"}
-{"level":"info","message":"Services initialized successfully","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:01.615Z"}
-{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:01.629Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.472Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.472Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.505Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.505Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.647Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.647Z"}
-{"level":"warn","message":"Attempt 1 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.694Z"}
-{"attemptNumber":1,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":3,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:07.694Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.013Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.013Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.058Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.058Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.619Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.619Z"}
-{"level":"warn","message":"Attempt 2 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.662Z"}
-{"attemptNumber":2,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":2,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:12.662Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:18.494Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:18.495Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:19.000Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:19.004Z"}
-{"level":"warn","message":"Attempt 3 failed, retrying... Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:19.245Z"}
-{"attemptNumber":3,"error":"Unknown subtask ArkoseLogin","level":"error","message":"Retry attempt failed:","retriesLeft":1,"service":"middle-earth-agents","timestamp":"2025-01-23T10:23:19.246Z"}
-{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T10:23:19.307Z"}
-{"clientVersion":"6.2.1","level":"error","message":"Failed to start server: \nInvalid `prisma2.agent.findMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2435:38\n\n  2432   return new Agent(agentConfig, agentId);\n  2433 }\n  2434 var startAgents = async () => {\n→ 2435   const agents = await prisma2.agent.findMany(\nCan't reach database server at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`\n\nPlease make sure your database server is running at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`.","name":"PrismaClientInitializationError","service":"middle-earth-agents","stack":"PrismaClientInitializationError: \nInvalid `prisma2.agent.findMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2435:38\n\n  2432   return new Agent(agentConfig, agentId);\n  2433 }\n  2434 var startAgents = async () => {\n→ 2435   const agents = await prisma2.agent.findMany(\nCan't reach database server at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`\n\nPlease make sure your database server is running at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`.\n    at Vn.handleRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:7640)\n    at Vn.handleAndLogRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6663)\n    at Vn.request (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6370)\n    at async l (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:130:9617)\n    at async startAgents (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2435:18)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2480:27)","timestamp":"2025-01-23T21:52:08.974Z"}
-{"level":"error","message":"Agent purrlockpawsai has no password or username set","service":"middle-earth-agents","timestamp":"2025-01-23T21:52:23.837Z"}
+{"level":"error","message":"Agent purrlockpawsai has no password or username set","service":"middle-earth-agents","timestamp":"2025-01-23T22:02:24.541Z"}
+{"level":"error","message":"Agent purrlockpawsai PURRLOCKPAWSAI_PASSWORD PURRLOCKPAWSAI_USERNAME PURRLOCKPAWSAI_EMAIL password or username is not set","service":"middle-earth-agents","timestamp":"2025-01-23T22:04:29.189Z"}
+{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:10:11.169Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:10:11.173Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T22:10:11.233Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T22:10:15.828Z"}
+{"level":"info","message":"Twitter service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:14:01.370Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:14:01.374Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T22:14:01.427Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T22:20:09.104Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T22:21:57.936Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:22:07.669Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T22:22:07.674Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T22:23:02.421Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:36.158Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:36.166Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:38.808Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:41.071Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:42.704Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:43.864Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:45.878Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T22:24:46.229Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:15.876Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:15.884Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:18.893Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:18.894Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:20.435Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:20.435Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T22:29:21.963Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:09:12.120Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:09:12.128Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:09:29.165Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:09:29.171Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:12:57.217Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:12:57.228Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:32.313Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:32.324Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:37.292Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:37.293Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:39.038Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:39.039Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:41.221Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:41.221Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:42.827Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:42.828Z"}
+{"level":"info","message":"just finished reporting","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:44.036Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:44.036Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:47.471Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:47.471Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:49.195Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:49.195Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:50.816Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:50.816Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:52.437Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:52.437Z"}
+{"level":"info","message":"just finished reporting","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:53.666Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:53.666Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:57.899Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:57.899Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:59.751Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:14:59.751Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:15:01.401Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:15:01.401Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T23:15:02.481Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:16:23.036Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:16:23.061Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:16:28.589Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:16:28.590Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T23:16:30.081Z"}
+{"clientVersion":"6.2.1","level":"error","message":"Failed to start server: \nInvalid `prisma2.agent.findMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2529:38\n\n  2526   return new Agent(agentConfig, agentId);\n  2527 }\n  2528 var startAgents = async () => {\n→ 2529   const agents = await prisma2.agent.findMany(\nCan't reach database server at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`\n\nPlease make sure your database server is running at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`.","name":"PrismaClientInitializationError","service":"middle-earth-agents","stack":"PrismaClientInitializationError: \nInvalid `prisma2.agent.findMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2529:38\n\n  2526   return new Agent(agentConfig, agentId);\n  2527 }\n  2528 var startAgents = async () => {\n→ 2529   const agents = await prisma2.agent.findMany(\nCan't reach database server at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`\n\nPlease make sure your database server is running at `ep-summer-credit-a8phz689.eastus2.azure.neon.tech:5432`.\n    at Vn.handleRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:7640)\n    at Vn.handleAndLogRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6663)\n    at Vn.request (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6370)\n    at async l (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:130:9617)\n    at async startAgents (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2529:18)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:2577:27)","timestamp":"2025-01-23T23:22:32.799Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:34.740Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:34.748Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:38.870Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:38.871Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:40.734Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:40.734Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:42.833Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:42.834Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:44.650Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:44.651Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:47.882Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:47.882Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:51.366Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:51.366Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T23:23:52.824Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:24:56.765Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:24:56.784Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:00.946Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:00.947Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:02.659Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:02.660Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:04.675Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:04.675Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:06.583Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:06.583Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:09.733Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:09.733Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T23:25:12.412Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:26:11.523Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:26:11.571Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:26:16.096Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:26:16.099Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T23:26:16.455Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:26.606Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:26.619Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:30.745Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:30.746Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:32.734Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:32.737Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:34.551Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:34.552Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:36.174Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:36.174Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:39.549Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:39.550Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:42.664Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:42.664Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:44.410Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:44.411Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:46.064Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:46.064Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:47.688Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:47.688Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:50.864Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:50.864Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:54.458Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:54.459Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:56.888Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:56.888Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:58.552Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:27:58.552Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:00.363Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:00.364Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:03.365Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:03.366Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:06.275Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:06.275Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:07.928Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:07.928Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:09.946Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:09.946Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:12.253Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:12.253Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:15.549Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:15.549Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:18.912Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:18.913Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:20.790Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:20.790Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:22.346Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:22.346Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:24.132Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:24.132Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:26.998Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:26.998Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:30.022Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:30.023Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:31.757Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:31.757Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:33.293Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:33.293Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:34.894Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:34.894Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:37.896Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:37.897Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:41.833Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:41.855Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:43.493Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:43.493Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:45.434Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:45.434Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:47.864Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:47.865Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:51.169Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:51.170Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:54.974Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:54.974Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:58.145Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:58.204Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:59.942Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:28:59.942Z"}
+{"level":"info","message":"just finished moving","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:01.787Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:01.788Z"}
+{"level":"info","message":"just finished tweeting🔥🔥🔥🔥🔥🔥🔥:","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:04.769Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:04.770Z"}
+{"level":"info","message":"just finished scanning terrain","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:08.323Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:08.324Z"}
+{"level":"info","message":"just finished predicting encounters","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:10.181Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:10.181Z"}
+{"level":"info","message":"just finished analyzing tokenomics","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:11.722Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:11.723Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-23T23:29:13.185Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-24T05:10:41.368Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-24T05:10:41.378Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-24T05:10:45.108Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-24T05:10:49.113Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-24T05:24:32.683Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-24T05:24:32.694Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-24T05:24:36.378Z"}
+{"level":"error","message":"Failed to generate keypair for agent f23305f5-c2d2-4ae0-bf7e-4cce3d4dd752: Keypair encryption key is not set","service":"middle-earth-agents","stack":"Error: Keypair encryption key is not set\n    at KeyManager.encryptPrivateKey (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1581:13)\n    at KeyManager.generateKeypair (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1523:59)\n    at KeyManager.getKeypair (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1509:38)\n    at async Solana.processMovement (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1798:21)","timestamp":"2025-01-24T05:24:36.993Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-24T05:29:08.423Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-24T05:29:08.439Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-24T05:29:12.191Z"}
+{"code":"ERR_CRYPTO_INVALID_KEYLEN","level":"error","message":"Failed to generate keypair for agent f23305f5-c2d2-4ae0-bf7e-4cce3d4dd752: Invalid key length","service":"middle-earth-agents","stack":"RangeError: Invalid key length\n    at Cipheriv.createCipherBase (node:internal/crypto/cipher:121:19)\n    at Cipheriv.createCipherWithIV (node:internal/crypto/cipher:133:3)\n    at new Cipheriv (node:internal/crypto/cipher:234:3)\n    at createCipheriv (node:crypto:143:10)\n    at KeyManager.encryptPrivateKey (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1584:53)\n    at KeyManager.generateKeypair (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1523:59)\n    at KeyManager.getKeypair (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1509:38)\n    at async Solana.processMovement (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1798:21)","timestamp":"2025-01-24T05:29:12.717Z"}
+{"level":"info","message":"KeyManager service initialized","service":"middle-earth-agents","timestamp":"2025-01-24T05:49:11.616Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-24T05:49:11.623Z"}
+{"level":"info","message":"just finished steps","service":"middle-earth-agents","timestamp":"2025-01-24T05:49:14.769Z"}
+{"code":"ERR_CRYPTO_INVALID_KEYLEN","level":"error","message":"Failed to generate keypair for agent f23305f5-c2d2-4ae0-bf7e-4cce3d4dd752: Invalid key length","service":"middle-earth-agents","stack":"RangeError: Invalid key length\n    at Cipheriv.createCipherBase (node:internal/crypto/cipher:121:19)\n    at Cipheriv.createCipherWithIV (node:internal/crypto/cipher:133:3)\n    at new Cipheriv (node:internal/crypto/cipher:234:3)\n    at createCipheriv (node:crypto:143:10)\n    at KeyManager.encryptPrivateKey (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1592:53)\n    at KeyManager.generateKeypair (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1528:59)\n    at KeyManager.getKeypair (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1513:38)\n    at async Solana.processMovement (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:1806:21)","timestamp":"2025-01-24T05:49:15.313Z"}
