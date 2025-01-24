@@ -3,6 +3,27 @@ import { KeyManager } from "../keyManager";
 import { Keypair } from "@solana/web3.js";
 import { prisma } from "../../config/prisma";
 import { mockSecurityConfig, mockKeypairData } from "./test-types";
+import { createDecipheriv } from "crypto";
+
+// Mock crypto operations
+const mockCipher = {
+  update: vi.fn(() => Buffer.from("mock-encrypted-data")),
+  final: vi.fn(() => Buffer.from("mock-final")),
+  getAuthTag: vi.fn(() => Buffer.from("1234567890123456")),
+};
+
+const mockDecipher = {
+  setAuthTag: vi.fn(),
+  update: vi.fn(() => Buffer.from("mock-secret-key")),
+  final: vi.fn(() => Buffer.from([])),
+};
+
+vi.mock("crypto", () => ({
+  createCipheriv: vi.fn(() => mockCipher),
+  createDecipheriv: vi.fn(() => mockDecipher),
+  randomBytes: vi.fn(() => Buffer.from("1234567890123456")),
+  scryptSync: vi.fn(() => Buffer.from("mock-derived-key-32-bytes-long!!!")),
+}));
 
 // Mock the external dependencies
 vi.mock("@solana/web3.js", () => ({
@@ -29,11 +50,12 @@ vi.mock("../../config/prisma", () => ({
       findUnique: vi.fn(),
       upsert: vi.fn(),
     },
-    $transaction: vi.fn((callback) => {
+    $transaction: vi.fn(async (callback) => {
       if (typeof callback === "function") {
-        return callback(prisma);
+        const result = await callback(prisma);
+        return result || mockKeypairData;
       }
-      return Promise.resolve();
+      return Promise.resolve(mockKeypairData);
     }),
   },
 }));
@@ -75,12 +97,6 @@ describe("KeyManager", () => {
       vi.mocked(prisma.agentKeypair.upsert).mockResolvedValueOnce(
         mockKeypairData
       );
-      vi.mocked(prisma.$transaction).mockImplementationOnce((callback) => {
-        if (typeof callback === "function") {
-          return callback(prisma);
-        }
-        return Promise.resolve(mockKeypairData);
-      });
 
       const result = await keyManager.getKeypair(mockAgentId);
 
@@ -92,16 +108,14 @@ describe("KeyManager", () => {
     });
 
     it("should return existing keypair from database", async () => {
-      // Create properly encrypted test data
-      const testPrivateKey = Buffer.from("test-private-key-data");
-      const testIv = Buffer.from("1234567890123456"); // 16 bytes for AES-256-GCM
-      const testTag = Buffer.from("12345678901234567890123456789012"); // 32 bytes for auth tag
-
       const mockStoredKeypair = {
         ...mockKeypairData,
-        encryptedPrivateKey: testPrivateKey.toString("hex"),
-        iv: testIv,
-        tag: testTag,
+        encryptedPrivateKey: Buffer.concat([
+          Buffer.from("mock-encrypted-data"),
+          Buffer.from("mock-final"),
+        ]).toString("hex"),
+        iv: Buffer.from("1234567890123456"),
+        tag: Buffer.from("1234567890123456"),
       };
 
       vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce(
@@ -111,6 +125,7 @@ describe("KeyManager", () => {
       const result = await keyManager.getKeypair(mockAgentId);
 
       expect(result).toBeDefined();
+      expect(result.publicKey.toBase58()).toBe("mock-public-key");
       expect(prisma.agentKeypair.findUnique).toHaveBeenCalledWith({
         where: { agentId: mockAgentId },
       });
@@ -132,13 +147,6 @@ describe("KeyManager", () => {
       vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce({
         ...mockKeypairData,
         rotatedAt: new Date(Date.now() - 25 * 60 * 60 * 1000), // 25 hours ago
-      });
-
-      vi.mocked(prisma.$transaction).mockImplementationOnce((callback) => {
-        if (typeof callback === "function") {
-          return callback(prisma);
-        }
-        return Promise.resolve(mockKeypairData);
       });
 
       vi.mocked(prisma.agentKeypair.upsert).mockResolvedValueOnce(
@@ -188,12 +196,16 @@ describe("KeyManager", () => {
     const mockAgentId = "test-agent-id";
 
     it("should return encrypted private key data", async () => {
-      const testIv = Buffer.from("1234567890123456"); // 16 bytes for AES-256-GCM
-      const testTag = Buffer.from("12345678901234567890123456789012"); // 32 bytes for auth tag
+      const testIv = Buffer.from("1234567890123456");
+      const testTag = Buffer.from("1234567890123456");
+      const testEncryptedData = Buffer.concat([
+        Buffer.from("mock-encrypted-data"),
+        Buffer.from("mock-final"),
+      ]).toString("hex");
 
       vi.mocked(prisma.agentKeypair.findUnique).mockResolvedValueOnce({
         ...mockKeypairData,
-        encryptedPrivateKey: "encrypted-data",
+        encryptedPrivateKey: testEncryptedData,
         iv: testIv,
         tag: testTag,
       });
@@ -201,7 +213,7 @@ describe("KeyManager", () => {
       const result = await keyManager.getEncryptedPrivateKey(mockAgentId);
 
       expect(result).toEqual({
-        encryptedKey: "encrypted-data",
+        encryptedKey: testEncryptedData,
         iv: testIv,
         tag: testTag,
       });

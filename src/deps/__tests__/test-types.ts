@@ -8,7 +8,10 @@ export const mockSecurityConfig: SecurityConfig = {
 // Create test buffers with proper sizes for AES-256-GCM
 const testIv = Buffer.from("1234567890123456"); // 16 bytes for IV
 const testTag = Buffer.from("1234567890123456"); // 16 bytes for auth tag
-const testPrivateKey = Buffer.from("test-private-key-data");
+const mockEncryptedData = Buffer.concat([
+  Buffer.from("mock-encrypted-data"),
+  Buffer.from("mock-final"),
+]).toString("hex");
 
 export const mockKeypairData = {
   id: "mock-id",
@@ -16,7 +19,7 @@ export const mockKeypairData = {
   updatedAt: new Date(),
   agentId: "test-agent-id",
   publicKey: "mock-public-key",
-  encryptedPrivateKey: testPrivateKey.toString("hex"),
+  encryptedPrivateKey: mockEncryptedData,
   iv: testIv as unknown as Uint8Array,
   tag: testTag as unknown as Uint8Array,
   rotatedAt: new Date(),
