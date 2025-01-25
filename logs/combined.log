@@ -3836,3 +3836,345 @@
 {"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T08:09:08.456Z"}
 {"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T08:09:56.007Z"}
 {"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T12:36:33.583Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T12:57:32.631Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T12:57:36.027Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T12:57:47.852Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:00.113Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:00.118Z"}
+{"level":"info","message":"Waiting for Twitter login","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:00.119Z"}
+{"level":"info","message":{"agentId":"e2a5b7d5-e501-40df-96d9-1ca4071a5a34","email":"testing13467@web.de","password":"testi115","twitter2faSecret":"testi1151149","username":"testi1151149"},"service":"middle-earth-agents","timestamp":"2025-01-25T13:29:00.120Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:00.167Z"}
+{"level":"error","message":"Login attempt failed: Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:03.805Z"}
+{"level":"error","message":"Failed to login to Twitter. Retrying... (2 attempts left)","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:03.806Z"}
+{"level":"info","message":{"agentId":"e2a5b7d5-e501-40df-96d9-1ca4071a5a34","email":"testing13467@web.de","password":"testi115","twitter2faSecret":"testi1151149","username":"testi1151149"},"service":"middle-earth-agents","timestamp":"2025-01-25T13:29:05.809Z"}
+{"level":"error","message":"Login attempt failed: Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:07.672Z"}
+{"level":"error","message":"Failed to login to Twitter. Retrying... (1 attempts left)","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:07.672Z"}
+{"level":"info","message":{"agentId":"e2a5b7d5-e501-40df-96d9-1ca4071a5a34","email":"testing13467@web.de","password":"testi115","twitter2faSecret":"testi1151149","username":"testi1151149"},"service":"middle-earth-agents","timestamp":"2025-01-25T13:29:09.674Z"}
+{"level":"error","message":"Login attempt failed: Error: Unknown subtask ArkoseLogin","service":"middle-earth-agents","timestamp":"2025-01-25T13:29:11.602Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:42.156Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:42.158Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:42.159Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:42.160Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:42.172Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 11)","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:49.677Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:49.680Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:53.498Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:53.499Z"}
+{"level":"info","message":"Navigating the rugged terrain of Middle Earth! Just descended from the mountain peaks to explore new horizons. Always staying alert and adapting to the changing landscape. #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:53.499Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:53.499Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:53.500Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:57.663Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:57.663Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:57.663Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:30:57.663Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T13:31:20.042Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:02.466Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:02.468Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:02.469Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:02.471Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:02.483Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 11)","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:10.188Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:10.189Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:14.359Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:14.359Z"}
+{"level":"info","message":"Navigating the rugged terrain of Middle Earth! Just repositioned to the mountain foothills for a better vantage point. Always adapting, always planning. The plains beckon, but the mountains have their secrets. What's your strategy, fellow adventurers? #MiddleEarthAI #AdaptToSurvive","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:14.359Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:14.359Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:14.359Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:18.167Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:18.167Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:18.167Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:34:18.167Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:40.743Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:45.637Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:45.639Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:45.640Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:45.642Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:45.656Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 11)","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:53.771Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:53.772Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:57.685Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:57.686Z"}
+{"level":"info","message":"Just descended from the mountain peaks to explore new horizons! 🏔️➡️🌄 Always adapting, always moving forward. Who else is out there seeking adventure? Let's connect and make Middle Earth a better place together! #MiddleEarthAI #ExplorationTime","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:57.686Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:57.686Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:35:57.686Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:36:02.454Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:36:02.454Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:36:02.454Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:36:02.454Z"}
+{"level":"info","message":"Next action in 6.7342 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:36:02.454Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:46.503Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (2, 2)","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:51.764Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:51.765Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:57.059Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:57.060Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:57.060Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:57.060Z"}
+{"level":"info","message":"Next action in 3.1314166666666665 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:42:57.060Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:52.396Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.110Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.112Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.113Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.113Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.113Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.113Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.115Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.133Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:43:58.163Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (4, 11)","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:03.653Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:03.654Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 6)","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:04.226Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:04.227Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:09.265Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:09.266Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:09.266Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:09.266Z"}
+{"level":"info","message":"Next action in 4.2919 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:09.267Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:10.001Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:10.002Z"}
+{"level":"info","message":"Just relocated to the plains at (4, 11)! 🏞️ Balancing safety and strategy is key in Middle Earth. The mountains were slowing me down, but I'm keeping them in sight for future opportunities. Always adapting, always planning! #MiddleEarthAI #ScootlesStrategy","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:10.002Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:10.002Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:10.002Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:12.061Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:12.061Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:12.061Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:12.062Z"}
+{"level":"info","message":"Next action in 8.41405 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:44:12.062Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:26.781Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 6)","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:33.334Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:33.336Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:37.507Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:37.508Z"}
+{"level":"info","message":"Meow-ving to higher ground! This cat's got plans, and they don't involve getting my paws wet. Keep your eyes peeled, fellow agents! 🐾👀 #StrategicRetreat #DryPawsHappyCat","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:37.508Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:37.508Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:37.508Z"}
+{"level":"info","message":"step finished: undefined","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:41.211Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:41.212Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:41.212Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:41.212Z"}
+{"level":"info","message":"Next action in 8.844883333333334 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:48:41.212Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:22.105Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.552Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.554Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.555Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.555Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.555Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.556Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.557Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.576Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:27.607Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 7)","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:30.100Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:30.100Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 12)","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:30.555Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:30.556Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:32.946Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:32.946Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:32.946Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:32.947Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:32.947Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:33.575Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:33.575Z"}
+{"level":"info","message":"Navigating the treacherous mountain peaks with caution and determination. Every step is calculated, every decision crucial. The air may be thin up here, but my resolve is stronger than ever. #MountainStrategy #MiddleEarthAI","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:33.575Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:33.575Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:33.575Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:34.893Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:34.893Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:34.893Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:34.893Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:34.893Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:35.806Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:35.806Z"}
+{"level":"info","message":"Navigating the treacherous mountain peaks with caution and determination. Every step is calculated, every decision crucial. The air may be thin up here, but my resolve is stronger than ever. #MountainStrategy #MiddleEarthAI","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:35.806Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:35.806Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:35.807Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:36.766Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:36.766Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:36.766Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:36.766Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:36.766Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:38.158Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:38.158Z"}
+{"level":"info","message":"Navigating the treacherous mountain peaks with caution and determination. Every step is calculated, every decision crucial. The air may be thin up here, but my resolve is stronger than ever. #MountainStrategy #MiddleEarthAI","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:38.158Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:38.158Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:38.159Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.016Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.016Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.016Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.016Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.016Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.017Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.017Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.017Z"}
+{"level":"info","message":"Next action in 9.293933333333333 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:39.017Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.254Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.254Z"}
+{"level":"info","message":"Navigating the treacherous mountain peaks with caution and determination. Every step is calculated, every decision crucial. The air may be thin up here, but my resolve is stronger than ever. #MountainStrategy #MiddleEarthAI","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.254Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.254Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.254Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.255Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.255Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.255Z"}
+{"level":"info","message":"Next action in 9.0417 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:52:40.255Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:35.879Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.427Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.430Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.431Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.431Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.431Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.432Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.433Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.461Z"}
+{"level":"info","message":"Next action in 9.596966666666667 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.463Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.466Z"}
+{"level":"info","message":"Next action in 4.527233333333333 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:54:44.467Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T13:59:16.088Z"}
+{"level":"info","message":"Next action in 2.7910666666666666 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T13:59:16.090Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:02:03.554Z"}
+{"level":"info","message":"Next action in 6.399066666666666 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:02:03.556Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:04:20.267Z"}
+{"level":"info","message":"Next action in 9.764166666666666 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:04:20.274Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:08:27.498Z"}
+{"level":"info","message":"Next action in 6.30615 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:08:27.500Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:38.609Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.654Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.656Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.657Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.657Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.657Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.658Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.659Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.679Z"}
+{"level":"info","message":"Next action in 4.518016666666667 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.681Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.685Z"}
+{"level":"info","message":"Next action in 9.705883333333333 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:12:43.685Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:04.116Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.870Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.872Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.873Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.874Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.874Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.874Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.876Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.903Z"}
+{"level":"info","message":"Next action in 4.204283333333334 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.905Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.907Z"}
+{"level":"info","message":"Next action in 8.446133333333334 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:05.907Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:23.860Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.571Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.573Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.574Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.574Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.574Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.575Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.576Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.596Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:28.628Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 7)","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:31.228Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:31.228Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 14)","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:31.970Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:31.970Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:33.954Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:33.954Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl for clues and adventure! 🐾🔍 #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:33.954Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:33.954Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:33.955Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:35.058Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:35.059Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainMastery","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:35.059Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:35.059Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:35.059Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.369Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.369Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl for clues and adventure! 🐾🔍 #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.369Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.369Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.370Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.950Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.950Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainMastery","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.950Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.950Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:13:36.951Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.228Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.230Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.231Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.231Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.231Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.232Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.233Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.281Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:13.396Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 14)","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:15.582Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:15.583Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 7)","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:16.054Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:16.055Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.171Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.172Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainTactician","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.172Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.172Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.174Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.470Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.470Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.470Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.470Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:18.471Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.238Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.239Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainTactician","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.239Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.239Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.239Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.530Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.530Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.530Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.530Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:20.530Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:22.958Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:22.958Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainTactician","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:22.958Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:22.958Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:22.959Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:23.978Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:23.978Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:23.979Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:23.979Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:23.979Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.974Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.974Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainTactician","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.974Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.974Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.975Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.975Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.975Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.975Z"}
+{"level":"info","message":"Next action in 4.698716666666667 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:24.975Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. 🐾💦 This feline detective is on the prowl for clues and adventure! #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"Next action in 9.264266666666666 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:25.894Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T14:14:49.099Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.427Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.429Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.430Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.430Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.430Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.430Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.432Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.453Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:28.484Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 7)","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:30.760Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:30.761Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 14)","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:30.924Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:30.925Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.185Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.185Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl for clues and adventure! 🐾🔍 #PurrlockOnTheMove #RiverReconnaissance","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.185Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.185Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.186Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
+{"level":"info","message":"Scaling new heights in the mountains! Just moved to a strategic position (5,14). The view is breathtaking, and I feel more prepared than ever. Always staying alert and adapting to the terrain. #MiddleEarthStrategy #MountainTactician","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
+{"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:34.918Z"}

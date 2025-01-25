@@ -2,7 +2,6 @@ import { tool } from "ai";
 import { z } from "zod";
 import { logger } from "./logger";
 import { Solana } from "@/deps/solana";
-import { TerrainType } from "@/types";
 import { Twitter } from "@/deps/twitter";
 
 export const moveTool = function (agentId: string, solana: Solana) {

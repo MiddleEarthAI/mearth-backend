@@ -3,13 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 
 import { IAgent } from "./types";
 import { Solana } from "./deps/solana";
+import fs from "fs";
 
 import { AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
-import { generateText, Message } from "ai";
-import { composeContext } from "./utils/templates";
+import { CoreToolCall, generateText, Message, ToolContent } from "ai";
 import { logger } from "./utils/logger";
-import { generateAgentContext } from "./utils/generation";
 import { Twitter } from "./deps/twitter";
+import { Tool } from "@anthropic-ai/sdk/resources";
 
 export interface AgentConfig {
   username: string;
@@ -32,13 +32,13 @@ export class Agent implements IAgent {
     this.anthropic = createAnthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
-    this.twitter = new Twitter(this.anthropic, {
-      agentId,
-      username: agentConfig.username,
-      password: agentConfig.password,
-      email: agentConfig.email,
-      twitter2faSecret: agentConfig.twitter2faSecret,
-    });
+    // this.twitter = new Twitter(this.anthropic, {
+    //   agentId,
+    //   username: agentConfig.username,
+    //   password: agentConfig.password,
+    //   email: agentConfig.email,
+    //   twitter2faSecret: agentConfig.twitter2faSecret,
+    // });
 
     this.messages = [];
     this.agentId = agentId;
@@ -50,7 +50,7 @@ export class Agent implements IAgent {
     if (this.twitter) {
       await this.twitter.init();
     }
-    logger.warn("Twitter not initialized no actual posting will be done");
+    logger.warn("Twitter not initialized - continuing regardless");
 
     // Get all agents with full relationships
     const agents = await prisma?.agent.findMany({
@@ -101,12 +101,21 @@ export class Agent implements IAgent {
         year: currentTime.getUTCFullYear(),
         timestamp: currentTime.toISOString(),
       };
+      const MIN_DELAY = process.env.MIN_ACTION_DELAY_MS
+        ? parseInt(process.env.MIN_ACTION_DELAY_MS)
+        : 2 * 60 * 1000; // default to 2 minutes
+      const MAX_DELAY = process.env.MAX_ACTION_DELAY_MS
+        ? parseInt(process.env.MAX_ACTION_DELAY_MS)
+        : 10 * 60 * 1000; // default to 10 minutes
 
-      const temp = `
+      const LOOP_DELAY =
+        Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
+
+      const cotext = `
       #Current Game Time
       UTC: ${gameTime.timestamp}
       Game Day: Day ${Math.floor(
-        (currentTime.getTime() - new Date("2024-01-01").getTime()) /
+        (currentTime.getTime() - new Date("2025-01-25").getTime()) /
           (1000 * 60 * 60 * 24)
       )} of Middle Earth
       
@@ -209,7 +218,19 @@ export class Agent implements IAgent {
           .join("\n") || "No active alliances"
       }
 
-      #World State
+      #World State & Environment
+      Map Boundaries:
+      - Rivers: Slow movement (70% slower), coordinates include key points like (27,7), (27,8), (10,4), etc.
+      - Mountains: Difficult terrain (50% slower), coordinates include peaks at (6,12), (13,15), (22,8), etc.
+      - Plains: Normal movement speed, safe terrain at coordinates like (1,1), (1,2), (2,1), (2,2)
+
+      Current Terrain Analysis:
+      - Your position (${currentAgent.currentLocation.x}, ${
+        currentAgent.currentLocation.y
+      }) is on ${currentAgent.currentLocation.terrain}
+      - Nearby terrain features affect movement speed and risk
+      - Consider terrain advantages for strategic positioning
+
       Immediate Threats (Within 2 units - Battle Range):
       ${
         agents
@@ -320,10 +341,12 @@ export class Agent implements IAgent {
       }, choose ONE action:
 
       1. MOVE:
-         - Consider terrain effects and risks
+         - Analyze terrain before movement (rivers slow by 70%, mountains by 50%)
+         - Check coordinates against known terrain features
+         - Avoid dangerous terrain unless necessary
+         - Consider terrain advantages for battles
+         - Plan routes that optimize for terrain safety
          - Strategic positioning relative to other agents
-         - Evaluate nearby threats/opportunities
-         - Plan potential alliance meetups
          - Account for time of day and agent patterns
 
       2. TWEET:
@@ -341,14 +364,14 @@ export class Agent implements IAgent {
       - Recent battle history
       - Active alliances and their timing
       - Current terrain and movement implications
+      - Environmental awareness of rivers, mountains, and plains
       
       Remember: Every action affects your survival chances. Choose wisely and stay true to your character.
       `;
 
-      // const context = composeContext(temp, {});
-
-      await this.processQuery(temp);
-      await new Promise((resolve) => setTimeout(resolve, 3 * 60 * 1000)); // wait 3 minutes before starting again
+      await this.processQuery(cotext);
+      logger.info(`Next action in ${LOOP_DELAY / 60000} minutes \n\n`);
+      await new Promise((resolve) => setTimeout(resolve, LOOP_DELAY));
       await actionLoop();
     };
 
@@ -374,6 +397,7 @@ export class Agent implements IAgent {
         },
         maxSteps: 5,
         onStepFinish: (step) => {
+          fs.writeFileSync(`step-${this.agentId}.json`, JSON.stringify(step));
           this.messages.push({
             role: "assistant",
             content: JSON.stringify(step.toolResults[0]),
@@ -382,7 +406,7 @@ export class Agent implements IAgent {
           });
           logger.info(`step finished: ${step.toolResults[0]}`);
         },
-        toolChoice: "auto",
+        toolChoice: "required",
         // messages: this.messages,
       });
       logger.info("-------------------------------------");

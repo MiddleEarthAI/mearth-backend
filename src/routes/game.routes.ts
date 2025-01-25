@@ -16,23 +16,30 @@ router.get(
           select: {
             id: true,
             name: true,
-            type: true,
-            isAlive: true,
-            tokenBalance: true,
-            positionX: true,
-            positionY: true,
+            characterType: true,
+            status: true,
+            wallet: {
+              select: {
+                governanceTokens: true,
+              },
+            },
+            currentLocation: {
+              select: {
+                x: true,
+                y: true,
+              },
+            },
             twitterHandle: true,
           },
         }),
         prisma.battle.count(),
         prisma.alliance.count({
-          where: { dissolvedAt: null },
+          where: { status: "ACTIVE" },
         }),
       ]);
 
       res.json({
-        activeAgents: agents.filter((a: { isAlive: boolean }) => a.isAlive)
-          .length,
+        activeAgents: agents.filter((a) => a.status === "ACTIVE").length,
         totalBattles: battles,
         activeAlliances: alliances,
         agents,
@@ -57,6 +64,9 @@ router.post(
 
       const agent = await prisma.agent.findUnique({
         where: { id: agentId },
+        include: {
+          wallet: true,
+        },
       });
 
       if (!agent) {
@@ -64,15 +74,15 @@ router.post(
         return;
       }
 
-      if (!agent.isAlive) {
-        res.status(400).json({ message: "Cannot stake on dead agent" });
+      if (agent.status === "DEFEATED") {
+        res.status(400).json({ message: "Cannot stake on defeated agent" });
         return;
       }
 
-      await prisma.agent.update({
-        where: { id: agentId },
+      await prisma.wallet.update({
+        where: { id: agent.wallet.id },
         data: {
-          tokenBalance: {
+          governanceTokens: {
             increment: amount,
           },
         },
@@ -80,7 +90,7 @@ router.post(
 
       res.json({
         message: "Tokens staked successfully",
-        newBalance: agent.tokenBalance + amount,
+        newBalance: agent.wallet.governanceTokens + amount,
       });
     } catch (error) {
       next(error);
@@ -97,7 +107,7 @@ router.get(
         take: 20,
         orderBy: { timestamp: "desc" },
         include: {
-          initiator: {
+          attacker: {
             select: { name: true, twitterHandle: true },
           },
           defender: {
@@ -121,23 +131,20 @@ router.get(
       const agent = await prisma.agent.findUnique({
         where: { id: req.params.id },
         include: {
-          initiatedBattles: {
+          AttackerBattles: {
             take: 5,
             orderBy: { timestamp: "desc" },
           },
-          defendedBattles: {
+          DefenderBattles: {
             take: 5,
             orderBy: { timestamp: "desc" },
           },
-          movements: {
+          movementHistory: {
             take: 10,
             orderBy: { timestamp: "desc" },
           },
-          alliancesAsAgent1: {
-            where: { dissolvedAt: null },
-          },
-          alliancesAsAgent2: {
-            where: { dissolvedAt: null },
+          alliances: {
+            where: { status: "ACTIVE" },
           },
         },
       });
@@ -149,9 +156,9 @@ router.get(
 
       // Calculate battle statistics
       const totalBattles =
-        agent.initiatedBattles.length + agent.defendedBattles.length;
-      const wins = [...agent.initiatedBattles, ...agent.defendedBattles].filter(
-        (b) => b.outcome === "WIN"
+        agent.AttackerBattles.length + agent.DefenderBattles.length;
+      const wins = [...agent.AttackerBattles, ...agent.DefenderBattles].filter(
+        (b) => b.outcome === "ATTACKER_WIN"
       ).length;
 
       res.json({
@@ -160,8 +167,7 @@ router.get(
           totalBattles,
           wins,
           winRate: totalBattles > 0 ? (wins / totalBattles) * 100 : 0,
-          activeAlliances:
-            agent.alliancesAsAgent1.length + agent.alliancesAsAgent2.length,
+          activeAlliances: agent.alliances.length,
         },
       });
     } catch (error) {
