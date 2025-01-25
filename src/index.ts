@@ -34,28 +34,32 @@ function createAgent(agentId: string, agentConfig: AgentConfig) {
 const startAgents = async () => {
   const agents = await prisma.agent.findMany();
   if (!agents) {
+    console.log("agent is runing");
     logger.error("No agents found");
     throw new Error("No agents found");
   }
 
   const agentRuntimes = await Promise.all(
     agents.map(async (agent) => {
-      const passKey = `${agent.twitterHandle.toUpperCase()}_PASSWORD`;
-      const usernameKey = `${agent.twitterHandle.toUpperCase()}_USERNAME`;
-      const emailKey = `${agent.twitterHandle.toUpperCase()}_EMAIL`;
-
+      const username =
+        process.env[`${agent.characterType.toUpperCase()}_USERNAME`]!;
+      const password =
+        process.env[`${agent.characterType.toUpperCase()}_PASSWORD`]!;
+      const email = process.env[`${agent.characterType.toUpperCase()}_EMAIL`]!;
+      const twitter2faSecret =
+        process.env[`${agent.characterType.toUpperCase()}_TWITTER_2FA_SECRET`]!;
       const agentConfig: AgentConfig = {
-        username: agent.twitterHandle,
-        password: process.env[passKey]!,
-        email: process.env[emailKey]!,
-        maxMessagesForSummary: 100,
+        username,
+        password,
+        email,
+        twitter2faSecret,
       };
       if (!agentConfig.password || !agentConfig.username) {
         logger.error(
-          `Agent ${agent.twitterHandle} ${passKey} ${usernameKey} ${emailKey} password or username is not set`
+          `Agent ${agent.characterType} password or username is not set`
         );
         throw new Error(
-          `Agent ${agent.twitterHandle} ${passKey} ${usernameKey} ${emailKey} password or username is not set`
+          `Agent ${agent.characterType} password or username is not set`
         );
       }
       const agentRuntime = createAgent(agent.id, agentConfig);
@@ -101,5 +105,27 @@ async function startServer() {
     process.exit(1);
   }
 }
+
+app.get("/health", async (req, res) => {
+  try {
+    // Check database connection
+    await prisma.$queryRaw`SELECT 1`;
+
+    res.status(200).json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+    });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Database connection failed";
+    res.status(500).json({
+      status: "unhealthy",
+      error: errorMessage,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
 
 startServer();

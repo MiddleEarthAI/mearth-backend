@@ -106,7 +106,7 @@ export class KeyManager implements IKeyManager {
       if (cached) return cached;
 
       // Check database
-      const stored = await prisma.agentKeypair.findUnique({
+      const stored = await prisma.keypair.findUnique({
         where: { agentId },
       });
 
@@ -171,7 +171,7 @@ export class KeyManager implements IKeyManager {
 
       // Transactional database update with logging
       await prisma.$transaction(async (tx) => {
-        await tx.agentKeypair.upsert({
+        await tx.keypair.upsert({
           where: { agentId },
           update: {
             publicKey: keypair.publicKey.toBase58(),
@@ -241,7 +241,7 @@ export class KeyManager implements IKeyManager {
   private async getLastRotationTime(
     agentId: string
   ): Promise<Date | undefined> {
-    const keypair = await prisma.agentKeypair.findUnique({
+    const keypair = await prisma.keypair.findUnique({
       where: { agentId },
       select: { rotatedAt: true },
     });
@@ -316,7 +316,7 @@ export class KeyManager implements IKeyManager {
 
   async getPublicKey(agentId: string): Promise<string> {
     try {
-      const keypair = await prisma.agentKeypair.findUnique({
+      const keypair = await prisma.keypair.findUnique({
         where: { agentId },
         select: { publicKey: true },
       });
@@ -336,7 +336,7 @@ export class KeyManager implements IKeyManager {
     agentId: string
   ): Promise<{ encryptedKey: string; iv: Buffer; tag: Buffer }> {
     try {
-      const keypair = await prisma.agentKeypair.findUnique({
+      const keypair = await prisma.keypair.findUnique({
         where: { agentId },
       });
 

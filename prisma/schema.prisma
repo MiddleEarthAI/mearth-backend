@@ -1,102 +1,41 @@
-generator client {
-    provider = "prisma-client-js"
-}
-
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
+generator client {
+    provider = "prisma-client-js"
+}
+
 model Agent {
-    id                 String        @id @default(uuid())
-    type               String // AgentType enum
-    name               String
-    positionX          Float
-    positionY          Float
-    tokenBalance       Float         @default(0)
-    isAlive            Boolean       @default(true)
-    allianceWith       String?
-    lastBattleTime     DateTime?
-    lastAllianceTime   DateTime?
-    twitterHandle      String        @unique
-    aggressiveness     Int // 0-100
-    alliancePropensity Int // 0-100
-    influenceability   Int // 0-100
-    createdAt          DateTime      @default(now())
-    updatedAt          DateTime      @updatedAt
-    keypair            AgentKeypair?
+    id             String        @id @default(uuid())
+    name           String        @unique
+    twitterHandle  String        @unique
+    lastActionTime DateTime?
+    characterType  CharacterType
+    bio            String[]
+    lore           String[]
+    knowledge      String[]
+    wallet         Wallet        @relation(fields: [walletId], references: [id])
+    walletId       String        @unique
+    keypair        Keypair?
 
-    // Relations
-    initiatedBattles  Battle[]   @relation("BattleInitiator")
-    defendedBattles   Battle[]   @relation("BattleDefender")
-    movements         Movement[]
-    alliancesAsAgent1 Alliance[] @relation("AllianceAgent1")
-    alliancesAsAgent2 Alliance[] @relation("AllianceAgent2")
+    currentLocation Location     @relation(fields: [locationId], references: [id])
+    locationId      String
+    movementHistory Movement[]
+    alliances       Alliance[]
+    tweets          Tweet[]
+    traits          AgentTrait[]
+    status          AgentStatus  @default(ACTIVE)
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
 
-    // New relations
-    personality AgentPersonality?
-    context     AgentContext?
-    memory      Memory?
-
-    // Add Twitter interactions
-    twitterInteractions TwitterInteraction[]
-
-    @@index([isAlive])
-    @@index([twitterHandle])
+    AttackerBattles Battle[] @relation("AttackerBattles")
+    DefenderBattles Battle[] @relation("DefenderBattles")
+    Battle          Battle[]
 }
 
-model Battle {
-    id           String   @id @default(uuid())
-    initiator    Agent    @relation("BattleInitiator", fields: [initiatorId], references: [id])
-    initiatorId  String
-    defender     Agent    @relation("BattleDefender", fields: [defenderId], references: [id])
-    defenderId   String
-    timestamp    DateTime @default(now())
-    outcome      String // BattleOutcome enum
-    tokensBurned Float
-    locationX    Float
-    locationY    Float
-    createdAt    DateTime @default(now())
-
-    @@index([initiatorId])
-    @@index([defenderId])
-    @@index([timestamp])
-}
-
-model Alliance {
-    id          String    @id @default(uuid())
-    agent1      Agent     @relation("AllianceAgent1", fields: [agent1Id], references: [id])
-    agent1Id    String
-    agent2      Agent     @relation("AllianceAgent2", fields: [agent2Id], references: [id])
-    agent2Id    String
-    formedAt    DateTime  @default(now())
-    dissolvedAt DateTime?
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-
-    @@index([agent1Id])
-    @@index([agent2Id])
-    @@index([formedAt])
-}
-
-model Movement {
-    id        String   @id @default(uuid())
-    agent     Agent    @relation(fields: [agentId], references: [id])
-    agentId   String
-    fromX     Float
-    fromY     Float
-    toX       Float
-    toY       Float
-    terrain   String // TerrainType enum
-    timestamp DateTime @default(now())
-    speed     Float
-    createdAt DateTime @default(now())
-
-    @@index([agentId])
-    @@index([timestamp])
-}
-
-model AgentKeypair {
+model Keypair {
     id                  String    @id @default(uuid())
     agentId             String    @unique
     publicKey           String
@@ -111,127 +50,152 @@ model AgentKeypair {
     @@index([agentId])
 }
 
-model AgentPersonality {
-    id      String @id @default(uuid())
-    agentId String @unique
-    agent   Agent  @relation(fields: [agentId], references: [id])
-
-    // Core Personality Traits (0-100)
-    openness          Int // Willingness to try new things
-    conscientiousness Int // Planning vs spontaneity
-    extraversion      Int // Social energy and assertiveness
-    agreeableness     Int // Cooperation vs competition
-    neuroticism       Int // Emotional stability
-
-    // Game-Specific Traits (0-100)
-    riskTolerance  Int // Willingness to engage in battles
-    deceptionLevel Int // Tendency to deceive others
-    loyaltyLevel   Int // Commitment to alliances
-    adaptability   Int // Response to community influence
-
-    // Behavioral Patterns
-    preferredTerrain String[] // Terrain types the agent prefers
-    avoidedAgents    String[] // IDs of agents they tend to avoid
-    allyPreferences  String[] // IDs of preferred alliance partners
-
-    // Dynamic Personality Factors
-    currentMood     String // Current emotional state
-    stressLevel     Int // Affects decision making (0-100)
-    confidenceLevel Int // Affects battle willingness (0-100)
-
-    // Memory and Learning
-    pastInteractions Json // Record of significant events
-    learningRate     Int // Speed of adapting to feedback (0-100)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Wallet {
+    id                 String          @id @default(uuid())
+    agent              Agent?
+    governanceTokens   Float           @default(0)
+    stakingRewards     StakingReward[]
+    transactionHistory Transaction[]
 }
 
-model AgentContext {
-    id      String @id @default(uuid())
-    agentId String @unique
-    agent   Agent  @relation(fields: [agentId], references: [id])
-
-    // Base Context
-    backstory String   @db.Text // Rich character background
-    goals     String[] // Current objectives
-    values    String[] // Core principles
-    fears     String[] // Things to avoid
-
-    // Behavioral Context
-    decisionHistory  Json // Past decisions and outcomes
-    relationshipMap  Json // Current relationships with other agents
-    battleStrategy   Json // Preferred battle approaches
-    movementPatterns Json // Historical movement preferences
-
-    // Community Influence
-    communityFeedback Json // Recent community interactions
-    influenceWeight   Int // How much community affects decisions (0-100)
-
-    // Dynamic Context
-    currentStrategy   String   @db.Text // Active game plan
-    missionCritical   Boolean // Whether in a critical situation
-    lastContextUpdate DateTime @default(now())
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Location {
+    id            String      @id @default(uuid())
+    x             Float
+    y             Float
+    terrain       TerrainType
+    agents        Agent[]
+    movementsFrom Movement[]  @relation("MovementFrom")
+    movementsTo   Movement[]  @relation("MovementTo")
 }
 
-model Memory {
-    id        String   @id @default(uuid())
-    role      Role
-    agentId   String   @unique
-    agent     Agent    @relation(fields: [agentId], references: [id])
-    content   Json
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-enum Role {
-    System
-    Community
-    Agent
-    Action
-}
-
-// Add Twitter interaction models
-model TwitterInteraction {
-    id             String             @id @default(uuid())
+model Movement {
+    id             String   @id @default(uuid())
+    agent          Agent    @relation(fields: [agentId], references: [id])
     agentId        String
-    tweetId        String
-    conversationId String
-    content        String
-    authorUsername String
-    authorId       String
-    createdAt      DateTime           @default(now())
-    sentiment      String             @default("neutral") // positive, negative, neutral
-    influence      TwitterInfluence?
-    feedback       CommunityFeedback?
-    agent          Agent              @relation(fields: [agentId], references: [id])
-
-    @@index([agentId])
-    @@index([tweetId])
-    @@index([conversationId])
+    fromLocation   Location @relation("MovementFrom", fields: [fromLocationId], references: [id])
+    fromLocationId String
+    toLocation     Location @relation("MovementTo", fields: [toLocationId], references: [id])
+    toLocationId   String
+    timestamp      DateTime @default(now())
+    speed          Float
 }
 
-model TwitterInfluence {
-    id                  String             @id @default(uuid())
-    interactionId       String             @unique
-    authorFollowerCount Int                @default(0)
-    impressions         Int                @default(0)
-    likes               Int                @default(0)
-    commentCount        Int                @default(0)
-    interaction         TwitterInteraction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
+model Battle {
+    id                 String        @id @default(uuid())
+    attacker           Agent         @relation("AttackerBattles", fields: [attackerId], references: [id])
+    attackerId         String
+    defender           Agent         @relation("DefenderBattles", fields: [defenderId], references: [id])
+    defenderId         String
+    outcome            BattleOutcome
+    tokensBurned       Float
+    timestamp          DateTime      @default(now())
+    winningProbability Float
+    Agent              Agent?        @relation(fields: [agentId], references: [id])
+    agentId            String?
 }
 
-model CommunityFeedback {
-    id              String             @id @default(uuid())
-    interactionId   String             @unique
-    suggestedAction String // move, battle, alliance, ignore
-    targetAgent     String?
-    coordinateX     Int?
-    coordinateY     Int?
-    confidence      Float              @default(0.5)
-    reasoning       String?
-    interaction     TwitterInteraction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
+model Alliance {
+    id              String         @id @default(uuid())
+    agents          Agent[]
+    formedAt        DateTime       @default(now())
+    dissolutionTime DateTime?
+    status          AllianceStatus
+}
+
+model Tweet {
+    id                  String           @id @default(uuid())
+    tweetId             BigInt
+    agent               Agent            @relation(fields: [agentId], references: [id])
+    agentId             String
+    content             String
+    authorFollowerCount Int              @default(0)
+    engagement          TweetEngagement?
+    feedback            TweetFeedback?
+    createdAt           DateTime         @default(now())
+    updatedAt           DateTime         @updatedAt
+}
+
+model TweetEngagement {
+    id               String @id @default(uuid())
+    tweet            Tweet  @relation(fields: [tweetId], references: [id])
+    tweetId          String @unique
+    likes            Int    @default(0)
+    impressions      Int    @default(0)
+    comments         Int    @default(0)
+    retweets         Int    @default(0)
+    influencerImpact Float  @default(0)
+}
+
+model TweetFeedback {
+    id              String @id @default(uuid())
+    tweet           Tweet  @relation(fields: [tweetId], references: [id])
+    tweetId         String @unique
+    suggestedAction String
+    targetAgent     String
+    coordinateX     Float
+    coordinateY     Float
+    confidence      Float
+    reasoning       String
+    sentiment       String
+}
+
+model Transaction {
+    id        String          @id @default(uuid())
+    wallet    Wallet          @relation(fields: [walletId], references: [id])
+    walletId  String
+    amount    Float
+    type      TransactionType
+    timestamp DateTime        @default(now())
+}
+
+model StakingReward {
+    id           String   @id @default(uuid())
+    wallet       Wallet   @relation(fields: [walletId], references: [id])
+    walletId     String
+    rewardAmount Float
+    timestamp    DateTime @default(now())
+}
+
+model AgentTrait {
+    id          String   @id @default(uuid())
+    agent       Agent    @relation(fields: [agentId], references: [id])
+    agentId     String
+    traitName   String
+    traitValue  Float
+    lastUpdated DateTime @default(now())
+}
+
+enum CharacterType {
+    SCOOTLES
+    PURRLOCK_PAWS
+    SIR_GULLIHOP
+    WANDERLEAF
+}
+
+enum TerrainType {
+    PLAINS
+    MOUNTAINS
+    RIVER
+}
+
+enum BattleOutcome {
+    ATTACKER_WIN
+    DEFENDER_WIN
+    DRAW
+}
+
+enum AllianceStatus {
+    ACTIVE
+    DISSOLVED
+}
+
+enum AgentStatus {
+    ACTIVE
+    DEFEATED
+}
+
+enum TransactionType {
+    TOKEN_TRANSFER
+    BATTLE_BURN
+    STAKING_REWARD
 }

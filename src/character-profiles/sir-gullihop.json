@@ -2,7 +2,7 @@
   "agent": {
     "id": "sirgullihop",
     "type": "SIR_GULLIHOP",
-    "name": "Sir Gullihop",
+    "name": "",
     "positionX": 45.2,
     "positionY": 67.8,
     "tokenBalance": 2000.0,

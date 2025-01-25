@@ -4,20 +4,25 @@ import { ITwitter } from "@/types";
 import { AnthropicProvider } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { prisma } from "@/config/prisma";
+import NodeCache, { EventEmitter } from "node-cache";
 
 class TwitterConfig {
-  readonly username: string;
-  readonly password: string;
-  readonly email: string;
-  readonly targetUsers?: string[];
-  readonly pollInterval?: number; // in seconds
-  readonly dryRun?: boolean;
-  readonly agentId: string;
+  public username: string;
+  public password: string;
+  public twitter2faSecret: string;
+  public email: string;
+
+  public targetUsers?: string[];
+  public pollInterval?: number; // in seconds
+  public dryRun?: boolean;
+  public agentId: string;
+
   constructor(config?: TwitterConfig) {
     if (
       !config?.username ||
       !config?.password ||
       !config?.email ||
+      !config?.twitter2faSecret ||
       !config?.agentId
     ) {
       throw new Error(
@@ -28,26 +33,35 @@ class TwitterConfig {
     this.username = config.username;
     this.password = config.password;
     this.email = config?.email;
+    this.twitter2faSecret = config?.twitter2faSecret;
     this.targetUsers = config?.targetUsers ?? [];
     this.pollInterval = config?.pollInterval ?? 120;
     this.dryRun = config?.dryRun ?? true;
   }
 }
 
-interface TweetInfluence {
-  authorFollowerCount: number;
-  impressions: number;
-  likes: number;
-  commentCount: number;
-  sentiment: "positive" | "negative" | "neutral";
-}
+type TwitterProfile = {
+  id: string;
+  username: string;
+  screenName: string;
+  bio: string;
+  nicknames: string[];
+};
 
 interface CommunityFeedback {
   suggestedAction: "move" | "battle" | "alliance" | "ignore";
   targetAgent?: string;
   coordinates?: { x: number; y: number };
   confidence: number;
-  influence: TweetInfluence;
+  influence: {
+    authorFollowerCount: number;
+    impressions: number;
+    likes: number;
+    retweets: number;
+    influencerImpact: number;
+    commentCount: number;
+    sentiment: "positive" | "negative" | "neutral";
+  };
   reasoning?: string;
 }
 
@@ -65,52 +79,131 @@ interface TweetAnalysis {
   reasoning: string;
 }
 
-export class Twitter implements ITwitter {
+export class Twitter extends EventEmitter implements ITwitter {
   private client: Scraper;
   private config: TwitterConfig;
+  private cache: NodeCache;
   private lastCheckedTweetId: bigint = 0n;
   private anthropic: AnthropicProvider;
+  private profile: TwitterProfile | null;
   private agentId: string;
 
   constructor(anthropic: AnthropicProvider, config: TwitterConfig) {
+    super();
     this.config = config;
-
     const scraper = new Scraper();
-    scraper.login(
-      this.config?.username,
-      this.config?.password,
-      this.config?.email
-    );
     this.client = scraper;
     this.anthropic = anthropic;
     this.agentId = config.agentId;
+    this.profile = null;
+    this.cache = new NodeCache();
+  }
 
-    logger.info("Twitter service initialized for agent:", this.agentId);
-    this.initializeLastCheckedTweet();
-    this.startMonitoring();
+  async init() {
+    const username = this.config.username;
+    const password = this.config.password;
+    const email = this.config.email;
+
+    let retries = 3;
+    const twitter2faSecret = this.config.twitter2faSecret;
+
+    const cachedCookies = await this.getCachedCookies(username);
+
+    if (cachedCookies) {
+      logger.info("Using cached cookies");
+      await this.setCookiesFromArray(cachedCookies);
+    }
+
+    logger.info("Waiting for Twitter login");
+    while (retries > 0) {
+      try {
+        if (await this.client.isLoggedIn()) {
+          // cookies are valid, no login required
+          logger.info("Successfully logged in.");
+          break;
+        } else {
+          // just for testing
+          this.config.username = "testi1151149";
+          this.config.password = "testi115";
+          this.config.email = "testing13467@web.de";
+          this.config.twitter2faSecret = "testi1151149";
+          logger.info(this.config);
+          await this.client.login(
+            this.config.username,
+            this.config.password,
+            this.config.email,
+            this.config.twitter2faSecret
+          );
+          if (await this.client.isLoggedIn()) {
+            // fresh login, store new cookies
+            logger.info("Successfully logged in.");
+            logger.info("Caching cookies");
+            await this.cacheCookies(username, await this.client.getCookies());
+            break;
+          }
+        }
+      } catch (error) {
+        logger.error(`Login attempt failed: ${error}`);
+      }
+
+      retries--;
+      logger.error(
+        `Failed to login to Twitter. Retrying... (${retries} attempts left)`
+      );
+
+      if (retries === 0) {
+        logger.error("Max retries reached. Exiting login process.");
+        throw new Error("Twitter login failed after maximum retries.");
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // wait 2 seconds before retrying
+    }
+
+    // Initialize Twitter profile
+    this.profile = await this.fetchProfile(username);
+
+    if (this.profile) {
+      logger.log("Twitter user ID:", this.profile.id);
+      logger.log("Twitter loaded:", JSON.stringify(this.profile, null, 10));
+      // Store profile info for use in responses
+      this.profile = {
+        id: this.profile.id,
+        username: this.profile.username,
+        screenName: this.profile.screenName,
+        bio: this.profile.bio,
+        nicknames: this.profile.nicknames,
+      };
+    } else {
+      throw new Error("Failed to load profile");
+    }
+
+    // await this.initializeLastCheckedTweet();
+    // await this.startMonitoring();
   }
 
   /**
    * Initialize last checked tweet from database
    */
   private async initializeLastCheckedTweet() {
-    const lastInteraction = await prisma.twitterInteraction.findFirst({
+    const lastInteraction = await prisma.tweet.findFirst({
       where: { agentId: this.agentId },
       orderBy: { tweetId: "desc" },
     });
 
     if (lastInteraction?.tweetId) {
-      this.lastCheckedTweetId = BigInt(lastInteraction.tweetId);
+      this.lastCheckedTweetId = lastInteraction.tweetId;
     }
   }
 
   /**
    * Start monitoring Twitter interactions
    */
-  private startMonitoring() {
-    const handleInteractionsLoop = () => {
+  private async startMonitoring() {
+    const handleInteractionsLoop = async () => {
       this.handleTwitterInteractions();
-      setTimeout(handleInteractionsLoop, this.config.pollInterval! * 1000);
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.config.pollInterval! * 1000 * 60 * 60)
+      ); // 1 hour
     };
     handleInteractionsLoop();
   }
@@ -192,34 +285,40 @@ export class Twitter implements ITwitter {
       // Analyze community feedback
       const feedback = await this.analyzeCommunityFeedback(tweet, thread);
 
-      // Store interaction and feedback in database
-      await prisma.twitterInteraction.create({
+      await prisma.tweetFeedback.create({
         data: {
-          agentId: this.agentId,
+          suggestedAction: feedback.suggestedAction,
+          targetAgent: feedback.targetAgent || "",
+          coordinateX: feedback.coordinates?.x || 0,
+          coordinateY: feedback.coordinates?.y || 0,
+          confidence: feedback.confidence,
+          reasoning: feedback.reasoning || "",
           tweetId: tweet.id,
-          conversationId: tweet.conversationId,
-          content: tweet.text || "",
-          authorUsername: tweet.username || "",
-          authorId: tweet.userId || "",
           sentiment: feedback.influence.sentiment,
-          influence: {
-            create: {
-              authorFollowerCount: feedback.influence.authorFollowerCount,
-              impressions: feedback.influence.impressions,
-              likes: feedback.influence.likes,
-              commentCount: feedback.influence.commentCount,
-            },
-          },
-          feedback: {
-            create: {
-              suggestedAction: feedback.suggestedAction,
-              targetAgent: feedback.targetAgent,
-              coordinateX: feedback.coordinates?.x,
-              coordinateY: feedback.coordinates?.y,
-              confidence: feedback.confidence,
-              reasoning: feedback.reasoning,
-            },
-          },
+        },
+      });
+
+      // Store interaction and feedback in database
+      await prisma.tweetEngagement.create({
+        data: {
+          comments: feedback.influence.commentCount,
+          retweets: feedback.influence.retweets,
+          likes: feedback.influence.likes,
+          influencerImpact: feedback.influence.influencerImpact,
+          tweetId: tweet.id,
+          // conversationId: tweet.conversationId,
+          // content: tweet.text || "",
+          // authorUsername: tweet.username || "",
+          // authorId: tweet.userId || "",
+          // sentiment: feedback.influence.sentiment,
+          // influence: {
+          //   create: {
+          //     // authorFollowerCount: feedback.influence.authorFollowerCount,
+          //     // impressions: feedback.influence.impressions,
+          //     likes: feedback.influence.likes,
+          //     // commentCount: feedback.influence.commentCount,
+          //   },
+          // },
         },
       });
 
@@ -269,14 +368,6 @@ export class Twitter implements ITwitter {
     tweet: ExtendedTweet,
     thread: Tweet[]
   ): Promise<CommunityFeedback> {
-    const influence: TweetInfluence = {
-      authorFollowerCount: tweet.authorFollowerCount || 0,
-      impressions: tweet.impressions || 0,
-      likes: tweet.likes || 0,
-      commentCount: tweet.replyCount || 0,
-      sentiment: await this.analyzeSentiment(tweet.text || "", thread),
-    };
-
     // Use LLM to analyze the tweet content and thread
     const analysis = await this.analyzeTweetContent(tweet, thread);
 
@@ -286,7 +377,15 @@ export class Twitter implements ITwitter {
       coordinates: analysis.coordinates || undefined,
       confidence: analysis.confidence || 0.5,
       reasoning: analysis.reasoning,
-      influence,
+      influence: {
+        authorFollowerCount: tweet.authorFollowerCount || 0,
+        impressions: tweet.impressions || 0,
+        likes: tweet.likes || 0,
+        retweets: 0,
+        influencerImpact: 0,
+        commentCount: tweet.replyCount || 0,
+        sentiment: await this.analyzeSentiment(tweet.text || "", thread),
+      },
     };
   }
 
@@ -395,7 +494,7 @@ export class Twitter implements ITwitter {
    * Get aggregated community feedback for decision making
    */
   async getCommunityFeedback(): Promise<CommunityFeedback[]> {
-    const recentInteractions = await prisma.twitterInteraction.findMany({
+    const recentTweets = await prisma.tweet.findMany({
       where: {
         agentId: this.agentId,
         createdAt: {
@@ -403,30 +502,39 @@ export class Twitter implements ITwitter {
         },
       },
       include: {
-        influence: true,
+        engagement: true,
         feedback: true,
       },
     });
 
-    return recentInteractions.map((interaction: any) => ({
-      suggestedAction: interaction.feedback?.suggestedAction || "move",
-      targetAgent: interaction.feedback?.targetAgent,
+    return recentTweets.map((tweet) => ({
+      suggestedAction:
+        (tweet.feedback?.suggestedAction as
+          | "move"
+          | "battle"
+          | "alliance"
+          | "ignore") || "move",
+      targetAgent: tweet.feedback?.targetAgent,
       coordinates:
-        interaction.feedback?.coordinateX && interaction.feedback?.coordinateY
+        tweet.feedback?.coordinateX && tweet.feedback?.coordinateY
           ? {
-              x: interaction.feedback.coordinateX,
-              y: interaction.feedback.coordinateY,
+              x: tweet.feedback.coordinateX,
+              y: tweet.feedback.coordinateY,
             }
           : undefined,
-      confidence: interaction.feedback?.confidence || 0.5,
+      confidence: tweet.feedback?.confidence || 0.5,
       influence: {
-        authorFollowerCount: interaction.influence?.authorFollowerCount || 0,
-        impressions: interaction.influence?.impressions || 0,
-        likes: interaction.influence?.likes || 0,
-        commentCount: interaction.influence?.commentCount || 0,
-        sentiment: interaction.sentiment,
+        authorFollowerCount: tweet.authorFollowerCount || 0,
+        impressions: tweet.engagement?.impressions || 0,
+        likes: tweet.engagement?.likes || 0,
+        retweets: tweet.engagement?.retweets || 0,
+        influencerImpact: tweet.engagement?.influencerImpact || 0,
+        commentCount: tweet.engagement?.comments || 0,
+        sentiment:
+          (tweet.feedback?.sentiment as "positive" | "negative" | "neutral") ||
+          "neutral",
       },
-      reasoning: interaction.feedback?.reasoning,
+      reasoning: tweet.feedback?.reasoning,
     }));
   }
 
@@ -435,7 +543,10 @@ export class Twitter implements ITwitter {
    */
   async postTweet(content: string): Promise<void> {
     try {
-      if (this.config.dryRun) {
+      const dryRun = this.config.dryRun;
+      logger.info(`Posting tweet: ${content}`);
+      logger.info(`Dry run🔥: ${dryRun}`);
+      if (dryRun) {
         logger.info(`[DRY RUN] Would post tweet: ${content}`);
         return;
       }
@@ -471,6 +582,51 @@ export class Twitter implements ITwitter {
       logger.info(`Posted reply: ${content} to tweet ${replyToTweetId}`);
     } catch (error) {
       logger.error(`Failed to post reply:`, error);
+      throw error;
+    }
+  }
+
+  async setCookiesFromArray(cookiesArray: any[]) {
+    const cookieStrings = cookiesArray.map(
+      (cookie) =>
+        `${cookie.key}=${cookie.value}; Domain=${cookie.domain}; Path=${
+          cookie.path
+        }; ${cookie.secure ? "Secure" : ""}; ${
+          cookie.httpOnly ? "HttpOnly" : ""
+        }; SameSite=${cookie.sameSite || "Lax"}`
+    );
+    await this.client.setCookies(cookieStrings);
+  }
+
+  async getCachedCookies(username: string) {
+    return await this.cache.get<any[]>(`twitter/${username}/cookies`);
+  }
+
+  async cacheCookies(username: string, cookies: any[]) {
+    this.cache.set(`twitter/${username}/cookies`, cookies);
+  }
+
+  async fetchProfile(username: string): Promise<TwitterProfile> {
+    try {
+      const cachedProfile = (await this.cache.get(username)) as TwitterProfile;
+      if (cachedProfile) {
+        return cachedProfile;
+      }
+
+      const profile = await this.client.getProfile(username);
+
+      const twitterProfile = {
+        id: profile.userId!,
+        username,
+        screenName: profile.name!,
+        bio: profile.biography!,
+        nicknames: [],
+      } satisfies TwitterProfile;
+
+      await this.cache.set(username, twitterProfile);
+      return twitterProfile;
+    } catch (error) {
+      logger.error("Error fetching Twitter profile:", error);
       throw error;
     }
   }

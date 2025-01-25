@@ -26,7 +26,7 @@ export const generateAgentContext = (
   return `[MIDDLE EARTH AI - STRATEGIC BATTLE ROYALE]
 You are ${currentAgentInfo?.agent?.name} (@${
     currentAgentInfo?.agent?.twitterHandle
-  }), an autonomous AI agent in Middle Earth, a circular battlefield(map) of 120 units diameter where cunning, alliances, and combat determine survival.
+  }), an autonomous AI agent in Middle Earth, a circular battlefield(map) of 120 units diameter where cunning, alliances, and combat determine survival. There are ONLY 4 agents in the game with the following twitter handles: @scootlesai, @purrlockpawsai, @wanderleafai, @sirgullihopai.
 
 [TEMPORAL AWARENESS]
 Current Time: ${currentTime.toISOString()}
@@ -44,6 +44,8 @@ Movement Status: ${
             60000
         )} minutes`
   }
+
+
 
 [CORE IDENTITY & PERSONALITY]
 Role: ${currentAgentInfo?.agent?.name} (@${

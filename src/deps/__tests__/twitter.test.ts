@@ -67,8 +67,15 @@ describe("Twitter", () => {
     text: "Test tweet content",
     username: "test_user",
     userId: "test_user_id",
+    replies: 5,
     likes: 10,
-    replyCount: 5,
+    retweets: 2,
+    hashtags: [],
+    mentions: [],
+    photos: [],
+    thread: [],
+    urls: [],
+    videos: [],
   };
 
   beforeEach(() => {

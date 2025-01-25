@@ -46,18 +46,17 @@ export interface IAgent {}
 export interface ISolana {
   startMonitoring(): Promise<void>;
   stopMonitoring(): Promise<void>;
-  processBattle(
-    initiatorId: string,
-    defenderId: string,
-    tokenBurn: number
+
+  // Movement
+  processMoveAgent(
+    agentId: string,
+    x: number,
+    y: number,
+    terrain: TerrainType
   ): Promise<string>;
-  processAlliance(agentId1: string, agentId2: string): Promise<string>;
-  processMovement(agentId: string, x: number, y: number): Promise<string>;
-  getTokenBalance(agentId: string): Promise<number>;
-  burnTokens(agentId: string, amount: number): Promise<string>;
-  transferTokens(
-    fromAgentId: string,
-    toAgentId: string,
-    amount: number
-  ): Promise<string>;
+
+  // Alliance management
+  processFormAlliance(agentId1: string, agentId2: string): Promise<string>;
+  processBreakAlliance(agentId1: string, agentId2: string): Promise<string>;
+  processIgnoreAgent(agentId: string, targetAgentId: string): Promise<string>;
 }
