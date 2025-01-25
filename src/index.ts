@@ -54,6 +54,7 @@ const startAgents = async () => {
         email,
         twitter2faSecret,
       };
+
       if (!agentConfig.password || !agentConfig.username) {
         logger.error(
           `Agent ${agent.characterType} password or username is not set`

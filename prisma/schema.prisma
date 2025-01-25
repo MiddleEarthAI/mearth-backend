@@ -66,6 +66,8 @@ model Location {
     agents        Agent[]
     movementsFrom Movement[]  @relation("MovementFrom")
     movementsTo   Movement[]  @relation("MovementTo")
+
+    @@unique([x, y])
 }
 
 model Movement {

@@ -21,6 +21,7 @@ CREATE TABLE "Agent" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "twitterHandle" TEXT NOT NULL,
+    "lastActionTime" TIMESTAMP(3),
     "characterType" "CharacterType" NOT NULL,
     "bio" TEXT[],
     "lore" TEXT[],

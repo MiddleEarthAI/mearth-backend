@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { IAgent } from "./types";
 import { Solana } from "./deps/solana";
-import fs from "fs";
 
 import { AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, Message } from "ai";
@@ -43,6 +42,7 @@ export class Agent implements IAgent {
     this.agentId = agentId;
     this.solana = new Solana();
   }
+
   async start() {
     this.isRunning = true;
 
@@ -387,7 +387,7 @@ export class Agent implements IAgent {
     });
 
     try {
-      const result = await generateText({
+      await generateText({
         model: this.anthropic("claude-3-5-sonnet-20240620"),
         prompt: query,
         tools: {
@@ -395,39 +395,9 @@ export class Agent implements IAgent {
           tweet: tweetTool(this.agentId, this.twitter),
         },
         maxSteps: 5,
-        onStepFinish: (step) => {
-          fs.writeFileSync(`step-${this.agentId}.json`, JSON.stringify(step));
-          this.messages.push({
-            role: "assistant",
-            content: JSON.stringify(step.toolResults[0]),
-            id: uuidv4(),
-            createdAt: new Date(),
-          });
-          step.toolCalls.forEach((toolCall) => {
-            logger.info(`step finished: ${toolCall.toolName}`);
-            switch (toolCall.toolName) {
-              case "tweet": {
-                logger.info(`tweeting: ${toolCall.args.tweet}`);
-                break;
-              }
-            }
-          });
-        },
         toolChoice: "required",
         // messages: this.messages,
       });
-      logger.info("-------------------------------------");
-      logger.info(JSON.stringify(result.reasoning));
-      logger.info("-------------------------------------");
-
-      for (const toolCall of result.toolCalls) {
-        switch (toolCall.toolName) {
-          case "tweet": {
-            console.log("tweeting", toolCall.args.tweet);
-            break;
-          }
-        }
-      }
     } catch (error) {
       const errorMessage = `Error processing query: ${
         error instanceof Error ? error.message : String(error)

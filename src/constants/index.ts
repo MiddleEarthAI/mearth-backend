@@ -6,7 +6,7 @@ export const TOKEN_BURN_MAX = 50;
 export const DEATH_CHANCE = 0.05;
 export const BATTLE_COOLDOWN = 14400; // 4 hours in seconds
 
-export const water = {
+export const river = {
   type: TerrainType.RIVER,
   coordinates: new Set([
     "27,7",
@@ -778,7 +778,7 @@ export const plains = {
 };
 
 export const validCoordinates = new Set([
-  ...water.coordinates,
+  ...river.coordinates,
   ...mountains.coordinates,
   ...plains.coordinates,
 ]);
