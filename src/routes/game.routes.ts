@@ -6,6 +6,11 @@ import { validateRequest } from "@/middleware/validateRequest";
 const router = Router();
 const prisma = new PrismaClient();
 
+// Health check endpoint for Railway deployment
+router.get("/health", (_, res) => {
+  res.status(200).json({ status: "healthy" });
+});
+
 // Game Status Endpoints
 router.get(
   "/status",
