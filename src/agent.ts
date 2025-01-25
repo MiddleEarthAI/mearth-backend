@@ -6,10 +6,9 @@ import { Solana } from "./deps/solana";
 import fs from "fs";
 
 import { AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
-import { CoreToolCall, generateText, Message, ToolContent } from "ai";
+import { generateText, Message } from "ai";
 import { logger } from "./utils/logger";
 import { Twitter } from "./deps/twitter";
-import { Tool } from "@anthropic-ai/sdk/resources";
 
 export interface AgentConfig {
   username: string;
@@ -404,7 +403,15 @@ export class Agent implements IAgent {
             id: uuidv4(),
             createdAt: new Date(),
           });
-          logger.info(`step finished: ${step.toolResults[0]}`);
+          step.toolCalls.forEach((toolCall) => {
+            logger.info(`step finished: ${toolCall.toolName}`);
+            switch (toolCall.toolName) {
+              case "tweet": {
+                logger.info(`tweeting: ${toolCall.args.tweet}`);
+                break;
+              }
+            }
+          });
         },
         toolChoice: "required",
         // messages: this.messages,

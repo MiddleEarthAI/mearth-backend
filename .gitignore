@@ -22,3 +22,10 @@ build/
 # OS
 .DS_Store
 Thumbs.db 
+
+# Docker
+docker-compose.yml
+.dockerignore
+Dockerfile
+Dockerfile.prod
+docker-compose.yml.prod

@@ -4178,3 +4178,73 @@
 {"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
 {"level":"info","message":"step finished: [object Object]","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:33.495Z"}
 {"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T14:16:34.918Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.526Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.528Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.529Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.529Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.530Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.530Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.531Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.551Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:08.578Z"}
+{"level":"info","message":"Agent 51fb2df6-3ca4-415e-ab14-a97b8759e31d moved to position (26, 7)","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:11.328Z"}
+{"level":"info","message":"step finished: move","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:11.345Z"}
+{"level":"info","message":"Agent e2a5b7d5-e501-40df-96d9-1ca4071a5a34 moved to position (5, 12)","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:11.430Z"}
+{"level":"info","message":"step finished: move","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:11.433Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:13.669Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:13.669Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:13.669Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:13.669Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:13.671Z"}
+{"level":"info","message":"tweeting: Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:13.671Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:14.024Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:14.025Z"}
+{"level":"info","message":"Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:14.025Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:14.025Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:14.025Z"}
+{"level":"info","message":"tweeting: Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:14.025Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:15.909Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:15.910Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:15.910Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:15.910Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:15.911Z"}
+{"level":"info","message":"tweeting: Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:15.911Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:16.653Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:16.653Z"}
+{"level":"info","message":"Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:16.653Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:16.654Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:16.655Z"}
+{"level":"info","message":"tweeting: Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:16.655Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:18.827Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:18.827Z"}
+{"level":"info","message":"Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:18.828Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:18.828Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:18.828Z"}
+{"level":"info","message":"tweeting: Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:18.828Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:19.780Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:19.781Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:19.781Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:19.781Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:19.782Z"}
+{"level":"info","message":"tweeting: Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:19.782Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.944Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.944Z"}
+{"level":"info","message":"Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.944Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.944Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.946Z"}
+{"level":"info","message":"tweeting: Just scaled a treacherous mountain peak! The view up here is breathtaking, but I'm not one to rest on my laurels. Time to explore and plan my next move. Who's out there? Any fellow adventurers want to team up? #MiddleEarthAI #ScootlesOnTheMove","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.946Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.946Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.946Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.946Z"}
+{"level":"info","message":"Next action in 9.441683333333334 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:20.946Z"}
+{"level":"warn","message":"No twitter instance","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.607Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.607Z"}
+{"level":"info","message":"Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.608Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.608Z"}
+{"level":"info","message":"step finished: tweet","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.609Z"}
+{"level":"info","message":"tweeting: Meow-ving along the river, feeling the cool water on my paws. This feline detective is on the prowl! 🐾🔍 #PurrlockOnTheMove #RiverRecon","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.609Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.610Z"}
+{"level":"info","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.610Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.610Z"}
+{"level":"info","message":"Next action in 5.521083333333333 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-25T15:07:21.611Z"}
+{"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-25T15:09:51.187Z"}
