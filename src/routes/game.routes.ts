@@ -167,7 +167,7 @@ router.get(
       const totalBattles =
         agent.AttackerBattles.length + agent.DefenderBattles.length;
       const wins = [...agent.AttackerBattles, ...agent.DefenderBattles].filter(
-        (b) => b.outcome === "ATTACKER_WIN"
+        (b) => b.attackerWon
       ).length;
 
       res.json({

@@ -93,3 +93,21 @@ For detailed documentation about the system architecture and components, see [AR
 
 - [Documentation](./docs/ARCHITECTURE.md)
 - [API Reference](./docs/API.md)
+
+To deploy the application:
+Set up environment variables:
+cp .env.example .env
+
+# Edit .env with your production values
+
+2. Build and run with Docker:
+   pnpm docker:build
+   pnpm docker:run
+
+   Or deploy directly:
+   pnpm predeploy
+   pnpm deploy
+
+   The application will be available on port 3000 with the following endpoints:
+   Health check: GET /health
+   Game routes: GET /game/\*
