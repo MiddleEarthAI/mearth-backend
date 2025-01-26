@@ -1,8 +1,0 @@
-[build]
-command = "pnpm install && pnpm build"
-
-[deploy]
-startCommand = "pnpm start"
-healthcheckPath = "/health"
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 3
