@@ -6,6 +6,7 @@ import { config } from "./config";
 import { Agent, AgentConfig } from "./agent";
 import { prisma } from "./config/prisma";
 import { gameRoutes } from "./routes/game.routes";
+import { defaultRateLimiter } from "./middleware/rateLimiter";
 
 const app = express();
 
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+app.use(defaultRateLimiter); // Apply rate limiting globally
 
 // Routes
 app.use("/game", gameRoutes);

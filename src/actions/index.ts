@@ -6,7 +6,7 @@ import { proposeAllianceTool } from "./alliance";
 import { tweetTool } from "./tweet";
 import { tokenomicsTool } from "./tokenomics";
 import { ignoreTool } from "./ignore";
-import { telegramTool } from "./telegram";
+
 import { CoreTool } from "ai";
 
 // Export a function to get all tools for an agent

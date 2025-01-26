@@ -2,6 +2,7 @@ import { NextFunction, Router, Request, Response } from "express";
 import { body } from "express-validator";
 import { PrismaClient } from "@prisma/client";
 import { validateRequest } from "@/middleware/validateRequest";
+import { gameActionRateLimiter } from "@/middleware/rateLimiter";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -14,6 +15,7 @@ router.get("/health", (_, res) => {
 // Game Status Endpoints
 router.get(
   "/status",
+  gameActionRateLimiter,
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const [agents, battles, alliances] = await Promise.all([
@@ -62,6 +64,7 @@ router.post(
     body("agentId").isUUID(),
     body("amount").isFloat({ min: 0 }),
     validateRequest,
+    gameActionRateLimiter,
   ],
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -106,6 +109,7 @@ router.post(
 // Battle History
 router.get(
   "/battles",
+  gameActionRateLimiter,
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const battles = await prisma.battle.findMany({
