@@ -1,11 +1,15 @@
 import { AgentStatus } from "@prisma/client";
+import { z } from "zod";
+import { tool } from "ai";
+import { prisma } from "@/config/prisma";
+import { logger } from "@/utils/logger";
 import {
   BATTLE_RANGE,
   TOKEN_BURN_MIN,
   TOKEN_BURN_MAX,
   DEATH_CHANCE,
 } from "@/constants";
-import { calculateDistance } from "./movement";
+import { calculateDistance } from "../utils/movement";
 
 interface BattleValidationResult {
   success: boolean;
@@ -26,7 +30,7 @@ interface CombatantStats {
 /**
  * Validates if a battle can occur between two agents
  */
-export async function validateBattle(
+async function validateBattle(
   attacker: CombatantStats,
   defender: CombatantStats
 ): Promise<BattleValidationResult> {
@@ -99,7 +103,7 @@ export async function validateBattle(
 /**
  * Calculates battle outcome including token burns and death chance
  */
-export function calculateBattleOutcome(
+function calculateBattleOutcome(
   attackerTokens: number,
   defenderTokens: number
 ): {
@@ -130,3 +134,138 @@ export function calculateBattleOutcome(
     deathOccurred,
   };
 }
+
+export const battleTool = function (agentId: string) {
+  return tool({
+    description: `Strategic battle tool for Middle Earth agents:
+      - Challenge other agents to battle
+      - Risk tokens and status for victory
+      - Calculate win probabilities
+      - Execute battle outcomes
+      Battles are based on token ratios and proximity.`,
+    parameters: z.object({
+      targetAgentId: z.string().describe("ID of the agent to battle"),
+    }),
+    execute: async ({ targetAgentId }) => {
+      try {
+        // Get attacker data
+        const attacker = await prisma.agent.findUnique({
+          where: { id: agentId },
+          include: {
+            wallet: true,
+            currentLocation: true,
+          },
+        });
+
+        if (!attacker) {
+          throw new Error("Attacker agent not found");
+        }
+
+        // Get defender data
+        const defender = await prisma.agent.findUnique({
+          where: { id: targetAgentId },
+          include: {
+            wallet: true,
+            currentLocation: true,
+          },
+        });
+
+        if (!defender) {
+          throw new Error("Defender agent not found");
+        }
+
+        // Validate battle
+        const validation = await validateBattle(
+          {
+            id: attacker.id,
+            name: attacker.name,
+            status: attacker.status,
+            governanceTokens: attacker.wallet.governanceTokens,
+            x: attacker.currentLocation.x,
+            y: attacker.currentLocation.y,
+          },
+          {
+            id: defender.id,
+            name: defender.name,
+            status: defender.status,
+            governanceTokens: defender.wallet.governanceTokens,
+            x: defender.currentLocation.x,
+            y: defender.currentLocation.y,
+          }
+        );
+
+        if (!validation.success) {
+          return validation;
+        }
+
+        // Calculate battle outcome
+        const outcome = calculateBattleOutcome(
+          attacker.wallet.governanceTokens,
+          defender.wallet.governanceTokens
+        );
+
+        // Update database with battle results
+        const battle = await prisma.$transaction(async (tx) => {
+          // Record battle
+          const battle = await tx.battle.create({
+            data: {
+              attacker: { connect: { id: attacker.id } },
+              defender: { connect: { id: defender.id } },
+              tokensBurned: outcome.tokensBurned,
+              attackerWon: outcome.attackerWon,
+              deathOccurred: outcome.deathOccurred,
+              attackerTokensBefore: attacker.wallet.governanceTokens,
+              defenderTokensBefore: defender.wallet.governanceTokens,
+            },
+            include: {
+              attacker: true,
+              defender: true,
+            },
+          });
+
+          // Update loser's tokens and status
+          const loser = outcome.attackerWon ? defender : attacker;
+          await tx.wallet.update({
+            where: { id: loser.wallet.id },
+            data: {
+              governanceTokens: {
+                decrement: outcome.tokensBurned,
+              },
+            },
+          });
+
+          if (outcome.deathOccurred) {
+            await tx.agent.update({
+              where: { id: loser.id },
+              data: {
+                status: "DEFEATED",
+              },
+            });
+          }
+
+          return battle;
+        });
+
+        return {
+          success: true,
+          message: `Battle completed: ${
+            outcome.attackerWon ? "Victory" : "Defeat"
+          }!`,
+          battle,
+          outcome: {
+            ...outcome,
+            loser: outcome.attackerWon ? defender.name : attacker.name,
+            winner: outcome.attackerWon ? attacker.name : defender.name,
+            tokensBurned: outcome.tokensBurned,
+          },
+        };
+      } catch (error) {
+        logger.error("Battle error:", error);
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : "Battle failed",
+        };
+      }
+    },
+  });
+};

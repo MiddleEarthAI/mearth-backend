@@ -22,7 +22,7 @@ export function getAgentTools(
   twitter: Twitter | null
 ): AgentTools {
   return {
-    moveTool: moveTool(agentId),
+    moveTool: moveTool(agentId, solana),
     battleTool: battleTool(agentId),
     proposeAllianceTool: proposeAllianceTool(agentId),
     tweetTool: tweetTool(agentId, twitter),

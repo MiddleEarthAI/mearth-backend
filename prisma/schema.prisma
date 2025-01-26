@@ -83,17 +83,19 @@ model Movement {
 }
 
 model Battle {
-    id                 String        @id @default(uuid())
-    attacker           Agent         @relation("AttackerBattles", fields: [attackerId], references: [id])
-    attackerId         String
-    defender           Agent         @relation("DefenderBattles", fields: [defenderId], references: [id])
-    defenderId         String
-    outcome            BattleOutcome
-    tokensBurned       Float
-    timestamp          DateTime      @default(now())
-    winningProbability Float
-    Agent              Agent?        @relation(fields: [agentId], references: [id])
-    agentId            String?
+    id                   String   @id @default(uuid())
+    attacker             Agent    @relation("AttackerBattles", fields: [attackerId], references: [id])
+    attackerId           String
+    defender             Agent    @relation("DefenderBattles", fields: [defenderId], references: [id])
+    defenderId           String
+    attackerTokensBefore Float
+    defenderTokensBefore Float
+    tokensBurned         Float
+    attackerWon          Boolean
+    deathOccurred        Boolean
+    timestamp            DateTime @default(now())
+    Agent                Agent?   @relation(fields: [agentId], references: [id])
+    agentId              String?
 }
 
 model Alliance {

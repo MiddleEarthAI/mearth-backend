@@ -3,7 +3,7 @@ import { tool } from "ai";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 import { TerrainType } from "@prisma/client";
-import { calculateDistance } from "@/utils/movement";
+import { calculateDistance } from "./utils";
 
 interface TerrainScanResult {
   terrain: TerrainType;
