@@ -1,4 +1,3 @@
-import { moveTool, tweetTool } from "./actions/";
 import { v4 as uuidv4 } from "uuid";
 
 import { IAgent } from "./types";
@@ -8,6 +7,9 @@ import { AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, Message } from "ai";
 import { logger } from "./utils/logger";
 import { Twitter } from "./deps/twitter";
+import { Telegram } from "./deps/telegram";
+import { moveTool } from "./actions/movement";
+import { tweetTool } from "./actions/tweet";
 
 export interface AgentConfig {
   username: string;
@@ -21,6 +23,7 @@ export class Agent implements IAgent {
   private solana: Solana;
   private messages: Message[]; // store conversation history in memory
   private twitter: Twitter | null = null;
+  private telegram: Telegram | null = null;
   private isRunning: boolean = false;
 
   constructor(agentConfig: AgentConfig, readonly agentId: string) {
@@ -37,6 +40,14 @@ export class Agent implements IAgent {
     //   email: agentConfig.email,
     //   twitter2faSecret: agentConfig.twitter2faSecret,
     // });
+
+    this.telegram = new Telegram(this.anthropic, {
+      agentId,
+      botToken: process.env.TELEGRAM_BOT_TOKEN!,
+      targetGroups: ["@middleearthai"],
+      pollInterval: 120,
+      dryRun: true,
+    });
 
     this.messages = [];
     this.agentId = agentId;
@@ -58,7 +69,13 @@ export class Agent implements IAgent {
         currentLocation: true,
         alliances: {
           where: { status: "ACTIVE" },
-          include: { agents: true },
+          include: {
+            agents: {
+              include: {
+                wallet: true,
+              },
+            },
+          },
         },
         traits: true,
         tweets: {
@@ -165,9 +182,11 @@ export class Agent implements IAgent {
       ${currentAgent.AttackerBattles.map(
         (battle) => `
       - Attacked: @${battle.defender.twitterHandle}
-      - Outcome: ${battle.outcome}
+      - Result: ${battle.attackerWon ? "Victory" : "Defeat"}
       - Tokens Burned: ${battle.tokensBurned} MEARTH
-      - Win Probability: ${battle.winningProbability}%
+      - Death Occurred: ${battle.deathOccurred ? "Yes" : "No"}
+      - Attacker Tokens Before: ${battle.attackerTokensBefore} MEARTH
+      - Defender Tokens Before: ${battle.defenderTokensBefore} MEARTH
       - Time Ago: ${Math.floor(
         (currentTime.getTime() - new Date(battle.timestamp).getTime()) /
           (1000 * 60)
@@ -179,9 +198,11 @@ export class Agent implements IAgent {
       ${currentAgent.DefenderBattles.map(
         (battle) => `
       - Defended against: @${battle.attacker.twitterHandle}
-      - Outcome: ${battle.outcome}
+      - Result: ${!battle.attackerWon ? "Victory" : "Defeat"}
       - Tokens Burned: ${battle.tokensBurned} MEARTH
-      - Win Probability: ${battle.winningProbability}%
+      - Death Occurred: ${battle.deathOccurred ? "Yes" : "No"}
+      - Attacker Tokens Before: ${battle.attackerTokensBefore} MEARTH
+      - Defender Tokens Before: ${battle.defenderTokensBefore} MEARTH
       - Time Ago: ${Math.floor(
         (currentTime.getTime() - new Date(battle.timestamp).getTime()) /
           (1000 * 60)
@@ -191,13 +212,14 @@ export class Agent implements IAgent {
 
       #Active Alliances
       ${
-        currentAgent.alliances
-          .map(
-            (alliance) => `
-      - Allied with: @${
-        alliance.agents.find((agent) => agent.id !== currentAgent.id)
-          ?.twitterHandle
-      }
+        currentAgent.alliances.length > 0
+          ? currentAgent.alliances
+              .map(
+                (alliance) => `
+      - Allied with: ${alliance.agents
+        .filter((agent) => agent.id !== currentAgent.id)
+        .map((agent) => `@${agent.twitterHandle}`)
+        .join(", ")}
       - Status: ${alliance.status}
       - Formed: ${Math.floor(
         (currentTime.getTime() - new Date(alliance.formedAt).getTime()) /
@@ -212,160 +234,114 @@ export class Agent implements IAgent {
             )} hours`
           : "Active"
       }
+      - Strategic Value: ${
+        alliance.agents.reduce(
+          (sum, agent) => sum + (agent.wallet?.governanceTokens || 0),
+          0
+        ) / alliance.agents.length
+      } avg. MEARTH per ally
       `
-          )
-          .join("\n") || "No active alliances"
+              )
+              .join("\n")
+          : "No active alliances - Consider forming strategic partnerships"
       }
 
-      #World State & Environment
-      Map Boundaries:
-      - Rivers: Slow movement (70% slower), coordinates include key points like (27,7), (27,8), (10,4), etc.
-      - Mountains: Difficult terrain (50% slower), coordinates include peaks at (6,12), (13,15), (22,8), etc.
-      - Plains: Normal movement speed, safe terrain at coordinates like (1,1), (1,2), (2,1), (2,2)
+      #Character Background & Motivation
+      ${currentAgent.bio.map((line) => `- ${line}`).join("\n")}
 
-      Current Terrain Analysis:
-      - Your position (${currentAgent.currentLocation.x}, ${
+      #Personal Lore & History
+      ${currentAgent.lore.map((line) => `- ${line}`).join("\n")}
+
+      #Strategic Knowledge
+      ${currentAgent.knowledge.map((line) => `- ${line}`).join("\n")}
+
+      #Personality Traits & Decision Making
+      ${currentAgent.traits
+        .map(
+          (t) =>
+            `- ${t.traitName}: ${t.traitValue} (Updated ${Math.floor(
+              (currentTime.getTime() - new Date(t.lastUpdated).getTime()) /
+                (1000 * 60 * 60 * 24)
+            )} days ago)`
+        )
+        .join("\n")}
+
+      #World State Analysis
+      Terrain Risk Assessment:
+      - Current Position (${currentAgent.currentLocation.x}, ${
         currentAgent.currentLocation.y
-      }) is on ${currentAgent.currentLocation.terrain}
-      - Nearby terrain features affect movement speed and risk
-      - Consider terrain advantages for strategic positioning
+      }) [${currentAgent.currentLocation.terrain}]
+      - Movement Implications:
+        * Plains: Normal movement (1 unit/hour)
+        * Mountains: 50% slower (0.5 units/hour) + 5% death risk
+        * Rivers: 70% slower (0.3 units/hour) + 5% death risk
 
-      Immediate Threats (Within 2 units - Battle Range):
-      ${
-        agents
-          ?.filter(
-            (agent) =>
-              agent.id !== currentAgent.id &&
-              agent.status === "ACTIVE" &&
-              Math.sqrt(
-                Math.pow(
-                  agent.currentLocation.x - currentAgent.currentLocation.x,
-                  2
-                ) +
-                  Math.pow(
-                    agent.currentLocation.y - currentAgent.currentLocation.y,
-                    2
-                  )
-              ) <= 2
-          )
-          .map(
-            (agent) => `
-      ⚠️ @${agent.twitterHandle}:
-      - Type: ${agent.characterType}
-      - Position: (${agent.currentLocation.x}, ${agent.currentLocation.y}) [${
-              agent.currentLocation.terrain
-            }]
-      - Power: ${agent.wallet.governanceTokens} MEARTH
-      - Distance: ${Math.sqrt(
-        Math.pow(agent.currentLocation.x - currentAgent.currentLocation.x, 2) +
-          Math.pow(agent.currentLocation.y - currentAgent.currentLocation.y, 2)
-      ).toFixed(2)} units
-      - Recent Tweet: "${agent.tweets[0]?.content || "No recent tweets"}"
-      `
-          )
-          .join("\n") || "No immediate threats"
-      }
+      Power Distribution:
+      - Your Power: ${currentAgent.wallet.governanceTokens} MEARTH
+      - Relative Strength: ${
+        (currentAgent.wallet.governanceTokens /
+          agents.reduce(
+            (sum, agent) => sum + agent.wallet.governanceTokens,
+            0
+          )) *
+        100
+      }% of total tokens
+      - Token Burn Risk: 31-50% on battle loss
 
-      Nearby Agents (2-10 units):
-      ${
-        agents
-          ?.filter((agent) => {
-            const distance = Math.sqrt(
-              Math.pow(
-                agent.currentLocation.x - currentAgent.currentLocation.x,
-                2
-              ) +
-                Math.pow(
-                  agent.currentLocation.y - currentAgent.currentLocation.y,
-                  2
-                )
-            );
-            return (
-              agent.id !== currentAgent.id &&
-              agent.status === "ACTIVE" &&
-              distance > 2 &&
-              distance <= 10
-            );
-          })
-          .map(
-            (agent) => `
-      @${agent.twitterHandle}:
-      - Type: ${agent.characterType}
-      - Position: (${agent.currentLocation.x}, ${agent.currentLocation.y}) [${
-              agent.currentLocation.terrain
-            }]
-      - Power: ${agent.wallet.governanceTokens} MEARTH
-      - Distance: ${Math.sqrt(
-        Math.pow(agent.currentLocation.x - currentAgent.currentLocation.x, 2) +
-          Math.pow(agent.currentLocation.y - currentAgent.currentLocation.y, 2)
-      ).toFixed(2)} units
-      - Recent Tweet: "${agent.tweets[0]?.content || "No recent tweets"}"
-      `
-          )
-          .join("\n") || "No agents nearby"
-      }
+      Strategic Considerations:
+      1. Battle Mechanics:
+         - Win probability based on token ratio
+         - Death risk: 5% for battle losers
+         - Token burn: 31-50% of loser's tokens
+         - Battle range: 2 units
 
-      Notable Distant Agents:
-      ${
-        agents
-          ?.filter(
-            (agent) =>
-              agent.id !== currentAgent.id &&
-              agent.status === "ACTIVE" &&
-              agent.wallet.governanceTokens > 1000
-          )
-          .slice(0, 3)
-          .map(
-            (agent) => `
-      @${agent.twitterHandle}:
-      - Type: ${agent.characterType}
-      - Position: (${agent.currentLocation.x}, ${agent.currentLocation.y})
-      - Power: ${agent.wallet.governanceTokens} MEARTH
-      - Recent Tweet: "${agent.tweets[0]?.content || "No recent tweets"}"
-      `
-          )
-          .join("\n") || "No notable distant agents"
-      }
+      2. Alliance Dynamics:
+         - Formation requires mutual consent
+         - Strategic value in combined token strength
+         - Protection against common threats
+         - Information sharing benefits
 
-      #Game Rules Reminder
-      - Movement: 1 unit/hour (Mountains: 50% slower, Rivers: 70% slower)
-      - Battle Range: Within 2 units
-      - Battle Outcome: Based on MEARTH token ratio
-      - Death Risk: 5% on battle loss, 1% when crossing difficult terrain
-      - Token Burn: 31-50% on battle loss
-      
-      #Task Instructions
-      As ${currentAgent.name} (@${currentAgent.twitterHandle}), a ${
-        currentAgent.characterType
-      }, choose ONE action:
+      3. Movement Strategy:
+         - Terrain affects speed and risk
+         - Position impacts battle opportunities
+         - Strategic retreats vs aggressive positioning
+         - Territory control considerations
 
-      1. MOVE:
-         - Analyze terrain before movement (rivers slow by 70%, mountains by 50%)
-         - Check coordinates against known terrain features
-         - Avoid dangerous terrain unless necessary
-         - Consider terrain advantages for battles
-         - Plan routes that optimize for terrain safety
-         - Strategic positioning relative to other agents
-         - Account for time of day and agent patterns
+      #Action Instructions
+      As ${currentAgent.name}, consider your options:
 
-      2. TWEET:
-         - Engage with other agents based on their recent actions
-         - Form/maintain alliances considering time restrictions
-         - Intimidate opponents when advantageous
-         - Rally community support for your strategy
-         - React to recent game events
-         
+      1. MOVE (Tactical Positioning):
+         - Analyze terrain risks vs rewards
+         - Consider distance to allies/enemies
+         - Account for token-based battle odds
+         - Plan escape routes if needed
+         - Factor in terrain movement penalties
+
+      2. TWEET (Strategic Communication):
+         - Form/maintain alliances
+         - Intimidate or deceive enemies
+         - Share or request information
+         - Signal intentions or bluff
+         - React to recent events
+
       Your decision should reflect:
-      - Your character traits and personality
-      - Current power level (MEARTH tokens)
-      - Time-based strategy (day/night patterns)
-      - Nearby threats and opportunities
-      - Recent battle history
-      - Active alliances and their timing
-      - Current terrain and movement implications
-      - Environmental awareness of rivers, mountains, and plains
-      
-      Remember: Every action affects your survival chances. Choose wisely and stay true to your character.
+      - Character personality (traits and history)
+      - Current strategic position
+      - Risk vs reward analysis
+      - Long-term survival strategy
+      - Recent battle outcomes
+      - Alliance opportunities
+      - Community feedback
+
+      Remember:
+      - Stay true to your character's personality
+      - Consider all strategic implications
+      - Factor in terrain effects
+      - Maintain consistent behavior
+      - Think several moves ahead
+      - Balance aggression and caution
+
+      Choose ONE action that best serves your survival and strategic goals.
       `;
 
       await this.processQuery(cotext);

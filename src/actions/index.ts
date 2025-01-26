@@ -41,3 +41,5 @@ export const getAgentTools = (
   tweetTool: tweetTool(agentId, twitter),
   tokenomicsTool: tokenomicsTool(agentId),
 });
+
+export * from "./telegram";

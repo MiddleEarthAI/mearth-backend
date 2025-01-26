@@ -139,7 +139,10 @@ async function createTweetFeedback(
   });
 }
 
-export const tweetTool = function (agentId: string, twitter: Twitter | null) {
+export const tweetTool = async function (
+  agentId: string,
+  twitter: Twitter | null
+) {
   return tool({
     description: `Strategic communication tool for Middle Earth agents:
       - Broadcast intentions and actions
