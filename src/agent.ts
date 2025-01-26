@@ -1,4 +1,4 @@
-import { moveTool, tweetTool } from "./utils/actions";
+import { moveTool, tweetTool } from "./actions/";
 import { v4 as uuidv4 } from "uuid";
 
 import { IAgent } from "./types";
@@ -391,8 +391,8 @@ export class Agent implements IAgent {
         model: this.anthropic("claude-3-5-sonnet-20240620"),
         prompt: query,
         tools: {
-          move: moveTool(this.agentId, this.solana),
-          tweet: tweetTool(this.agentId, this.twitter),
+          move: await moveTool(this.agentId, this.solana),
+          tweet: await tweetTool(this.agentId, this.twitter),
         },
         maxSteps: 5,
         toolChoice: "required",

@@ -1,9 +1,4 @@
-import {
-  PrismaClient,
-  TerrainType,
-  CharacterType,
-  Prisma,
-} from "@prisma/client";
+import { PrismaClient, TerrainType, CharacterType } from "@prisma/client";
 import { mountains, plains, river } from "../src/constants";
 import * as fs from "fs";
 import * as path from "path";

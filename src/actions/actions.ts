@@ -1,78 +1,19 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { logger } from "./logger";
+import { logger } from "../utils/logger";
 import { Solana } from "@/deps/solana";
 import { Twitter } from "@/deps/twitter";
-import { mountains, validCoordinatesArray, river, plains } from "@/constants";
 import { prisma } from "@/config/prisma";
+import { TerrainType } from "@prisma/client";
+import {
+  calculateDistance,
+  calculateMovementSpeed,
+  moveTool,
+} from "@/actions/movement";
+import { validateBattle, calculateBattleOutcome } from "@/actions/battle";
+import { proposeAllianceTool, validateAlliance } from "@/actions/alliance";
+import { tweetTool } from "./tweet";
 
-export const moveTool = async function (agentId: string, solana: Solana) {
-  async function validateMove(x: number, y: number) {
-    const coordStr = `${x},${y}`;
-    let terrainType = "invalid";
-
-    // Fast validation using pre-computed valid coordinates
-    if (validCoordinatesArray.includes(coordStr)) {
-      // Get terrain type in one pass using Set.has() operations
-      terrainType = mountains.coordinates.has(coordStr)
-        ? "mountains"
-        : river.coordinates.has(coordStr)
-        ? "rivers"
-        : plains.coordinates.has(coordStr)
-        ? "plains"
-        : "invalid";
-
-      logger.warn(`Invalid move: ${terrainType} terrain at (${x},${y})`);
-      return {
-        success: false,
-        message: `validation failed: Invalid move to ${terrainType} terrain at (${x},${y})`,
-        terrain: terrainType,
-      };
-    }
-
-    return {
-      success: true,
-      message: `Valid move to (${x},${y})`,
-      terrain: terrainType,
-    };
-  }
-
-  return tool({
-    description: `Strategic movement tool for navigating the Middle Earth map. This tool allows agents to move to new coordinates while considering:
-      - Terrain effects (mountains slow movement by 50%, rivers by 70%)
-      - Death risk (1% chance when crossing mountains/rivers)
-      - Strategic positioning relative to other agents
-      - Distance limitations (1 unit per hour movement speed)
-      - Battle/alliance opportunities within 2 unit range
-      Use this tool to reposition your agent for battles, form alliances, or avoid threats.`,
-    parameters: z.object({
-      x: z.number().describe("New X coordinate position on the map "),
-      y: z.number().describe("New Y coordinate position on the map "),
-      terrain: z.string().describe("Terrain type to move on"),
-    }),
-    execute: async ({ x, y }) => {
-      const { success, message, terrain } = await validateMove(x, y);
-
-      const toLocation = await prisma.location.findFirst({
-        where: {
-          x,
-          y,
-        },
-      });
-      if (success) {
-        prisma.movement.create({
-          data: {
-            agentId,
-          },
-        });
-        return { success, message };
-      }
-      // await solana.processMoveAgent(agentId, x, y, TerrainType.PLAIN);
-      logger.info(`Agent ${agentId} moved to position (${x}, ${y})`);
-      return { x, y, success: true };
-    },
-  });
-};
 export const battleTool = function (agentId: string) {
   return tool({
     description: `Initiate combat with another agent within 2 unit range:
@@ -90,31 +31,134 @@ export const battleTool = function (agentId: string) {
         ),
     }),
     execute: async ({ twitterHandle }) => {
-      logger.info(`Agent ${agentId} initiated battle with ${twitterHandle}`);
-      return { twitterHandle, outcome: null };
-    },
-  });
-};
+      try {
+        // Get attacker data
+        const attacker = await prisma.agent.findUnique({
+          where: { id: agentId },
+          include: {
+            currentLocation: true,
+            wallet: true,
+          },
+        });
 
-export const proposeAllianceTool = function (agentId: string) {
-  return tool({
-    description: `Form strategic alliance with nearby agent:
-      - Combined token pools for battles
-      - Mutual defense and attack coordination
-      - 4 hour battle cooldown after dissolution
-      - 24 hour alliance cooldown after dissolution
-      - Both agents must agree to form alliance
-      Powerful tool for temporary cooperation and strength multiplication.`,
-    parameters: z.object({
-      twitterHandle: z
-        .string()
-        .describe(
-          "Twitter handle of the target agent to propose alliance to. Must be within 2 unit range."
-        ),
-    }),
-    execute: async ({ twitterHandle }) => {
-      logger.info(`Agent ${agentId} proposed alliance to ${twitterHandle}`);
-      return { twitterHandle, status: "pending" };
+        if (!attacker) {
+          throw new Error("Attacker agent not found");
+        }
+
+        // Get defender data
+        const defender = await prisma.agent.findUnique({
+          where: { twitterHandle },
+          include: {
+            currentLocation: true,
+            wallet: true,
+          },
+        });
+
+        if (!defender) {
+          return {
+            success: false,
+            message: `No agent found with Twitter handle: ${twitterHandle}`,
+          };
+        }
+
+        // Validate battle
+        const validation = await validateBattle(
+          {
+            id: attacker.id,
+            name: attacker.name,
+            status: attacker.status,
+            governanceTokens: attacker.wallet.governanceTokens,
+            x: attacker.currentLocation.x,
+            y: attacker.currentLocation.y,
+          },
+          {
+            id: defender.id,
+            name: defender.name,
+            status: defender.status,
+            governanceTokens: defender.wallet.governanceTokens,
+            x: defender.currentLocation.x,
+            y: defender.currentLocation.y,
+          }
+        );
+
+        if (!validation.success) {
+          return validation;
+        }
+
+        // Calculate battle outcome
+        const outcome = calculateBattleOutcome(
+          attacker.wallet.governanceTokens,
+          defender.wallet.governanceTokens
+        );
+
+        // Record battle in database
+        const battle = await prisma.battle.create({
+          data: {
+            attackerId: attacker.id,
+            defenderId: defender.id,
+            outcome: outcome.attackerWon ? "ATTACKER_WIN" : "DEFENDER_WIN",
+            tokensBurned: outcome.tokensBurned,
+            winningProbability: validation.winProbability || 0,
+          },
+        });
+
+        // Update tokens and status based on outcome
+        if (outcome.attackerWon) {
+          await prisma.$transaction([
+            // Update defender's tokens (burn tokens)
+            prisma.wallet.update({
+              where: { id: defender.wallet.id },
+              data: {
+                governanceTokens: {
+                  decrement: outcome.tokensBurned,
+                },
+              },
+            }),
+            // Update defender's status if they died
+            outcome.deathOccurred
+              ? prisma.agent.update({
+                  where: { id: defender.id },
+                  data: { status: "DEFEATED" },
+                })
+              : prisma.$queryRaw`SELECT 1`,
+          ]);
+        } else {
+          await prisma.$transaction([
+            // Update attacker's tokens (burn tokens)
+            prisma.wallet.update({
+              where: { id: attacker.wallet.id },
+              data: {
+                governanceTokens: {
+                  decrement: outcome.tokensBurned,
+                },
+              },
+            }),
+            // Update attacker's status if they died
+            outcome.deathOccurred
+              ? prisma.agent.update({
+                  where: { id: attacker.id },
+                  data: { status: "DEFEATED" },
+                })
+              : prisma.$queryRaw`SELECT 1`,
+          ]);
+        }
+
+        return {
+          success: true,
+          message: `Battle completed: ${
+            outcome.attackerWon ? "Victory" : "Defeat"
+          }! ${outcome.tokensBurned} tokens burned${
+            outcome.deathOccurred ? " and opponent defeated" : ""
+          }`,
+          battle,
+        };
+      } catch (error) {
+        logger.error("Battle error:", error);
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : "Battle failed",
+        };
+      }
     },
   });
 };
@@ -131,38 +175,6 @@ export const ignoreTool = function (agentId: string) {
     execute: async () => {
       logger.info(`Agent ${agentId} chose to ignore`);
       return { status: "ignored" };
-    },
-  });
-};
-
-export const tweetTool = function (agentId: string, twitter: Twitter | null) {
-  return tool({
-    description: `Broadcast strategic messages to the Middle Earth community:
-      - Announce movements and actions 
-      - Declare battle intentions
-      - Propose or discuss alliances
-      - Rally community support
-      - Influence other agents' decisions
-      Critical for community engagement and strategic communication.`,
-    parameters: z.object({
-      tweet: z
-        .string()
-        .describe(
-          "Strategic message to broadcast (max 280 characters). Avoid hashtags and use emojis sparingly. Message should align with agent's character and goals."
-        ),
-    }),
-    execute: async ({ tweet }) => {
-      if (!twitter) {
-        logger.warn("No twitter instance");
-        logger.info("---------------TWEET-----------------");
-        logger.info(tweet);
-        logger.info("-------------------------------------");
-        return { tweet, posted: false };
-      }
-
-      twitter.postTweet(tweet);
-      logger.info(`Agent ${agentId} tweeted: ${tweet}`);
-      return { tweet, posted: true };
     },
   });
 };
