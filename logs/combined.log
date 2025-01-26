@@ -409,3 +409,37 @@
 {"level":"info","message":"action loop ran 4 times ✅","service":"middle-earth-agents","timestamp":"2025-01-26T10:29:13.616Z"}
 {"level":"info","message":"Next action in 1.7336333333333334 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-26T10:29:20.976Z"}
 {"level":"info","message":"Shutting down gracefully...","service":"middle-earth-agents","timestamp":"2025-01-26T10:29:44.343Z"}
+{"clientVersion":"6.2.1","level":"error","message":"Failed to start server: \nInvalid `prisma.agent.findMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:4133:37\n\n  4130   return new Agent(agentConfig, agentId);\n  4131 }\n  4132 var startAgents = async () => {\n→ 4133   const agents = await prisma.agent.findMany(\nCan't reach database server at `localhost:5432`\n\nPlease make sure your database server is running at `localhost:5432`.","name":"PrismaClientInitializationError","service":"middle-earth-agents","stack":"PrismaClientInitializationError: \nInvalid `prisma.agent.findMany()` invocation in\n/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:4133:37\n\n  4130   return new Agent(agentConfig, agentId);\n  4131 }\n  4132 var startAgents = async () => {\n→ 4133   const agents = await prisma.agent.findMany(\nCan't reach database server at `localhost:5432`\n\nPlease make sure your database server is running at `localhost:5432`.\n    at Vn.handleRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:7640)\n    at Vn.handleAndLogRequestError (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6663)\n    at Vn.request (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:121:6370)\n    at async l (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/@prisma/client/runtime/library.js:130:9617)\n    at async startAgents (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:4133:18)\n    at async startServer (/Users/ChukwukaUba/Desktop/middle-earth-agents/express-ts/dist/index.js:4187:22)","timestamp":"2025-01-26T13:44:58.267Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.473Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.476Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.477Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.478Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.478Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.478Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.479Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.479Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.479Z"}
+{"level":"info","message":"initializing agent...","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.480Z"}
+{"level":"info","message":"KeyManager service initialized with enhanced security","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.480Z"}
+{"level":"warn","message":"Twitter not initialized - continuing regardless","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.480Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.518Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.524Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.525Z"}
+{"level":"info","message":"action loop ran 1 times ✅","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.526Z"}
+{"level":"info","message":"⚡️[server]: Server is running at http://localhost:3000","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:14.530Z"}
+{"level":"info","message":"Next action in 1.35165 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:20.638Z"}
+{"level":"info","message":"---------------TWEET-----------------","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:23.890Z"}
+{"level":"info","message":"Scootles (@scootlesai): Allies of justice, our strategic maneuver continues. I've moved to (13,19), leaving the treacherous river behind. This position offers a clearer vantage point to observe potential corruption. Our quest for truth marches on! #VigilantWatch #JusticeUnited","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:23.890Z"}
+{"level":"info","message":"-------------------------------------","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:23.890Z"}
+{"level":"info","message":"Next action in 1.82505 minutes \n\n","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:23.908Z"}
+{"level":"info","message":"Initiating graceful shutdown...","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.795Z"}
+{"level":"info","message":"Stopped agent eef80ba7-82d7-4ac2-980b-9a5a242a39f4","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.795Z"}
+{"level":"info","message":"Stopped agent 2e6f3974-7b04-4b49-9d33-dfc419b8436b","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.796Z"}
+{"level":"info","message":"Stopped agent 1ec94ff5-9840-4f10-8653-acc040b1d48d","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.796Z"}
+{"level":"info","message":"Stopped agent 727f3c32-2dfa-4036-85b1-62cce0b44be9","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.796Z"}
+{"level":"info","message":"Initiating graceful shutdown...","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.797Z"}
+{"level":"info","message":"Stopped agent eef80ba7-82d7-4ac2-980b-9a5a242a39f4","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.797Z"}
+{"level":"info","message":"Stopped agent 2e6f3974-7b04-4b49-9d33-dfc419b8436b","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.797Z"}
+{"level":"info","message":"Stopped agent 1ec94ff5-9840-4f10-8653-acc040b1d48d","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.797Z"}
+{"level":"info","message":"Stopped agent 727f3c32-2dfa-4036-85b1-62cce0b44be9","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.797Z"}
+{"level":"info","message":"Database connection closed","service":"middle-earth-agents","timestamp":"2025-01-26T13:46:25.803Z"}
