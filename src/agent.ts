@@ -324,21 +324,311 @@ export class Agent implements IAgent {
   }
 
   async processQuery(query: string) {
+    // Get enriched agent data with full context
+    const currentAgent = await prisma.agent.findUnique({
+      where: { id: this.agentId },
+      include: {
+        wallet: {
+          include: {
+            stakingRewards: {
+              take: 5,
+              orderBy: { timestamp: "desc" },
+            },
+            transactionHistory: {
+              take: 10,
+              orderBy: { timestamp: "desc" },
+            },
+          },
+        },
+        currentLocation: true,
+        movementHistory: {
+          take: 5,
+          orderBy: { timestamp: "desc" },
+          include: {
+            fromLocation: true,
+            toLocation: true,
+          },
+        },
+        alliances: {
+          where: { status: "ACTIVE" },
+          include: {
+            agents: {
+              include: {
+                wallet: true,
+                currentLocation: true,
+                traits: true,
+              },
+            },
+          },
+        },
+        traits: {
+          orderBy: { lastUpdated: "desc" },
+        },
+        tweets: {
+          take: 5,
+          orderBy: { createdAt: "desc" },
+          include: {
+            engagement: true,
+            feedback: true,
+          },
+        },
+        AttackerBattles: {
+          take: 5,
+          orderBy: { timestamp: "desc" },
+          include: {
+            defender: {
+              include: {
+                wallet: true,
+                currentLocation: true,
+              },
+            },
+          },
+        },
+        DefenderBattles: {
+          take: 5,
+          orderBy: { timestamp: "desc" },
+          include: {
+            attacker: {
+              include: {
+                wallet: true,
+                currentLocation: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!currentAgent) {
+      throw new Error("Agent not found");
+    }
+
+    const currentTime = new Date();
+
+    // Build enhanced context with all available information
+    const enhancedContext = `
+    #Current Game Time & State
+    UTC: ${currentTime.toISOString()}
+    Game Day: Day ${Math.floor(
+      (currentTime.getTime() - new Date("2025-01-25").getTime()) /
+        (1000 * 60 * 60 * 24)
+    )} of Middle Earth
+    
+    #Character Profile & Economic Status
+    - Identity: ${currentAgent.name} (@${currentAgent.twitterHandle})
+    - Character Type: ${currentAgent.characterType}
+    - Status: ${currentAgent.status}
+    - Power Level: ${currentAgent.wallet.governanceTokens} MEARTH tokens
+    - Recent Staking Rewards: ${currentAgent.wallet.stakingRewards
+      .map(
+        (reward) =>
+          `\n      * ${reward.rewardAmount} MEARTH (${Math.floor(
+            (currentTime.getTime() - new Date(reward.timestamp).getTime()) /
+              (1000 * 60)
+          )} mins ago)`
+      )
+      .join("")}
+    - Recent Transactions: ${currentAgent.wallet.transactionHistory
+      .map(
+        (tx) =>
+          `\n      * ${tx.type}: ${tx.amount} MEARTH (${Math.floor(
+            (currentTime.getTime() - new Date(tx.timestamp).getTime()) /
+              (1000 * 60)
+          )} mins ago)`
+      )
+      .join("")}
+    
+    #Location & Movement
+    - Current Position: (${currentAgent.currentLocation.x}, ${
+      currentAgent.currentLocation.y
+    })
+    - Current Terrain: ${currentAgent.currentLocation.terrain}
+    - Recent Movements: ${currentAgent.movementHistory
+      .map(
+        (move) =>
+          `\n      * From (${move.fromLocation.x}, ${move.fromLocation.y}) [${
+            move.fromLocation.terrain
+          }] -> To (${move.toLocation.x}, ${move.toLocation.y}) [${
+            move.toLocation.terrain
+          }]
+       * Speed: ${move.speed} units/hour
+       * Time: ${Math.floor(
+         (currentTime.getTime() - new Date(move.timestamp).getTime()) /
+           (1000 * 60)
+       )} mins ago`
+      )
+      .join("")}
+    
+    #Alliance Network Analysis
+    ${
+      currentAgent.alliances.length > 0
+        ? currentAgent.alliances
+            .map(
+              (alliance) => `
+    Alliance Group Analysis:
+    - Members: ${alliance.agents
+      .filter((a) => a.id !== currentAgent.id)
+      .map((ally) => `@${ally.twitterHandle}`)
+      .join(", ")}
+    - Combined Strength: ${alliance.agents.reduce(
+      (sum, ally) => sum + ally.wallet.governanceTokens,
+      0
+    )} MEARTH
+    - Average Power: ${(
+      alliance.agents.reduce(
+        (sum, ally) => sum + ally.wallet.governanceTokens,
+        0
+      ) / alliance.agents.length
+    ).toFixed(2)} MEARTH
+    - Geographical Distribution: ${alliance.agents
+      .map(
+        (ally) =>
+          `\n      * @${ally.twitterHandle}: (${ally.currentLocation.x}, ${ally.currentLocation.y}) [${ally.currentLocation.terrain}]`
+      )
+      .join("")}
+    - Member Traits: ${alliance.agents
+      .filter((a) => a.id !== currentAgent.id)
+      .map(
+        (ally) =>
+          `\n      * @${ally.twitterHandle}: ${ally.traits
+            .map((t) => `${t.traitName}: ${t.traitValue}`)
+            .join(", ")}`
+      )
+      .join("")}
+    `
+            )
+            .join("\n")
+        : "No active alliances - Consider strategic partnerships"
+    }
+    
+    #Combat Analytics
+    Recent Offensive Operations:
+    ${currentAgent.AttackerBattles.map(
+      (battle) => `
+    - Target: @${battle.defender.twitterHandle}
+    - Outcome: ${battle.attackerWon ? "Victory" : "Defeat"}
+    - Token Analysis:
+      * Pre-battle Power Ratio: ${(
+        battle.attackerTokensBefore / battle.defenderTokensBefore
+      ).toFixed(2)}
+      * Tokens Burned: ${battle.tokensBurned} MEARTH
+      * Death Event: ${battle.deathOccurred ? "Yes" : "No"}
+    - Target's Current Status:
+      * Location: (${battle.defender.currentLocation.x}, ${
+        battle.defender.currentLocation.y
+      })
+      * Current Power: ${battle.defender.wallet.governanceTokens} MEARTH
+    - Time: ${Math.floor(
+      (currentTime.getTime() - new Date(battle.timestamp).getTime()) /
+        (1000 * 60)
+    )} mins ago
+    `
+    ).join("\n")}
+
+    Recent Defensive Operations:
+    ${currentAgent.DefenderBattles.map(
+      (battle) => `
+    - Attacker: @${battle.attacker.twitterHandle}
+    - Outcome: ${!battle.attackerWon ? "Victory" : "Defeat"}
+    - Token Analysis:
+      * Pre-battle Power Ratio: ${(
+        battle.defenderTokensBefore / battle.attackerTokensBefore
+      ).toFixed(2)}
+      * Tokens Burned: ${battle.tokensBurned} MEARTH
+      * Death Event: ${battle.deathOccurred ? "Yes" : "No"}
+    - Attacker's Current Status:
+      * Location: (${battle.attacker.currentLocation.x}, ${
+        battle.attacker.currentLocation.y
+      })
+      * Current Power: ${battle.attacker.wallet.governanceTokens} MEARTH
+    - Time: ${Math.floor(
+      (currentTime.getTime() - new Date(battle.timestamp).getTime()) /
+        (1000 * 60)
+    )} mins ago
+    `
+    ).join("\n")}
+
+    #Social Intelligence & Community Feedback
+    Recent Social Activities:
+    ${currentAgent.tweets
+      .map(
+        (tweet) => `
+    - Tweet [${new Date(tweet.createdAt).toISOString()}]: "${tweet.content}"
+    - Engagement Metrics:
+      * Likes: ${tweet.engagement?.likes || 0}
+      * Retweets: ${tweet.engagement?.retweets || 0}
+      * Comments: ${tweet.engagement?.comments || 0}
+      * Impressions: ${tweet.engagement?.impressions || 0}
+      * Influencer Impact: ${tweet.engagement?.influencerImpact || 0}
+    - Community Feedback:
+      * Suggested Action: ${tweet.feedback?.suggestedAction || "N/A"}
+      * Target Location: (${tweet.feedback?.coordinateX || "N/A"}, ${
+          tweet.feedback?.coordinateY || "N/A"
+        })
+      * Confidence: ${tweet.feedback?.confidence || "N/A"}
+      * Sentiment: ${tweet.feedback?.sentiment || "N/A"}
+      * Reasoning: ${tweet.feedback?.reasoning || "N/A"}
+    - Time: ${Math.floor(
+      (currentTime.getTime() - new Date(tweet.createdAt).getTime()) /
+        (1000 * 60)
+    )} mins ago
+    `
+      )
+      .join("\n")}
+
+    #Character Evolution & Traits
+    Current Trait Analysis:
+    ${currentAgent.traits
+      .map(
+        (trait) => `
+    - ${trait.traitName}: ${trait.traitValue}
+      * Last Updated: ${Math.floor(
+        (currentTime.getTime() - new Date(trait.lastUpdated).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )} days ago
+    `
+      )
+      .join("")}
+
+    #Core Identity
+    Background:
+    ${currentAgent.bio.map((line) => `- ${line}`).join("\n")}
+
+    Personal Lore:
+    ${currentAgent.lore.map((line) => `- ${line}`).join("\n")}
+
+    Strategic Knowledge Base:
+    ${currentAgent.knowledge.map((line) => `- ${line}`).join("\n")}
+
+    Decision Framework:
+    1. Consider all economic indicators (tokens, rewards, transactions)
+    2. Evaluate geographical advantages and movement patterns
+    3. Analyze alliance network strength and reliability
+    4. Review combat performance and threat assessment
+    5. Factor in social sentiment and community feedback
+    6. Stay true to character traits and evolution
+    7. Balance short-term opportunities with long-term survival
+
+    Choose your next action based on this comprehensive analysis while maintaining character consistency and strategic depth.
+    `;
+
+    // Log the query for monitoring
     await prisma.message.create({
       data: {
-        content: query,
+        content: enhancedContext,
         senderId: this.agentId,
         senderType: "SYSTEM",
         contentType: "TEXT",
         platform: "X_TWITTER",
       },
     });
+
     const tools = await getAgentTools(this.agentId, this.solana, this.twitter);
 
     try {
       const result = await generateText({
         model: this.anthropic("claude-3-5-sonnet-20240620"),
-        prompt: query,
+        prompt: enhancedContext,
         tools,
         maxSteps: 5,
         toolChoice: "required",
