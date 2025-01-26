@@ -1,22 +1,27 @@
-FROM node:22.13.0-slim
+FROM node:23.3.0-slim AS builder
+
+RUN apt-get update -y && apt-get install -y openssl
+
+# Install pnpm
+RUN npm install -g pnpm
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package.json and pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
 
-# Install app dependencies
-RUN npm ci
+# Install dependencies using pnpm
+RUN pnpm install --frozen-lockfile
 
 # Bundle app source
 COPY . .
 
 # Build the TypeScript files
-RUN npm run build
+RUN pnpm run build
 
 # Expose port 3000
 EXPOSE 3000
 
 # Start the app
-CMD npm run start
+CMD pnpm run start
