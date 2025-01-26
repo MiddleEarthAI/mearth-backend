@@ -187,7 +187,7 @@ export const tweetTool = async (agentId: string, twitter: Twitter | null) =>
         // Post tweet
         let twitterResponse = null;
         if (twitter) {
-          twitterResponse = await twitter.postTweet(tweet);
+          twitterResponse = await twitter.postTweet(tweet, agent.twitterHandle);
         } else {
           logger.info("---------------TWEET-----------------");
           logger.info(`${agent.name} (@${agent.twitterHandle}): ${tweet}`);

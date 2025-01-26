@@ -41,7 +41,7 @@ export interface IKeyManager {
 }
 
 export interface ITwitter {
-  postTweet(content: string): Promise<void>;
+  postTweet(content: string, agentUsername: string): Promise<void>;
 }
 
 export type IAgent = {

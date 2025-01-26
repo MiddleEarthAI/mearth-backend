@@ -541,7 +541,9 @@ export class Twitter extends EventEmitter implements ITwitter {
   /**
    * Post a tweet from an agent's account
    */
-  async postTweet(content: string): Promise<void> {
+
+  // TODO: Remove this agentUsername parameter
+  async postTweet(content: string, agentUsername: string): Promise<void> {
     try {
       const dryRun = this.config.dryRun;
       logger.info(`Posting tweet: ${content}`);
