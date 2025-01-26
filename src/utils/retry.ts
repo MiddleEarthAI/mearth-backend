@@ -8,38 +8,38 @@ import { logger } from "./logger";
  * @param maxTimeout Maximum timeout between retries in ms (default: 10000)
  */
 export async function retryWithExponentialBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  minTimeout: number = 1000,
-  maxTimeout: number = 10000
+	fn: () => Promise<T>,
+	maxRetries = 3,
+	minTimeout = 1000,
+	maxTimeout = 10000,
 ): Promise<T> {
-  let lastError: Error | null = null;
+	let lastError: Error | null = null;
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
+	for (let attempt = 0; attempt < maxRetries; attempt++) {
+		try {
+			return await fn();
+		} catch (error) {
+			lastError = error as Error;
 
-      if (attempt === maxRetries - 1) break;
+			if (attempt === maxRetries - 1) break;
 
-      const factor = Math.pow(2, attempt);
-      const delay = Math.min(
-        maxTimeout,
-        Math.max(minTimeout, minTimeout * factor * (0.5 + Math.random()))
-      );
+			const factor = 2 ** attempt;
+			const delay = Math.min(
+				maxTimeout,
+				Math.max(minTimeout, minTimeout * factor * (0.5 + Math.random())),
+			);
 
-      logger.warn(
-        `Attempt ${attempt + 1} failed, retrying in ${delay}ms... Error: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+			logger.warn(
+				`Attempt ${attempt + 1} failed, retrying in ${delay}ms... Error: ${
+					error instanceof Error ? error.message : "Unknown error"
+				}`,
+			);
 
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
+			await new Promise((resolve) => setTimeout(resolve, delay));
+		}
+	}
 
-  throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
+	throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
 }
 
 /**
@@ -49,30 +49,30 @@ export async function retryWithExponentialBackoff<T>(
  * @param delay Delay between retries in ms (default: 1000)
  */
 export async function retryWithLinearBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  delay: number = 1000
+	fn: () => Promise<T>,
+	maxRetries = 3,
+	delay = 1000,
 ): Promise<T> {
-  let lastError: Error | null = null;
+	let lastError: Error | null = null;
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
+	for (let attempt = 0; attempt < maxRetries; attempt++) {
+		try {
+			return await fn();
+		} catch (error) {
+			lastError = error as Error;
 
-      if (attempt === maxRetries - 1) break;
+			if (attempt === maxRetries - 1) break;
 
-      logger.warn(
-        `Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
-        error
-      );
+			logger.warn(
+				`Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
+				error,
+			);
 
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
+			await new Promise((resolve) => setTimeout(resolve, delay));
+		}
+	}
 
-  throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
+	throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
 }
 
 /**
@@ -82,30 +82,30 @@ export async function retryWithLinearBackoff<T>(
  * @param backoffStrategy Function that takes attempt number and returns delay in ms
  */
 export async function retryWithCustomBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number,
-  backoffStrategy: (attempt: number) => number
+	fn: () => Promise<T>,
+	maxRetries: number,
+	backoffStrategy: (attempt: number) => number,
 ): Promise<T> {
-  let lastError: Error | null = null;
+	let lastError: Error | null = null;
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
+	for (let attempt = 0; attempt < maxRetries; attempt++) {
+		try {
+			return await fn();
+		} catch (error) {
+			lastError = error as Error;
 
-      if (attempt === maxRetries - 1) break;
+			if (attempt === maxRetries - 1) break;
 
-      const delay = backoffStrategy(attempt);
+			const delay = backoffStrategy(attempt);
 
-      logger.warn(
-        `Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
-        error
-      );
+			logger.warn(
+				`Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
+				error,
+			);
 
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
+			await new Promise((resolve) => setTimeout(resolve, delay));
+		}
+	}
 
-  throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
+	throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
 }

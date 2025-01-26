@@ -1,9 +1,9 @@
-import { z } from "zod";
-import { tool } from "ai";
-import { Twitter } from "@/deps/twitter";
 import { prisma } from "@/config/prisma";
+import type { Twitter } from "@/deps/twitter";
 import { logger } from "@/utils/logger";
+import { tool } from "ai";
 import natural from "natural";
+import { z } from "zod";
 
 interface TweetValidationResult {
   success: boolean;
@@ -106,8 +106,8 @@ async function createTweetFeedback(
   const coordMatch = content.match(coordRegex);
   const coordinates = coordMatch
     ? {
-        x: parseFloat(coordMatch[1]),
-        y: parseFloat(coordMatch[2]),
+        x: Number.parseFloat(coordMatch[1]),
+        y: Number.parseFloat(coordMatch[2]),
       }
     : null;
 
@@ -139,11 +139,8 @@ async function createTweetFeedback(
   });
 }
 
-export const tweetTool = async function (
-  agentId: string,
-  twitter: Twitter | null
-) {
-  return tool({
+export const tweetTool = async (agentId: string, twitter: Twitter | null) =>
+  tool({
     description: `Strategic communication tool for Middle Earth agents:
       - Broadcast intentions and actions
       - Form alliances and declare battles
@@ -202,8 +199,8 @@ export const tweetTool = async function (
           data: {
             agentId,
             content: tweet,
-            tweetId: twitterResponse!?.id || BigInt(Date.now()),
-            authorFollowerCount: twitterResponse!?.author_followers || 0,
+            tweetId: twitterResponse!?.id ?? BigInt(Date.now()),
+            authorFollowerCount: twitterResponse!?.author_followers ?? 0,
           },
         });
 
@@ -229,4 +226,3 @@ export const tweetTool = async function (
       }
     },
   });
-};

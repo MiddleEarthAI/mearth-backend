@@ -353,82 +353,82 @@ ${baseResponseFormat}
 
 // Function to parse template response JSON
 export function parseTemplateResponse(jsonString: string): {
-  tool_calls: Array<{
-    name: string;
-    input: any;
-  }>;
-  reasoning: string;
-  response: string;
-  confidence: number;
-  alternatives?: Array<{
-    action: string;
-    reason_not_chosen: string;
-  }>;
+	tool_calls: Array<{
+		name: string;
+		input: any;
+	}>;
+	reasoning: string;
+	response: string;
+	confidence: number;
+	alternatives?: Array<{
+		action: string;
+		reason_not_chosen: string;
+	}>;
 } {
-  try {
-    const parsed = JSON.parse(jsonString);
+	try {
+		const parsed = JSON.parse(jsonString);
 
-    // Validate required fields
-    if (!parsed.tool_calls || !Array.isArray(parsed.tool_calls)) {
-      throw new Error("Missing or invalid tool_calls array");
-    }
-    if (typeof parsed.reasoning !== "string") {
-      throw new Error("Missing or invalid reasoning string");
-    }
-    if (typeof parsed.response !== "string") {
-      throw new Error("Missing or invalid response string");
-    }
-    if (
-      typeof parsed.confidence !== "number" ||
-      parsed.confidence < 0 ||
-      parsed.confidence > 1
-    ) {
-      throw new Error("Missing or invalid confidence number (must be 0-1)");
-    }
+		// Validate required fields
+		if (!parsed.tool_calls || !Array.isArray(parsed.tool_calls)) {
+			throw new Error("Missing or invalid tool_calls array");
+		}
+		if (typeof parsed.reasoning !== "string") {
+			throw new Error("Missing or invalid reasoning string");
+		}
+		if (typeof parsed.response !== "string") {
+			throw new Error("Missing or invalid response string");
+		}
+		if (
+			typeof parsed.confidence !== "number" ||
+			parsed.confidence < 0 ||
+			parsed.confidence > 1
+		) {
+			throw new Error("Missing or invalid confidence number (must be 0-1)");
+		}
 
-    // Validate tool calls
-    parsed.tool_calls.forEach((call: any, index: number) => {
-      if (!call.name || typeof call.name !== "string") {
-        throw new Error(`Invalid tool name in tool_calls[${index}]`);
-      }
-      if (!call.input || typeof call.input !== "object") {
-        throw new Error(`Invalid tool input in tool_calls[${index}]`);
-      }
-    });
+		// Validate tool calls
+		parsed.tool_calls.forEach((call: any, index: number) => {
+			if (!call.name || typeof call.name !== "string") {
+				throw new Error(`Invalid tool name in tool_calls[${index}]`);
+			}
+			if (!call.input || typeof call.input !== "object") {
+				throw new Error(`Invalid tool input in tool_calls[${index}]`);
+			}
+		});
 
-    // Validate alternatives if present
-    if (parsed.alternatives) {
-      if (!Array.isArray(parsed.alternatives)) {
-        throw new Error("Invalid alternatives array");
-      }
-      parsed.alternatives.forEach((alt: any, index: number) => {
-        if (!alt.action || typeof alt.action !== "string") {
-          throw new Error(`Invalid action in alternatives[${index}]`);
-        }
-        if (
-          !alt.reason_not_chosen ||
-          typeof alt.reason_not_chosen !== "string"
-        ) {
-          throw new Error(
-            `Invalid reason_not_chosen in alternatives[${index}]`
-          );
-        }
-      });
-    }
+		// Validate alternatives if present
+		if (parsed.alternatives) {
+			if (!Array.isArray(parsed.alternatives)) {
+				throw new Error("Invalid alternatives array");
+			}
+			parsed.alternatives.forEach((alt: any, index: number) => {
+				if (!alt.action || typeof alt.action !== "string") {
+					throw new Error(`Invalid action in alternatives[${index}]`);
+				}
+				if (
+					!alt.reason_not_chosen ||
+					typeof alt.reason_not_chosen !== "string"
+				) {
+					throw new Error(
+						`Invalid reason_not_chosen in alternatives[${index}]`,
+					);
+				}
+			});
+		}
 
-    return parsed;
-  } catch (error) {
-    throw new Error(`Failed to parse template response: ${error}`);
-  }
+		return parsed;
+	} catch (error) {
+		throw new Error(`Failed to parse template response: ${error}`);
+	}
 }
 
 // Function to compose context from template
 export function composeContext(
-  template: string,
-  values: Record<string, any>
+	template: string,
+	values: Record<string, any>,
 ): string {
-  return template.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
-    const trimmedKey = key.trim();
-    return values[trimmedKey] !== undefined ? values[trimmedKey] : "";
-  });
+	return template.replace(/\{\{([^}]+)\}\}/g, (match, key) => {
+		const trimmedKey = key.trim();
+		return values[trimmedKey] !== undefined ? values[trimmedKey] : "";
+	});
 }

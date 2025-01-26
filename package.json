@@ -1,7 +1,7 @@
 {
   "name": "middle-earth-agents-api",
   "version": "1.0.0",
-  "description": "API server for Middle Earth Agents",
+  "description": "Agents server for Middle Earth Agents",
   "main": "src/index.ts",
   "private": true,
   "scripts": {
@@ -13,14 +13,13 @@
     "lint:fix": "biome check src/ --fix",
     "format": "biome format src/",
     "test": "vitest run",
-    "prepare": "is-ci || husky",
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate": "prisma migrate deploy",
     "db:reset": "prisma migrate reset --force",
     "prestart": "npm run db:migrate",
     "predeploy": "npm run build && npm run db:migrate",
     "deploy": "npm run start",
-    "docker:build": "HUSKY=0 docker build -t middle-earth-agents-api .",
+    "docker:build": "docker build -t middle-earth-agents-api .",
     "docker:run": "docker run -p 3000:3000 --env-file .env middle-earth-agents-api"
   },
   "dependencies": {
@@ -51,20 +50,12 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/supertest": "^6.0.2",
-    "husky": "^9.0.11",
-    "is-ci": "^4.1.0",
-    "lint-staged": "^15.2.2",
     "supertest": "^7.0.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.2",
     "typescript": "^5.7.3",
     "vite-tsconfig-paths": "^5.0.0",
     "vitest": "^2.0.0"
-  },
-  "lint-staged": {
-    "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": [
-      "biome check --apply --no-errors-on-unmatched"
-    ]
   },
   "tsup": {
     "entry": [

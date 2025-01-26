@@ -1,19 +1,19 @@
-import { Solana } from "@/deps/solana";
-import { Twitter } from "@/deps/twitter";
-import { moveTool } from "./movement";
-import { battleTool } from "./battle";
+import type { Solana } from "@/deps/solana";
+import type { Twitter } from "@/deps/twitter";
 import { proposeAllianceTool } from "./alliance";
-import { tweetTool } from "./tweet";
-import { tokenomicsTool } from "./tokenomics";
+import { battleTool } from "./battle";
 import { ignoreTool } from "./ignore";
+import { moveTool } from "./movement";
+import { tokenomicsTool } from "./tokenomics";
+import { tweetTool } from "./tweet";
 
-import { CoreTool } from "ai";
+import type { CoreTool } from "ai";
 
 // Export a function to get all tools for an agent
 export const getAgentTools = async (
   agentId: string,
   solana: Solana,
-  twitter: Twitter
+  twitter: Twitter | null
 ): Promise<Record<string, CoreTool<any, any>>> => {
   const tools = {
     move: await moveTool(agentId, solana),

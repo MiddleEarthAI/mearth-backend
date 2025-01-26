@@ -1,7 +1,7 @@
-import { z } from "zod";
-import { tool } from "ai";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
+import { tool } from "ai";
+import { z } from "zod";
 
 interface TokenMetrics {
   totalSupply: number;
@@ -74,8 +74,8 @@ async function analyzeTokenDistribution(): Promise<TokenMetrics> {
     averageHolding: totalSupply / activeWallets.length,
     gini: calculateGiniCoefficient(balances),
     topHolders: sortedWallets.map((w) => ({
-      name: w.agent!.name,
-      twitterHandle: w.agent!.twitterHandle,
+      name: w.agent?.name ?? "",
+      twitterHandle: w.agent?.twitterHandle ?? "",
       balance: w.governanceTokens,
       percentage: (w.governanceTokens / totalSupply) * 100,
     })),

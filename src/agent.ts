@@ -1,12 +1,12 @@
-import { IAgent } from "./types";
-import { Solana } from "./deps/solana";
 import { prisma } from "@/config/prisma";
+import { Solana } from "./deps/solana";
+import type { IAgent } from "./types";
 
-import { AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
-import { generateText, Message } from "ai";
-import { logger } from "./utils/logger";
-import { Twitter } from "./deps/twitter";
+import { type AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
+import { type Message, generateText } from "ai";
 import { getAgentTools } from "./actions";
+import type { Twitter } from "./deps/twitter";
+import { logger } from "./utils/logger";
 
 export interface AgentConfig {
   username: string;
@@ -16,11 +16,10 @@ export interface AgentConfig {
 }
 
 export class Agent implements IAgent {
-  private anthropic: AnthropicProvider;
-  private solana: Solana;
-  private messages: Message[]; // store conversation history in memory
-  private twitter: Twitter | null = null;
-  private isRunning: boolean = false;
+  public anthropic: AnthropicProvider;
+  public solana: Solana;
+  public twitter: Twitter | null = null;
+  private isRunning = false;
 
   constructor(agentConfig: AgentConfig, readonly agentId: string) {
     logger.info("initializing agent...");
@@ -37,7 +36,6 @@ export class Agent implements IAgent {
     //   twitter2faSecret: agentConfig.twitter2faSecret,
     // });
 
-    this.messages = [];
     this.agentId = agentId;
     this.solana = new Solana();
   }
@@ -106,10 +104,10 @@ export class Agent implements IAgent {
         timestamp: currentTime.toISOString(),
       };
       const MIN_DELAY = process.env.MIN_ACTION_DELAY_MS
-        ? parseInt(process.env.MIN_ACTION_DELAY_MS)
+        ? Number.parseInt(process.env.MIN_ACTION_DELAY_MS)
         : 1 * 60 * 1000; // default to 1 minute
       const MAX_DELAY = process.env.MAX_ACTION_DELAY_MS
-        ? parseInt(process.env.MAX_ACTION_DELAY_MS)
+        ? Number.parseInt(process.env.MAX_ACTION_DELAY_MS)
         : 2 * 60 * 1000; // default to 2 minutes
 
       const LOOP_DELAY =
@@ -335,7 +333,7 @@ export class Agent implements IAgent {
         platform: "X_TWITTER",
       },
     });
-    const tools = await getAgentTools(this.agentId, this.solana, this.twitter!);
+    const tools = await getAgentTools(this.agentId, this.solana, this.twitter);
 
     try {
       const result = await generateText({
@@ -345,7 +343,6 @@ export class Agent implements IAgent {
         maxSteps: 5,
         toolChoice: "required",
       });
-      return result;
     } catch (error) {
       const errorMessage = `Error processing query: ${
         error instanceof Error ? error.message : String(error)
@@ -359,12 +356,7 @@ export class Agent implements IAgent {
           platform: "X_TWITTER",
         },
       });
-      return errorMessage;
     }
-  }
-
-  getConversationHistory(): Message[] {
-    return this.messages;
   }
 
   stop() {
