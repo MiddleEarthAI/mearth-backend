@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 import { logger } from "./utils/logger";
 import { config } from "./config";
 import { Agent, AgentConfig } from "./agent";
@@ -13,7 +12,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(helmet());
-app.use(morgan("combined"));
 app.use(express.json());
 
 // Routes

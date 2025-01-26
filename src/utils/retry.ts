@@ -1,4 +1,3 @@
-import pRetry from "p-retry";
 import { logger } from "./logger";
 
 /**
@@ -14,38 +13,40 @@ export async function retryWithExponentialBackoff<T>(
   minTimeout: number = 1000,
   maxTimeout: number = 10000
 ): Promise<T> {
-  return pRetry(
-    async (attempt) => {
-      try {
-        return await fn();
-      } catch (error) {
-        logger.warn(
-          `Attempt ${attempt} failed, retrying... Error: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`
-        );
-        throw error;
-      }
-    },
-    {
-      retries: maxRetries,
-      minTimeout,
-      maxTimeout,
-      factor: 2,
-      randomize: true,
-      onFailedAttempt: (error) => {
-        logger.error("Retry attempt failed:", {
-          attemptNumber: error.attemptNumber,
-          retriesLeft: error.retriesLeft,
-          error: error.message,
-        });
-      },
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+
+      if (attempt === maxRetries - 1) break;
+
+      const factor = Math.pow(2, attempt);
+      const delay = Math.min(
+        maxTimeout,
+        Math.max(minTimeout, minTimeout * factor * (0.5 + Math.random()))
+      );
+
+      logger.warn(
+        `Attempt ${attempt + 1} failed, retrying in ${delay}ms... Error: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
-  );
+  }
+
+  throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
 }
 
 /**
  * Retry with linear backoff
+ * @param fn Function to retry
+ * @param maxRetries Maximum number of retries (default: 3)
+ * @param delay Delay between retries in ms (default: 1000)
  */
 export async function retryWithLinearBackoff<T>(
   fn: () => Promise<T>,
@@ -62,7 +63,7 @@ export async function retryWithLinearBackoff<T>(
 
       if (attempt === maxRetries - 1) break;
 
-      console.warn(
+      logger.warn(
         `Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
         error
       );
@@ -76,6 +77,9 @@ export async function retryWithLinearBackoff<T>(
 
 /**
  * Retry with custom backoff strategy
+ * @param fn Function to retry
+ * @param maxRetries Maximum number of retries
+ * @param backoffStrategy Function that takes attempt number and returns delay in ms
  */
 export async function retryWithCustomBackoff<T>(
   fn: () => Promise<T>,
@@ -94,7 +98,7 @@ export async function retryWithCustomBackoff<T>(
 
       const delay = backoffStrategy(attempt);
 
-      console.warn(
+      logger.warn(
         `Attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
         error
       );

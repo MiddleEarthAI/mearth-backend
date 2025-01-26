@@ -371,3 +371,11 @@ export class Agent implements IAgent {
     this.isRunning = false;
   }
 }
+
+//  Build and run with Docker:
+// pnpm docker:build
+// pnpm docker:run
+
+// Or deploy directly:
+// pnpm predeploy
+// pnpm deploy
