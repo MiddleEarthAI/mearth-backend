@@ -78,7 +78,7 @@ async function validateIgnore(
   };
 }
 
-export const ignoreTool = function (agentId: string) {
+export const ignoreTool = async (agentId: string) => {
   return tool({
     description: `Strategic ignore tool for Middle Earth agents:
       - Temporarily ignore specific agents

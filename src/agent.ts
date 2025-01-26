@@ -1,15 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
-
 import { IAgent } from "./types";
 import { Solana } from "./deps/solana";
+import { prisma } from "@/config/prisma";
 
 import { AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, Message } from "ai";
 import { logger } from "./utils/logger";
 import { Twitter } from "./deps/twitter";
-import { Telegram } from "./deps/telegram";
-import { moveTool } from "./actions/movement";
-import { tweetTool } from "./actions/tweet";
+import { getAgentTools } from "./actions";
 
 export interface AgentConfig {
   username: string;
@@ -23,7 +20,6 @@ export class Agent implements IAgent {
   private solana: Solana;
   private messages: Message[]; // store conversation history in memory
   private twitter: Twitter | null = null;
-  private telegram: Telegram | null = null;
   private isRunning: boolean = false;
 
   constructor(agentConfig: AgentConfig, readonly agentId: string) {
@@ -40,14 +36,6 @@ export class Agent implements IAgent {
     //   email: agentConfig.email,
     //   twitter2faSecret: agentConfig.twitter2faSecret,
     // });
-
-    this.telegram = new Telegram(this.anthropic, {
-      agentId,
-      botToken: process.env.TELEGRAM_BOT_TOKEN!,
-      targetGroups: ["@middleearthai"],
-      pollInterval: 120,
-      dryRun: true,
-    });
 
     this.messages = [];
     this.agentId = agentId;
@@ -104,9 +92,9 @@ export class Agent implements IAgent {
     if (!currentAgent) {
       throw new Error("Current agent not found");
     }
+    let count = 0;
 
     const actionLoop = async () => {
-      let count = 0;
       logger.info(`action loop ran ${++count} times ✅`);
 
       const currentTime = new Date();
@@ -119,10 +107,10 @@ export class Agent implements IAgent {
       };
       const MIN_DELAY = process.env.MIN_ACTION_DELAY_MS
         ? parseInt(process.env.MIN_ACTION_DELAY_MS)
-        : 2 * 60 * 1000; // default to 2 minutes
+        : 1 * 60 * 1000; // default to 1 minute
       const MAX_DELAY = process.env.MAX_ACTION_DELAY_MS
         ? parseInt(process.env.MAX_ACTION_DELAY_MS)
-        : 10 * 60 * 1000; // default to 10 minutes
+        : 2 * 60 * 1000; // default to 2 minutes
 
       const LOOP_DELAY =
         Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
@@ -307,23 +295,7 @@ export class Agent implements IAgent {
          - Strategic retreats vs aggressive positioning
          - Territory control considerations
 
-      #Action Instructions
-      As ${currentAgent.name}, consider your options:
-
-      1. MOVE (Tactical Positioning):
-         - Analyze terrain risks vs rewards
-         - Consider distance to allies/enemies
-         - Account for token-based battle odds
-         - Plan escape routes if needed
-         - Factor in terrain movement penalties
-
-      2. TWEET (Strategic Communication):
-         - Form/maintain alliances
-         - Intimidate or deceive enemies
-         - Share or request information
-         - Signal intentions or bluff
-         - React to recent events
-
+      
       Your decision should reflect:
       - Character personality (traits and history)
       - Current strategic position
@@ -354,35 +326,38 @@ export class Agent implements IAgent {
   }
 
   async processQuery(query: string) {
-    // Add user input to conversation history
-    this.messages.push({
-      role: "user",
-      content: query,
-      id: uuidv4(),
-      createdAt: new Date(),
+    await prisma.message.create({
+      data: {
+        content: query,
+        senderId: this.agentId,
+        senderType: "SYSTEM",
+        contentType: "TEXT",
+        platform: "X_TWITTER",
+      },
     });
+    const tools = await getAgentTools(this.agentId, this.solana, this.twitter!);
 
     try {
-      await generateText({
+      const result = await generateText({
         model: this.anthropic("claude-3-5-sonnet-20240620"),
         prompt: query,
-        tools: {
-          move: await moveTool(this.agentId, this.solana),
-          tweet: await tweetTool(this.agentId, this.twitter),
-        },
+        tools,
         maxSteps: 5,
         toolChoice: "required",
-        // messages: this.messages,
       });
+      return result;
     } catch (error) {
       const errorMessage = `Error processing query: ${
         error instanceof Error ? error.message : String(error)
       }`;
-      this.messages.push({
-        role: "assistant",
-        content: errorMessage,
-        id: uuidv4(),
-        createdAt: new Date(),
+      await prisma.message.create({
+        data: {
+          content: errorMessage,
+          senderId: this.agentId,
+          senderType: "SYSTEM",
+          contentType: "TEXT",
+          platform: "X_TWITTER",
+        },
       });
       return errorMessage;
     }

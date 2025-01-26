@@ -10,6 +10,7 @@ import {
   DEATH_CHANCE,
 } from "@/constants";
 import { calculateDistance } from "./utils";
+import { Solana } from "@/deps/solana";
 
 interface BattleValidationResult {
   success: boolean;
@@ -135,7 +136,7 @@ function calculateBattleOutcome(
   };
 }
 
-export const battleTool = function (agentId: string) {
+export const battleTool = async function (agentId: string, solana: Solana) {
   return tool({
     description: `Strategic battle tool for Middle Earth agents:
       - Challenge other agents to battle

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 
-export const proposeAllianceTool = function (agentId: string) {
+export const proposeAllianceTool = async (agentId: string) => {
   return tool({
     description: `Form strategic alliance with nearby agent:
       - Combined token pools for battles

@@ -106,6 +106,8 @@ model Alliance {
     status          AllianceStatus
 }
 
+// ------------------------------------------ Twitter
+
 model Tweet {
     id                  String           @id @default(uuid())
     tweetId             BigInt
@@ -141,6 +143,80 @@ model TweetFeedback {
     confidence      Float
     reasoning       String
     sentiment       String
+}
+
+// ----------------------------------------- Message
+
+model Message {
+    id String @id @default(uuid())
+
+    // Platform-agnostic identifiers
+    externalId String?         @unique // Original message ID from source platform
+    platform   MessagePlatform
+
+    // Sender and Recipient Information
+    senderId     String // Could be an Agent ID or external user ID
+    senderType   SenderType // Agent, Human, System
+    senderHandle String? // Twitter/Telegram handle
+
+    recipientId   String? // Optional, for direct messages
+    recipientType RecipientType? // Agent, Human, Group
+
+    // Message Content
+    content     String
+    contentType MessageContentType
+
+    // Metadata
+    sentAt DateTime  @default(now())
+    readAt DateTime?
+
+    // Optional Context Fields
+    threadId  String? // For tracking conversation threads
+    replyToId String? // Reference to parent message
+
+    // Optional Game-Specific Context
+    relatedEntityId String? // Could link to Tweet, Battle, Alliance etc.
+
+    // Tracking and Processing
+    processed   Boolean @default(false)
+    actionTaken Boolean @default(false)
+
+    @@index([platform, externalId])
+    @@index([senderId, platform])
+}
+
+// Platform Enums
+enum MessagePlatform {
+    X_TWITTER
+    TELEGRAM
+    DISCORD
+    INTERNAL_GAME
+    EMAIL
+    SMS
+}
+
+// Content Type Helps in Processing
+enum MessageContentType {
+    TEXT
+    MEDIA
+    COMMAND
+    GAME_ACTION
+    SYSTEM_NOTIFICATION
+}
+
+// Sender Classification
+enum SenderType {
+    AGENT
+    HUMAN
+    SYSTEM
+}
+
+// Recipient Classification
+enum RecipientType {
+    AGENT
+    HUMAN
+    GROUP
+    BROADCAST
 }
 
 model Transaction {

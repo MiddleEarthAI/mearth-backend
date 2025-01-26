@@ -6,6 +6,8 @@ import { logger } from "./utils/logger";
 import { config } from "./config";
 import { Agent, AgentConfig } from "./agent";
 import { prisma } from "./config/prisma";
+import { gameRoutes } from "./routes/game.routes";
+
 const app = express();
 
 // Middleware
@@ -13,6 +15,45 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("combined"));
 app.use(express.json());
+
+// Routes
+app.use("/game", gameRoutes);
+
+// Health check endpoint for deployment
+app.get("/health", async (req, res) => {
+  try {
+    // Check database connection
+    await prisma.$queryRaw`SELECT 1`;
+
+    // Get system status
+    const [agentsCount, activeAgents] = await Promise.all([
+      prisma.agent.count(),
+      prisma.agent.count({ where: { status: "ACTIVE" } }),
+    ]);
+
+    res.status(200).json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      database: "connected",
+      agents: {
+        total: agentsCount,
+        active: activeAgents,
+      },
+      version: process.env.npm_package_version || "1.0.0",
+    });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "System health check failed";
+    logger.error("Health check failed:", error);
+    res.status(503).json({
+      status: "unhealthy",
+      error: errorMessage,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
 
 // Error handling middleware
 app.use(
@@ -34,7 +75,6 @@ function createAgent(agentId: string, agentConfig: AgentConfig) {
 const startAgents = async () => {
   const agents = await prisma.agent.findMany();
   if (!agents) {
-    console.log("agent is runing");
     logger.error("No agents found");
     throw new Error("No agents found");
   }
@@ -48,6 +88,7 @@ const startAgents = async () => {
       const email = process.env[`${agent.characterType.toUpperCase()}_EMAIL`]!;
       const twitter2faSecret =
         process.env[`${agent.characterType.toUpperCase()}_TWITTER_2FA_SECRET`]!;
+
       const agentConfig: AgentConfig = {
         username,
         password,
@@ -56,15 +97,14 @@ const startAgents = async () => {
       };
 
       if (!agentConfig.password || !agentConfig.username) {
-        logger.error(
-          `Agent ${agent.characterType} password or username is not set`
-        );
+        logger.error(`Agent ${agent.characterType} credentials not configured`);
         throw new Error(
-          `Agent ${agent.characterType} password or username is not set`
+          `Agent ${agent.characterType} credentials not configured`
         );
       }
+
       const agentRuntime = createAgent(agent.id, agentConfig);
-      agentRuntime.start();
+      await agentRuntime.start();
       return agentRuntime;
     })
   );
@@ -72,20 +112,32 @@ const startAgents = async () => {
   return agentRuntimes;
 };
 
-let agentRuntimesOutside: Agent[] = [];
+let agentRuntimes: Agent[] = [];
 
 // Graceful shutdown
 async function shutdown() {
-  agentRuntimesOutside.forEach((agent) => {
-    agent.stop();
-  });
-  logger.info("Shutting down gracefully...");
-  try {
-    process.exit(0);
-  } catch (error) {
-    logger.error("Error during shutdown:", error);
-    process.exit(1);
+  logger.info("Initiating graceful shutdown...");
+
+  // Stop all agents
+  for (const agent of agentRuntimes) {
+    try {
+      agent.stop();
+      logger.info(`Stopped agent ${agent.agentId}`);
+    } catch (error) {
+      logger.error(`Error stopping agent ${agent.agentId}:`, error);
+    }
   }
+
+  // Close database connection
+  try {
+    await prisma.$disconnect();
+    logger.info("Database connection closed");
+  } catch (error) {
+    logger.error("Error closing database connection:", error);
+  }
+
+  logger.info("Shutdown complete");
+  process.exit(0);
 }
 
 process.on("SIGTERM", shutdown);
@@ -94,8 +146,9 @@ process.on("SIGINT", shutdown);
 // Start server
 async function startServer() {
   try {
-    const agentRuntimes = await startAgents();
-    agentRuntimesOutside = agentRuntimes;
+    const runtimes = await startAgents();
+    agentRuntimes = runtimes;
+
     app.listen(config.app.port, () => {
       logger.info(
         `⚡️[server]: Server is running at http://localhost:${config.app.port}`
@@ -106,27 +159,5 @@ async function startServer() {
     process.exit(1);
   }
 }
-
-app.get("/health", async (req, res) => {
-  try {
-    // Check database connection
-    await prisma.$queryRaw`SELECT 1`;
-
-    res.status(200).json({
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      environment: process.env.NODE_ENV,
-    });
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Database connection failed";
-    res.status(500).json({
-      status: "unhealthy",
-      error: errorMessage,
-      timestamp: new Date().toISOString(),
-    });
-  }
-});
 
 startServer();

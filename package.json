@@ -14,7 +14,14 @@
     "format": "biome format src/",
     "test": "vitest run",
     "prepare": "husky",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:migrate": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset --force",
+    "prestart": "npm run db:migrate",
+    "predeploy": "npm run build && npm run db:migrate",
+    "deploy": "npm run start",
+    "docker:build": "docker build -t middle-earth-agents-api .",
+    "docker:run": "docker run -p 3000:3000 middle-earth-agents-api"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.1.2",

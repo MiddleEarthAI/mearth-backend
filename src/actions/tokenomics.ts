@@ -81,7 +81,6 @@ async function analyzeTokenDistribution(): Promise<TokenMetrics> {
     })),
   };
 }
-
 /**
  * Analyzes staking metrics and rewards
  */
@@ -122,7 +121,7 @@ async function analyzeStakingMetrics(): Promise<StakingMetrics> {
   };
 }
 
-export const tokenomicsTool = function (agentId: string) {
+export const tokenomicsTool = async (agentId: string) => {
   return tool({
     description: `Advanced tokenomics analysis tool:
       - Token distribution metrics
