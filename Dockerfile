@@ -30,4 +30,4 @@ RUN pnpm run build
 EXPOSE 3000
 
 # Start the app
-CMD pnpm run db:migrate && pnpm run start
+CMD pnpm run db:migrate && pnpm run db:seed && pnpm run start

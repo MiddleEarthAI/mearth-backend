@@ -5,7 +5,7 @@ import type { IAgent } from "./types";
 import { type AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
 import { type Message, generateText } from "ai";
 import { getAgentTools } from "./actions";
-import type { Twitter } from "./deps/twitter";
+import { Twitter } from "./deps/twitter";
 import { logger } from "./utils/logger";
 
 export interface AgentConfig {
@@ -28,13 +28,13 @@ export class Agent implements IAgent {
     this.anthropic = createAnthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
-    // this.twitter = new Twitter(this.anthropic, {
-    //   agentId,
-    //   username: agentConfig.username,
-    //   password: agentConfig.password,
-    //   email: agentConfig.email,
-    //   twitter2faSecret: agentConfig.twitter2faSecret,
-    // });
+    this.twitter = new Twitter(this.anthropic, {
+      agentId,
+      username: agentConfig.username,
+      password: agentConfig.password,
+      email: agentConfig.email,
+      twitter2faSecret: agentConfig.twitter2faSecret,
+    });
 
     this.agentId = agentId;
     this.solana = new Solana();
@@ -105,10 +105,10 @@ export class Agent implements IAgent {
       };
       const MIN_DELAY = process.env.MIN_ACTION_DELAY_MS
         ? Number.parseInt(process.env.MIN_ACTION_DELAY_MS)
-        : 1 * 60 * 1000; // default to 1 minute
+        : 30 * 60 * 1000; // default to 30 minutes
       const MAX_DELAY = process.env.MAX_ACTION_DELAY_MS
         ? Number.parseInt(process.env.MAX_ACTION_DELAY_MS)
-        : 2 * 60 * 1000; // default to 2 minutes
+        : 70 * 60 * 1000; // default to 70 minutes
 
       const LOOP_DELAY =
         Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
