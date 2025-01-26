@@ -1,6 +1,6 @@
 import { AllianceStatus } from "@prisma/client";
 import { BATTLE_RANGE } from "@/constants";
-import { calculateDistance } from "./movement";
+import { calculateDistance } from "./utils";
 import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";

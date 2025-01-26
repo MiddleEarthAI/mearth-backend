@@ -199,8 +199,8 @@ export const tweetTool = function (agentId: string, twitter: Twitter | null) {
           data: {
             agentId,
             content: tweet,
-            tweetId: twitterResponse?.id || BigInt(Date.now()),
-            authorFollowerCount: twitterResponse?.author_followers || 0,
+            tweetId: twitterResponse!?.id || BigInt(Date.now()),
+            authorFollowerCount: twitterResponse!?.author_followers || 0,
           },
         });
 

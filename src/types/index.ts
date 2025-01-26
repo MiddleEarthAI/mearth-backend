@@ -60,3 +60,30 @@ export interface ISolana {
   processBreakAlliance(agentId1: string, agentId2: string): Promise<string>;
   processIgnoreAgent(agentId: string, targetAgentId: string): Promise<string>;
 }
+
+export interface ITelegram {
+  init(): Promise<void>;
+  sendMessage(chatId: string, text: string): Promise<void>;
+  replyToMessage(
+    chatId: string,
+    messageId: string,
+    text: string
+  ): Promise<void>;
+  getCommunityFeedback(): Promise<
+    {
+      suggestedAction: "move" | "battle" | "alliance" | "ignore";
+      targetAgent?: string;
+      coordinates?: { x: number; y: number };
+      confidence: number;
+      influence: {
+        memberCount: number;
+        messageViews: number;
+        reactions: number;
+        replies: number;
+        influencerImpact: number;
+        sentiment: "positive" | "negative" | "neutral";
+      };
+      reasoning?: string;
+    }[]
+  >;
+}

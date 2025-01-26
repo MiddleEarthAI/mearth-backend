@@ -9,7 +9,7 @@ import {
   TOKEN_BURN_MAX,
   DEATH_CHANCE,
 } from "@/constants";
-import { calculateDistance } from "../utils/movement";
+import { calculateDistance } from "./utils";
 
 interface BattleValidationResult {
   success: boolean;
@@ -144,9 +144,11 @@ export const battleTool = function (agentId: string) {
       - Execute battle outcomes
       Battles are based on token ratios and proximity.`,
     parameters: z.object({
-      targetAgentId: z.string().describe("ID of the agent to battle"),
+      twitterHandle: z
+        .string()
+        .describe("Twitter handle of the agent to battle"),
     }),
-    execute: async ({ targetAgentId }) => {
+    execute: async ({ twitterHandle }) => {
       try {
         // Get attacker data
         const attacker = await prisma.agent.findUnique({
@@ -163,7 +165,7 @@ export const battleTool = function (agentId: string) {
 
         // Get defender data
         const defender = await prisma.agent.findUnique({
-          where: { id: targetAgentId },
+          where: { twitterHandle },
           include: {
             wallet: true,
             currentLocation: true,
