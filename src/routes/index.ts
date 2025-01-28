@@ -1,18 +1,18 @@
 import { Router } from "express";
-import { gameRoutes } from "./game.routes";
+import agentRoutes from "./agent";
+import gameRoutes from "./game";
+import tokenRoutes from "./token";
 
 const router = Router();
 
 // Health check endpoint
-router.get("/health", (req, res) => {
-	res.status(200).json({
-		status: "success",
-		message: "Server is healthy",
-		timestamp: new Date().toISOString(),
-	});
+router.get("/health", (_, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Game routes
+// Mount routes
 router.use("/game", gameRoutes);
+router.use("/agent", agentRoutes);
+router.use("/token", tokenRoutes);
 
-export { router as routes };
+export default router;

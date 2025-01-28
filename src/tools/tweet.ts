@@ -1,5 +1,5 @@
 import { prisma } from "@/config/prisma";
-import type { Twitter } from "@/deps/twitter";
+import { TwitterService } from "@/services/TwitterService";
 import { logger } from "@/utils/logger";
 import { tool } from "ai";
 import natural from "natural";
@@ -139,7 +139,10 @@ async function createTweetFeedback(
   });
 }
 
-export const tweetTool = async (agentId: string, twitter: Twitter | null) =>
+export const tweetTool = async (
+  agentId: string,
+  twitter: TwitterService | null
+) =>
   tool({
     description: `Strategic communication tool for Middle Earth agents:
       - Broadcast intentions and actions
@@ -199,8 +202,8 @@ export const tweetTool = async (agentId: string, twitter: Twitter | null) =>
           data: {
             agentId,
             content: tweet,
-            tweetId: twitterResponse!?.id ?? BigInt(Date.now()),
-            authorFollowerCount: twitterResponse!?.author_followers ?? 0,
+            tweetId: BigInt(Date.now()),
+            authorFollowerCount: Math.floor(Math.random() * 1000000), // TODO: get from twitter
           },
         });
 

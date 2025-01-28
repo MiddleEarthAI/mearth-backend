@@ -7,32 +7,60 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model Agent {
-    id             String        @id @default(uuid())
-    name           String        @unique
-    twitterHandle  String        @unique
-    lastActionTime DateTime?
-    characterType  CharacterType
-    bio            String[]
-    lore           String[]
-    knowledge      String[]
-    wallet         Wallet        @relation(fields: [walletId], references: [id])
-    walletId       String        @unique
-    keypair        Keypair?
+model Game {
+    id                 String        @id @default(uuid())
+    onchainId          Int           @unique
+    programId          String
+    programAccountId   String
+    isActive           Boolean       @default(true)
+    createdAt          DateTime      @default(now())
+    updatedAt          DateTime      @updatedAt
+    agents             Agent[]       @relation("GameAgents")
+    alliances          Alliance[]    @relation("GameAlliances")
+    mapDiameter        Int
+    terrainType        TerrainType
+    tokenMint          String
+    rewardsVault       String
+    totalStakeAccounts StakerStake[]
+    bump               BigInt
+}
 
-    currentLocation Location     @relation(fields: [locationId], references: [id])
+model Agent {
+    id              String        @id @default(uuid())
+    name            String        @unique
+    twitterHandle   String        @unique
+    lastActionTime  DateTime?
+    characterType   CharacterType
+    bio             String[]
+    lore            String[]
+    knowledge       String[]
+    wallet          Wallet        @relation(fields: [walletId], references: [id])
+    walletId        String        @unique
+    keypair         Keypair?
+    game            Game          @relation("GameAgents", fields: [gameId], references: [id])
+    gameId          String // Required - agent must belong to a game
+    currentLocation Location      @relation(fields: [locationId], references: [id])
     locationId      String
     movementHistory Movement[]
     alliances       Alliance[]
     tweets          Tweet[]
     traits          AgentTrait[]
-    status          AgentStatus  @default(ACTIVE)
-    createdAt       DateTime     @default(now())
-    updatedAt       DateTime     @updatedAt
+    status          AgentStatus   @default(ACTIVE)
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
 
-    AttackerBattles Battle[] @relation("AttackerBattles")
-    DefenderBattles Battle[] @relation("DefenderBattles")
-    Battle          Battle[]
+    // Battle relations
+    attackerBattles Battle[] @relation("AttackerBattles")
+    defenderBattles Battle[] @relation("DefenderBattles")
+    otherBattles    Battle[] @relation("OtherBattles")
+}
+
+model StakerStake {
+    id         String @id @default(uuid())
+    agentId    String
+    totalStake BigInt
+    game       Game   @relation(fields: [gameId], references: [id])
+    gameId     String
 }
 
 model Keypair {
@@ -94,7 +122,7 @@ model Battle {
     attackerWon          Boolean
     deathOccurred        Boolean
     timestamp            DateTime @default(now())
-    Agent                Agent?   @relation(fields: [agentId], references: [id])
+    agent                Agent?   @relation("OtherBattles", fields: [agentId], references: [id])
     agentId              String?
 }
 
@@ -104,6 +132,8 @@ model Alliance {
     formedAt        DateTime       @default(now())
     dissolutionTime DateTime?
     status          AllianceStatus
+    game            Game?          @relation("GameAlliances", fields: [gameId], references: [id])
+    gameId          String?
 }
 
 // ------------------------------------------ Twitter

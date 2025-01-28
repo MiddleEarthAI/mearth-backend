@@ -177,8 +177,8 @@ export class Twitter extends EventEmitter implements ITwitter {
       throw new Error("Failed to load profile");
     }
 
-    // await this.initializeLastCheckedTweet();
-    // await this.startMonitoring();
+    await this.initializeLastCheckedTweet();
+    await this.startMonitoring();
   }
 
   /**
@@ -457,8 +457,8 @@ export class Twitter extends EventEmitter implements ITwitter {
     Return the analysis in this JSON format:
     {
       "suggestedAction": "move|battle|alliance|ignore",
-      "targetAgent": "@username or null",
-      "coordinates": {"x": number, "y": number} or null,
+      "targetAgent": "@username" | null,
+      "coordinates": {"x": number, "y": number} | null,
       "confidence": number,
       "reasoning": "brief explanation"
     }
@@ -473,7 +473,7 @@ export class Twitter extends EventEmitter implements ITwitter {
       const analysis = JSON.parse(result.toString());
       return {
         suggestedAction: analysis.suggestedAction || "move",
-        targetAgent: analysis.targetAgent?.replace("@", "") || null,
+        targetAgent: analysis.targetAgent || null,
         coordinates: analysis.coordinates || null,
         confidence: analysis.confidence || 0.5,
         reasoning: analysis.reasoning || "",
@@ -625,7 +625,7 @@ export class Twitter extends EventEmitter implements ITwitter {
         nicknames: [],
       } satisfies TwitterProfile;
 
-      await this.cache.set(username, twitterProfile);
+      this.cache.set(username, twitterProfile);
       return twitterProfile;
     } catch (error) {
       logger.error("Error fetching Twitter profile:", error);

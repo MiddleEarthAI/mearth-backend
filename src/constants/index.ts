@@ -1,4 +1,4 @@
-import { TerrainType } from "@/types";
+import { TerrainType } from "@/types/program";
 
 export const BATTLE_RANGE = 2;
 export const TOKEN_BURN_MIN = 31;
@@ -7,7 +7,7 @@ export const DEATH_CHANCE = 0.05;
 export const BATTLE_COOLDOWN = 14400; // 4 hours in seconds
 
 export const river = {
-	type: TerrainType.RIVER,
+	type: TerrainType.Rivers,
 	coordinates: new Set([
 		"27,7",
 		"27,8",
@@ -115,7 +115,7 @@ export const river = {
 };
 
 export const mountains = {
-	type: TerrainType.MOUNTAIN,
+	type: TerrainType.Mountains,
 	coordinates: new Set([
 		"6,12",
 		"6,13",
@@ -197,7 +197,7 @@ export const mountains = {
 };
 
 export const plains = {
-	type: TerrainType.PLAIN,
+	type: TerrainType.Plains,
 	coordinates: new Set([
 		"15,21",
 		"26,21",
