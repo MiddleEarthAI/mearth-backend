@@ -1,8 +1,18 @@
 import { Router } from "express";
+import { Connection, Keypair } from "@solana/web3.js";
 
-import { getGameService, getGameStateService } from "@/services";
+import * as anchor from "@coral-xyz/anchor";
+import {
+  getGameService,
+  getGameStateService,
+  initializeServices,
+} from "@/services";
 
 import { logger } from "@/utils/logger";
+import { GameAccount } from "@/types/program";
+import { AgentManager } from "@/agent/AgentManager";
+import { getProgram } from "@/utils";
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 const router = Router();
 
@@ -50,7 +60,7 @@ router.post("/init", async (req, res) => {
 /**
  * Get game state
  */
-router.get("/state/:gameId", async (req, res) => {
+router.get("/:gameId", async (req, res) => {
   try {
     const { gameId } = req.params;
     if (!gameId) {

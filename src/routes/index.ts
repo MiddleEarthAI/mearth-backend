@@ -7,7 +7,7 @@ const router = Router();
 
 // Health check endpoint
 router.get("/health", (_, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+	res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // Mount routes

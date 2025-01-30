@@ -1,7 +1,4 @@
-import { BN, Program } from "@coral-xyz/anchor";
-import { type Connection, PublicKey, SystemProgram } from "@solana/web3.js";
-
-import type { MearthProgram } from "@/types";
+import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import {
   type AgentAccount,
   type GameAccount,
@@ -9,7 +6,9 @@ import {
 } from "@/types/program";
 import { logger } from "@/utils/logger";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
+import { BN, type Program } from "@coral-xyz/anchor";
+import { type Connection, PublicKey, SystemProgram } from "@solana/web3.js";
+import { getTerrain } from ".";
 
 type InitializeGameResult = {
   tx: string;
@@ -150,13 +149,21 @@ export class GameService {
     agentId: number,
     newX: number,
     newY: number,
-    terrain: TerrainType
+    terrain: TerrainType | null
   ): Promise<string> {
     logger.info(`🚶 Agent ${agentId} traveling to (${newX},${newY})`);
 
     try {
       const [gamePDA] = getGamePDA(this.program.programId, gameId);
       const [agentPDA] = getAgentPDA(this.program.programId, gamePDA, agentId);
+
+      if (!terrain) {
+        terrain = getTerrain(newX, newY);
+        if (!terrain) {
+          throw new Error("Terrain not found");
+        }
+      }
+
       const terrainTypeKey =
         terrain === TerrainType.Rivers
           ? "river"
@@ -397,13 +404,65 @@ export class GameService {
     }
   }
 
+  // /**
+  //  * Claim staking rewards for an agent
+  //  * @param agentId Agent identifier
+  //  */
+  // async claimStakingRewards(agentId: number): Promise<string> {
+  //   logger.info(`💎 Claiming staking rewards for agent ${agentId}`);
+
+  //   try {
+  //     const [agentPDA] = PublicKey.findProgramAddressSync(
+  //       [Buffer.from("agent"), new BN(agentId)],
+  //       this.program.programId
+  //     );
+
+  //     const tx = await this.program.methods
+  //       .claimStakingRewards()
+  //       .accounts({
+  //         agent: agentPDA,
+  //       })
+  //       .rpc();
+
+  //     logger.info(`🎁 Successfully claimed rewards for agent ${agentId}`);
+  //     return tx;
+  //   } catch (error) {
+  //     logger.error(`❌ Reward claim failed for agent ${agentId}:`, error);
+  //     throw error;
+  //   }
+  // }
+
   /**
-   * Ignore an agent to prevent interactions
-   * @param agentId Agent identifier
-   * @param targetAgentId Target agent to ignore
+   * End the game
+   * @param gameId Game identifier
    */
-  async ignoreAgent(agentId: number, targetAgentId: number): Promise<string> {
-    logger.info(`🙈 Agent ${agentId} ignoring Agent ${targetAgentId}`);
+  async endGame(gameId: number): Promise<string> {
+    logger.info(`🏁 Ending game ${gameId}`);
+
+    try {
+      const [gamePDA] = getGamePDA(this.program.programId, gameId);
+
+      const tx = await this.program.methods
+        .endGame()
+        .accounts({
+          game: gamePDA,
+        })
+        .rpc();
+
+      logger.info(`🎬 Game ${gameId} has ended`);
+      return tx;
+    } catch (error) {
+      logger.error(`❌ Failed to end game ${gameId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Kill an agent
+   * @param agentId Agent identifier
+   */
+  async killAgent(agentId: number): Promise<string> {
+    logger.info(`💀 Removing agent ${agentId} from the game`);
 
     try {
       const [agentPDA] = PublicKey.findProgramAddressSync(
@@ -411,29 +470,80 @@ export class GameService {
         this.program.programId
       );
 
-      const [gamePDA] = PublicKey.findProgramAddressSync(
-        [Buffer.from("game")],
-        this.program.programId
-      );
-
-      const [agentAuthority] = PublicKey.findProgramAddressSync(
-        [Buffer.from("agent_authority"), agentPDA.toBuffer()],
-        this.program.programId
-      );
-
       const tx = await this.program.methods
-        .ignoreAgent(targetAgentId)
+        .killAgent()
         .accounts({
           agent: agentPDA,
         })
         .rpc();
 
-      logger.info(
-        `🚫 Agent ${agentId} has blocked interactions with Agent ${targetAgentId}`
-      );
+      logger.info(`☠️ Agent ${agentId} has been removed from the game`);
       return tx;
     } catch (error) {
-      logger.error(`❌ Ignore action failed for agent ${agentId}:`, error);
+      logger.error(`❌ Failed to remove agent ${agentId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Set agent cooldown
+   * @param agentId Agent identifier
+   * @param newCooldown New cooldown timestamp
+   */
+  async setAgentCooldown(
+    agentId: number,
+    newCooldown: number
+  ): Promise<string> {
+    logger.info(`⏳ Setting cooldown for agent ${agentId}`);
+
+    try {
+      const [agentPDA] = PublicKey.findProgramAddressSync(
+        [Buffer.from("agent"), new BN(agentId)],
+        this.program.programId
+      );
+
+      const tx = await this.program.methods
+        .setAgentCooldown(new BN(newCooldown))
+        .accounts({
+          agent: agentPDA,
+          authority: this.program.provider?.publicKey,
+        })
+        .rpc();
+
+      logger.info(`⌛ Cooldown set for agent ${agentId}`);
+      return tx;
+    } catch (error) {
+      logger.error(`❌ Failed to set cooldown for agent ${agentId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update daily rewards
+   * @param gameId Game identifier
+   * @param newDailyReward New daily reward amount
+   */
+  async updateDailyRewards(
+    gameId: number,
+    newDailyReward: number
+  ): Promise<string> {
+    logger.info(`📈 Updating daily rewards to ${newDailyReward}`);
+
+    try {
+      const [gamePDA] = getGamePDA(this.program.programId, gameId);
+
+      const tx = await this.program.methods
+        .updateDailyRewards(new BN(newDailyReward))
+        .accounts({
+          game: gamePDA,
+          authority: this.program.provider?.publicKey,
+        })
+        .rpc();
+
+      logger.info(`💰 Daily rewards updated to ${newDailyReward}`);
+      return tx;
+    } catch (error) {
+      logger.error(`❌ Failed to update daily rewards:`, error);
       throw error;
     }
   }

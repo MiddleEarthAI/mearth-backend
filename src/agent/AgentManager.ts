@@ -1,11 +1,7 @@
 import { logger } from "@/utils/logger";
-import { Agent, type AgentConfig } from "../Agent";
-import { getGameService, getGameStateService, getTokenService } from ".";
-import { GameStateService } from "./GameStateService";
-
-import { GameService } from "./GameService";
-import { TokenService } from "./TokenService";
-import { getAgentConfigById } from "@/utils";
+import { getGameStateService } from "../services";
+import type { GameStateService } from "../services/GameStateService";
+import { Agent } from "./Agent";
 import { GameAccount } from "@/types/program";
 
 /**
@@ -16,13 +12,9 @@ export class AgentManager {
   private static instance: AgentManager;
   private activeAgents: Map<number, Agent> = new Map();
   private gameStateService: GameStateService;
-  private gameService: GameService;
-  private tokenService: TokenService;
 
   private constructor() {
     this.gameStateService = getGameStateService();
-    this.gameService = getGameService();
-    this.tokenService = getTokenService();
   }
 
   /**
@@ -38,17 +30,13 @@ export class AgentManager {
   /**
    * Initialize the agent manager and start all registered agents
    */
-  public async initialize(gameId: number): Promise<void> {
+  public async initializeAndStartAgents(
+    gameAccount: GameAccount
+  ): Promise<void> {
     try {
       logger.info("Initializing AgentManager...");
 
-      // Get game state from blockchain
-      const gameAccount = await this.gameStateService.getGameState(gameId);
       logger.info(JSON.stringify(gameAccount, null, 2));
-
-      if (!gameAccount) {
-        throw new Error("Game account not found");
-      }
 
       const agents = await Promise.all(
         gameAccount.agents.map(async (agent) => {
@@ -61,25 +49,20 @@ export class AgentManager {
 
       // Log number of agents found
       logger.info(
-        `Found ${gameAccount.agents.length} agents in game ${gameId}`
+        `Found ${gameAccount.agents.length} agents in game ${gameAccount.gameId}`
       );
 
+      const aliveAgents = agents.filter((agent) => agent?.isAlive);
+
       // Start each agent
-      for (const agent of agents) {
-        const configPrefix = agent?.id;
-
-        const config = getAgentConfigById(configPrefix);
-
+      for (const agent of aliveAgents) {
         if (agent?.id) {
-          await this.startAgent(gameId, agent.id, config);
+          await this.createAndStart(gameAccount.gameId.toNumber(), agent.id);
           logger.info(
             `Started agent ${agent.id} at position (${agent.x}, ${agent.y})`
           );
-        } else {
-          logger.warn(`Agent ${agent?.id} is not alive, skipping`);
         }
       }
-
       logger.info("AgentManager initialized successfully");
     } catch (error) {
       logger.error("Failed to initialize AgentManager:", error);
@@ -90,17 +73,14 @@ export class AgentManager {
   /**
    * Start a new agent
    */
-  public async startAgent(
-    gameId: number,
-    agentId: number,
-    config: AgentConfig
-  ): Promise<void> {
+  public async createAndStart(gameId: number, agentId: number): Promise<void> {
     if (this.activeAgents.has(agentId)) {
       logger.warn(`Agent ${agentId} is already active`);
       return;
     }
 
     const agent = await this.gameStateService.getAgent(agentId, gameId);
+
     if (!agent) {
       throw new Error(`Agent ${agentId} not found`);
     }
@@ -110,17 +90,10 @@ export class AgentManager {
       return;
     }
 
-    const agentService = new Agent(
-      gameId,
-      agentId,
-      this.gameService,
-      this.gameStateService,
-      this.tokenService,
-      config
-    );
+    const activeAgent = new Agent(gameId, agentId, this.gameStateService);
 
-    await agentService.start();
-    this.activeAgents.set(agentId, agentService);
+    await activeAgent.start();
+    this.activeAgents.set(agentId, activeAgent);
   }
 
   /**
@@ -152,6 +125,14 @@ export class AgentManager {
     this.activeAgents.clear();
 
     logger.info("AgentManager shutdown complete");
+  }
+
+  public async getAgent(agentId: number): Promise<Agent> {
+    const agent = this.activeAgents.get(agentId);
+    if (!agent) {
+      throw new Error(`Agent ${agentId} not found`);
+    }
+    return agent;
   }
 
   /**

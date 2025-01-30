@@ -1,5 +1,5 @@
 export const mearthIdl = {
-  address: "G3Uq1kV4YiGNBCxA735K3oBHvX6LHQvQbWmAbJSiEKTc",
+  address: "3LkBxfnNptSAEnRJYx3FMgNZJALX7bo4vtya5ofax5Lv",
   metadata: {
     name: "middle_earth_ai_program",
     version: "0.1.0",
@@ -80,10 +80,6 @@ export const mearthIdl = {
           writable: true,
         },
         {
-          name: "rewards_authority",
-          writable: true,
-        },
-        {
           name: "staker_destination",
           writable: true,
         },
@@ -91,7 +87,11 @@ export const mearthIdl = {
           name: "authority",
           writable: true,
           signer: true,
-          relations: ["agent"],
+        },
+        {
+          name: "rewards_authority",
+          writable: true,
+          signer: true,
         },
         {
           name: "system_program",
@@ -154,32 +154,6 @@ export const mearthIdl = {
       args: [],
     },
     {
-      name: "ignore_agent",
-      discriminator: [76, 176, 91, 153, 115, 53, 234, 22],
-      accounts: [
-        {
-          name: "agent",
-          writable: true,
-        },
-        {
-          name: "game",
-          relations: ["agent"],
-        },
-        {
-          name: "authority",
-          writable: true,
-          signer: true,
-          relations: ["agent"],
-        },
-      ],
-      args: [
-        {
-          name: "target_agent_id",
-          type: "u8",
-        },
-      ],
-    },
-    {
       name: "initialize_game",
       discriminator: [44, 62, 102, 247, 126, 208, 130, 215],
       accounts: [
@@ -226,7 +200,6 @@ export const mearthIdl = {
       accounts: [
         {
           name: "agent",
-          docs: ["The agent this stake will be associated with"],
           writable: true,
         },
         {
@@ -236,7 +209,6 @@ export const mearthIdl = {
         },
         {
           name: "stake_info",
-          docs: ["Create the stake_info account (first deposit)"],
           writable: true,
           pda: {
             seeds: [
@@ -257,23 +229,16 @@ export const mearthIdl = {
         },
         {
           name: "staker_source",
-          docs: [
-            "It's safe because we manually verify it's owned by the SPL token program.",
-          ],
           writable: true,
         },
         {
           name: "agent_vault",
-          docs: [
-            "Also safe because we ensure it's owned by the SPL token program.",
-          ],
           writable: true,
         },
         {
           name: "authority",
           writable: true,
           signer: true,
-          relations: ["agent"],
         },
         {
           name: "system_program",
@@ -292,11 +257,53 @@ export const mearthIdl = {
       ],
     },
     {
-      name: "kill_agent",
-      docs: [
-        "Marks an agent as dead.",
-        "**Access Control:** Only the agent's authority (or game authority) may call this function.",
+      name: "initiate_cooldown",
+      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."],
+      discriminator: [156, 179, 66, 226, 152, 118, 213, 187],
+      accounts: [
+        {
+          name: "agent",
+          writable: true,
+        },
+        {
+          name: "game",
+          writable: true,
+          relations: ["agent"],
+        },
+        {
+          name: "stake_info",
+          writable: true,
+          pda: {
+            seeds: [
+              {
+                kind: "const",
+                value: [115, 116, 97, 107, 101],
+              },
+              {
+                kind: "account",
+                path: "agent",
+              },
+              {
+                kind: "account",
+                path: "authority",
+              },
+            ],
+          },
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+        },
+        {
+          name: "system_program",
+          address: "11111111111111111111111111111111",
+        },
       ],
+      args: [],
+    },
+    {
+      name: "kill_agent",
       discriminator: [152, 243, 180, 237, 215, 248, 160, 57],
       accounts: [
         {
@@ -305,9 +312,7 @@ export const mearthIdl = {
         },
         {
           name: "authority",
-          docs: [
-            "The authority that can perform the kill. In many cases this should match agent.authority.",
-          ],
+          writable: true,
           signer: true,
           relations: ["agent"],
         },
@@ -330,7 +335,6 @@ export const mearthIdl = {
           name: "authority",
           writable: true,
           signer: true,
-          relations: ["agent"],
         },
       ],
       args: [
@@ -354,10 +358,7 @@ export const mearthIdl = {
     },
     {
       name: "register_agent",
-      docs: [
-        "Combined function for agent registration.",
-        "This instruction both initializes an Agent account and registers it in the game’s agent list.",
-      ],
+      docs: ["Registers a new Agent in the game (init + list registration)."],
       discriminator: [135, 157, 66, 195, 2, 113, 175, 30],
       accounts: [
         {
@@ -373,7 +374,6 @@ export const mearthIdl = {
           name: "authority",
           writable: true,
           signer: true,
-          relations: ["game"],
         },
         {
           name: "system_program",
@@ -400,10 +400,34 @@ export const mearthIdl = {
       ],
     },
     {
-      name: "resolve_battle_agent_vs_alliance",
-      docs: [
-        "Resolves a battle with alliances by updating cooldowns for all allied agents.",
+      name: "reset_battle_times",
+      discriminator: [146, 108, 240, 41, 237, 80, 28, 102],
+      accounts: [
+        {
+          name: "agent1",
+          writable: true,
+        },
+        {
+          name: "agent2",
+          writable: true,
+        },
+        {
+          name: "agent3",
+          writable: true,
+        },
+        {
+          name: "agent4",
+          writable: true,
+        },
+        {
+          name: "authority",
+          signer: true,
+        },
       ],
+      args: [],
+    },
+    {
+      name: "resolve_battle_agent_vs_alliance",
       discriminator: [59, 240, 150, 171, 245, 203, 23, 134],
       accounts: [
         {
@@ -489,7 +513,7 @@ export const mearthIdl = {
         },
         {
           name: "game",
-          relations: ["leader_a", "leader_b"],
+          relations: ["leader_a", "partner_a", "leader_b", "partner_b"],
         },
         {
           name: "leader_a_token",
@@ -546,9 +570,6 @@ export const mearthIdl = {
     },
     {
       name: "resolve_battle_simple",
-      docs: [
-        "Resolves a simple battle (without alliances) by updating the winner's and loser's cooldowns.",
-      ],
       discriminator: [194, 166, 52, 185, 99, 39, 139, 37],
       accounts: [
         {
@@ -593,6 +614,31 @@ export const mearthIdl = {
       ],
     },
     {
+      name: "set_agent_cooldown",
+      discriminator: [135, 110, 177, 130, 20, 228, 172, 214],
+      accounts: [
+        {
+          name: "agent",
+          writable: true,
+        },
+        {
+          name: "game",
+          relations: ["agent"],
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+        },
+      ],
+      args: [
+        {
+          name: "new_cooldown",
+          type: "i64",
+        },
+      ],
+    },
+    {
       name: "stake_tokens",
       discriminator: [136, 126, 91, 162, 40, 131, 13, 127],
       accounts: [
@@ -607,7 +653,6 @@ export const mearthIdl = {
         },
         {
           name: "stake_info",
-          docs: ["Must be initialized"],
           writable: true,
           pda: {
             seeds: [
@@ -628,21 +673,16 @@ export const mearthIdl = {
         },
         {
           name: "staker_source",
-          docs: [
-            "We verify it's owned by the SPL token program to ensure it's a valid token account.",
-          ],
           writable: true,
         },
         {
           name: "agent_vault",
-          docs: ["We verify it's owned by the SPL token program."],
           writable: true,
         },
         {
           name: "authority",
           writable: true,
           signer: true,
-          relations: ["agent"],
         },
         {
           name: "system_program",
@@ -659,6 +699,92 @@ export const mearthIdl = {
           type: "u64",
         },
       ],
+    },
+    {
+      name: "start_battle_agent_vs_alliance",
+      docs: ["Starts a battle between an agent and an alliance."],
+      discriminator: [29, 18, 137, 62, 26, 102, 56, 46],
+      accounts: [
+        {
+          name: "attacker",
+          writable: true,
+        },
+        {
+          name: "alliance_leader",
+          writable: true,
+        },
+        {
+          name: "alliance_partner",
+          writable: true,
+        },
+        {
+          name: "game",
+          relations: ["attacker", "alliance_leader", "alliance_partner"],
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "start_battle_alliances",
+      docs: ["Starts a battle between two alliances."],
+      discriminator: [246, 90, 25, 201, 196, 166, 220, 54],
+      accounts: [
+        {
+          name: "leader_a",
+          writable: true,
+        },
+        {
+          name: "partner_a",
+          writable: true,
+        },
+        {
+          name: "leader_b",
+          writable: true,
+        },
+        {
+          name: "partner_b",
+          writable: true,
+        },
+        {
+          name: "game",
+          relations: ["leader_a", "partner_a", "leader_b", "partner_b"],
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "start_battle_simple",
+      discriminator: [32, 12, 65, 240, 219, 11, 225, 62],
+      accounts: [
+        {
+          name: "winner",
+          writable: true,
+        },
+        {
+          name: "loser",
+          writable: true,
+        },
+        {
+          name: "game",
+          relations: ["winner", "loser"],
+        },
+        {
+          name: "authority",
+          writable: true,
+          signer: true,
+        },
+      ],
+      args: [],
     },
     {
       name: "unstake_tokens",
@@ -698,24 +824,6 @@ export const mearthIdl = {
           writable: true,
         },
         {
-          name: "agent_authority",
-          pda: {
-            seeds: [
-              {
-                kind: "const",
-                value: [
-                  97, 103, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105,
-                  116, 121,
-                ],
-              },
-              {
-                kind: "account",
-                path: "agent",
-              },
-            ],
-          },
-        },
-        {
           name: "staker_destination",
           writable: true,
         },
@@ -723,7 +831,12 @@ export const mearthIdl = {
           name: "authority",
           writable: true,
           signer: true,
-          relations: ["agent"],
+        },
+        {
+          name: "game_authority",
+          docs: ["The game authority, who owns the vault"],
+          writable: true,
+          signer: true,
         },
         {
           name: "system_program",
@@ -737,6 +850,26 @@ export const mearthIdl = {
       args: [
         {
           name: "amount",
+          type: "u64",
+        },
+      ],
+    },
+    {
+      name: "update_daily_rewards",
+      discriminator: [235, 160, 223, 244, 149, 193, 160, 179],
+      accounts: [
+        {
+          name: "game",
+          writable: true,
+        },
+        {
+          name: "authority",
+          signer: true,
+        },
+      ],
+      args: [
+        {
+          name: "new_daily_reward",
           type: "u64",
         },
       ],
@@ -768,6 +901,14 @@ export const mearthIdl = {
     {
       name: "BattleResolved",
       discriminator: [47, 156, 226, 94, 163, 176, 162, 241],
+    },
+    {
+      name: "CooldownInitiated",
+      discriminator: [251, 119, 98, 184, 229, 163, 146, 86],
+    },
+    {
+      name: "DailyRewardUpdated",
+      discriminator: [147, 255, 214, 103, 150, 229, 42, 92],
     },
   ],
   errors: [
@@ -891,6 +1032,41 @@ export const mearthIdl = {
       name: "InvalidAmount",
       msg: "Invalid amount specified.",
     },
+    {
+      code: 6024,
+      name: "InvalidBump",
+      msg: "Invalid bump.",
+    },
+    {
+      code: 6025,
+      name: "NoRewardsToClaim",
+      msg: "No rewards to claim.",
+    },
+    {
+      code: 6026,
+      name: "InsufficientRewards",
+      msg: "Insufficient rewards to complete this action.",
+    },
+    {
+      code: 6027,
+      name: "CooldownAlreadyActive",
+      msg: "Cooldown is already active.",
+    },
+    {
+      code: 6028,
+      name: "BattleNotStarted",
+      msg: "Battle has not started yet ",
+    },
+    {
+      code: 6029,
+      name: "BattleAlreadyStarted",
+      msg: "Battle has already started ",
+    },
+    {
+      code: 6030,
+      name: "BattleNotReadyToResolve",
+      msg: "Battle not ready to resolve",
+    },
   ],
   types: [
     {
@@ -947,16 +1123,6 @@ export const mearthIdl = {
             type: "i64",
           },
           {
-            name: "ignore_cooldowns",
-            type: {
-              vec: {
-                defined: {
-                  name: "IgnoreCooldown",
-                },
-              },
-            },
-          },
-          {
             name: "token_balance",
             type: "u64",
           },
@@ -997,6 +1163,12 @@ export const mearthIdl = {
           {
             name: "last_alliance_broken",
             type: "i64",
+          },
+          {
+            name: "battle_start_time",
+            type: {
+              option: "i64",
+            },
           },
           {
             name: "vault_bump",
@@ -1111,6 +1283,35 @@ export const mearthIdl = {
       },
     },
     {
+      name: "CooldownInitiated",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "stake_info",
+            type: "pubkey",
+          },
+          {
+            name: "cooldown_ends_at",
+            type: "i64",
+          },
+        ],
+      },
+    },
+    {
+      name: "DailyRewardUpdated",
+      docs: ["Optional events"],
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "new_daily_reward",
+            type: "u64",
+          },
+        ],
+      },
+    },
+    {
       name: "Game",
       type: {
         kind: "struct",
@@ -1152,6 +1353,10 @@ export const mearthIdl = {
             type: "u8",
           },
           {
+            name: "daily_reward_tokens",
+            type: "u64",
+          },
+          {
             name: "alliances",
             type: {
               vec: {
@@ -1180,22 +1385,6 @@ export const mearthIdl = {
                 },
               },
             },
-          },
-        ],
-      },
-    },
-    {
-      name: "IgnoreCooldown",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "agent_id",
-            type: "u8",
-          },
-          {
-            name: "timestamp",
-            type: "i64",
           },
         ],
       },

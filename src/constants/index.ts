@@ -5,6 +5,8 @@ export const TOKEN_BURN_MIN = 31;
 export const TOKEN_BURN_MAX = 50;
 export const DEATH_CHANCE = 0.05;
 export const BATTLE_COOLDOWN = 14400; // 4 hours in seconds
+export const MOVE_COOLDOWN_MS = 1000 * 60 * 60 * 1000; // 1 hour in milliseconds
+export const MOVE_UNITS_PER_HOUR = 10; // 1 units per hour
 
 export const river = {
 	type: TerrainType.Rivers,

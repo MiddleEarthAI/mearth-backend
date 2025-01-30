@@ -2,34 +2,34 @@ import { BN } from "@coral-xyz/anchor";
 import type { PublicKey } from "@solana/web3.js";
 
 export enum TerrainType {
-  Plains = 0,
-  Mountains = 1,
-  Rivers = 2,
+	Plains = 0,
+	Mountains = 1,
+	Rivers = 2,
 }
 
 export enum BattleResult {
-  Victory = 0,
-  Defeat = 1,
-  Draw = 2,
+	Victory = 0,
+	Defeat = 1,
+	Draw = 2,
 }
 
 export interface GameAccount {
-  authority: PublicKey;
-  alliances: Alliance[];
-  lastUpdate: BN;
-  gameId: BN;
-  tokenMint: PublicKey;
-  rewardsVault: PublicKey;
-  mapDiameter: BN;
-  isActive: boolean;
-  bump: BN;
-  totalStakeAccounts: BN;
-  agents: AgentInfo[];
+	authority: PublicKey;
+	alliances: Alliance[];
+	lastUpdate: BN;
+	gameId: BN;
+	tokenMint: PublicKey;
+	rewardsVault: PublicKey;
+	mapDiameter: BN;
+	isActive: boolean;
+	bump: BN;
+	totalStakeAccounts: BN;
+	agents: AgentInfo[];
 }
 
 export interface AgentInfo {
-  key: PublicKey;
-  name: string;
+	key: PublicKey;
+	name: string;
 }
 
 // {
@@ -53,101 +53,104 @@ export interface AgentInfo {
 // }
 
 export interface AgentAccount {
-  game: PublicKey;
-  authority: PublicKey;
-  id: BN;
-  x: BN;
-  y: BN;
-  isAlive: boolean;
-  lastMove: BN;
-  lastBattle: BN;
-  currentBattleStart: BN | null;
-  allianceWith: PublicKey | null;
-  tokenBalance: BN;
-  nextMoveTime: BN;
-  vaultBump: BN;
+	game: PublicKey;
+	authority: PublicKey;
+	id: BN;
+	x: BN;
+	y: BN;
+	isAlive: boolean;
+	lastMove: BN;
+	lastBattle: BN;
+	currentBattleStart: BN | null;
+	allianceWith: PublicKey | null;
+	tokenBalance: BN;
+	nextMoveTime: BN;
+	vaultBump: BN;
 }
 
 export interface StakeInfo {
-  agent: PublicKey;
-  staker: PublicKey;
-  amount: BN;
-  shares: BN;
-  lastRewardTimestamp: BN;
-  cooldownEndsAt: BN;
-  isInitialized: boolean;
+	agent: PublicKey;
+	staker: PublicKey;
+	amount: BN;
+	shares: BN;
+	lastRewardTimestamp: BN;
+	cooldownEndsAt: BN;
+	isInitialized: boolean;
 }
 
 export interface Alliance {
-  agent1: AgentAccount;
-  agent2: AgentAccount;
-  isActive: boolean;
-  formedAt: BN;
+	agent: AgentAccount;
+	ally: AgentAccount;
+	pastAlly: AgentAccount | null;
+	isActive: boolean;
+	formedAt: BN;
 }
 
 export interface AllianceInfo {
-  ally: AgentAccount;
-  formedAt: Date;
-  allyTokens: BN;
+	agent: AgentAccount;
+	ally: AgentAccount;
+	pastAlly: AgentAccount | null;
+	isActive: boolean;
+	formedAt: BN;
 }
 
 export interface BattleAccount {
-  attacker: PublicKey;
-  defender: PublicKey;
-  startTime: BN;
-  endTime: BN | null;
-  result: BattleResult | null;
-  tokensBurned: BN;
-  isActive: boolean;
+	attacker: PublicKey;
+	defender: PublicKey;
+	startTime: BN;
+	endTime: BN | null;
+	result: BattleResult | null;
+	tokensBurned: BN;
+	isActive: boolean;
 }
 
 export interface ProgramError {
-  code: number;
-  name: string;
-  msg: string;
+	code: number;
+	name: string;
+	msg: string;
 }
 
 // Program Events
 export interface AgentMovedEvent {
-  agentId: BN;
-  oldX: BN;
-  oldY: BN;
-  newX: BN;
-  newY: BN;
-  terrain: TerrainType;
-  timestamp: BN;
+	agentId: BN;
+	oldX: BN;
+	oldY: BN;
+	newX: BN;
+	newY: BN;
+	terrain: TerrainType;
+	timestamp: BN;
 }
 
 export interface BattleInitiatedEvent {
-  attackerId: BN;
-  defenderId: BN;
-  attackerTokens: BN;
-  defenderTokens: BN;
-  timestamp: BN;
+	attackerId: BN;
+	defenderId: BN;
+	attackerTokens: BN;
+	defenderTokens: BN;
+	timestamp: BN;
 }
 
 export interface BattleResolvedEvent {
-  battleId: PublicKey;
-  winnerId: BN;
-  loserId: BN;
-  tokensBurned: BN;
-  deathOccurred: boolean;
-  timestamp: BN;
+	battleId: PublicKey;
+	winnerId: BN;
+	loserId: BN;
+	tokensBurned: BN;
+	deathOccurred: boolean;
+	timestamp: BN;
 }
 
 export interface AllianceEvent {
-  agent1Id: BN;
-  agent2Id: BN;
-  isFormation: boolean;
-  timestamp: BN;
+	agent1Id: BN;
+	agent2Id: BN;
+	isFormation: boolean;
+	timestamp: BN;
 }
 
 export interface StakeEvent {
-  agentId: BN;
-  amount: BN;
-  isStake: boolean;
-  shares: BN;
-  timestamp: BN;
+	agentId: BN;
+	amount: BN;
+	isStake: boolean;
+	shares: BN;
+	timestamp: BN;
 }
 
 // Program Constants

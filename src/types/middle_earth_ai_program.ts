@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/middle_earth_ai_program.json`.
  */
 export type MiddleEarthAiProgram = {
-  address: "G3Uq1kV4YiGNBCxA735K3oBHvX6LHQvQbWmAbJSiEKTc";
+  address: "3LkBxfnNptSAEnRJYx3FMgNZJALX7bo4vtya5ofax5Lv";
   metadata: {
     name: "middleEarthAiProgram";
     version: "0.1.0";
@@ -86,10 +86,6 @@ export type MiddleEarthAiProgram = {
           writable: true;
         },
         {
-          name: "rewardsAuthority";
-          writable: true;
-        },
-        {
           name: "stakerDestination";
           writable: true;
         },
@@ -97,7 +93,11 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-          relations: ["agent"];
+        },
+        {
+          name: "rewardsAuthority";
+          writable: true;
+          signer: true;
         },
         {
           name: "systemProgram";
@@ -160,32 +160,6 @@ export type MiddleEarthAiProgram = {
       args: [];
     },
     {
-      name: "ignoreAgent";
-      discriminator: [76, 176, 91, 153, 115, 53, 234, 22];
-      accounts: [
-        {
-          name: "agent";
-          writable: true;
-        },
-        {
-          name: "game";
-          relations: ["agent"];
-        },
-        {
-          name: "authority";
-          writable: true;
-          signer: true;
-          relations: ["agent"];
-        }
-      ];
-      args: [
-        {
-          name: "targetAgentId";
-          type: "u8";
-        }
-      ];
-    },
-    {
       name: "initializeGame";
       discriminator: [44, 62, 102, 247, 126, 208, 130, 215];
       accounts: [
@@ -232,7 +206,6 @@ export type MiddleEarthAiProgram = {
       accounts: [
         {
           name: "agent";
-          docs: ["The agent this stake will be associated with"];
           writable: true;
         },
         {
@@ -242,7 +215,6 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "stakeInfo";
-          docs: ["Create the stake_info account (first deposit)"];
           writable: true;
           pda: {
             seeds: [
@@ -263,23 +235,16 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "stakerSource";
-          docs: [
-            "It's safe because we manually verify it's owned by the SPL token program."
-          ];
           writable: true;
         },
         {
           name: "agentVault";
-          docs: [
-            "Also safe because we ensure it's owned by the SPL token program."
-          ];
           writable: true;
         },
         {
           name: "authority";
           writable: true;
           signer: true;
-          relations: ["agent"];
         },
         {
           name: "systemProgram";
@@ -298,11 +263,53 @@ export type MiddleEarthAiProgram = {
       ];
     },
     {
-      name: "killAgent";
-      docs: [
-        "Marks an agent as dead.",
-        "**Access Control:** Only the agent's authority (or game authority) may call this function."
+      name: "initiateCooldown";
+      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."];
+      discriminator: [156, 179, 66, 226, 152, 118, 213, 187];
+      accounts: [
+        {
+          name: "agent";
+          writable: true;
+        },
+        {
+          name: "game";
+          writable: true;
+          relations: ["agent"];
+        },
+        {
+          name: "stakeInfo";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [115, 116, 97, 107, 101];
+              },
+              {
+                kind: "account";
+                path: "agent";
+              },
+              {
+                kind: "account";
+                path: "authority";
+              }
+            ];
+          };
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "systemProgram";
+          address: "11111111111111111111111111111111";
+        }
       ];
+      args: [];
+    },
+    {
+      name: "killAgent";
       discriminator: [152, 243, 180, 237, 215, 248, 160, 57];
       accounts: [
         {
@@ -311,9 +318,7 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "authority";
-          docs: [
-            "The authority that can perform the kill. In many cases this should match agent.authority."
-          ];
+          writable: true;
           signer: true;
           relations: ["agent"];
         }
@@ -336,7 +341,6 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-          relations: ["agent"];
         }
       ];
       args: [
@@ -360,10 +364,7 @@ export type MiddleEarthAiProgram = {
     },
     {
       name: "registerAgent";
-      docs: [
-        "Combined function for agent registration.",
-        "This instruction both initializes an Agent account and registers it in the game’s agent list."
-      ];
+      docs: ["Registers a new Agent in the game (init + list registration)."];
       discriminator: [135, 157, 66, 195, 2, 113, 175, 30];
       accounts: [
         {
@@ -379,7 +380,6 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-          relations: ["game"];
         },
         {
           name: "systemProgram";
@@ -406,10 +406,34 @@ export type MiddleEarthAiProgram = {
       ];
     },
     {
-      name: "resolveBattleAgentVsAlliance";
-      docs: [
-        "Resolves a battle with alliances by updating cooldowns for all allied agents."
+      name: "resetBattleTimes";
+      discriminator: [146, 108, 240, 41, 237, 80, 28, 102];
+      accounts: [
+        {
+          name: "agent1";
+          writable: true;
+        },
+        {
+          name: "agent2";
+          writable: true;
+        },
+        {
+          name: "agent3";
+          writable: true;
+        },
+        {
+          name: "agent4";
+          writable: true;
+        },
+        {
+          name: "authority";
+          signer: true;
+        }
       ];
+      args: [];
+    },
+    {
+      name: "resolveBattleAgentVsAlliance";
       discriminator: [59, 240, 150, 171, 245, 203, 23, 134];
       accounts: [
         {
@@ -495,7 +519,7 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "game";
-          relations: ["leaderA", "leaderB"];
+          relations: ["leaderA", "partnerA", "leaderB", "partnerB"];
         },
         {
           name: "leaderAToken";
@@ -552,9 +576,6 @@ export type MiddleEarthAiProgram = {
     },
     {
       name: "resolveBattleSimple";
-      docs: [
-        "Resolves a simple battle (without alliances) by updating the winner's and loser's cooldowns."
-      ];
       discriminator: [194, 166, 52, 185, 99, 39, 139, 37];
       accounts: [
         {
@@ -599,6 +620,31 @@ export type MiddleEarthAiProgram = {
       ];
     },
     {
+      name: "setAgentCooldown";
+      discriminator: [135, 110, 177, 130, 20, 228, 172, 214];
+      accounts: [
+        {
+          name: "agent";
+          writable: true;
+        },
+        {
+          name: "game";
+          relations: ["agent"];
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        }
+      ];
+      args: [
+        {
+          name: "newCooldown";
+          type: "i64";
+        }
+      ];
+    },
+    {
       name: "stakeTokens";
       discriminator: [136, 126, 91, 162, 40, 131, 13, 127];
       accounts: [
@@ -613,7 +659,6 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "stakeInfo";
-          docs: ["Must be initialized"];
           writable: true;
           pda: {
             seeds: [
@@ -634,21 +679,16 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "stakerSource";
-          docs: [
-            "We verify it's owned by the SPL token program to ensure it's a valid token account."
-          ];
           writable: true;
         },
         {
           name: "agentVault";
-          docs: ["We verify it's owned by the SPL token program."];
           writable: true;
         },
         {
           name: "authority";
           writable: true;
           signer: true;
-          relations: ["agent"];
         },
         {
           name: "systemProgram";
@@ -665,6 +705,92 @@ export type MiddleEarthAiProgram = {
           type: "u64";
         }
       ];
+    },
+    {
+      name: "startBattleAgentVsAlliance";
+      docs: ["Starts a battle between an agent and an alliance."];
+      discriminator: [29, 18, 137, 62, 26, 102, 56, 46];
+      accounts: [
+        {
+          name: "attacker";
+          writable: true;
+        },
+        {
+          name: "allianceLeader";
+          writable: true;
+        },
+        {
+          name: "alliancePartner";
+          writable: true;
+        },
+        {
+          name: "game";
+          relations: ["attacker", "allianceLeader", "alliancePartner"];
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "startBattleAlliances";
+      docs: ["Starts a battle between two alliances."];
+      discriminator: [246, 90, 25, 201, 196, 166, 220, 54];
+      accounts: [
+        {
+          name: "leaderA";
+          writable: true;
+        },
+        {
+          name: "partnerA";
+          writable: true;
+        },
+        {
+          name: "leaderB";
+          writable: true;
+        },
+        {
+          name: "partnerB";
+          writable: true;
+        },
+        {
+          name: "game";
+          relations: ["leaderA", "partnerA", "leaderB", "partnerB"];
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        }
+      ];
+      args: [];
+    },
+    {
+      name: "startBattleSimple";
+      discriminator: [32, 12, 65, 240, 219, 11, 225, 62];
+      accounts: [
+        {
+          name: "winner";
+          writable: true;
+        },
+        {
+          name: "loser";
+          writable: true;
+        },
+        {
+          name: "game";
+          relations: ["winner", "loser"];
+        },
+        {
+          name: "authority";
+          writable: true;
+          signer: true;
+        }
+      ];
+      args: [];
     },
     {
       name: "unstakeTokens";
@@ -704,37 +830,6 @@ export type MiddleEarthAiProgram = {
           writable: true;
         },
         {
-          name: "agentAuthority";
-          pda: {
-            seeds: [
-              {
-                kind: "const";
-                value: [
-                  97,
-                  103,
-                  101,
-                  110,
-                  116,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  111,
-                  114,
-                  105,
-                  116,
-                  121
-                ];
-              },
-              {
-                kind: "account";
-                path: "agent";
-              }
-            ];
-          };
-        },
-        {
           name: "stakerDestination";
           writable: true;
         },
@@ -742,7 +837,12 @@ export type MiddleEarthAiProgram = {
           name: "authority";
           writable: true;
           signer: true;
-          relations: ["agent"];
+        },
+        {
+          name: "gameAuthority";
+          docs: ["The game authority, who owns the vault"];
+          writable: true;
+          signer: true;
         },
         {
           name: "systemProgram";
@@ -756,6 +856,26 @@ export type MiddleEarthAiProgram = {
       args: [
         {
           name: "amount";
+          type: "u64";
+        }
+      ];
+    },
+    {
+      name: "updateDailyRewards";
+      discriminator: [235, 160, 223, 244, 149, 193, 160, 179];
+      accounts: [
+        {
+          name: "game";
+          writable: true;
+        },
+        {
+          name: "authority";
+          signer: true;
+        }
+      ];
+      args: [
+        {
+          name: "newDailyReward";
           type: "u64";
         }
       ];
@@ -787,6 +907,14 @@ export type MiddleEarthAiProgram = {
     {
       name: "battleResolved";
       discriminator: [47, 156, 226, 94, 163, 176, 162, 241];
+    },
+    {
+      name: "cooldownInitiated";
+      discriminator: [251, 119, 98, 184, 229, 163, 146, 86];
+    },
+    {
+      name: "dailyRewardUpdated";
+      discriminator: [147, 255, 214, 103, 150, 229, 42, 92];
     }
   ];
   errors: [
@@ -909,6 +1037,41 @@ export type MiddleEarthAiProgram = {
       code: 6023;
       name: "invalidAmount";
       msg: "Invalid amount specified.";
+    },
+    {
+      code: 6024;
+      name: "invalidBump";
+      msg: "Invalid bump.";
+    },
+    {
+      code: 6025;
+      name: "noRewardsToClaim";
+      msg: "No rewards to claim.";
+    },
+    {
+      code: 6026;
+      name: "insufficientRewards";
+      msg: "Insufficient rewards to complete this action.";
+    },
+    {
+      code: 6027;
+      name: "cooldownAlreadyActive";
+      msg: "Cooldown is already active.";
+    },
+    {
+      code: 6028;
+      name: "battleNotStarted";
+      msg: "Battle has not started yet ";
+    },
+    {
+      code: 6029;
+      name: "battleAlreadyStarted";
+      msg: "Battle has already started ";
+    },
+    {
+      code: 6030;
+      name: "battleNotReadyToResolve";
+      msg: "Battle not ready to resolve";
     }
   ];
   types: [
@@ -966,16 +1129,6 @@ export type MiddleEarthAiProgram = {
             type: "i64";
           },
           {
-            name: "ignoreCooldowns";
-            type: {
-              vec: {
-                defined: {
-                  name: "ignoreCooldown";
-                };
-              };
-            };
-          },
-          {
             name: "tokenBalance";
             type: "u64";
           },
@@ -1016,6 +1169,12 @@ export type MiddleEarthAiProgram = {
           {
             name: "lastAllianceBroken";
             type: "i64";
+          },
+          {
+            name: "battleStartTime";
+            type: {
+              option: "i64";
+            };
           },
           {
             name: "vaultBump";
@@ -1130,6 +1289,35 @@ export type MiddleEarthAiProgram = {
       };
     },
     {
+      name: "cooldownInitiated";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "stakeInfo";
+            type: "pubkey";
+          },
+          {
+            name: "cooldownEndsAt";
+            type: "i64";
+          }
+        ];
+      };
+    },
+    {
+      name: "dailyRewardUpdated";
+      docs: ["Optional events"];
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "newDailyReward";
+            type: "u64";
+          }
+        ];
+      };
+    },
+    {
       name: "game";
       type: {
         kind: "struct";
@@ -1171,6 +1359,10 @@ export type MiddleEarthAiProgram = {
             type: "u8";
           },
           {
+            name: "dailyRewardTokens";
+            type: "u64";
+          },
+          {
             name: "alliances";
             type: {
               vec: {
@@ -1199,22 +1391,6 @@ export type MiddleEarthAiProgram = {
                 };
               };
             };
-          }
-        ];
-      };
-    },
-    {
-      name: "ignoreCooldown";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "agentId";
-            type: "u8";
-          },
-          {
-            name: "timestamp";
-            type: "i64";
           }
         ];
       };

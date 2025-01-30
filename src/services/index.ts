@@ -1,9 +1,11 @@
-import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
+import { mountains, plains, river } from "@/constants";
+import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { GameService } from "@/services/GameService";
 import { GameStateService } from "@/services/GameStateService";
 import { TokenService } from "@/services/TokenService";
+import { TerrainType } from "@/types/program";
 import { logger } from "@/utils/logger";
-import { Program } from "@coral-xyz/anchor";
+import type { Program } from "@coral-xyz/anchor";
 import type { Connection } from "@solana/web3.js";
 
 let gameService: GameService | null = null;
@@ -12,6 +14,7 @@ let tokenService: TokenService | null = null;
 
 /**
  * Initialize all services
+ * @param gameId Game ID
  * @param connection Solana connection
  * @param program Middle Earth program
  */
@@ -59,4 +62,16 @@ export function getTokenService(): TokenService {
     throw new Error("TokenService not initialized");
   }
   return tokenService;
+}
+
+export function getTerrain(x: number, y: number): TerrainType | null {
+  if (mountains.coordinates.has(`${x},${y}`)) {
+    return TerrainType.Mountains;
+  } else if (plains.coordinates.has(`${x},${y}`)) {
+    return TerrainType.Plains;
+  } else if (river.coordinates.has(`${x},${y}`)) {
+    return TerrainType.Rivers;
+  }
+
+  return null;
 }

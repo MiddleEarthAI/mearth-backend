@@ -1,311 +1,218 @@
-datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
 }
 
-generator client {
-    provider = "prisma-client-js"
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Game {
-    id                 String        @id @default(uuid())
-    onchainId          Int           @unique
-    programId          String
-    programAccountId   String
-    isActive           Boolean       @default(true)
-    createdAt          DateTime      @default(now())
-    updatedAt          DateTime      @updatedAt
-    agents             Agent[]       @relation("GameAgents")
-    alliances          Alliance[]    @relation("GameAlliances")
-    mapDiameter        Int
-    terrainType        TerrainType
-    tokenMint          String
-    rewardsVault       String
-    totalStakeAccounts StakerStake[]
-    bump               BigInt
+  id                String   @id @default(uuid())
+  gameId            Int      @unique // Unique identifier for the game instance
+  authority         String // Authority that controls the game
+  tokenMint         String // Token mint used in the game
+  rewardsVault      String // Vault that holds staking rewards
+  mapDiameter       Int // Diameter of the circular map
+  isActive          Boolean  @default(true) // Whether game is currently active
+  lastUpdate        DateTime @default(now()) // Timestamp of last game state update
+  bump              Int // PDA bump seed
+  dailyRewardTokens Float // Number of tokens to distribute daily
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  agents    Agent[] // One game has many agents
+  alliances Alliance[] // One game has many alliances
+  battles   Battle[] // One game has many battles
 }
 
 model Agent {
-    id              String        @id @default(uuid())
-    name            String        @unique
-    twitterHandle   String        @unique
-    lastActionTime  DateTime?
-    characterType   CharacterType
-    bio             String[]
-    lore            String[]
-    knowledge       String[]
-    wallet          Wallet        @relation(fields: [walletId], references: [id])
-    walletId        String        @unique
-    keypair         Keypair?
-    game            Game          @relation("GameAgents", fields: [gameId], references: [id])
-    gameId          String // Required - agent must belong to a game
-    currentLocation Location      @relation(fields: [locationId], references: [id])
-    locationId      String
-    movementHistory Movement[]
-    alliances       Alliance[]
-    tweets          Tweet[]
-    traits          AgentTrait[]
-    status          AgentStatus   @default(ACTIVE)
-    createdAt       DateTime      @default(now())
-    updatedAt       DateTime      @updatedAt
+  id                  String   @id @default(uuid())
+  agentId             Int      @unique
+  name                String
+  xHandle             String   @unique
+  publicKey           String   @unique
+  backstory           String   @db.Text
+  characteristics     String[]
+  influenceDifficulty String   @default("medium")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-    // Battle relations
-    attackerBattles Battle[] @relation("AttackerBattles")
-    defenderBattles Battle[] @relation("DefenderBattles")
-    otherBattles    Battle[] @relation("OtherBattles")
-}
+  // Relations
+  game            Game            @relation(fields: [gameId], references: [id])
+  gameId          String
+  location        Location?
+  currentAlliance Alliance?
+  battles         Battle[]
+  community       Community?
+  personality     Personality?
+  state           AgentState?
+  tokenomics      TokenEconomics?
+  strategy        Strategy?
+  cooldowns       Cooldown[]
 
-model StakerStake {
-    id         String @id @default(uuid())
-    agentId    String
-    totalStake BigInt
-    game       Game   @relation(fields: [gameId], references: [id])
-    gameId     String
-}
-
-model Keypair {
-    id                  String    @id @default(uuid())
-    agentId             String    @unique
-    publicKey           String
-    encryptedPrivateKey String
-    iv                  Bytes // Initialization vector for encryption
-    tag                 Bytes // Authentication tag for encryption
-    createdAt           DateTime  @default(now())
-    rotatedAt           DateTime?
-    updatedAt           DateTime  @updatedAt
-    agent               Agent     @relation(fields: [agentId], references: [id])
-
-    @@index([agentId])
-}
-
-model Wallet {
-    id                 String          @id @default(uuid())
-    agent              Agent?
-    governanceTokens   Float           @default(0)
-    stakingRewards     StakingReward[]
-    transactionHistory Transaction[]
+  // Reverse relations
+  alliedBy          Alliance[] @relation("AlliedAgent")
+  battlesAsOpponent Battle[]   @relation("OpponentAgent")
 }
 
 model Location {
-    id            String      @id @default(uuid())
-    x             Float
-    y             Float
-    terrain       TerrainType
-    agents        Agent[]
-    movementsFrom Movement[]  @relation("MovementFrom")
-    movementsTo   Movement[]  @relation("MovementTo")
+  id                  String    @id @default(uuid())
+  x                   Int
+  y                   Int
+  fieldType           FieldType // 'plain', 'mountain', 'river'
+  stuckTurnsRemaining Int       @default(0)
 
-    @@unique([x, y])
-}
-
-model Movement {
-    id             String   @id @default(uuid())
-    agent          Agent    @relation(fields: [agentId], references: [id])
-    agentId        String
-    fromLocation   Location @relation("MovementFrom", fields: [fromLocationId], references: [id])
-    fromLocationId String
-    toLocation     Location @relation("MovementTo", fields: [toLocationId], references: [id])
-    toLocationId   String
-    timestamp      DateTime @default(now())
-    speed          Float
-}
-
-model Battle {
-    id                   String   @id @default(uuid())
-    attacker             Agent    @relation("AttackerBattles", fields: [attackerId], references: [id])
-    attackerId           String
-    defender             Agent    @relation("DefenderBattles", fields: [defenderId], references: [id])
-    defenderId           String
-    attackerTokensBefore Float
-    defenderTokensBefore Float
-    tokensBurned         Float
-    attackerWon          Boolean
-    deathOccurred        Boolean
-    timestamp            DateTime @default(now())
-    agent                Agent?   @relation("OtherBattles", fields: [agentId], references: [id])
-    agentId              String?
+  // Relations
+  agent   Agent  @relation(fields: [agentId], references: [id])
+  agentId String @unique
 }
 
 model Alliance {
-    id              String         @id @default(uuid())
-    agents          Agent[]
-    formedAt        DateTime       @default(now())
-    dissolutionTime DateTime?
-    status          AllianceStatus
-    game            Game?          @relation("GameAlliances", fields: [gameId], references: [id])
-    gameId          String?
+  id               String   @id @default(uuid())
+  formedAt         DateTime @default(now())
+  canBreakAlliance Boolean  @default(true)
+  combinedTokens   Float
+
+  // Relations
+  game          Game   @relation(fields: [gameId], references: [id])
+  gameId        String
+  agent         Agent  @relation(fields: [agentId], references: [id])
+  agentId       String @unique
+  alliedAgent   Agent  @relation("AlliedAgent", fields: [alliedAgentId], references: [id])
+  alliedAgentId String
 }
 
-// ------------------------------------------ Twitter
+model Battle {
+  id           String   @id @default(uuid())
+  timestamp    DateTime @default(now())
+  outcome      String // 'victory' or 'defeat'
+  tokensLost   Float?
+  tokensGained Float?
+  probability  Float
 
-model Tweet {
-    id                  String           @id @default(uuid())
-    tweetId             BigInt
-    agent               Agent            @relation(fields: [agentId], references: [id])
-    agentId             String
-    content             String
-    authorFollowerCount Int              @default(0)
-    engagement          TweetEngagement?
-    feedback            TweetFeedback?
-    createdAt           DateTime         @default(now())
-    updatedAt           DateTime         @updatedAt
+  // Relations
+  game       Game   @relation(fields: [gameId], references: [id])
+  gameId     String
+  agent      Agent  @relation(fields: [agentId], references: [id])
+  agentId    String
+  opponent   Agent  @relation("OpponentAgent", fields: [opponentId], references: [id])
+  opponentId String
 }
 
-model TweetEngagement {
-    id               String @id @default(uuid())
-    tweet            Tweet  @relation(fields: [tweetId], references: [id])
-    tweetId          String @unique
-    likes            Int    @default(0)
-    impressions      Int    @default(0)
-    comments         Int    @default(0)
-    retweets         Int    @default(0)
-    influencerImpact Float  @default(0)
+model Community {
+  id                String @id @default(uuid())
+  followers         Int    @default(0)
+  averageEngagement Float  @default(0)
+  supporterCount    Int    @default(0)
+
+  // Relations
+  agent        Agent         @relation(fields: [agentId], references: [id])
+  agentId      String        @unique
+  interactions Interaction[]
 }
 
-model TweetFeedback {
-    id              String @id @default(uuid())
-    tweet           Tweet  @relation(fields: [tweetId], references: [id])
-    tweetId         String @unique
-    suggestedAction String
-    targetAgent     String
-    coordinateX     Float
-    coordinateY     Float
-    confidence      Float
-    reasoning       String
-    sentiment       String
+model Interaction {
+  id              String   @id @default(uuid())
+  type            String // 'comment', 'quote', 'mention'
+  content         String   @db.Text
+  authorFollowers Int
+  engagement      Int
+  sentiment       String // 'positive', 'neutral', 'negative'
+  timestamp       DateTime @default(now())
+
+  // Relations
+  community   Community @relation(fields: [communityId], references: [id])
+  communityId String
 }
 
-// ----------------------------------------- Message
+model Personality {
+  id               String @id @default(uuid())
+  aggressiveness   Int
+  trustworthiness  Int
+  manipulativeness Int
+  intelligence     Int
+  adaptability     Int
 
-model Message {
-    id String @id @default(uuid())
+  // Influence factors
+  baseInfluence        Float
+  followerMultiplier   Float
+  engagementMultiplier Float
+  consensusMultiplier  Float
 
-    // Platform-agnostic identifiers
-    externalId String?         @unique // Original message ID from source platform
-    platform   MessagePlatform
-
-    // Sender and Recipient Information
-    senderId     String // Could be an Agent ID or external user ID
-    senderType   SenderType // Agent, Human, System
-    senderHandle String? // Twitter/Telegram handle
-
-    recipientId   String? // Optional, for direct messages
-    recipientType RecipientType? // Agent, Human, Group
-
-    // Message Content
-    content     String
-    contentType MessageContentType
-
-    // Metadata
-    sentAt DateTime  @default(now())
-    readAt DateTime?
-
-    // Optional Context Fields
-    threadId  String? // For tracking conversation threads
-    replyToId String? // Reference to parent message
-
-    // Optional Game-Specific Context
-    relatedEntityId String? // Could link to Tweet, Battle, Alliance etc.
-
-    // Tracking and Processing
-    processed   Boolean @default(false)
-    actionTaken Boolean @default(false)
-
-    @@index([platform, externalId])
-    @@index([senderId, platform])
+  // Relations
+  agent   Agent  @relation(fields: [agentId], references: [id])
+  agentId String @unique
 }
 
-// Platform Enums
-enum MessagePlatform {
-    X_TWITTER
-    TELEGRAM
-    DISCORD
-    INTERNAL_GAME
-    EMAIL
-    SMS
+model AgentState {
+  id                String   @id @default(uuid())
+  isAlive           Boolean  @default(true)
+  health            Int      @default(100)
+  lastActionType    String // 'move', 'battle', 'alliance', 'ignore'
+  lastActionTime    DateTime @default(now())
+  lastActionDetails String   @db.Text
+
+  // Relations
+  agent   Agent  @relation(fields: [agentId], references: [id])
+  agentId String @unique
 }
 
-// Content Type Helps in Processing
-enum MessageContentType {
-    TEXT
-    MEDIA
-    COMMAND
-    GAME_ACTION
-    SYSTEM_NOTIFICATION
+model Cooldown {
+  id     String   @id @default(uuid())
+  type   String // 'alliance', 'battle', 'ignore'
+  endsAt DateTime
+
+  // Relations
+  agent         Agent  @relation(fields: [agentId], references: [id])
+  agentId       String
+  targetAgentId String
+
+  @@unique([agentId, targetAgentId, type])
 }
 
-// Sender Classification
-enum SenderType {
-    AGENT
-    HUMAN
-    SYSTEM
+model TokenEconomics {
+  id           String @id @default(uuid())
+  stakedTokens Float
+  totalStaked  Float
+  stakersCount Int
+
+  // Battle statistics
+  totalWon  Int   @default(0)
+  totalLost Int   @default(0)
+  winRate   Float @default(0)
+
+  // Relations
+  agent             Agent              @relation(fields: [agentId], references: [id])
+  agentId           String             @unique
+  unstakingRequests UnstakingRequest[]
 }
 
-// Recipient Classification
-enum RecipientType {
-    AGENT
-    HUMAN
-    GROUP
-    BROADCAST
+model UnstakingRequest {
+  id         String   @id @default(uuid())
+  amount     Float
+  unlockTime DateTime
+
+  // Relations
+  tokenEconomics   TokenEconomics @relation(fields: [tokenEconomicsId], references: [id])
+  tokenEconomicsId String
 }
 
-model Transaction {
-    id        String          @id @default(uuid())
-    wallet    Wallet          @relation(fields: [walletId], references: [id])
-    walletId  String
-    amount    Float
-    type      TransactionType
-    timestamp DateTime        @default(now())
+model Strategy {
+  id             String @id @default(uuid())
+  publicStrategy String @db.Text
+  actualStrategy String @db.Text
+  deceptionLevel Int
+
+  // Relations
+  agent   Agent  @relation(fields: [agentId], references: [id])
+  agentId String @unique
 }
 
-model StakingReward {
-    id           String   @id @default(uuid())
-    wallet       Wallet   @relation(fields: [walletId], references: [id])
-    walletId     String
-    rewardAmount Float
-    timestamp    DateTime @default(now())
-}
-
-model AgentTrait {
-    id          String   @id @default(uuid())
-    agent       Agent    @relation(fields: [agentId], references: [id])
-    agentId     String
-    traitName   String
-    traitValue  Float
-    lastUpdated DateTime @default(now())
-}
-
-enum CharacterType {
-    SCOOTLES
-    PURRLOCK_PAWS
-    SIR_GULLIHOP
-    WANDERLEAF
-}
-
-enum TerrainType {
-    PLAINS
-    MOUNTAINS
-    RIVER
-}
-
-enum BattleOutcome {
-    ATTACKER_WIN
-    DEFENDER_WIN
-    DRAW
-}
-
-enum AllianceStatus {
-    ACTIVE
-    DISSOLVED
-}
-
-enum AgentStatus {
-    ACTIVE
-    DEFEATED
-}
-
-enum TransactionType {
-    TOKEN_TRANSFER
-    BATTLE_BURN
-    STAKING_REWARD
+enum FieldType {
+  Plain
+  Mountain
+  River
 }

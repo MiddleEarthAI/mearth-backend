@@ -1,14 +1,14 @@
-import type { AgentAccount, Alliance, GameAccount } from "@/types/program";
+import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
+import type {
+  AgentAccount,
+  Alliance,
+  AllianceInfo,
+  GameAccount,
+} from "@/types/program";
 import { logger } from "@/utils/logger";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import {
-  Account,
-  AccountInfo,
-  PublicKey,
-  type Connection,
-} from "@solana/web3.js";
-import { Program } from "@coral-xyz/anchor";
-import { MiddleEarthAiProgram } from "@/constants/middle_earth_ai_program";
+import type { BN, Program } from "@coral-xyz/anchor";
+import type { Connection, PublicKey } from "@solana/web3.js";
 
 /**
  * Service for fetching game state
@@ -20,7 +20,7 @@ export class GameStateService {
   ) {}
 
   /**
-   * Get game state
+   * returns game state
    */
   async getGameState(gameId: number): Promise<GameAccount | null> {
     try {
@@ -57,12 +57,15 @@ export class GameStateService {
   /**
    * Get alliance state
    */
-  async getAlliance(agentId: number, gameId: number): Promise<Alliance | null> {
+  async getAllianceInfo(
+    agentId: number,
+    gameId: number
+  ): Promise<AllianceInfo | null> {
     try {
       const [gamePDA] = getGamePDA(this.program.programId, gameId);
       const [agentPDA] = getAgentPDA(this.program.programId, gamePDA, agentId);
 
-      const gameAccount = await this.program.account.game.fetch(gamePDA);
+      // const gameAccount = await this.program.account.game.fetch(gamePDA);
       const agentAccount = await this.program.account.agent.fetch(agentPDA);
 
       const alliance = agentAccount.allianceWith;
@@ -71,11 +74,19 @@ export class GameStateService {
         return null;
       }
 
-      const allianceAccount = await this.program.account.agent.fetch(alliance);
+      const allyAccount = await this.program.account.agent.fetch(alliance);
+
+      let pastAllyAccount: AgentAccount | null = null;
+      if (agentAccount.lastAllianceAgent) {
+        pastAllyAccount = await this.program.account.agent.fetch(
+          agentAccount.lastAllianceAgent
+        );
+      }
 
       return {
-        agent1: agentAccount,
-        agent2: allianceAccount,
+        agent: agentAccount,
+        ally: allyAccount,
+        pastAlly: pastAllyAccount,
         formedAt: agentAccount.allianceTimestamp,
         isActive: agentAccount.allianceWith === alliance,
       };
