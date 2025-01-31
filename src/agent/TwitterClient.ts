@@ -1,4 +1,3 @@
-import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 
 import { TwitterApi, type UserV2Result } from "twitter-api-v2";

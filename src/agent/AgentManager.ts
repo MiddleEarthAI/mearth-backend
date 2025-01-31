@@ -5,23 +5,13 @@ import { Agent } from "./Agent";
 import { GameAccount } from "@/types/program";
 import { prisma } from "@/config/prisma";
 
-interface AgentStatus {
-  id: number;
-  status: "active" | "inactive" | "error";
-  lastAction?: string;
-  error?: string;
-}
-
 /**
  * Service for managing multiple AI agents
- * Handles initialization, monitoring, and cleanup of agents
  */
 export class AgentManager {
   private static instance: AgentManager;
   private activeAgents: Map<number, Agent> = new Map();
-  private agentStatuses: Map<number, AgentStatus> = new Map();
   private gameStateService: GameStateService;
-  private isInitialized = false;
 
   private constructor() {
     this.gameStateService = getGameStateService();
@@ -38,252 +28,159 @@ export class AgentManager {
   }
 
   /**
-   * Initialize the agent manager and start all registered agents
-   * @param gameAccount The game account to initialize agents for
+   * Initialize and start all agents for a game
    */
   public async initializeAndStartAgents(
     gameAccount: GameAccount
   ): Promise<void> {
     try {
-      if (this.isInitialized) {
-        logger.warn("AgentManager is already initialized");
-        return;
-      }
-
-      logger.info("🚀 Initializing AgentManager...", {
+      logger.info("🚀 Starting agent initialization...", {
         gameId: gameAccount.gameId.toString(),
         totalAgents: gameAccount.agents.length,
       });
 
-      // Fetch all agent accounts in parallel
-      const agentAccounts = await Promise.all(
-        gameAccount.agents.map(async (agent) => {
-          try {
-            return await this.gameStateService.getAgentByPublicKey(agent.key);
-          } catch (error) {
-            logger.error(`Failed to fetch agent for key ${agent.key}:`, error);
-            return null;
-          }
-        })
-      );
-
-      // Filter out null results and dead agents
-      const validAgents = agentAccounts.filter(
-        (agent): agent is NonNullable<typeof agent> =>
-          agent !== null && agent.isAlive
-      );
-
-      logger.info("📊 Agent Status Summary", {
-        total: gameAccount.agents.length,
-        alive: validAgents.length,
-        dead: gameAccount.agents.length - validAgents.length,
+      // Get all registered agents from database
+      const game = await prisma.game.findUnique({
+        where: { gameId: gameAccount.gameId.toNumber() },
+        select: { agents: { include: { state: true } } },
       });
+      logger.info("🔍 Found game", { game });
+      if (!game?.agents) {
+        throw new Error(
+          "No agents found in database. Please run setup sync first."
+        );
+      }
 
-      // Start each valid agent
-      await Promise.all(
-        validAgents.map(async (agent) => {
-          try {
-            await this.startAgent(gameAccount.gameId.toNumber(), agent.id);
-            this.updateAgentStatus(agent.id, {
-              status: "active",
-              lastAction: "initialization",
-            });
-          } catch (error) {
-            const errorMsg =
-              error instanceof Error ? error.message : "Unknown error";
-            logger.error(`Failed to start agent ${agent.id}:`, error);
-            this.updateAgentStatus(agent.id, {
-              status: "error",
-              error: errorMsg,
-            });
-          }
-        })
-      );
+      // Start each alive agent
+      for (const dbAgent of game.agents) {
+        if (!dbAgent.state?.isAlive) {
+          logger.info(`⚰️ Skipping dead agent ${dbAgent.agentId}`);
+          continue;
+        }
 
-      this.isInitialized = true;
-      logger.info("✅ AgentManager initialized successfully", {
-        activeAgents: this.getActiveAgentsSummary(),
+        try {
+          const agent = new Agent(
+            gameAccount.gameId.toNumber(),
+            dbAgent.agentId,
+            this.gameStateService
+          );
+
+          await agent.start();
+          this.activeAgents.set(dbAgent.agentId, agent);
+
+          logger.info(`✅ Started agent ${dbAgent.agentId}`, {
+            name: dbAgent.name,
+            status: "active",
+          });
+        } catch (error) {
+          logger.error(`Failed to start agent ${dbAgent.agentId}:`, error);
+        }
+      }
+
+      const activeCount = this.activeAgents.size;
+      logger.info(`✨ Agent initialization complete`, {
+        total: game.agents.length,
+        active: activeCount,
+        inactive: game.agents.length - activeCount,
       });
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      logger.error("❌ Failed to initialize AgentManager:", error);
-      throw new Error(`AgentManager initialization failed: ${errorMsg}`);
+      logger.error("❌ Failed to initialize agents:", error);
+      throw error;
     }
   }
 
   /**
-   * Start a new agent or restart an existing one
+   * Start a single agent
    */
-  private async startAgent(gameId: number, agentId: number): Promise<void> {
-    // Check if agent is already active
+  public async startAgent(gameId: number, agentId: number): Promise<void> {
     if (this.activeAgents.has(agentId)) {
-      logger.warn(`Agent ${agentId} is already active, skipping start`);
+      logger.warn(`Agent ${agentId} is already active`);
       return;
     }
 
-    // Verify agent exists and is alive
-    const agent = await this.gameStateService.getAgent(gameId, agentId);
-    if (!agent) {
-      throw new Error(`Agent ${agentId} not found in game ${gameId}`);
+    const dbAgent = await prisma.agent.findFirst({
+      where: {
+        gameId: gameId.toString(),
+        agentId,
+      },
+      include: { state: true },
+    });
+
+    if (!dbAgent) {
+      throw new Error(`Agent ${agentId} not found in database`);
     }
 
-    if (!agent.isAlive) {
-      logger.warn(`Agent ${agentId} is not alive, skipping start`);
-      this.updateAgentStatus(agentId, {
-        status: "inactive",
-        lastAction: "skipped - agent dead",
-      });
+    if (!dbAgent.state?.isAlive) {
+      logger.warn(`Agent ${agentId} is not alive, skipping`);
       return;
     }
 
-    try {
-      // Create and start new agent instance
-      const activeAgent = new Agent(gameId, agentId, this.gameStateService);
-      await activeAgent.start();
+    const agent = new Agent(gameId, agentId, this.gameStateService);
+    await agent.start();
+    this.activeAgents.set(agentId, agent);
 
-      this.activeAgents.set(agentId, activeAgent);
-      this.updateAgentStatus(agentId, {
-        status: "active",
-        lastAction: "started",
-      });
-
-      logger.info(`✅ Started agent ${agentId}`, {
-        gameId,
-        position: { x: agent.x, y: agent.y },
-      });
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      logger.error(`Failed to start agent ${agentId}:`, error);
-      this.updateAgentStatus(agentId, {
-        status: "error",
-        error: errorMsg,
-      });
-      throw error;
-    }
+    logger.info(`✅ Started agent ${agentId}`, {
+      name: dbAgent.name,
+      status: "active",
+    });
   }
 
   /**
-   * Create and start a new agent
-   */
-  public async createAndStart(gameId: number, agentId: number): Promise<void> {
-    try {
-      await this.startAgent(gameId, agentId);
-    } catch (error) {
-      logger.error(`Failed to create and start agent ${agentId}:`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Stop an agent
+   * Stop a single agent
    */
   public async stopAgent(agentId: number): Promise<void> {
     const agent = this.activeAgents.get(agentId);
     if (!agent) {
-      logger.warn(`Agent ${agentId} is not active, cannot stop`);
+      logger.warn(`Agent ${agentId} is not active`);
       return;
     }
 
-    try {
-      agent.stop();
-      this.activeAgents.delete(agentId);
-      this.updateAgentStatus(agentId, {
-        status: "inactive",
-        lastAction: "stopped",
-      });
-      logger.info(`Stopped agent ${agentId}`);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      logger.error(`Failed to stop agent ${agentId}:`, error);
-      this.updateAgentStatus(agentId, {
-        status: "error",
-        error: errorMsg,
-      });
-      throw error;
-    }
+    agent.stop();
+    this.activeAgents.delete(agentId);
+    logger.info(`🛑 Stopped agent ${agentId}`);
   }
 
   /**
    * Stop all agents and cleanup
    */
   public async shutdown(): Promise<void> {
-    logger.info("🛑 Shutting down AgentManager...");
+    logger.info("🛑 Shutting down all agents...");
 
-    try {
-      const stopPromises = Array.from(this.activeAgents.keys()).map((agentId) =>
-        this.stopAgent(agentId)
-      );
-
-      await Promise.all(stopPromises);
-      this.activeAgents.clear();
-      this.agentStatuses.clear();
-      this.isInitialized = false;
-
-      logger.info("✅ AgentManager shutdown complete");
-    } catch (error) {
-      logger.error("❌ Error during AgentManager shutdown:", error);
-      throw error;
+    for (const [agentId, agent] of this.activeAgents) {
+      try {
+        agent.stop();
+        logger.info(`Stopped agent ${agentId}`);
+      } catch (error) {
+        logger.error(`Failed to stop agent ${agentId}:`, error);
+      }
     }
+
+    this.activeAgents.clear();
+    logger.info("✅ All agents stopped");
   }
 
   /**
-   * Get a specific agent instance
+   * Get an active agent instance
    */
-  public async getAgent(agentId: number): Promise<Agent> {
-    const agent = this.activeAgents.get(agentId);
-    if (!agent) {
-      throw new Error(`Agent ${agentId} not found or not active`);
-    }
-    return agent;
+  public getAgent(agentId: number): Agent | undefined {
+    return this.activeAgents.get(agentId);
   }
 
   /**
-   * Update agent status
-   */
-  private updateAgentStatus(
-    agentId: number,
-    status: Partial<AgentStatus>
-  ): void {
-    const currentStatus = this.agentStatuses.get(agentId) || {
-      id: agentId,
-      status: "inactive",
-    };
-    this.agentStatuses.set(agentId, { ...currentStatus, ...status });
-  }
-
-  /**
-   * Get detailed status of all agents
-   */
-  private getActiveAgentsSummary(): {
-    total: number;
-    active: number;
-    inactive: number;
-    error: number;
-    agents: AgentStatus[];
-  } {
-    const statuses = Array.from(this.agentStatuses.values());
-    return {
-      total: statuses.length,
-      active: statuses.filter((a) => a.status === "active").length,
-      inactive: statuses.filter((a) => a.status === "inactive").length,
-      error: statuses.filter((a) => a.status === "error").length,
-      agents: statuses,
-    };
-  }
-
-  /**
-   * Get all active agents (legacy method for compatibility)
+   * Get summary of active agents
    */
   public getActiveAgents(): {
     count: number;
     agents: { id: number; status: string }[];
   } {
-    const summary = this.getActiveAgentsSummary();
+    const agents = Array.from(this.activeAgents.keys()).map((id) => ({
+      id,
+      status: "active",
+    }));
+
     return {
-      count: summary.active,
-      agents: summary.agents
-        .filter((a) => a.status === "active")
-        .map(({ id, status }) => ({ id, status: status })),
+      count: agents.length,
+      agents,
     };
   }
 }

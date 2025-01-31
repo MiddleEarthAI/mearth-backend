@@ -109,11 +109,11 @@ export async function setup(): Promise<void> {
 
     // Set up Anchor with optimized configuration
     const wallet = new anchor.Wallet(keypair);
+
     const provider = new anchor.AnchorProvider(connection, wallet, {
       commitment: "confirmed",
-      preflightCommitment: "confirmed",
-      skipPreflight: false,
     });
+
     logger.info("⚓ Anchor provider configured", {
       commitment: provider.connection.commitment,
       wallet: wallet.publicKey.toBase58(),
@@ -131,13 +131,14 @@ export async function setup(): Promise<void> {
       gameIds: gameAccounts.map((g) => g.account.gameId.toString()),
     });
 
-    // Find active game or create new one with optimized logic
+    // Find active game or create new one
     logger.info("🔍 Looking for active game or creating new one...");
     const { mostRecentActiveGame, dbGame } = await getOrCreateGame(
       program,
       gameAccounts,
       keypair
     );
+
     logger.info("✅ Game setup complete", {
       gameId: mostRecentActiveGame.account.gameId.toString(),
       publicKey: mostRecentActiveGame.publicKey.toBase58(),
@@ -181,28 +182,13 @@ export async function setup(): Promise<void> {
       });
 
       await syncAgents(program, gamePda, dbGame, keypair);
-
-      // Verify sync was successful
-      const finalAgentCount = await prisma.agent.count({
-        where: { gameId: mostRecentActiveGame.account.gameId.toString() },
-      });
-
-      if (finalAgentCount !== gameData.agents.length) {
-        throw new Error(
-          `Agent sync failed: Expected ${gameData.agents.length} agents, but found ${finalAgentCount} in database`
-        );
-      }
-
-      logger.info("✅ Agent synchronization completed successfully", {
-        totalAgents: finalAgentCount,
-      });
     } else {
       logger.info("✅ All agents already registered", {
         totalAgents: registeredAgents.length,
       });
     }
 
-    // Initialize core services and agent manager
+    // Initialize services and agent manager
     logger.info("🔧 Initializing core services...");
     await initializeServices(connection, program);
 

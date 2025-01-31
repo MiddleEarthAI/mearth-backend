@@ -1,5 +1,8 @@
 -- CreateEnum
-CREATE TYPE "FieldType" AS ENUM ('Plain', 'Mountain', 'River');
+CREATE TYPE "TerrainType" AS ENUM ('Plain', 'Mountain', 'River');
+
+-- CreateEnum
+CREATE TYPE "AllianceStatus" AS ENUM ('Active', 'Pending', 'Broken');
 
 -- CreateTable
 CREATE TABLE "Game" (
@@ -26,8 +29,10 @@ CREATE TABLE "Agent" (
     "name" TEXT NOT NULL,
     "xHandle" TEXT NOT NULL,
     "publicKey" TEXT NOT NULL,
-    "backstory" TEXT NOT NULL,
+    "bio" TEXT[],
+    "lore" TEXT[],
     "characteristics" TEXT[],
+    "knowledge" TEXT[],
     "influenceDifficulty" TEXT NOT NULL DEFAULT 'medium',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -41,7 +46,7 @@ CREATE TABLE "Location" (
     "id" TEXT NOT NULL,
     "x" INTEGER NOT NULL,
     "y" INTEGER NOT NULL,
-    "fieldType" "FieldType" NOT NULL,
+    "terrainType" "TerrainType" NOT NULL,
     "stuckTurnsRemaining" INTEGER NOT NULL DEFAULT 0,
     "agentId" TEXT NOT NULL,
 
@@ -54,6 +59,7 @@ CREATE TABLE "Alliance" (
     "formedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "canBreakAlliance" BOOLEAN NOT NULL DEFAULT true,
     "combinedTokens" DOUBLE PRECISION NOT NULL,
+    "status" "AllianceStatus" NOT NULL DEFAULT 'Active',
     "gameId" TEXT NOT NULL,
     "agentId" TEXT NOT NULL,
     "alliedAgentId" TEXT NOT NULL,
