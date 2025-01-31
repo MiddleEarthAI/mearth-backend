@@ -1,10 +1,5 @@
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
-import type {
-  AgentAccount,
-  Alliance,
-  AllianceInfo,
-  GameAccount,
-} from "@/types/program";
+import type { AgentAccount, AllianceInfo, GameAccount } from "@/types/program";
 import { logger } from "@/utils/logger";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import type { BN, Program } from "@coral-xyz/anchor";
@@ -109,5 +104,19 @@ export class GameStateService {
       logger.error("Failed to fetch agent:", error);
       return null;
     }
+  }
+
+  async getAllAliveAgents(gameId: number): Promise<AgentAccount[]> {
+    const gameState = await this.getGameState(gameId);
+    if (!gameState) throw new Error("Game state not found");
+    if (!gameState.agents) return [];
+    const agents = [];
+    for (const agent of gameState.agents) {
+      const agentAccount = await this.program.account.agent.fetch(agent.key);
+      if (agentAccount.isAlive) {
+        agents.push(agentAccount);
+      }
+    }
+    return agents;
   }
 }

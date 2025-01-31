@@ -1,9 +1,9 @@
-import { mountains, plains, river } from "@/constants";
+import { mountains, plains, rivers } from "@/constants";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { GameService } from "@/services/GameService";
 import { GameStateService } from "@/services/GameStateService";
 import { TokenService } from "@/services/TokenService";
-import { TerrainType } from "@/types/program";
+import { TerrainType } from "@prisma/client";
 import { logger } from "@/utils/logger";
 import type { Program } from "@coral-xyz/anchor";
 import type { Connection } from "@solana/web3.js";
@@ -66,11 +66,11 @@ export function getTokenService(): TokenService {
 
 export function getTerrain(x: number, y: number): TerrainType | null {
   if (mountains.coordinates.has(`${x},${y}`)) {
-    return TerrainType.Mountains;
+    return TerrainType.Mountain;
   } else if (plains.coordinates.has(`${x},${y}`)) {
-    return TerrainType.Plains;
-  } else if (river.coordinates.has(`${x},${y}`)) {
-    return TerrainType.Rivers;
+    return TerrainType.Plain;
+  } else if (rivers.coordinates.has(`${x},${y}`)) {
+    return TerrainType.River;
   }
 
   return null;

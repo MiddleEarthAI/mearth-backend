@@ -14,11 +14,11 @@ model Game {
   authority         String // Authority that controls the game
   tokenMint         String // Token mint used in the game
   rewardsVault      String // Vault that holds staking rewards
-  mapDiameter       Int // Diameter of the circular map
+  mapDiameter       Int      @db.Integer // Diameter of the circular map (must be > 0)
   isActive          Boolean  @default(true) // Whether game is currently active
   lastUpdate        DateTime @default(now()) // Timestamp of last game state update
-  bump              Int // PDA bump seed
-  dailyRewardTokens Float // Number of tokens to distribute daily
+  bump              Int      @db.Integer // PDA bump seed
+  dailyRewardTokens Float    @db.DoublePrecision // Number of tokens to distribute daily (must be >= 0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -34,8 +34,10 @@ model Agent {
   name                String
   xHandle             String   @unique
   publicKey           String   @unique
-  backstory           String   @db.Text
+  bio                 String[]
+  lore                String[]
   characteristics     String[]
+  knowledge           String[]
   influenceDifficulty String   @default("medium")
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -59,11 +61,11 @@ model Agent {
 }
 
 model Location {
-  id                  String    @id @default(uuid())
-  x                   Int
-  y                   Int
-  fieldType           FieldType // 'plain', 'mountain', 'river'
-  stuckTurnsRemaining Int       @default(0)
+  id                  String      @id @default(uuid())
+  x                   Int         @db.Integer
+  y                   Int         @db.Integer
+  terrainType         TerrainType // 'plain', 'mountain', 'river'
+  stuckTurnsRemaining Int         @default(0) @db.Integer // Must be >= 0
 
   // Relations
   agent   Agent  @relation(fields: [agentId], references: [id])
@@ -71,10 +73,11 @@ model Location {
 }
 
 model Alliance {
-  id               String   @id @default(uuid())
-  formedAt         DateTime @default(now())
-  canBreakAlliance Boolean  @default(true)
+  id               String         @id @default(uuid())
+  formedAt         DateTime       @default(now())
+  canBreakAlliance Boolean        @default(true)
   combinedTokens   Float
+  status           AllianceStatus @default(Active)
 
   // Relations
   game          Game   @relation(fields: [gameId], references: [id])
@@ -130,17 +133,18 @@ model Interaction {
 
 model Personality {
   id               String @id @default(uuid())
-  aggressiveness   Int
-  trustworthiness  Int
-  manipulativeness Int
-  intelligence     Int
-  adaptability     Int
+  // All personality traits must be between 0 and 100
+  aggressiveness   Int    @db.Integer
+  trustworthiness  Int    @db.Integer
+  manipulativeness Int    @db.Integer
+  intelligence     Int    @db.Integer
+  adaptability     Int    @db.Integer
 
-  // Influence factors
-  baseInfluence        Float
-  followerMultiplier   Float
-  engagementMultiplier Float
-  consensusMultiplier  Float
+  // Influence factors (all must be >= 0)
+  baseInfluence        Float @db.DoublePrecision
+  followerMultiplier   Float @db.DoublePrecision
+  engagementMultiplier Float @db.DoublePrecision
+  consensusMultiplier  Float @db.DoublePrecision
 
   // Relations
   agent   Agent  @relation(fields: [agentId], references: [id])
@@ -211,8 +215,14 @@ model Strategy {
   agentId String @unique
 }
 
-enum FieldType {
+enum TerrainType {
   Plain
   Mountain
   River
+}
+
+enum AllianceStatus {
+  Active
+  Pending
+  Broken
 }

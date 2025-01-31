@@ -1,18 +1,7 @@
 import { Router } from "express";
-import { Connection, Keypair } from "@solana/web3.js";
-
-import * as anchor from "@coral-xyz/anchor";
-import {
-  getGameService,
-  getGameStateService,
-  initializeServices,
-} from "@/services";
+import { getGameService, getGameStateService } from "@/services";
 
 import { logger } from "@/utils/logger";
-import { GameAccount } from "@/types/program";
-import { AgentManager } from "@/agent/AgentManager";
-import { getProgram } from "@/utils";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 const router = Router();
 

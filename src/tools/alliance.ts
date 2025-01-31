@@ -24,51 +24,76 @@ export const allianceTool = async (gameId: number, agentId: number) => {
     where: {
       agentId: agentId,
     },
+    include: {
+      currentAlliance: true,
+      tokenomics: true,
+      location: true,
+    },
   });
 
-  const contextualDescription = `🤝 Alliance System for @${agent?.xHandle},
+  const contextualDescription = `Alliance System | Agent: ${agent?.xHandle}
 
-Current Diplomatic Status:
-👥 Active Alliances:
+CURRENT STATUS
+Position: (${allianceInfo?.agent.x ?? "-"}, ${allianceInfo?.agent.y ?? "-"})
+Resources: ${allianceInfo?.agent.tokenBalance ?? "-"} MEARTH
+Active Alliance: ${agent?.currentAlliance ? "Yes" : "None"}
 
-🤔 Recent Relations:
+DIPLOMATIC FRAMEWORK
+Core Mechanics:
+- Proximity-based alliance formation (<=2 distance units)
+- Mutual token staking mechanism
+- Shared reward distribution system
+- Strategic territory control
+- Dissolution cooldown period
 
-Alliance Mechanics:
-• Alliances require mutual trust
-• Combined token staking available
-• Shared battle rewards
-• Territory control bonuses
-• Cooldown after dissolution
+Strategic Advantages:
+1. Resource Optimization
+   - Combined token pools
+   - Shared battle spoils
+   - Enhanced territory yields
 
+2. Tactical Benefits
+   - Coordinated military operations
+   - Shared intelligence network
+   - Defensive pact benefits
 
-Strategic Benefits:
-• Pooled resources for battles
-• Shared intelligence network
-• Coordinated movements
-• Defensive partnerships
-• Market trading advantages
-• Reputation effects
+3. Economic Impact
+   - Joint market operations
+   - Trading privileges
+   - Resource sharing protocols
 
-Current Position: (${allianceInfo?.agent.x ?? "-"}, ${
-    allianceInfo?.agent.y ?? "-"
-  })
-Token Balance: ${allianceInfo?.agent.tokenBalance ?? "-"} MEARTH
+4. Political Influence
+   - Enhanced diplomatic weight
+   - Combined voting power
+   - Unified negotiation stance
 
+Risk Assessment:
+- Trust verification required
+- Resource commitment
+- Strategic vulnerability
+- Reputation impact
 
-Choose allies carefully, @${
-    agent?.xHandle ?? "-"
-  }. Trust is earned, not given.`;
+Consider your diplomatic moves carefully. Alliances shape the future of Middle Earth.
+
+Current Game State:
+- Map Position: ${allianceInfo?.agent.x ?? "-"}, ${allianceInfo?.agent.y ?? "-"}
+- Available Resources: ${allianceInfo?.agent.tokenBalance ?? "-"} MEARTH
+- Strategic Value: ${agent?.tokenomics?.winRate ?? 0}% victory rate
+
+Your decisions echo through the realm. Choose wisely.`;
 
   return tool({
     description: contextualDescription,
     parameters: z.object({
       allyXHandle: z
         .string()
-        .describe("Twitter handle of the agent to form alliance with"),
+        .describe(
+          "Target agent's Twitter handle for alliance formation. Consider their strategic value, location, and resource compatibility."
+        ),
       reason: z
         .string()
         .describe(
-          "Reason for forming alliance and the benefits of taking this decision"
+          "Detailed strategic rationale for alliance formation. Include military, economic, and political considerations. Analyze potential synergies and risk mitigation strategies."
         ),
     }),
 
@@ -76,66 +101,89 @@ Choose allies carefully, @${
       if (!allianceInfo) {
         return {
           success: false,
-          message: "Agent or ally not found",
+          message: "Alliance validation failed: Agent data unavailable",
         };
       }
 
+      // Validate existing alliance status
       if (allianceInfo.isActive) {
         return {
           success: false,
-          message: "Agent already has an active alliance",
+          message: "Alliance formation blocked: Active alliance already exists",
         };
       }
 
       const ally = await prisma.agent.findUnique({
-        where: {
-          xHandle: allyXHandle,
+        where: { xHandle: allyXHandle },
+        include: {
+          currentAlliance: true,
+          location: true,
+          tokenomics: true,
         },
       });
 
       if (!agent || !ally) {
         return {
           success: false,
-          message: "Agent or ally not found in database",
+          message: "Alliance formation failed: Invalid agent credentials",
         };
       }
+
       try {
-        // Calculate distance
+        // Validate proximity requirement
         const distance = calculateDistance(
-          allianceInfo.agent.x,
-          allianceInfo.agent.y,
-          allianceInfo.ally.x,
-          allianceInfo.ally.y
+          agent.location?.x ?? 0,
+          agent.location?.y ?? 0,
+          ally.location?.x ?? 0,
+          ally.location?.y ?? 0
         );
 
         if (distance > 2) {
           return {
             success: false,
             message:
-              "The agent you want to form alliance with is too far for the alliance to be formed",
+              "Alliance formation failed: Agents exceed maximum alliance distance (2 units)",
           };
         }
 
-        // Execute alliance formation
-        const tx = await gameService.formAlliance(agentId, ally.agentId);
+        // Execute on-chain alliance formation
+        const tx = await gameService.formAlliance(
+          agentId,
+          ally.agentId,
+          gameId
+        );
+
+        // Update database
+        await prisma.alliance.create({
+          data: {
+            gameId: gameId.toString(),
+            agentId: agent.id,
+            alliedAgentId: ally.id,
+            combinedTokens:
+              (agent.tokenomics?.stakedTokens ?? 0) +
+              (ally.tokenomics?.stakedTokens ?? 0),
+            canBreakAlliance: true,
+          },
+        });
 
         return {
           success: true,
-          message: `You @${
+          message: `Alliance formed successfully between ${
             agent.xHandle
-          } have successfully formed an alliance with Agent ${allyXHandle} with the combined token stake of ${
-            allianceInfo.agent.tokenBalance + allianceInfo.ally.tokenBalance
-          } MEARTH. ${reason} Date: ${new Date().toISOString()}`,
+          } and ${allyXHandle}. Combined strength: ${
+            (agent.tokenomics?.stakedTokens ?? 0) +
+            (ally.tokenomics?.stakedTokens ?? 0)
+          } MEARTH. Strategic basis: ${reason}. Timestamp: ${new Date().toISOString()}`,
           transactionId: tx,
         };
       } catch (error) {
-        logger.error("Alliance error:", error);
+        logger.error("Alliance formation error:", error);
         return {
           success: false,
           message:
             error instanceof Error
               ? error.message
-              : "Alliance formation failed",
+              : "Alliance formation failed: Unknown error",
         };
       }
     },

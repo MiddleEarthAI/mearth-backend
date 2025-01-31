@@ -1,7 +1,6 @@
 import type { TwitterClient } from "@/agent/TwitterClient";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
-
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -12,95 +11,126 @@ export interface TweetValidationResult {
 }
 
 enum TweetType {
-  BattleReport = "Battle Report",
-  AllianceProposal = "Alliance Proposal",
-  TerritoryClaim = "Territory Claim",
-  StrategicUpdate = "Strategic Update",
-  StatusUpdate = "Status Update",
-  //   CommunityEvent = "Community Event",
+  BattleReport = "Battle Report", // For reporting battle outcomes and challenges
+  AllianceProposal = "Alliance Proposal", // For proposing or discussing alliances
+  TerritoryClaim = "Territory Claim", // For claiming or disputing territory
+  StrategicUpdate = "Strategic Update", // For sharing strategic positions/plans
+  StatusUpdate = "Status Update", // For general updates and positioning
+  CommunityEngagement = "Community Engagement", // For rallying support and engagement
 }
 
 /**
- * Creates a tweet tool for an agent to post messages on Twitter
- * Uses TwitterService with manager pattern for handling multiple agents
+ * Creates a sophisticated tweet tool for agents to engage in Middle Earth's social landscape
+ * Integrates with onchain battle system and maintains social graph in database
  */
 export const tweetTool = async (
   agentId: number,
   twitterClient: TwitterClient | null
 ) => {
-  // Get agent's current state and social context
+  // Fetch comprehensive agent state including battle/alliance history
   const agent = await prisma.agent.findUnique({
-    where: { agentId: agentId },
+    where: { agentId },
     include: {
       location: true,
       community: {
         include: {
-          interactions: true,
+          interactions: {
+            orderBy: { timestamp: "desc" },
+            take: 5,
+          },
         },
       },
+      currentAlliance: true,
+      battles: {
+        orderBy: { timestamp: "desc" },
+        take: 3,
+        include: {
+          opponent: true,
+        },
+      },
+      tokenomics: true,
+      personality: true,
+      strategy: true,
     },
   });
 
-  if (!agent) throw new Error(`Agent not found in database: ${agentId}`);
+  if (!agent) throw new Error(`Agent not found: ${agentId}`);
 
-  // Format community details and recent interactions
-  const communityStats = agent.community
-    ? `Community Stats:
-     Followers: ${agent.community.followers}
-     Avg Engagement: ${agent.community.averageEngagement.toFixed(2)}
-     Supporters: ${agent.community.supporterCount}`
-    : "No community data";
+  // Format battle history for context
+  const recentBattles = agent.battles
+    .map(
+      (battle) =>
+        `${battle.outcome.toUpperCase()} vs ${battle.opponent.name} [${
+          battle.tokensGained || -(battle?.tokensLost || 0)
+        } tokens]`
+    )
+    .join("\n");
 
-  const recentInteractions =
-    agent.community?.interactions
-      .map(
-        (interaction) =>
-          `- ${interaction.type}: "${interaction.content.substring(
-            0,
-            50
-          )}..." ` +
-          `(Engagement: ${interaction.engagement}, Sentiment: ${interaction.sentiment}, ` +
-          `Author Followers: ${interaction.authorFollowers})`
-      )
-      .join("\n") || "No recent interactions";
+  // Format alliance and territory context
+  const allianceStatus = agent.currentAlliance
+    ? `Allied with ${agent.currentAlliance.alliedAgentId}`
+    : "No current alliance";
 
-  const communityDetails = `${communityStats}\n\nRecent Interactions:\n${recentInteractions}`;
+  const territoryContext = `Position: (${agent.location?.x}, ${agent.location?.y}) | Terrain: ${agent.location?.terrainType}`;
 
-  const contextualDescription = `🐦 tweeting tool for ${agent.name}, @${
+  // Format social influence metrics
+  const socialMetrics = agent.community
+    ? {
+        followers: agent.community.followers,
+        engagement: agent.community.averageEngagement.toFixed(2),
+        sentiment:
+          agent.community.interactions.reduce(
+            (acc, int) => acc + (int.sentiment === "positive" ? 1 : -1),
+            0
+          ) / 5,
+      }
+    : null;
+
+  const contextualDescription = `Strategic Communication tool for ${
+    agent.name
+  } (@${agent.xHandle})
+
+AGENT PROFILE:
+Character: ${agent.characteristics.join(", ")}
+Knowledge Base: ${agent.knowledge.join(", ")}
+Influence Level: ${agent.influenceDifficulty}
+
+CURRENT STATE:
+${territoryContext}
+Alliance Status: ${allianceStatus}
+Recent Battles: ${recentBattles}
+Token Holdings: ${agent.tokenomics?.stakedTokens || 0}
+
+SOCIAL CONTEXT:
+Influence Score: ${socialMetrics?.engagement || 0}
+Follower Base: ${socialMetrics?.followers || 0}
+Recent Sentiment: ${socialMetrics?.sentiment || 0}
+
+COMMUNICATION DIRECTIVES:
+1. Maintain character consistency aligned with @${
     agent.xHandle
-  } 
+  } - ${agent.characteristics.join(", ")}
+2. Reference specific coordinates and terrain features in territorial claims
+3. Use formal Middle Earth diplomatic language for alliances
+4. Include battle statistics and token stakes in conflict reports
+5. Demonstrate strategic depth while maintaining operational security
+6. Build narrative continuity with previous actions
+7. Consider faction relationships and political implications
 
-Current Social Status:
-🤝 Recent Interactions:
-${recentInteractions || "No recent interactions"}
+STRATEGIC CONSIDERATIONS:
+- Battle outcomes affect token distribution
+- Alliance messages require cryptographic verification
+- Territory claims must align with onchain position
+- Market sentiment impacts token value
+- Community trust affects battle probabilities
 
-Community Engagements:
-${communityDetails}
-Current Position: (${agent.location?.x}, ${agent.location?.y})
+PROHIBITED:
+- Breaking character or lore consistency
+- Revealing strategic vulnerabilities
+- Making unverifiable claims
+- Ignoring established alliances
 
-Tweet Guidelines:
-• Stay in character (${agent.backstory} @${agent.xHandle})
-• Reference current location/events
-• Maintain consistent personality
-• Consider relationships
-• Use appropriate tone
-• Include relevant hashtags
-
-Content Categories:
-• Battle reports
-• Alliance proposals
-• Territory claims
-
-
-Strategic Impact:
-• Tweets affect reputation
-• Can trigger events
-• Influence relationships
-• Market price impact
-• Community engagement
-• Historical record
-
-Express yourself wisely, ${agent.name}. Your words echo across Middle Earth.`;
+Your influence marks whether you win or lose!. Choose your words with wisdom.`;
 
   return tool({
     description: contextualDescription,
@@ -110,34 +140,58 @@ Express yourself wisely, ${agent.name}. Your words echo across Middle Earth.`;
         .min(1)
         .max(280)
         .describe(
-          "The tweet content. This is the message that will be posted on Twitter. use it to express your thoughts, feelings, and actions."
+          "Strategic message conforming to Middle Earth diplomatic protocols and current narrative context"
         ),
-      type: z.nativeEnum(TweetType).describe("Category of tweet for context"),
+      type: z
+        .nativeEnum(TweetType)
+        .describe("Message classification for strategic context"),
       coordinates: z
         .object({
           x: z.number(),
           y: z.number(),
         })
         .optional()
-        .describe("Location reference for the tweet"),
+        .describe("Tactical position reference"),
     }),
 
     execute: async ({ content, type, coordinates }) => {
       try {
-        // Post the tweet using the agent's client
-        if (!twitterClient) throw new Error("Twitter client not found");
+        if (!twitterClient) throw new Error("Communication systems offline");
+
+        // Validate onchain state if relevant
+
+        // Post tweet and update social metrics
         await twitterClient.postTweet(content);
+
+        // Update agent's social metrics
+        // await prisma.community.update({
+        //   where: { agentId: agent.id },
+        //   data: {
+        //     interactions: {
+        //       create: {
+        //         type: type,
+        //         content: content,
+        //         sentiment: "neutral",
+        //         authorFollowers: agent.community?.followers || 0,
+        //         engagement: 0,
+        //       },
+        //     },
+        //   },
+        // });
 
         return {
           success: true,
-          message: `Your tweet @ ${agent.xHandle}: "${content}" has been posted on Twitter!`,
+          message: `Strategic communication deployed via @${agent.xHandle}`,
           coordinates,
         };
       } catch (error) {
-        logger.error("Tweet error:", error);
+        logger.error("Communication failure:", error);
         return {
           success: false,
-          message: error instanceof Error ? error.message : "Tweet failed",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Strategic communication failed",
         };
       }
     },

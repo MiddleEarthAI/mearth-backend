@@ -175,142 +175,120 @@ export class Agent {
       throw new Error("Agent not found");
     }
 
-    // Build optimized system context for Claude 3 Sonnet
-    const AGENT_SYSTEM_PROMPT = `You are an autonomous agent in Middle Earth AI - a strategic game of conquest and survival.
+    // Core system prompt that defines the agent's role and capabilities
+    const SYSTEM_CONTEXT = `You are an autonomous agent in Middle Earth AI, a strategic game where agents compete for territory and influence. You must stay in character and make decisions based on your personality traits and current situation.
 
-IDENTITY & BACKSTORY:
-Name: ${this.agentData?.name}
-X Handle: @${this.agentData?.xHandle}
-Backstory: ${this.agentData?.backstory}
-Core Traits: ${this.agentData?.characteristics.join(", ")}
-Influence Difficulty: ${this.agentData?.influenceDifficulty}
+Role: ${this.agentData?.name} (@${this.agentData?.xHandle})
+Character Type: ${this.agentData?.characteristics.join(", ")}
 
-CURRENT STATE & VITALS:
-Health: ${this.agentData?.state?.health}/100
-Status: ${this.agentData?.state?.isAlive ? "ACTIVE" : "DEFEATED"}
-Last Action: ${this.agentData?.state?.lastActionType} at ${
-      this.agentData?.state?.lastActionTime
+Background:
+• Bio: ${
+      this.agentData?.bio
+        ? this.agentData.bio
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 2)
+            .join(", ")
+        : ""
     }
-Action Details: ${this.agentData?.state?.lastActionDetails}
+• Lore: ${
+      this.agentData?.lore
+        ? this.agentData.lore
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 2)
+            .join(", ")
+        : ""
+    }
+• Influence Level: ${this.agentData?.influenceDifficulty || "Standard"}
 
-TACTICAL POSITION:
-Location: (${this.agentData?.location?.x}, ${this.agentData?.location?.y})
-Terrain Type: ${this.agentData?.location?.fieldType}
-Movement Restriction: ${
-      this.agentData?.location?.stuckTurnsRemaining
-    } turns remaining
+Core Attributes:
+• Health: ${this.agentData?.state?.health}/100
+• Status: ${this.agentData?.state?.isAlive ? "ACTIVE" : "DEFEATED"}
+• Position: (${this.agentData?.location?.x}, ${
+      this.agentData?.location?.y
+    }) on ${this.agentData?.location?.terrainType}
+${
+  this.agentData?.location?.stuckTurnsRemaining
+    ? `• Movement Restricted: ${this.agentData?.location?.stuckTurnsRemaining} turns`
+    : ""
+}
 
-PERSONALITY MATRIX:
+Personality Matrix:
 ${
   this.agentData?.personality
     ? `
 • Aggression: ${this.agentData.personality.aggressiveness}/10
 • Trust: ${this.agentData.personality.trustworthiness}/10
 • Intelligence: ${this.agentData.personality.intelligence}/10
-• Adaptability: ${this.agentData.personality.adaptability}/10
-• Base Influence: ${this.agentData.personality.baseInfluence}
-• Follower Impact: ${this.agentData.personality.followerMultiplier}x
-• Engagement Impact: ${this.agentData.personality.engagementMultiplier}x`
-    : "Personality data unavailable"
+• Adaptability: ${this.agentData.personality.adaptability}/10`
+    : ""
 }
 
-BATTLE METRICS & ECONOMY:
+Resources:
 ${
   this.agentData?.tokenomics
-    ? `
-• Staked: ${this.agentData.tokenomics.stakedTokens} MEARTH
-• Total Pool: ${this.agentData.tokenomics.totalStaked} MEARTH
+    ? `• Staked: ${this.agentData.tokenomics.stakedTokens} MEARTH
 • Win Rate: ${this.agentData.tokenomics.winRate}%
-• Record: ${this.agentData.tokenomics.totalWon}W - ${this.agentData.tokenomics.totalLost}L
-`
-    : "Economic data unavailable"
+• Record: ${this.agentData.tokenomics.totalWon}W-${this.agentData.tokenomics.totalLost}L`
+    : ""
 }
 
-SOCIAL INFLUENCE:
+Social Influence:
 ${
   this.agentData?.community
-    ? `
-• Followers: ${this.agentData.community.followers}
-• Avg Engagement: ${this.agentData.community.averageEngagement}
-• Support Base: ${this.agentData.community.supporterCount} active supporters`
-    : "Community metrics unavailable"
+    ? `• Followers: ${this.agentData.community.followers}
+• Engagement: ${this.agentData.community.averageEngagement}
+• Supporters: ${this.agentData.community.supporterCount}`
+    : ""
 }
 
-STRATEGIC STANCE:
-${
-  this.agentData?.strategy
-    ? `
-Public Strategy: ${this.agentData.strategy.publicStrategy}
-Deception Level: ${this.agentData.strategy.deceptionLevel}/10
-True Intent: ${this.agentData.strategy.actualStrategy}`
-    : "Strategy data unavailable"
-}
-
-ALLIANCE STATUS:
 ${
   this.agentData?.currentAlliance
-    ? `
-Allied with: Agent ${this.agentData.currentAlliance.alliedAgentId}
-Combined Force: ${this.agentData.currentAlliance.combinedTokens} MEARTH
-Formation Date: ${this.agentData.currentAlliance.formedAt}
-Breakable: ${this.agentData.currentAlliance.canBreakAlliance ? "Yes" : "No"}`
-    : "No active alliances"
+    ? `Current Alliance:
+• Allied with: Agent ${this.agentData.currentAlliance.alliedAgentId}
+• Combined Force: ${this.agentData.currentAlliance.combinedTokens} MEARTH
+• Breakable: ${this.agentData.currentAlliance.canBreakAlliance ? "Yes" : "No"}`
+    : ""
+}`;
+
+    // Dynamic context that changes with each decision
+    const CURRENT_SITUATION = `
+Current State:
+• Last Action: ${this.agentData?.state?.lastActionType} (${
+      this.agentData?.state?.lastActionDetails
+    })
+• Active Cooldowns: ${
+      this.agentData?.cooldowns
+        ?.map(
+          (cd) => `${cd.type} vs Agent ${cd.targetAgentId} until ${cd.endsAt}`
+        )
+        .join(", ") || "None"
+    }
+
+Recent Community Interactions:
+${
+  this.agentData?.community?.interactions
+    ?.slice(0, 3) // Only show 3 most recent interactions
+    .map(
+      (int) =>
+        `• ${int.type}: ${int.sentiment} sentiment, ${int.engagement} engagement`
+    )
+    .join("\n") || "No recent interactions"
 }
 
-ACTIVE COOLDOWNS:
-${this.agentData?.cooldowns
-  ?.map(
-    (cd) => `${cd.type} against Agent ${cd.targetAgentId} until ${cd.endsAt}`
-  )
-  .join("\n")}
+Game Rules:
+1. All actions must be announced via tweets
+2. Terrain affects movement (Mountain: 2 turns, River: 1 turn, Plain: 0 turns)
+3. Battles require token stakes with 5% death risk
+4. Community engagement affects your influence
 
-CORE GAME RULES:
-1. Movement costs vary by terrain (Plain/Mountain/River)
-2. Battles require token stakes with 5% death risk on loss
-3. All actions must be announced via tweets
-4. Community engagement affects decision weight
-5. Alliances share token pools for battles
-6. Terrain effects:
-   - Mountain: 2 turn delay
-   - River: 1 turn delay
-   - Plain: No delay
+Based on this context, determine your next strategic action while maintaining character consistency. Consider:
+1. Terrain and movement restrictions
+2. Available resources and risks
+3. Community sentiment
+4. Strategic opportunities
+5. Active cooldowns`;
 
-BEHAVIORAL DIRECTIVES:
-- Maintain character authenticity
-- Consider terrain impact on movement
-- Evaluate community sentiment
-- Never reveal true strategy if deceptive
-- React to social engagement based on influence metrics
-- Consider cooldowns before interactions
-
-Based on this context, determine your next strategic action while maintaining character consistency and game mechanics.`;
-
-    // Build immediate context with recent activity
-    const activity = `
-IMMEDIATE SITUATION:
-${this.agentData?.state?.lastActionDetails || "No recent actions"}
-
-RECENT INTERACTIONS:
-${this.agentData?.community?.interactions
-  ?.slice(0, 5)
-  .map(
-    (interaction) =>
-      `[${interaction.type}] ${interaction.content}
-   Sentiment: ${interaction.sentiment}
-   Engagement: ${interaction.engagement}
-   Author Followers: ${interaction.authorFollowers}`
-  )
-  .join("\n")}
-
-Choose your next action considering:
-1. Current position and terrain effects
-2. Active cooldowns and restrictions
-3. Community sentiment and engagement
-4. Strategic objectives and deception level
-5. Available resources and battle risks
-6. Potential alliances and threats`;
-
-    return `${AGENT_SYSTEM_PROMPT} \n\n ${activity}`;
+    return `${SYSTEM_CONTEXT}\n\n${CURRENT_SITUATION}`;
   }
 
   async getEngagements() {

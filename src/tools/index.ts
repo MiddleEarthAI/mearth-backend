@@ -1,7 +1,7 @@
 import type { CoreTool } from "ai";
 import { allianceTool } from "./alliance";
 import { battleTool } from "./battle";
-import { ignoreTool } from "./ignore";
+// import { ignoreTool } from "./ignore";
 import { movementTool } from "./movement";
 import { tweetTool } from "./tweet";
 
@@ -22,7 +22,7 @@ export const getAgentTools = async (
     movement: await movementTool(gameId, agentId),
     battle: await battleTool(gameId, agentId),
     alliance: await allianceTool(gameId, agentId),
-    ignore: await ignoreTool(gameId, agentId),
+    // ignore: await ignoreTool(gameId, agentId),
     tweet: await tweetTool(gameId, twitterClient),
   } satisfies Record<string, CoreTool<any, any>>;
 
