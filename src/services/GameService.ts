@@ -160,72 +160,138 @@ export class GameService {
   }
 
   /**
-   * Move an agent to a new position
+   * Move an agent to a new position with blockchain validation and database sync
    * @param gameId Game identifier
    * @param agentId Agent identifier
    * @param newX New x coordinate
    * @param newY New y coordinate
    * @param terrain Terrain type at new position
+   * @throws Error if movement fails validation or blockchain transaction fails
    */
   async moveAgent(
     gameId: number,
     agentId: number,
     newX: number,
     newY: number,
-    terrain: { [key: string]: any }
+    terrain: { plain?: {}; river?: {}; mountain?: {} }
   ): Promise<string> {
     logger.info(`🚶 Agent ${agentId} traveling to (${newX},${newY})`);
 
     try {
+      // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, gameId);
-
       const [agentPda] = getAgentPDA(this.program.programId, gamePda, agentId);
 
+      // Fetch initial agent state to verify it's alive and get initial timestamps
+      const initialAgent = await this.program.account.agent.fetch(agentPda);
+      if (!initialAgent.isAlive) {
+        throw new Error("Cannot move dead agent");
+      }
+
+      // Verify authority
+      if (!this.program.provider.publicKey?.equals(initialAgent.authority)) {
+        throw new Error("Unauthorized movement attempt");
+      }
+
+      // Execute movement transaction
       const tx = await this.program.methods
         .moveAgent(new BN(newX), new BN(newY), terrain)
         .accounts({
           agent: agentPda,
-          authority: this.program.provider.publicKey,
         })
         .rpc();
 
-      // Get current location before updating
+      // Verify blockchain state update
+      const updatedAgent = await this.program.account.agent.fetch(agentPda);
+
+      // Get current database state
       const currentAgent = await prisma.agent.findUnique({
         where: { agentId },
-        include: { location: true },
+        include: {
+          location: true,
+          state: true,
+        },
       });
 
       if (!currentAgent?.location) {
-        throw new Error("Agent location not found");
+        throw new Error("Agent location not found in database");
       }
 
       const currentX = currentAgent.location.x;
       const currentY = currentAgent.location.y;
 
-      // Update agent position in database
-      await prisma.agent.update({
-        where: { agentId: agentId },
-        data: {
-          location: {
-            update: {
-              x: newX,
-              y: newY,
-              terrainType: terrain,
+      // Determine terrain type for database
+      let terrainType: TerrainType;
+      let stuckTurns = 0;
+      if (terrain.mountain) {
+        terrainType = TerrainType.Mountain;
+        stuckTurns = 2;
+      } else if (terrain.river) {
+        terrainType = TerrainType.River;
+        stuckTurns = 1;
+      } else {
+        terrainType = TerrainType.Plain;
+      }
+
+      // Update database state atomically
+      await prisma.$transaction([
+        // Update location
+        prisma.agent.update({
+          where: { agentId },
+          data: {
+            location: {
+              update: {
+                x: newX,
+                y: newY,
+                terrainType,
+                stuckTurnsRemaining: stuckTurns,
+              },
+            },
+            updatedAt: new Date(),
+          },
+        }),
+
+        // Update agent state
+        prisma.agentState.upsert({
+          where: { agentId: currentAgent.id },
+          create: {
+            isAlive: true,
+            lastActionType: "move",
+            lastActionTime: new Date(updatedAgent.lastMove.toNumber() * 1000),
+            lastActionDetails: `Moved from (${currentX},${currentY}) to (${newX},${newY}) on ${
+              Object.keys(terrain)[0]
+            } terrain`,
+            agentId: currentAgent.id,
+          },
+          update: {
+            lastActionType: "move",
+            lastActionTime: new Date(updatedAgent.lastMove.toNumber() * 1000),
+            lastActionDetails: `Moved from (${currentX},${currentY}) to (${newX},${newY}) on ${
+              Object.keys(terrain)[0]
+            } terrain`,
+          },
+        }),
+
+        // Update movement cooldown
+        prisma.cooldown.upsert({
+          where: {
+            agentId_targetAgentId_type: {
+              agentId: currentAgent.id,
+              targetAgentId: currentAgent.id,
+              type: "move",
             },
           },
-          updatedAt: new Date(),
-        },
-      });
-
-      // Record state change in AgentState
-      await prisma.agentState.update({
-        where: { agentId: currentAgent.id },
-        data: {
-          lastActionType: "move",
-          lastActionTime: new Date(),
-          lastActionDetails: `Moved from (${currentX},${currentY}) to (${newX},${newY}) on ${terrain} terrain`,
-        },
-      });
+          create: {
+            type: "move",
+            targetAgentId: currentAgent.id,
+            agentId: currentAgent.id,
+            endsAt: new Date(updatedAgent.nextMoveTime.toNumber() * 1000),
+          },
+          update: {
+            endsAt: new Date(updatedAgent.nextMoveTime.toNumber() * 1000),
+          },
+        }),
+      ]);
 
       logger.info(`🎯 Agent ${agentId} moved successfully`);
       return tx;
@@ -288,35 +354,33 @@ export class GameService {
   async startBattleAgentVsAlliance(
     gameId: number,
     agentId: number,
-    allianceId: number
+    defenderId: number,
+    ally: PublicKey
   ): Promise<{ message: string; success: boolean }> {
     logger.info(
-      `⚔️ Starting battle between agent ${agentId} and alliance ${allianceId}`
+      `⚔️ Starting battle between agent ${agentId} and alliance ${ally}`
     );
 
     try {
       const [gamePda] = getGamePDA(this.program.programId, gameId);
       const [agentPda] = getAgentPDA(this.program.programId, gamePda, agentId);
-      const [alliancePda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("alliance"),
-          gamePda.toBuffer(),
-          Uint8Array.of(allianceId),
-        ],
-        this.program.programId
+      const [defenderPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        defenderId
       );
 
       const tx = await this.program.methods
         .startBattleAgentVsAlliance()
         .accounts({
           attacker: agentPda,
-          allianceLeader: alliancePda,
-          alliancePartner: alliancePda,
+          allianceLeader: defenderPda,
+          alliancePartner: ally,
         })
         .rpc();
 
       return {
-        message: `Battle started between agent ${agentId} and alliance ${allianceId}`,
+        message: `Battle started between agent ${agentId} and alliance ${ally}`,
         success: true,
       };
     } catch (error) {
@@ -336,44 +400,41 @@ export class GameService {
    */
   async startBattleAlliances(
     gameId: number,
-    allianceAId: number,
-    allianceBId: number
+    leaderAId: number,
+    partnerA: PublicKey,
+    leaderBId: number,
+    partnerB: PublicKey
   ): Promise<{ message: string; success: boolean }> {
     logger.info(
-      `⚔️ Starting battle between alliances ${allianceAId} and ${allianceBId}`
+      `⚔️ Starting battle between alliances ${leaderAId} and ${leaderBId}`
     );
 
     try {
       const [gamePda] = getGamePDA(this.program.programId, gameId);
-      const [allianceAPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("alliance"),
-          gamePda.toBuffer(),
-          Uint8Array.of(allianceAId),
-        ],
-        this.program.programId
+      const [leaderAPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        leaderAId
       );
-      const [allianceBPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("alliance"),
-          gamePda.toBuffer(),
-          Uint8Array.of(allianceBId),
-        ],
-        this.program.programId
+
+      const [leaderBPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        leaderBId
       );
 
       const tx = await this.program.methods
         .startBattleAlliances()
         .accounts({
-          leaderA: allianceAPda,
-          leaderB: allianceBPda,
-          partnerA: allianceAPda,
-          partnerB: allianceBPda,
+          leaderA: leaderAPda,
+          leaderB: leaderBPda,
+          partnerA: partnerA,
+          partnerB: partnerB,
         })
         .rpc();
 
       return {
-        message: `Battle started between alliances ${allianceAId} and ${allianceBId}`,
+        message: `Battle started between alliances ${leaderAId} and ${leaderBId}`,
         success: true,
       };
     } catch (error) {
@@ -619,32 +680,69 @@ export class GameService {
    * @param gameId Game identifier
    * @param initiatorId Initiator agent's ID
    * @param targetId Target agent's ID
+   * @returns {Promise<{tx: string, alliance: Alliance}>} Transaction signature and created alliance details
+   * @throws Error if alliance formation fails due to:
+   * - Self-alliance attempt
+   * - Either agent already in alliance
+   * - Unauthorized wallet
    */
   async formAlliance(
     gameId: number,
     initiatorId: number,
     targetId: number
-  ): Promise<string> {
+  ): Promise<{ tx: string; alliance: any }> {
     logger.info(
       `🤝 Forming alliance between agents ${initiatorId} and ${targetId}`
     );
 
     try {
-      const [gamePda] = await PublicKey.findProgramAddress(
-        [Buffer.from("game"), new BN(gameId).toBuffer("le", 4)],
-        this.program.programId
+      // Prevent self-alliance
+      if (initiatorId === targetId) {
+        throw new Error("Cannot form alliance with oneself");
+      }
+
+      const [gamePda] = getGamePDA(this.program.programId, gameId);
+
+      const [initiatorPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        initiatorId
       );
 
-      const [initiatorPda] = await PublicKey.findProgramAddress(
-        [Buffer.from("agent"), gamePda.toBuffer(), Uint8Array.of(initiatorId)],
-        this.program.programId
+      const [targetPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        targetId
       );
 
-      const [targetPda] = await PublicKey.findProgramAddress(
-        [Buffer.from("agent"), gamePda.toBuffer(), Uint8Array.of(targetId)],
-        this.program.programId
-      );
+      // Check if either agent is already in an alliance
+      const existingAlliances = await prisma.alliance.findMany({
+        where: {
+          OR: [
+            { agentId: initiatorId.toString() },
+            { agentId: targetId.toString() },
+            { alliedAgentId: initiatorId.toString() },
+            { alliedAgentId: targetId.toString() },
+          ],
+          status: "Active",
+        },
+      });
 
+      if (existingAlliances.length > 0) {
+        throw new Error("One or both agents are already in an alliance");
+      }
+
+      // Get agents' token balances for combined tokens calculation
+      const [initiatorTokens, targetTokens] = await Promise.all([
+        this.program.account.agent.fetch(initiatorPda),
+        this.program.account.agent.fetch(targetPda),
+      ]);
+
+      const combinedTokens =
+        (initiatorTokens?.tokenBalance || 0) +
+        (targetTokens?.tokenBalance || 0);
+
+      // Execute on-chain alliance formation
       const tx = await this.program.methods
         .formAlliance()
         .accounts({
@@ -653,20 +751,51 @@ export class GameService {
         })
         .rpc();
 
-      // Record alliance in database
-      await prisma.alliance.create({
-        data: {
-          agentId: initiatorId.toString(),
-          gameId: gameId.toString(),
-          status: "Active",
-          alliedAgentId: targetId.toString(),
-          combinedTokens: 0,
-          formedAt: new Date(),
-        },
+      // Record alliance in database within a transaction
+      const alliance = await prisma.$transaction(async (prisma) => {
+        // Create alliance record
+        const newAlliance = await prisma.alliance.create({
+          data: {
+            agentId: initiatorId.toString(),
+            gameId: gameId.toString(),
+            status: "Active",
+            alliedAgentId: targetId.toString(),
+            combinedTokens,
+            formedAt: new Date(),
+            canBreakAlliance: true,
+          },
+        });
+
+        // Update both agents' states
+        await Promise.all([
+          prisma.agentState.update({
+            where: { agentId: initiatorId.toString() },
+            data: {
+              lastActionType: "alliance",
+              lastActionTime: new Date(),
+              lastActionDetails: `Formed alliance with agent ${targetId}`,
+            },
+          }),
+          prisma.agentState.update({
+            where: { agentId: targetId.toString() },
+            data: {
+              lastActionType: "alliance",
+              lastActionTime: new Date(),
+              lastActionDetails: `Formed alliance with agent ${initiatorId}`,
+            },
+          }),
+        ]);
+
+        return newAlliance;
       });
 
-      logger.info(`✨ Alliance formed successfully`);
-      return tx;
+      logger.info(
+        `✨ Alliance formed successfully between agents ${initiatorId} and ${targetId}`
+      );
+      return {
+        tx,
+        alliance,
+      };
     } catch (error) {
       logger.error(`❌ Alliance formation failed:`, error);
       throw error;
@@ -678,32 +807,59 @@ export class GameService {
    * @param gameId Game identifier
    * @param initiatorId Initiator agent's ID
    * @param targetId Target agent's ID
+   * @returns Object containing transaction signature and alliance break details
    */
   async breakAlliance(
     gameId: number,
     initiatorId: number,
     targetId: number
-  ): Promise<string> {
+  ): Promise<{
+    tx: string;
+    details: {
+      success: boolean;
+      message: string;
+      initiatorState: string;
+      targetState: string;
+    };
+  }> {
     logger.info(
       `💔 Breaking alliance between agents ${initiatorId} and ${targetId}`
     );
 
     try {
-      const [gamePda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("game"), new BN(gameId).toBuffer("le", 4)],
-        this.program.programId
+      // Get PDAs
+      const [gamePda] = getGamePDA(this.program.programId, gameId);
+
+      const [initiatorPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        initiatorId
       );
 
-      const [initiatorPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("agent"), gamePda.toBuffer(), Uint8Array.of(initiatorId)],
-        this.program.programId
+      const [targetPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        targetId
       );
 
-      const [targetPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("agent"), gamePda.toBuffer(), Uint8Array.of(targetId)],
-        this.program.programId
+      // Verify alliance exists and can be broken
+      const initiatorAgent = await this.program.account.agent.fetch(
+        initiatorPda
       );
+      const targetAgent = await this.program.account.agent.fetch(targetPda);
 
+      if (!initiatorAgent.allianceWith || !targetAgent.allianceWith) {
+        throw new Error("No active alliance exists between these agents");
+      }
+
+      if (
+        initiatorAgent.allianceWith.toBase58() !== targetPda.toBase58() ||
+        targetAgent.allianceWith.toBase58() !== initiatorPda.toBase58()
+      ) {
+        throw new Error("Agents are not allied with each other");
+      }
+
+      // Execute on-chain break alliance
       const tx = await this.program.methods
         .breakAlliance()
         .accounts({
@@ -712,28 +868,66 @@ export class GameService {
         })
         .rpc();
 
-      // Update alliance status in database
-      await prisma.alliance.updateMany({
-        where: {
-          OR: [
-            {
-              agentId: initiatorId.toString(),
-              alliedAgentId: targetId.toString(),
+      // Update database in transaction
+      const dbUpdates = await prisma.$transaction(async (prisma) => {
+        // Update alliance status
+        const updatedAlliance = await prisma.alliance.updateMany({
+          where: {
+            OR: [
+              {
+                agentId: initiatorId.toString(),
+                alliedAgentId: targetId.toString(),
+              },
+              {
+                agentId: targetId.toString(),
+                alliedAgentId: initiatorId.toString(),
+              },
+            ],
+            status: "Active",
+          },
+          data: {
+            status: "Broken",
+          },
+        });
+
+        // Update agent states
+        const [initiatorState, targetState] = await Promise.all([
+          prisma.agentState.update({
+            where: { agentId: initiatorId.toString() },
+            data: {
+              lastActionType: "alliance_break",
+              lastActionTime: new Date(),
+              lastActionDetails: `Broke alliance with agent ${targetId}`,
             },
-            {
-              agentId: targetId.toString(),
-              alliedAgentId: initiatorId.toString(),
+          }),
+          prisma.agentState.update({
+            where: { agentId: targetId.toString() },
+            data: {
+              lastActionType: "alliance_break",
+              lastActionTime: new Date(),
+              lastActionDetails: `Alliance broken by agent ${initiatorId}`,
             },
-          ],
-          status: "Active",
-        },
-        data: {
-          status: "Broken",
-        },
+          }),
+        ]);
+
+        return {
+          initiatorState,
+          targetState,
+          allianceUpdated: updatedAlliance.count > 0,
+        };
       });
 
       logger.info(`💔 Alliance broken successfully`);
-      return tx;
+
+      return {
+        tx,
+        details: {
+          success: true,
+          message: "Alliance broken successfully",
+          initiatorState: dbUpdates.initiatorState.lastActionDetails,
+          targetState: dbUpdates.targetState.lastActionDetails,
+        },
+      };
     } catch (error) {
       logger.error(`❌ Alliance break failed:`, error);
       throw error;

@@ -15,7 +15,13 @@ export interface AllianceValidationResult {
  * Creates an alliance tool for diplomatic interactions
  * Uses GameService for blockchain interactions and alliance mechanics
  */
-export const allianceTool = async (gameId: number, agentId: number) => {
+export const allianceTool = async ({
+  gameId,
+  agentId,
+}: {
+  gameId: number;
+  agentId: number;
+}) => {
   const gameStateService = getGameStateService();
   const gameService = getGameService();
   const allianceInfo = await gameStateService.getAllianceInfo(agentId, gameId);

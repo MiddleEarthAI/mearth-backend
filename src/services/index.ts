@@ -7,10 +7,12 @@ import { TerrainType } from "@prisma/client";
 import { logger } from "@/utils/logger";
 import type { Program } from "@coral-xyz/anchor";
 import type { Connection } from "@solana/web3.js";
+import { BattleResolutionService } from "./BattleResolutionService";
 
 let gameService: GameService | null = null;
 let gameStateService: GameStateService | null = null;
 let tokenService: TokenService | null = null;
+let battleResolutionService: BattleResolutionService | null = null;
 
 /**
  * Initialize all services
@@ -26,6 +28,8 @@ export async function initializeServices(
     gameService = new GameService(program, connection);
     gameStateService = new GameStateService(program, connection);
     tokenService = new TokenService(program, connection);
+    battleResolutionService = new BattleResolutionService(gameService, program);
+    battleResolutionService.start();
 
     logger.info("Game services initialized successfully");
   } catch (error) {

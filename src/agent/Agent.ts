@@ -1,51 +1,24 @@
 import { logger } from "@/utils/logger";
 import { type AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
-import type { GameStateService } from "../services/GameStateService";
-
 import { TwitterClient } from "@/agent/TwitterClient";
 import { prisma } from "@/config/prisma";
-import { getAgentTools } from "@/tools";
-import type { Prisma } from "@prisma/client";
-
-type AgentData = Prisma.AgentGetPayload<{
-  include: {
-    tokenomics: true;
-    personality: true;
-    strategy: true;
-    location: true;
-    state: true;
-    community: {
-      include: {
-        interactions: true;
-      };
-    };
-    currentAlliance: true;
-    cooldowns: true;
-    battles: true;
-    alliedBy: true;
-    battlesAsOpponent: true;
-  };
-}>;
+import { tweetTool } from "@/tools/static/tweet.tool";
 
 /**
  * Service for managing AI agentData behavior and decision making
  */
 export class Agent {
-  private gameId: number;
+  private currentGameId: number;
   private agentId: number;
   private anthropic: AnthropicProvider;
   private isRunning = false;
-  private agentData: AgentData | null = null;
+
   private twitterClient: TwitterClient | null = null;
 
-  constructor(
-    agentId: number,
-    gameId: number,
-    private readonly gameStateService: GameStateService
-  ) {
+  constructor(agentId: number, currentGameId: number) {
     this.agentId = agentId;
-    this.gameId = gameId;
+    this.currentGameId = currentGameId;
     const ACCESS_TOKEN = process.env[`TWITTER_ACCESS_TOKEN_${this.agentId}`];
     const ACCESS_SECRET = process.env[`TWITTER_ACCESS_SECRET_${this.agentId}`];
     if (!ACCESS_TOKEN || !ACCESS_SECRET) {
@@ -61,91 +34,36 @@ export class Agent {
       accessToken: ACCESS_TOKEN,
       accessSecret: ACCESS_SECRET,
     });
-
-    this.init();
-  }
-
-  /**
-   * Initialize agentData state and knowledge
-   */
-  private async init(): Promise<void> {
-    try {
-      logger.info("🔥🔥🔥🔥🔥🔥 agent Id about to be found", this.agentId);
-
-      // Load agentData data from database
-      const agentData = await prisma.agent.findUnique({
-        where: { agentId: this.agentId },
-        include: {
-          battles: true,
-          alliedBy: true,
-          community: {
-            include: {
-              interactions: true,
-              _count: true,
-            },
-          },
-          personality: true,
-          currentAlliance: true,
-
-          battlesAsOpponent: true,
-          location: true,
-          state: true,
-          strategy: true,
-          tokenomics: true,
-          cooldowns: true,
-        },
-      });
-
-      if (!agentData) {
-        throw new Error(
-          `Agent with agentId ${this.agentId} not found in database`
-        );
-      }
-
-      this.agentData = agentData;
-
-      logger.info(
-        `Agent ${this.agentId} with gameId ${this.gameId} with id 
-        ${this.agentData?.id} with twitter handle ${this.agentData?.xHandle} with name ${this.agentData?.name} initialized successfully`
-      );
-    } catch (error) {
-      logger.error("Failed to initialize agentData:", error);
-      throw error;
-    }
   }
 
   /**
    * Start the agentData's decision-making loop
    */
+
   async start(): Promise<void> {
     this.isRunning = true;
     logger.info(`Starting agentData ${this.agentId}`);
-    const MAX_ACTION_DELAY_MS = process.env.MAX_ACTION_DELAY_MS
-      ? Number(process.env.MAX_ACTION_DELAY_MS)
-      : 60 * 70 * 1000; // 1hr 10 minutes
-    const MIN_ACTION_DELAY_MS = process.env.MIN_ACTION_DELAY_MS
-      ? Number(process.env.MIN_ACTION_DELAY_MS)
-      : 60 * 60 * 1000; // 1hr
+    const MAX_ACTION_DELAY_MS = 60 * 70 * 1000; // 1hr 10 minutes
+    const MIN_ACTION_DELAY_MS = 60 * 60 * 1000; // 1hr
 
     const actionLoop = async (): Promise<void> => {
       if (!this.isRunning) return;
 
       try {
-        const context = await this.generateContext();
+        const context = await this.generateContextString();
 
         // Get AI decision using tools
-        await generateText({
+        const { text, steps } = await generateText({
           model: this.anthropic("claude-3-sonnet-20240229"),
           prompt: context,
-          tools: await getAgentTools(
-            Number(this.gameId),
-            Number(this.agentId),
-            this.twitterClient
-          ),
-          maxSteps: 5,
+          tools: {
+            tweet: tweetTool(this.twitterClient),
+          },
+          maxSteps: 1,
           toolChoice: "required",
         });
-
+        logger.info(`Agent ${this.agentId} decision: ${text}`);
+        logger.info(`Agent ${this.agentId} steps: ${steps}`);
         // Calculate next action delay
         const delay = Math.floor(
           Math.random() * (MAX_ACTION_DELAY_MS - MIN_ACTION_DELAY_MS + 1) +
@@ -164,100 +82,107 @@ export class Agent {
     actionLoop();
   }
 
-  async generateContext(): Promise<string> {
-    // Get current game state
-    const agentAccount = await this.gameStateService.getAgent(
-      Number(this.gameId),
-      Number(this.agentId)
-    );
-
-    if (!agentAccount) {
-      throw new Error("Agent not found");
-    }
+  async generateContextString(): Promise<string> {
+    const dbAgent = await prisma.agent.findUnique({
+      where: { agentId: Number(this.agentId) },
+      include: {
+        state: true,
+        location: true,
+        personality: true,
+        tokenomics: true,
+        currentAlliance: true,
+        cooldowns: true,
+        community: {
+          include: {
+            interactions: true,
+          },
+        },
+      },
+    });
 
     // Core system prompt that defines the agent's role and capabilities
     const SYSTEM_CONTEXT = `You are an autonomous agent in Middle Earth AI, a strategic game where agents compete for territory and influence. You must stay in character and make decisions based on your personality traits and current situation.
 
-Role: ${this.agentData?.name} (@${this.agentData?.xHandle})
-Character Type: ${this.agentData?.characteristics.join(", ")}
+Role: ${dbAgent?.name} (@${dbAgent?.xHandle})
+Character Type: ${dbAgent?.characteristics.join(", ")}
 
 Background:
 • Bio: ${
-      this.agentData?.bio
-        ? this.agentData.bio
+      dbAgent?.bio
+        ? dbAgent.bio
             .sort(() => 0.5 - Math.random())
             .slice(0, 2)
             .join(", ")
         : ""
     }
 • Lore: ${
-      this.agentData?.lore
-        ? this.agentData.lore
+      dbAgent?.lore
+        ? dbAgent.lore
             .sort(() => 0.5 - Math.random())
             .slice(0, 2)
             .join(", ")
         : ""
     }
-• Influence Level: ${this.agentData?.influenceDifficulty || "Standard"}
+• Influence Level: ${dbAgent?.influenceDifficulty || "Standard"}
 
 Core Attributes:
-• Health: ${this.agentData?.state?.health}/100
-• Status: ${this.agentData?.state?.isAlive ? "ACTIVE" : "DEFEATED"}
-• Position: (${this.agentData?.location?.x}, ${
-      this.agentData?.location?.y
-    }) on ${this.agentData?.location?.terrainType}
+• Health: ${dbAgent?.state?.health}/100
+• Status: ${dbAgent?.state?.isAlive ? "ACTIVE" : "DEFEATED"}
+• Position: (${dbAgent?.location?.x}, ${dbAgent?.location?.y}) on ${
+      dbAgent?.location?.terrainType
+    }
 ${
-  this.agentData?.location?.stuckTurnsRemaining
-    ? `• Movement Restricted: ${this.agentData?.location?.stuckTurnsRemaining} turns`
+  dbAgent?.location?.stuckTurnsRemaining
+    ? `• Movement Restricted: ${dbAgent?.location?.stuckTurnsRemaining} turns`
     : ""
 }
 
 Personality Matrix:
 ${
-  this.agentData?.personality
+  dbAgent?.personality
     ? `
-• Aggression: ${this.agentData.personality.aggressiveness}/10
-• Trust: ${this.agentData.personality.trustworthiness}/10
-• Intelligence: ${this.agentData.personality.intelligence}/10
-• Adaptability: ${this.agentData.personality.adaptability}/10`
+• Aggression: ${dbAgent?.personality.aggressiveness}/10
+• Trust: ${dbAgent?.personality.trustworthiness}/10
+• Intelligence: ${dbAgent?.personality.intelligence}/10
+• Adaptability: ${dbAgent?.personality.adaptability}/10`
     : ""
 }
 
 Resources:
 ${
-  this.agentData?.tokenomics
-    ? `• Staked: ${this.agentData.tokenomics.stakedTokens} MEARTH
-• Win Rate: ${this.agentData.tokenomics.winRate}%
-• Record: ${this.agentData.tokenomics.totalWon}W-${this.agentData.tokenomics.totalLost}L`
+  dbAgent?.tokenomics
+    ? `• Staked: ${dbAgent?.tokenomics.stakedTokens} MEARTH
+• Win Rate: ${dbAgent?.tokenomics?.winRate}%
+• Record: ${dbAgent?.tokenomics?.totalWon}W-${dbAgent?.tokenomics?.totalLost}L`
     : ""
 }
 
 Social Influence:
 ${
-  this.agentData?.community
-    ? `• Followers: ${this.agentData.community.followers}
-• Engagement: ${this.agentData.community.averageEngagement}
-• Supporters: ${this.agentData.community.supporterCount}`
+  dbAgent?.community
+    ? `• Followers: ${dbAgent?.community.followers}
+• Engagement: ${dbAgent?.community?.averageEngagement}
+• Supporters: ${dbAgent?.community?.supporterCount}`
     : ""
 }
 
 ${
-  this.agentData?.currentAlliance
+  dbAgent?.currentAlliance
     ? `Current Alliance:
-• Allied with: Agent ${this.agentData.currentAlliance.alliedAgentId}
-• Combined Force: ${this.agentData.currentAlliance.combinedTokens} MEARTH
-• Breakable: ${this.agentData.currentAlliance.canBreakAlliance ? "Yes" : "No"}`
+• Allied with: Agent ${dbAgent?.currentAlliance?.alliedAgentId}
+• Combined Force: ${dbAgent?.currentAlliance?.combinedTokens} MEARTH
+• Breakable: ${dbAgent?.currentAlliance?.canBreakAlliance ? "Yes" : "No"}`
     : ""
 }`;
 
     // Dynamic context that changes with each decision
     const CURRENT_SITUATION = `
 Current State:
-• Last Action: ${this.agentData?.state?.lastActionType} (${
-      this.agentData?.state?.lastActionDetails
+• Last Action: ${dbAgent?.state?.lastActionType} (${
+      dbAgent?.state?.lastActionDetails
     })
 • Active Cooldowns: ${
-      this.agentData?.cooldowns
+      dbAgent?.cooldowns
         ?.map(
           (cd) => `${cd.type} vs Agent ${cd.targetAgentId} until ${cd.endsAt}`
         )
@@ -266,7 +191,7 @@ Current State:
 
 Recent Community Interactions:
 ${
-  this.agentData?.community?.interactions
+  dbAgent?.community?.interactions
     ?.slice(0, 3) // Only show 3 most recent interactions
     .map(
       (int) =>
@@ -297,7 +222,7 @@ Based on this context, determine your next strategic action while maintaining ch
     }
     const tweets = await this.twitterClient.getOwnTweets();
     const engagementAnalysis = await Promise.all(
-      tweets.data.map((tweet) =>
+      tweets.data.data.map((tweet) =>
         this.twitterClient?.analyzeEngagement(tweet.id)
       )
     );

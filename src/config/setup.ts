@@ -6,7 +6,7 @@ import { getProgram } from "@/utils";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { prisma } from "./prisma";
 import { initializeServices } from "@/services";
-import { AgentManager } from "@/agent/AgentManager";
+
 import { GameAccount } from "@/types/program";
 import { BN } from "@coral-xyz/anchor";
 import { TerrainType } from "@prisma/client";
@@ -14,6 +14,7 @@ import { gameData } from "./game-data";
 import { MearthProgram } from "@/types";
 
 import { Prisma } from "@prisma/client";
+import { Agent } from "@/agent/Agent";
 
 type PrismaAgent = Prisma.AgentGetPayload<{
   include: {
@@ -191,12 +192,7 @@ export async function setup(): Promise<void> {
     // Initialize services and agent manager
     logger.info("🔧 Initializing core services...");
     await initializeServices(connection, program);
-
-    const agentManager = AgentManager.getInstance();
-    await agentManager.initializeAndStartAgents(mostRecentActiveGame.account);
-    logger.info("✨ Core services initialized", {
-      activeAgents: agentManager.getActiveAgents(),
-    });
+    await createAndStartAgents(dbGame);
 
     logger.info("🎉 Application initialization completed successfully");
   } catch (error) {
@@ -591,4 +587,39 @@ async function createAgentInDB(
     location: { x: agent.location?.x || 0, y: agent.location?.y || 0 },
     health: agent.state?.health ?? 100,
   });
+}
+
+/**
+ * Helper function to create and start agents for a game
+ * @param game The game object containing agent data
+ * @returns Array of initialized Agent instances
+ */
+async function createAndStartAgents(game: PrismaGame) {
+  logger.info("🤖 Creating and starting agents...", {
+    gameId: game.gameId,
+    agentCount: game.agents.length,
+  });
+
+  const agents: Agent[] = [];
+
+  for (const agentData of game.agents) {
+    try {
+      const agent = new Agent(agentData.agentId, game.gameId);
+      await agent.start();
+      agents.push(agent);
+
+      logger.info(`✅ Agent initialized successfully`, {
+        name: agentData.name,
+        agentId: agentData.agentId,
+      });
+    } catch (error) {
+      logger.error(`❌ Failed to initialize agent`, {
+        name: agentData.name,
+        agentId: agentData.agentId,
+        error: (error as Error).message,
+      });
+    }
+  }
+
+  return agents;
 }

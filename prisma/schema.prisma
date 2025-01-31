@@ -103,6 +103,12 @@ model Battle {
   agentId    String
   opponent   Agent  @relation("OpponentAgent", fields: [opponentId], references: [id])
   opponentId String
+
+  type           BattleType   @default(Simple)
+  status         BattleStatus @default(Active)
+  startTime      DateTime
+  resolutionTime DateTime
+  resolvedAt     DateTime?
 }
 
 model Community {
@@ -225,4 +231,16 @@ enum AllianceStatus {
   Active
   Pending
   Broken
+}
+
+enum BattleStatus {
+  Active
+  Resolved
+  Failed
+}
+
+enum BattleType {
+  Simple
+  AgentVsAlliance
+  AllianceVsAlliance
 }

@@ -23,10 +23,14 @@ enum TweetType {
  * Creates a sophisticated tweet tool for agents to engage in Middle Earth's social landscape
  * Integrates with onchain battle system and maintains social graph in database
  */
-export const tweetTool = async (
-  agentId: number,
-  twitterClient: TwitterClient | null
-) => {
+export const tweetTool = async ({
+  agentId,
+  twitterClient,
+}: {
+  gameId: number;
+  agentId: number;
+  twitterClient: TwitterClient | null;
+}) => {
   // Fetch comprehensive agent state including battle/alliance history
   const agent = await prisma.agent.findUnique({
     where: { agentId },

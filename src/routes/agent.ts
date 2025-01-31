@@ -1,4 +1,3 @@
-import { AgentManager } from "@/agent/AgentManager";
 import { validateZod } from "@/middleware/validateZod";
 import { registerAgentSchema } from "@/schemas/agent";
 import {
@@ -33,10 +32,6 @@ router.post("/register", validateZod(registerAgentSchema), async (req, res) => {
       name,
       xHandle
     );
-
-    // Start the agent
-    const agentManager = AgentManager.getInstance();
-    await agentManager.createAndStart(gameId, agentId);
 
     logger.info(`✨ Successfully registered agent ${name} (ID: ${agentId})`);
     res.json({
@@ -82,13 +77,6 @@ router.post("/start", async (req, res) => {
       });
     }
 
-    const agentManager = AgentManager.getInstance();
-    await agentManager.createAndStart(
-      Number.parseInt(gameId),
-      Number.parseInt(agentId)
-    );
-
-    logger.info(`🚀 Agent ${agentId} successfully started`);
     res.json({
       success: true,
       message: `Agent ${agentId} started`,
@@ -162,34 +150,6 @@ router.post("/:agentId/move", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Failed to move agent",
-      details: (error as Error).message,
-    });
-  }
-});
-
-/**
- * Stop an agent
- */
-router.post("/:agentId/stop", async (req, res) => {
-  try {
-    const { agentId } = req.params;
-    const agentManager = AgentManager.getInstance();
-    await agentManager.stopAgent(Number.parseInt(agentId));
-
-    logger.info(`🛑 Agent ${agentId} successfully stopped`);
-    res.json({
-      success: true,
-      message: `Agent ${agentId} stopped`,
-      data: {
-        agentId,
-        stopTime: new Date().toISOString(),
-      },
-    });
-  } catch (error) {
-    logger.error("💥 Failed to stop agent:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to stop agent",
       details: (error as Error).message,
     });
   }
@@ -284,32 +244,6 @@ router.post("/:agentId/stake", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Failed to stake tokens",
-      details: (error as Error).message,
-    });
-  }
-});
-
-/**
- * Get all active agents
- */
-router.get("/active", async (_req, res) => {
-  try {
-    const agentManager = AgentManager.getInstance();
-    const activeAgents = agentManager.getActiveAgents();
-
-    res.json({
-      success: true,
-      data: {
-        count: activeAgents.count,
-        agents: activeAgents.agents,
-        timestamp: new Date().toISOString(),
-      },
-    });
-  } catch (error) {
-    logger.error("💥 Failed to get active agents:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to get active agents",
       details: (error as Error).message,
     });
   }

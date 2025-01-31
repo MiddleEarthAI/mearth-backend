@@ -20,7 +20,13 @@ export interface BattleValidationResult {
  * Creates a battle tool for agents to engage in combat with advanced mechanics
  * Integrates with Solana blockchain for token transfers and state management
  */
-export const battleTool = async (gameId: number, agentId: number) => {
+export const battleTool = async ({
+  gameId,
+  agentId,
+}: {
+  gameId: number;
+  agentId: number;
+}) => {
   const gameService = getGameService();
   const gameState = getGameStateService();
 

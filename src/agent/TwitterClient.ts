@@ -14,11 +14,29 @@ export interface TwitterClientConfig {
  * Handles authentication, tweet operations, and engagement analysis for a single agent
  */
 export class TwitterClient {
-  private client: TwitterApi | null = null;
+  private client: TwitterApi;
   private engagementAnalyzer: TwitterEngagementAnalyzer | null = null;
   private user: UserV2Result | null = null;
-  private retryLimit = 3;
-  constructor(private readonly config: TwitterClientConfig) {
+  private agentId: number;
+  private dryRun: boolean = true;
+
+  constructor(config: TwitterClientConfig) {
+    const { agentId, accessToken, accessSecret } = config;
+
+    if (!process.env.TWITTER_API_KEY || !process.env.TWITTER_API_SECRET) {
+      throw new Error("Twitter API credentials not configured");
+    }
+
+    this.agentId = agentId;
+
+    // Create client with user context
+    this.client = new TwitterApi({
+      appKey: process.env.TWITTER_API_KEY,
+      appSecret: process.env.TWITTER_API_SECRET,
+      accessToken: accessToken,
+      accessSecret: accessSecret,
+    });
+
     this.init();
   }
 
@@ -26,26 +44,7 @@ export class TwitterClient {
    * Initialize the Twitter client with provided credentials
    */
   async init(): Promise<void> {
-    const TWITTER_API_KEY = process.env.TWITTER_API_KEY;
-    const TWITTER_API_SECRET = process.env.TWITTER_API_SECRET;
-
-    if (
-      !TWITTER_API_KEY ||
-      !TWITTER_API_SECRET ||
-      !this.config.accessToken ||
-      !this.config.accessSecret
-    ) {
-      throw new Error("Twitter credentials not found");
-    }
-
     try {
-      this.client = new TwitterApi({
-        appKey: TWITTER_API_KEY,
-        appSecret: TWITTER_API_SECRET,
-        accessToken: this.config.accessToken,
-        accessSecret: this.config.accessSecret,
-      });
-
       this.engagementAnalyzer = new TwitterEngagementAnalyzer(this.client);
       this.user = await this.client.v2.me();
 
@@ -53,9 +52,7 @@ export class TwitterClient {
         throw new Error("Failed to load Twitter user");
       }
 
-      logger.info(
-        `Twitter client initialized for agent ${this.config.agentId}`
-      );
+      logger.info(`Twitter client initialized for agent ${this.agentId}`);
     } catch (error) {
       logger.error("Twitter client initialization error:", error);
       throw error;
@@ -65,32 +62,25 @@ export class TwitterClient {
   /**
    * Post a tweet with retry mechanism and error handling
    */
-  async postTweet(content: string): Promise<void> {
-    if (!this.client) {
-      throw new Error("Twitter client not initialized");
-    }
-
+  async postTweet(content: string): Promise<string> {
     try {
-      if (!content || content.length > 280) {
-        throw new Error(`Invalid tweet length: ${content?.length}`);
+      if (this.dryRun) {
+        logger.info(
+          `🐦 Agent ${this.agentId} dry run posting tweet: ${content}`
+        );
+        return "dry-run-tweet-id";
       }
 
-      let retries = this.retryLimit;
-      while (retries > 0) {
-        try {
-          await this.client.v2.tweet(content);
-        } catch (error) {
-          logger.error(
-            `Tweet attempt failed (${retries} retries left):`,
-            error
-          );
-          retries--;
-          if (retries === 0) throw error;
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-      }
+      const tweet = await this.client.v2.tweet(content);
+
+      logger.info(`✅ Tweet posted successfully`, {
+        agentId: this.agentId,
+        tweetId: tweet.data.id,
+      });
+
+      return tweet.data.id;
     } catch (error) {
-      logger.error("Tweet posting error:", error);
+      logger.error(`Failed to post tweet for agent ${this.agentId}:`, error);
       throw error;
     }
   }
@@ -105,11 +95,21 @@ export class TwitterClient {
     return this.engagementAnalyzer.analyzeEngagement(tweetId);
   }
 
-  async getOwnTweets() {
-    if (!this.client || !this.user) {
-      throw new Error("Twitter client or user not initialized");
+  /**
+   * Get agent's own tweets
+   */
+  async getOwnTweets(maxResults: number = 10) {
+    try {
+      const tweets = await this.client.v2.userTimeline(this.user!.data.id, {
+        max_results: maxResults,
+        "tweet.fields": ["created_at", "public_metrics"],
+      });
+
+      return tweets;
+    } catch (error) {
+      logger.error(`Failed to fetch tweets for agent ${this.agentId}:`, error);
+      throw error;
     }
-    return this.client.v2.tweets(this.user.data.id);
   }
 
   /**
@@ -120,6 +120,73 @@ export class TwitterClient {
   }
 
   getAgentId() {
-    return this.config.agentId;
+    return this.agentId;
   }
+
+  /**
+   * Follow another user
+   */
+  async followUser(userId: string) {
+    try {
+      const me = await this.client.v2.me();
+      await this.client.v2.follow(me.data.id, userId);
+
+      logger.info(`✅ Successfully followed user`, {
+        agentId: this.agentId,
+        targetUserId: userId,
+      });
+    } catch (error) {
+      logger.error(`Failed to follow user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get user's followers
+   */
+  async getFollowers(maxResults: number = 100) {
+    try {
+      const followers = await this.client.v2.followers(this.user!.data.id, {
+        max_results: maxResults,
+        "user.fields": ["public_metrics"],
+      });
+
+      return followers;
+    } catch (error) {
+      logger.error(
+        `Failed to fetch followers for agent ${this.agentId}:`,
+        error
+      );
+      throw error;
+    }
+  }
+}
+
+// Helper function to calculate influence score
+function calculateInfluence(metrics: any): number {
+  if (!metrics) return 0;
+
+  const {
+    reply_count = 0,
+    retweet_count = 0,
+    like_count = 0,
+    quote_count = 0,
+  } = metrics;
+
+  // Weight different engagement types
+  const weights = {
+    reply: 2, // Replies show more engagement
+    retweet: 1.5, // Retweets show good reach
+    like: 1, // Likes show basic engagement
+    quote: 2.5, // Quotes show high engagement
+  };
+
+  const totalEngagement =
+    reply_count * weights.reply +
+    retweet_count * weights.retweet +
+    like_count * weights.like +
+    quote_count * weights.quote;
+
+  // Normalize to 0-1 range (you can adjust the denominator based on your needs)
+  return Math.min(totalEngagement / 1000, 1);
 }

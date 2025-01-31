@@ -785,4 +785,14 @@ export const validCoordinates = new Set([
   ...plains.coordinates,
 ]);
 
+export const getTerrainTypeByCoordinates = (x: number, y: number) => {
+  if (rivers.coordinates.has(`${x},${y}`)) {
+    return { river: {} };
+  }
+  if (mountains.coordinates.has(`${x},${y}`)) {
+    return { mountain: {} };
+  }
+  return { plain: {} };
+};
+
 export const validCoordinatesArray = Array.from(validCoordinates);

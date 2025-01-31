@@ -6,6 +6,7 @@ import { movementTool } from "./movement";
 import { tweetTool } from "./tweet";
 
 import { TwitterClient } from "@/agent/TwitterClient";
+import { logger } from "@/utils/logger";
 
 /**
  * Get all tools for an agent with proper service integrations
@@ -13,17 +14,24 @@ import { TwitterClient } from "@/agent/TwitterClient";
  * @param agentId - The ID of the agent
  * @returns Record of available tools for the agent
  */
-export const getAgentTools = async (
-  gameId: number,
-  agentId: number,
-  twitterClient: TwitterClient | null
-): Promise<Record<string, CoreTool<any, any>>> => {
+export const getAgentTools = async ({
+  gameId,
+  agentId,
+  twitterClient,
+}: {
+  gameId: number;
+  agentId: number;
+  twitterClient: TwitterClient | null;
+}): Promise<Record<string, CoreTool<any, any>>> => {
+  logger.info(
+    `Creating tools for agent ${agentId} in game ${gameId} with twitter client ${twitterClient}`
+  );
   const toolsMap = {
-    movement: await movementTool(gameId, agentId),
-    battle: await battleTool(gameId, agentId),
-    alliance: await allianceTool(gameId, agentId),
+    // movement: await movementTool({ gameId, agentId }),
+    battle: await battleTool({ gameId, agentId }),
+    alliance: await allianceTool({ gameId, agentId }),
     // ignore: await ignoreTool(gameId, agentId),
-    tweet: await tweetTool(gameId, twitterClient),
+    tweet: await tweetTool({ agentId, gameId, twitterClient }),
   } satisfies Record<string, CoreTool<any, any>>;
 
   return toolsMap;

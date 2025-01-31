@@ -2,11 +2,15 @@ import { logger } from "@/utils/logger";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import { AgentManager } from "./agent/AgentManager";
+
 import { prisma } from "./config/prisma";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
 import { setup } from "./config/setup";
+import { config } from "dotenv";
+
+// Load environment variables
+config();
 
 const app = express();
 
@@ -46,32 +50,16 @@ export async function startServer() {
   }
 }
 
-// Graceful shutdown
-async function shutdown() {
-  logger.info("Initiating graceful shutdown...");
-
-  // Stop all agents
-  try {
-    const agentManager = AgentManager.getInstance();
-    await agentManager.shutdown();
-    logger.info("All agents stopped");
-  } catch (error) {
-    logger.error("Error stopping agents:", error);
-  }
-
-  // Close database connection
-  try {
-    await prisma.$disconnect();
-    logger.info("Database connection closed");
-  } catch (error) {
-    logger.error("Error closing database connection:", error);
-  }
-
-  logger.info("Shutdown complete");
+process.on("SIGTERM", () => {
+  logger.info("SIGTERM received. Starting graceful shutdown...");
+  prisma.$disconnect();
   process.exit(0);
-}
+});
 
-process.on("SIGTERM", shutdown);
-process.on("SIGINT", shutdown);
+process.on("SIGINT", () => {
+  logger.info("SIGINT received. Starting graceful shutdown...");
+  prisma.$disconnect();
+  process.exit(0);
+});
 
 startServer();

@@ -8,10 +8,13 @@ import { z } from "zod";
  * Creates a Twitter engagement analysis tool for analyzing tweet engagement and community dynamics
  * Uses TwitterService with manager pattern for advanced analysis
  */
-export const twitterAnalysisTool = async (
-  agentId: number,
-  twitterClient: TwitterClient
-) => {
+export const twitterAnalysisTool = async ({
+  agentId,
+  twitterClient,
+}: {
+  agentId: number;
+  twitterClient: TwitterClient;
+}) => {
   // Get agent's current state and social context
   const agent = await prisma.agent.findUnique({
     where: { agentId: agentId },

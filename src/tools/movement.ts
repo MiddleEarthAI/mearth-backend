@@ -25,11 +25,21 @@ export interface MoveValidationResult {
  * Uses GameService for blockchain interactions and movement mechanics
  * Handles terrain effects, cooldowns, and updates both chain and DB state
  */
-export const movementTool = async (gameId: number, agentId: number) => {
+export const movementTool = async ({
+  gameId,
+  agentId,
+}: {
+  gameId: number;
+  agentId: number;
+}) => {
+  logger.info(`Creating movement tool for agent ${agentId} in game ${gameId}`);
   const gameStateService = getGameStateService();
   const gameService = getGameService();
 
   const allAliveAgents = await gameStateService.getAllAliveAgents(gameId);
+  logger.info(
+    `All alive agents: ${allAliveAgents.map((a) => a.id).join(", ")}`
+  );
   const agent = allAliveAgents.find((a) => a.id === agentId);
 
   if (!agent) throw new Error("Agent not found onchain");
