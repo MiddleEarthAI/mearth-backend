@@ -21,7 +21,13 @@ export enum BattleType {
 /**
  * Tool for initiating and managing battles between agents with cooldown periods
  */
-export const battleTool = (agentId: number, gameId: number) =>
+export const battleTool = ({
+  agentId,
+  gameId,
+}: {
+  agentId: number;
+  gameId: number;
+}) =>
   tool({
     description: `Battle tool/action for engaging in combat with other agents in Middle Earth.
 Features:

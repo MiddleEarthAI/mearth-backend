@@ -14,6 +14,12 @@ import { TerrainType } from "@prisma/client";
 import { Twitter } from "@/services/twitter";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
+import {
+  battleTool,
+  breakAllianceTool,
+  formAllianceTool,
+  movementTool,
+} from "@/tools/static";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -82,8 +88,24 @@ export class Agent {
               gameId: this.currentGameId,
               twitterApi: this.twitterApi,
             }),
+            formAlliance: await formAllianceTool({
+              gameId: this.currentGameId,
+              agentId: this.agent.agentId,
+            }),
+            movement: movementTool({
+              gameId: this.currentGameId,
+              agentId: this.agent.agentId,
+            }),
+            battle: battleTool({
+              gameId: this.currentGameId,
+              agentId: this.agent.agentId,
+            }),
+            breakAlliance: await breakAllianceTool({
+              gameId: this.currentGameId,
+              agentId: this.agent.agentId,
+            }),
           },
-          maxSteps: 1,
+          maxSteps: 5,
           toolChoice: "required",
         });
 

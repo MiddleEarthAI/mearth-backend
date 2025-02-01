@@ -14,7 +14,6 @@ export const formAllianceTool = async ({
   gameId: number;
   agentId: number;
 }) => {
-  const gameService = getGameService();
   const agent = await prisma.agent.findUnique({
     where: { agentId },
   });
@@ -62,6 +61,8 @@ EFFECTS:
     }),
 
     execute: async ({ targetAgentXHandle }) => {
+      const gameService = getGameService();
+
       try {
         // Prevent self-alliance
         if (agent?.xHandle === targetAgentXHandle) {

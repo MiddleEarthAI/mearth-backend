@@ -15,7 +15,7 @@ export const movementTool = (context: { gameId: number; agentId: number }) => {
   const gameService = getGameService();
 
   return tool({
-    description: `Movement System for navigating Middle Earth's terrain.
+    description: `Movement Tool for navigating Middle Earth's terrain.
 
 Features:
 - Move to specific coordinates
