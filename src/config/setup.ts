@@ -2,7 +2,6 @@ import { logger } from "@/utils/logger";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import * as anchor from "@coral-xyz/anchor";
 import { Keypair, SystemProgram, Connection, PublicKey } from "@solana/web3.js";
-import { getProgram } from "@/utils";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { prisma } from "./prisma";
 import { initializeServices } from "@/services";
@@ -16,7 +15,6 @@ import { MearthProgram } from "@/types";
 import { Prisma } from "@prisma/client";
 import { Agent } from "@/agent/Agent";
 import { getProgramWithWallet } from "@/utils/program";
-import { program } from "@coral-xyz/anchor/dist/cjs/native/system";
 
 type PrismaAgent = Prisma.AgentGetPayload<{
   include: {
@@ -354,29 +352,53 @@ async function syncAgents(
     existingAgents: dbGame.agents.length,
   });
 
-  for (const agent of gameData.agents as PrismaAgent[]) {
-    // Check if the agent is already in the database
-    if (!dbGame.agents.find((a) => a.agentId === agent.agentId)) {
-      logger.info(`👤 Processing new agent`, {
-        name: agent.name,
-        agentId: agent.agentId,
+  // Register all agents from game-data.ts
+  for (const agentData of gameData.agents) {
+    try {
+      logger.info(`👤 Processing agent`, {
+        name: agentData.name,
+        agentId: agentData.agentId,
       });
 
-      const agentKeypair = Keypair.generate();
+      // First register on chain
+      await registerAgentOnChain(program, gamePda, agentData as PrismaAgent);
 
-      const walletInfo = `${bs58.encode(
-        agentKeypair.secretKey
-      )},${agentKeypair.publicKey.toBase58()}`;
-
-      await registerAgentOnChain(program, gamePda, agent);
-
-      await createAgentInDB(agent, dbGame.id.toString(), walletInfo);
-      logger.info(`✅ Agent synchronized successfully`, {
-        name: agent.name,
-        publicKey: agentKeypair.publicKey.toBase58(),
+      // Then create in database if not exists
+      const existingAgent = await prisma.agent.findUnique({
+        where: { agentId: agentData.agentId },
       });
+
+      if (!existingAgent) {
+        const agentKeypair = Keypair.generate();
+        const walletInfo = `${bs58.encode(
+          agentKeypair.secretKey
+        )},${agentKeypair.publicKey.toBase58()}`;
+
+        await createAgentInDB(agentData as PrismaAgent, dbGame.id, walletInfo);
+        logger.info(`✅ Agent synchronized successfully`, {
+          name: agentData.name,
+          publicKey: agentKeypair.publicKey.toBase58(),
+        });
+      } else {
+        logger.info(`✅ Agent already exists in database`, {
+          name: agentData.name,
+          agentId: agentData.agentId,
+        });
+      }
+    } catch (error) {
+      logger.error(`❌ Failed to sync agent`, {
+        name: agentData.name,
+        agentId: agentData.agentId,
+        error: (error as Error).message,
+      });
+      // Continue with next agent instead of throwing
+      continue;
     }
   }
+
+  logger.info("✅ Agent synchronization completed", {
+    totalProcessed: gameData.agents.length,
+  });
 }
 
 /**
@@ -440,7 +462,8 @@ async function registerAgentOnChain(
     gamePda: gamePda.toBase58(),
   });
 
-  const agentId = new anchor.BN(agent.id);
+  // Use agentId instead of id for on-chain registration
+  const agentId = new anchor.BN(agent.agentId);
 
   const [agentPda] = getAgentPDA(program.programId, gamePda, agentId);
 
@@ -453,7 +476,7 @@ async function registerAgentOnChain(
         agent.name
       )
       .accountsStrict({
-        authority: program.provider.publicKey?.toBase58() ?? "",
+        authority: program.provider.publicKey!,
         game: gamePda,
         agent: agentPda,
         systemProgram: SystemProgram.programId,

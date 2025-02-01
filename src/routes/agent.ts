@@ -4,6 +4,7 @@ import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
+import { BN } from "@coral-xyz/anchor";
 import { Router } from "express";
 
 const router = Router();
@@ -170,16 +171,9 @@ router.get("/:agentId", async (req, res) => {
 
     const program = await getProgramWithWallet();
 
-    const [gamePda] = getGamePDA(
-      program.programId,
-      Number.parseInt(gameId as string)
-    );
+    const [gamePda] = getGamePDA(program.programId, new BN(gameId));
 
-    const [agentPda] = getAgentPDA(
-      program.programId,
-      gamePda,
-      Number.parseInt(agentId)
-    );
+    const [agentPda] = getAgentPDA(program.programId, gamePda, new BN(agentId));
 
     const agent = await program.account.agent.fetch(agentPda);
 

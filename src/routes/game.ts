@@ -4,6 +4,7 @@ import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
 import { getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
+import { BN } from "@coral-xyz/anchor";
 
 const router = Router();
 
@@ -67,7 +68,7 @@ router.get("/:gameId", async (req, res) => {
 
     logger.info(`🔍 Fetching state for game ${gameId}`);
     const program = await getProgramWithWallet();
-    const [gamePda] = getGamePDA(program.programId, Number.parseInt(gameId));
+    const [gamePda] = getGamePDA(program.programId, new BN(gameId));
     const game = await program.account.game.fetch(gamePda);
 
     if (!game) {
