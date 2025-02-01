@@ -139,13 +139,14 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
     execute: async ({ content, type, coordinates }) => {
       try {
         if (!twitterApi) throw new Error("Communication systems offline");
+
+        // Post tweet and get its ID
+        const tweetId = await twitterApi.post(content);
+
         logger.info(`🐦 Agent ${agentId} is broadcasting message:
         ╔════════════════════════════════════════════
         ║ ${content}
         ╚════════════════════════════════════════════`);
-
-        // Post tweet and get its ID
-        // const tweetId = await twitterApi.post(content);
 
         return {
           success: true,

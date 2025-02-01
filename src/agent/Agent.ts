@@ -122,19 +122,19 @@ export class Agent {
       `Generating context string for agent ${this.agent.agentId} in game ${this.currentGameId}`
     );
 
-    const program = await getProgramWithWallet();
-    const [gamePda] = await PublicKey.findProgramAddress(
-      [Buffer.from("game"), new BN(this.currentGameId).toBuffer("le", 4)],
-      program.programId
-    );
-    const [agentPda] = await PublicKey.findProgramAddress(
-      [
-        Buffer.from("agent"),
-        gamePda.toBuffer(),
-        Uint8Array.of(new BN(this.agent.agentId)),
-      ],
-      program.programId
-    );
+    // const program = await getProgramWithWallet();
+    // const [gamePda] = await PublicKey.findProgramAddress(
+    //   [Buffer.from("game"), new BN(this.currentGameId).toBuffer("le", 4)],
+    //   program.programId
+    // );
+    // const [agentPda] = await PublicKey.findProgramAddress(
+    //   [
+    //     Buffer.from("agent"),
+    //     gamePda.toBuffer(),
+    //     Uint8Array.of(new BN(this.agent.agentId)),
+    //   ],
+    //   program.programId
+    // );
     // const agentAccount = await program.account.agent.fetch(agentPda);
 
     const [agent, otherAgents] = await Promise.all([
