@@ -18,7 +18,7 @@ export async function getProgramWithWallet() {
   }
   const connection = new Connection(rpcUrl, {
     commitment: "confirmed",
-    confirmTransactionInitialTimeout: 60000,
+    confirmTransactionInitialTimeout: 120000, // 2 minutes
   });
 
   const privateKey = bs58.decode(privateKeyString);

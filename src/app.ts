@@ -6,7 +6,6 @@ import helmet from "helmet";
 import { prisma } from "./config/prisma";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
-import { setup } from "./config/setup";
 import { config } from "dotenv";
 
 // Load environment variables
@@ -40,7 +39,6 @@ const PORT = process.env.PORT || 3000;
 
 export async function startServer() {
   try {
-    await setup();
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });

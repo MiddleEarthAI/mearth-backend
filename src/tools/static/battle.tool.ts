@@ -6,6 +6,8 @@ import { getAgentPDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 import { getGamePDA } from "@/utils/pda";
+import { GenerateContextStringResult } from "@/agent/Agent";
+import { program } from "@coral-xyz/anchor/dist/cjs/native/system";
 
 export enum BattleOutcome {
   Victory = "Victory",
@@ -21,13 +23,7 @@ export enum BattleType {
 /**
  * Tool for initiating and managing battles between agents with cooldown periods
  */
-export const battleTool = ({
-  agentId,
-  gameId,
-}: {
-  agentId: number;
-  gameId: number;
-}) =>
+export const battleTool = (result: GenerateContextStringResult) =>
   tool({
     description: `Battle tool/action for engaging in combat with other agents in Middle Earth.
 Features:
@@ -45,14 +41,18 @@ Features:
 
     execute: async ({ defenderXHandle }) => {
       const gameService = getGameService();
-      const program = await getProgramWithWallet();
-      const [gamePda] = getGamePDA(program.programId, new BN(gameId));
+      const agent = result.currentAgent;
+      const gameId = agent.gameId;
+      const game = await prisma.game.findUnique({
+        where: { id: gameId },
+      });
+      const agentId = agent.agentId;
 
       try {
         // Get agent states
         const [attackerDb, defenderDb] = await Promise.all([
           prisma.agent.findUnique({
-            where: { agentId },
+            where: { agentId_gameId: { agentId, gameId } },
             include: {
               location: true,
               battles: {
@@ -62,7 +62,12 @@ Features:
             },
           }),
           prisma.agent.findUnique({
-            where: { xHandle: defenderXHandle },
+            where: {
+              agentId_gameId: {
+                agentId: Number(defenderXHandle),
+                gameId: gameId,
+              },
+            },
             include: {
               location: true,
             },
@@ -74,7 +79,8 @@ Features:
             message: "The agent you are trying to battle is not available",
           };
         }
-
+        const program = await getProgramWithWallet();
+        const [gamePda] = getGamePDA(program.programId, new BN(gameId));
         const [agentPda] = getAgentPDA(
           program.programId,
           gamePda,
@@ -109,7 +115,7 @@ Features:
 
         if (agentAccount.allianceWith && opponentAccount.allianceWith) {
           gameService.startBattleAlliances(
-            gameId,
+            Number(game?.gameId),
             agentId,
             agentAccount.allianceWith,
             defenderDb.agentId,
@@ -117,7 +123,7 @@ Features:
           );
         } else if (!agentAccount.allianceWith && opponentAccount.allianceWith) {
           gameService.startBattleAgentVsAlliance(
-            gameId,
+            Number(game?.gameId),
             agentId,
             defenderDb.agentId,
             opponentAccount.allianceWith
@@ -126,7 +132,11 @@ Features:
           !agentAccount.allianceWith &&
           !opponentAccount.allianceWith
         ) {
-          gameService.startBattle(gameId, agentId, defenderDb.agentId);
+          gameService.startBattle(
+            Number(game?.gameId),
+            agentId,
+            defenderDb.agentId
+          );
         }
 
         // Check cooldown period (3600 seconds = 1 hour)
@@ -140,12 +150,16 @@ Features:
         const battleData = {
           attackerDb: { agentId: attackerDb.agentId },
           defenderDb: { agentId: defenderDb.agentId },
-          gameId,
+          gameId: Number(game?.gameId),
           type: BattleType.Simple,
           stake: agentAccount.tokenBalance,
         };
 
-        await gameService.startBattle(gameId, agentId, defenderDb.agentId);
+        await gameService.startBattle(
+          Number(game?.gameId),
+          agentId,
+          defenderDb.agentId
+        );
 
         // Calculate battle outcome
         const outcome = calculateBattleOutcome(attackerDb, defenderDb);

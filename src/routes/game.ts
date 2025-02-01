@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { getGameService } from "@/services";
 
 import { logger } from "@/utils/logger";
 import { getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
+
+import { createNextGame } from "@/config/setup";
+import { Agent } from "@/agent/Agent";
+import { prisma } from "@/config/prisma";
+import { initializeServices } from "@/services";
 
 const router = Router();
 
@@ -13,37 +17,94 @@ const router = Router();
  */
 router.post("/init", async (req, res) => {
   try {
-    const { gameId } = req.body;
-    if (!gameId) {
-      logger.warn("🚫 Missing gameId in initialization request");
-      return res.status(400).json({
-        success: false,
-        error: "Missing required parameter",
-        details: {
-          gameId: "Game ID is required",
-        },
-      });
-    }
+    const { tx, gameAccount } = await createNextGame();
 
-    logger.info(`🎮 Initializing new game world - Game ID: ${gameId}`);
-    const gameService = getGameService();
-    const { tx, gameAccount } = await gameService.initializeGame(gameId);
-
-    logger.info(`✨ Game ${gameId} successfully initialized!`);
+    logger.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
     res.json({
       success: true,
       transaction: tx,
       data: {
-        gameId,
+        gameId: gameAccount.gameId,
         gameAccount,
         initializationTime: new Date().toISOString(),
       },
     });
   } catch (error) {
-    logger.error(`💥 Failed to initialize game ${req.body.gameId}:`, error);
+    logger.error(`💥 Failed to initialize game ${""}:`, error);
     res.status(500).json({
       success: false,
       error: "Failed to initialize game",
+      details: (error as Error).message,
+    });
+  }
+});
+
+/**
+ * Start a new agent
+ */
+router.post("/start", async (req, res) => {
+  try {
+    const response = req.query;
+    const gameId = Number(response.gameId as string);
+    if (!gameId) {
+      logger.warn("🚫 Missing parameters for starting agents");
+      return res.status(400).json({
+        success: false,
+        error: "Missing required parameters",
+        details: {
+          gameId: !gameId ? "Missing game ID" : undefined,
+        },
+      });
+    }
+
+    await initializeServices();
+
+    const agents = await prisma.agent.findMany({
+      where: {
+        game: {
+          gameId: gameId,
+        },
+      },
+      include: {
+        agentProfile: true,
+        location: true,
+        community: {
+          include: {
+            interactions: true,
+          },
+        },
+        battles: true,
+        currentAlliance: true,
+        cooldowns: true,
+        state: true,
+      },
+    });
+
+    if (agents.length === 0) {
+      logger.warn(`🚫 No agents found for game ${gameId}`);
+      return res.status(404).json({
+        success: false,
+        error: "No agents found",
+        gameId,
+      });
+    }
+    for (const dbAgent of agents) {
+      const agent = new Agent(dbAgent, Number(gameId));
+      agent.start();
+    }
+    res.json({
+      success: true,
+      message: `Agents started for game ${gameId}`,
+      data: {
+        gameId,
+        startTime: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    logger.error("💥 Failed to start agent:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to start agent",
       details: (error as Error).message,
     });
   }

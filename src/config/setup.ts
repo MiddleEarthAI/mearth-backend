@@ -1,612 +1,125 @@
+import { generateGameId } from "@/utils";
 import { logger } from "@/utils/logger";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
-import * as anchor from "@coral-xyz/anchor";
-import { Keypair, SystemProgram, Connection, PublicKey } from "@solana/web3.js";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { prisma } from "./prisma";
-import { initializeServices } from "@/services";
-
-import { GameAccount } from "@/types/program";
-import { BN } from "@coral-xyz/anchor";
-import { TerrainType } from "@prisma/client";
-import { gameData } from "./game-data";
-import { MearthProgram } from "@/types";
-
-import { Prisma } from "@prisma/client";
-import { Agent } from "@/agent/Agent";
 import { getProgramWithWallet } from "@/utils/program";
+import { BN } from "@coral-xyz/anchor";
+import { prisma } from "./prisma";
+import { TerrainType } from "@prisma/client";
+import { getRandomCoordinatesWithTerrainType } from "@/constants";
+import { profiles } from "./game-data";
 
-type PrismaAgent = Prisma.AgentGetPayload<{
-  include: {
-    location: true;
-    personality: true;
-    state: true;
-    community: true;
-  };
-}>;
+export const createNextGame = async () => {
+  // await prisma.agentProfile.createMany({
+  //   data: profiles,
+  // });
+  logger.info(`🎮 Initializing new game world`);
 
-type PrismaGame = Prisma.GameGetPayload<{
-  include: {
-    agents: {
-      include: {
-        location: true;
-        personality: true;
-        state: true;
-        community: true;
-      };
-    };
-  };
-}>;
-
-interface WalletError extends Error {
-  message: string;
-}
-
-interface ChainError extends Error {
-  logs?: string[];
-}
-
-/**
- * Initialize the application and set up all required services and connections.
- * This function handles the complete initialization flow including:
- * 1. Setting up Solana connection with proper configuration
- * 2. Initializing wallet and program instance
- * 3. Managing game state (finding active or creating new)
- * 4. Registering and syncing agents across chain and database
- * 5. Starting core services and agent management system
- *
- * @throws {Error} If required environment variables are missing
- * @throws {Error} If any initialization step fails
- * @returns {Promise<void>}
- */
-export async function setup(): Promise<void> {
-  try {
-    logger.info("🚀 Starting application initialization...");
-
-    // Validate environment variables
-    const rpcUrl = process.env.SOLANA_RPC_URL;
-    const privateKeyString = process.env.WALLET_PRIVATE_KEY;
-
-    if (!rpcUrl || !privateKeyString) {
-      logger.error("❌ Missing environment variables!", {
-        rpcUrl: !!rpcUrl,
-        privateKeyPresent: !!privateKeyString,
-      });
-      throw new Error(
-        "Missing required environment variables: SOLANA_RPC_URL or WALLET_PRIVATE_KEY"
-      );
-    }
-
-    logger.info("✅ Environment variables validated", {
-      rpcUrl: rpcUrl.substring(0, 20) + "...",
-    });
-
-    // Initialize Solana connection with optimized settings
-    const connection = new Connection(rpcUrl, {
-      commitment: "confirmed",
-      confirmTransactionInitialTimeout: 60000,
-    });
-    logger.info("🌐 Solana connection established", {
-      endpoint: rpcUrl.substring(0, 20) + "...",
-      commitment: "confirmed",
-    });
-
-    const program = await getProgramWithWallet();
-    logger.info("📦 Program initialized successfully", {
-      programId: program.programId.toBase58(),
-    });
-
-    // Fetch and manage game accounts
-    const gameAccounts = await program.account.game.all();
-    logger.info(`🎮 Found existing games`, {
-      count: gameAccounts.length,
-      gameIds: gameAccounts.map((g) => g.account.gameId.toString()),
-    });
-
-    // Find active game or create new one
-    logger.info("🔍 Looking for active game or creating new one...");
-    const { mostRecentActiveGame, dbGame } = await getOrCreateGame(
-      program,
-      gameAccounts
-    );
-
-    logger.info("✅ Game setup complete", {
-      gameId: mostRecentActiveGame.account.gameId.toString(),
-      publicKey: mostRecentActiveGame.publicKey.toBase58(),
-      dbId: dbGame.id,
-    });
-
-    const [gamePda] = getGamePDA(
-      program.programId,
-      mostRecentActiveGame.account.gameId
-    );
-
-    // First verify agent registration state
-    logger.info("🔄 Verifying agent registration state...", {
-      gamePda: gamePda.toBase58(),
-      totalAgents: gameData.agents.length,
-    });
-
-    const registeredAgents = await prisma.agent.findMany({
-      where: {
-        gameId: mostRecentActiveGame.account.gameId.toString(),
-      },
-      include: {
-        location: true,
-        state: true,
-      },
-    });
-
-    // Check for unregistered agents
-    const unregisteredAgents = gameData.agents.filter(
-      (agent) =>
-        !registeredAgents.some(
-          (registered) => registered.agentId === agent.agentId
-        )
-    );
-
-    if (unregisteredAgents.length > 0) {
-      logger.info("🔄 Found unregistered agents, starting sync...", {
-        totalAgents: gameData.agents.length,
-        registered: registeredAgents.length,
-        unregistered: unregisteredAgents.length,
-      });
-
-      await syncAgents(program, gamePda, dbGame);
-    } else {
-      logger.info("✅ All agents already registered", {
-        totalAgents: registeredAgents.length,
-      });
-    }
-
-    // Initialize services and agent manager
-    logger.info("🔧 Initializing core services...");
-    await initializeServices(connection, program);
-    await createAndStartAgents(dbGame);
-
-    logger.info("🎉 Application initialization completed successfully");
-  } catch (error) {
-    const appError = error as Error;
-    logger.error("💥 Critical initialization failure", {
-      error: appError.message,
-      stack: appError.stack,
-    });
-    throw new Error(`Initialization failed: ${appError.message}`);
-  }
-}
-
-/**
- * Helper function to get existing or create new game
- */
-async function getOrCreateGame(
-  program: MearthProgram,
-  gameAccounts: { publicKey: PublicKey; account: GameAccount }[]
-) {
-  logger.info("🎲 Processing game accounts", {
-    totalAccounts: gameAccounts.length,
-    accounts: gameAccounts.map((g) => ({
-      id: g.account.gameId.toString(),
-      publicKey: g.publicKey.toBase58(),
-      isActive: g.account.isActive,
-    })),
-  });
-
-  // Sort games by ID in descending order to get the most recent first
-  const sortedGames = gameAccounts.sort((a, b) =>
-    b.account.gameId.sub(a.account.gameId).toNumber()
-  );
-
-  // Find the most recent active game
-  const mostRecentActiveGame = sortedGames.find((g) => g.account.isActive);
-
-  if (!mostRecentActiveGame) {
-    logger.info("🆕 No active games found, creating new game");
-    return await createNewGame(program, sortedGames);
-  }
-
-  logger.info("🔍 Looking up game in database", {
-    gameId: mostRecentActiveGame.account.gameId.toString(),
-    isActive: mostRecentActiveGame.account.isActive,
-  });
-
-  // Check if game exists in database
-  let dbGame = await prisma.game.findUnique({
-    where: { gameId: mostRecentActiveGame.account.gameId.toNumber() },
-    include: {
-      agents: {
-        include: {
-          location: true,
-          personality: true,
-          state: true,
-          community: true,
-        },
-      },
-    },
-  });
-
-  // If game exists on-chain but not in DB, create DB record
-  if (!dbGame) {
-    logger.info("🔄 Game exists on-chain but not in database, syncing...", {
-      gameId: mostRecentActiveGame.account.gameId.toString(),
-    });
-
-    try {
-      // Calculate bump for existing PDA
-      const [_, bump] = getGamePDA(
-        program.programId,
-        mostRecentActiveGame.account.gameId
-      );
-
-      dbGame = await createGameInDB(
-        mostRecentActiveGame,
-        mostRecentActiveGame.account.gameId,
-        bump,
-        program
-      );
-
-      logger.info("✅ Game synced to database successfully", {
-        gameId: dbGame.gameId,
-        chainPublicKey: mostRecentActiveGame.publicKey.toBase58(),
-      });
-    } catch (error) {
-      logger.error("❌ Failed to sync on-chain game to database", {
-        error: (error as Error).message,
-        gameId: mostRecentActiveGame.account.gameId.toString(),
-      });
-      throw new Error(
-        `Failed to sync game to database: ${(error as Error).message}`
-      );
-    }
-  }
-
-  return { mostRecentActiveGame, dbGame };
-}
-
-/**
- * Helper function to create a new game both on-chain and in database
- */
-async function createNewGame(
-  program: MearthProgram,
-  existingGames: { publicKey: PublicKey; account: GameAccount }[]
-) {
-  // Calculate new game ID
-  const gameId =
-    existingGames.length > 0
-      ? existingGames[0].account.gameId.add(new BN(1))
-      : new BN(1);
-
-  logger.info("🆕 Creating new game", { gameId: gameId.toString() });
-
-  // Get PDA for new game
-  const [gamePda, bump] = getGamePDA(program.programId, gameId);
+  const program = await getProgramWithWallet();
 
   try {
-    // Verify the PDA is not already in use
-    const existingAccount = await program.provider.connection.getAccountInfo(
-      gamePda
-    );
-    if (existingAccount) {
-      logger.error("❌ Game PDA already in use", {
-        pda: gamePda.toBase58(),
-        gameId: gameId.toString(),
-      });
-      throw new Error("Game PDA already in use");
-    }
+    const nextGameId = generateGameId();
 
-    // Initialize game on-chain
-    await program.methods.initializeGame(gameId, bump).accounts({}).rpc();
+    logger.info(`🌟 Checking for existing game - Game ID: ${nextGameId}`);
 
-    logger.info("✅ Game initialized on chain", {
-      gamePda: gamePda.toBase58(),
-      bump,
-    });
+    const [gamePda, bump] = getGamePDA(program.programId, new BN(nextGameId));
 
-    // Fetch the newly created game account
+    logger.info(`🎮 Game PDA in initializeGame: ${gamePda}`);
+
+    const tx = await program.methods
+      .initializeGame(new BN(nextGameId), bump)
+      .accounts({})
+      .rpc();
     const gameAccount = await program.account.game.fetch(gamePda);
 
-    // Verify the game is active
-    if (!gameAccount.isActive) {
-      logger.error("❌ Newly created game is not active!");
-      throw new Error("Failed to create active game");
-    }
+    // Create game record in database
+    const dbGame = await prisma.game.create({
+      data: {
+        gameId: nextGameId,
+        authority: program.provider.publicKey?.toString() ?? "",
+        bump: bump,
+        tokenMint: gameAccount.tokenMint.toString(),
+        rewardsVault: gameAccount.rewardsVault.toString(),
+        mapDiameter: gameAccount.mapDiameter || 120,
+        dailyRewardTokens: gameAccount.dailyRewardTokens.toNumber(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
 
-    const mostRecentActiveGame = {
-      publicKey: gamePda,
-      account: gameAccount,
+    logger.info(`✨ Game ${nextGameId} initialized successfully`);
+
+    for (const profile of profiles) {
+      const [gamePda] = getGamePDA(program.programId, new BN(nextGameId));
+      const [agentPda] = getAgentPDA(
+        program.programId,
+        gamePda,
+        new BN(profile.onchainId)
+      );
+      const { x, y, terrainType } = getRandomCoordinatesWithTerrainType();
+      await program.methods
+        .registerAgent(
+          new BN(profile.onchainId),
+          new BN(x),
+          new BN(y),
+          profile.name
+        )
+        .accounts({
+          game: gamePda,
+          agent: agentPda,
+          authority: program.provider.publicKey,
+        })
+        .rpc();
+      const agentAccount = await program.account.agent.fetch(agentPda);
+
+      await prisma.agent.create({
+        data: {
+          agentId: profile.onchainId,
+          game: { connect: { id: dbGame.id } },
+          location: {
+            create: {
+              x,
+              y,
+              terrainType:
+                Object.keys(terrainType)[0] == "plain"
+                  ? TerrainType.Plain
+                  : Object.keys(terrainType)[0] == "mountain"
+                  ? TerrainType.Mountain
+                  : TerrainType.River,
+            },
+          },
+          agentProfile: { connect: { onchainId: profile.onchainId } },
+          publicKey: agentAccount.authority.toString(),
+          state: {
+            create: {
+              isAlive: true,
+              lastActionType: "spawn",
+              lastActionTime: new Date(),
+              lastActionDetails: "Initial spawn",
+              influencedByTweet: null,
+              influenceScore: 0,
+            },
+          },
+          community: {
+            create: {
+              followers: 0,
+              averageEngagement: 0,
+              supporterCount: 0,
+              lastInfluenceTime: new Date(),
+              influenceScore: 0,
+            },
+          },
+        },
+      });
+      logger.info(
+        `✅ Agent ${profile.onchainId} created in database successfully`
+      );
+    }
+    return {
+      tx,
+      gameAccount: await program.account.game.fetch(gamePda),
     };
-
-    logger.info("💾 Creating game record in database...");
-    const dbGame = await createGameInDB(
-      mostRecentActiveGame,
-      gameId,
-      bump,
-      program
-    );
-
-    logger.info("✅ Game created successfully", {
-      dbId: dbGame.id,
-      gameId: dbGame.gameId,
-      isActive: gameAccount.isActive,
-    });
-
-    return { mostRecentActiveGame, dbGame };
   } catch (error) {
-    logger.error("❌ Failed to create new game", {
-      error: (error as Error).message,
-      gameId: gameId.toString(),
-    });
-    throw new Error(`Failed to create new game: ${(error as Error).message}`);
+    logger.error(`❌ Game initialization failed for ID ${""}:`, error);
+    throw error;
   }
-}
-
-/**
- * Helper function to sync agents between chain and database
- */
-async function syncAgents(
-  program: MearthProgram,
-  gamePda: PublicKey,
-  dbGame: PrismaGame
-) {
-  logger.info("🔄 Starting agent synchronization process", {
-    totalAgents: gameData.agents.length,
-    existingAgents: dbGame.agents.length,
-  });
-
-  // Register all agents from game-data.ts
-  for (const agentData of gameData.agents) {
-    try {
-      logger.info(`👤 Processing agent`, {
-        name: agentData.name,
-        agentId: agentData.agentId,
-      });
-
-      // First register on chain
-      await registerAgentOnChain(program, gamePda, agentData as PrismaAgent);
-
-      // Then create in database if not exists
-      const existingAgent = await prisma.agent.findUnique({
-        where: { agentId: agentData.agentId },
-      });
-
-      if (!existingAgent) {
-        const agentKeypair = Keypair.generate();
-        const walletInfo = `${bs58.encode(
-          agentKeypair.secretKey
-        )},${agentKeypair.publicKey.toBase58()}`;
-
-        await createAgentInDB(agentData as PrismaAgent, dbGame.id, walletInfo);
-        logger.info(`✅ Agent synchronized successfully`, {
-          name: agentData.name,
-          publicKey: agentKeypair.publicKey.toBase58(),
-        });
-      } else {
-        logger.info(`✅ Agent already exists in database`, {
-          name: agentData.name,
-          agentId: agentData.agentId,
-        });
-      }
-    } catch (error) {
-      logger.error(`❌ Failed to sync agent`, {
-        name: agentData.name,
-        agentId: agentData.agentId,
-        error: (error as Error).message,
-      });
-      // Continue with next agent instead of throwing
-      continue;
-    }
-  }
-
-  logger.info("✅ Agent synchronization completed", {
-    totalProcessed: gameData.agents.length,
-  });
-}
-
-/**
- * Helper function to create game record in database
- */
-async function createGameInDB(
-  mostRecentActiveGame: any,
-  gameId: BN,
-  bump: number,
-  program: MearthProgram
-): Promise<PrismaGame> {
-  logger.info("📝 Creating game record in database", {
-    gameId: gameId.toString(),
-  });
-
-  const game = await prisma.game.create({
-    data: {
-      gameId: gameId.toNumber(),
-      authority: program.provider.publicKey?.toBase58() ?? "",
-      tokenMint: mostRecentActiveGame.account.tokenMint.toBase58(),
-      rewardsVault: mostRecentActiveGame.account.rewardsVault.toBase58(),
-      mapDiameter: mostRecentActiveGame.account.mapDiameter,
-      isActive: mostRecentActiveGame.account.isActive,
-      bump,
-      dailyRewardTokens:
-        mostRecentActiveGame.account.dailyRewardTokens.toNumber(),
-    },
-    include: {
-      agents: {
-        include: {
-          location: true,
-          personality: true,
-          state: true,
-          community: true,
-        },
-      },
-    },
-  });
-
-  logger.info("✅ Game record created", {
-    id: game.id,
-    gameId: game.gameId,
-    tokenMint: game.tokenMint,
-    isActive: game.isActive,
-  });
-
-  return game;
-}
-
-/**
- * Helper function to register agent on chain
- */
-async function registerAgentOnChain(
-  program: MearthProgram,
-  gamePda: PublicKey,
-  agent: PrismaAgent
-) {
-  logger.info(`⛓️ Registering agent on chain`, {
-    name: agent.name,
-    agentId: agent.agentId,
-    gamePda: gamePda.toBase58(),
-  });
-
-  // Use agentId instead of id for on-chain registration
-  const agentId = new anchor.BN(agent.agentId);
-
-  const [agentPda] = getAgentPDA(program.programId, gamePda, agentId);
-
-  try {
-    await program.methods
-      .registerAgent(
-        agentId,
-        new BN(agent.location?.x || 0),
-        new BN(agent.location?.y || 0),
-        agent.name
-      )
-      .accountsStrict({
-        authority: program.provider.publicKey!,
-        game: gamePda,
-        agent: agentPda,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
-    logger.info(`✅ Agent registered on chain`, {
-      name: agent.name,
-      pda: agentPda.toBase58(),
-      location: { x: agent.location?.x || 0, y: agent.location?.y || 0 },
-    });
-  } catch (error) {
-    const chainError = error as ChainError;
-    if (!chainError.logs?.some((log) => log.includes("already in use"))) {
-      logger.error(`❌ Failed to register agent on chain`, {
-        name: agent.name,
-        error: chainError.message,
-        logs: chainError.logs,
-      });
-      throw error;
-    }
-    logger.warn(`⚠️ Agent already exists on chain`, {
-      name: agent.name,
-      pda: agentPda.toBase58(),
-    });
-  }
-}
-
-/**
- * Helper function to create agent record in database
- */
-async function createAgentInDB(
-  agent: PrismaAgent,
-  gameId: string,
-  walletInfo: string
-) {
-  logger.info(`💾 Creating database record for agent`, {
-    name: agent.name,
-    agentId: agent.agentId,
-    gameId,
-  });
-
-  const createdAgent = await prisma.agent.create({
-    data: {
-      agentId: agent.agentId,
-      name: agent.name,
-      xHandle: agent.xHandle,
-      publicKey: walletInfo,
-      bio: agent.bio,
-      lore: agent.lore,
-      characteristics: agent.characteristics,
-      knowledge: agent.knowledge,
-      gameId,
-      location: {
-        create: {
-          x: agent.location?.x || 0,
-          y: agent.location?.y || 0,
-          terrainType: agent.location?.terrainType || TerrainType.Plain,
-        },
-      },
-      personality: {
-        create: {
-          aggressiveness: agent.personality?.aggressiveness || 0,
-          trustworthiness: agent.personality?.trustworthiness || 0,
-          manipulativeness: agent.personality?.manipulativeness || 0,
-          intelligence: agent.personality?.intelligence || 0,
-          adaptability: agent.personality?.adaptability || 0,
-          baseInfluence: agent.personality?.baseInfluence || 0,
-          followerMultiplier: agent.personality?.followerMultiplier || 0,
-          engagementMultiplier: agent.personality?.engagementMultiplier || 0,
-          consensusMultiplier: agent.personality?.consensusMultiplier || 0,
-        },
-      },
-      state: {
-        create: {
-          isAlive: agent.state?.isAlive ?? true,
-          influencedByTweet: agent.state?.influencedByTweet || null,
-          influenceScore: agent.state?.influenceScore || 0,
-          lastActionType: agent.state?.lastActionType || "spawn",
-          lastActionDetails: agent.state?.lastActionDetails || "Initial spawn",
-        },
-      },
-      community: {
-        create: {
-          followers: 0,
-          averageEngagement: 0,
-          supporterCount: 0,
-        },
-      },
-    },
-  });
-
-  logger.info(`✅ Database record created for agent`, {
-    name: agent.name,
-    id: createdAgent.id,
-    location: { x: agent.location?.x || 0, y: agent.location?.y || 0 },
-    influenceScore: agent.state?.influenceScore || 0,
-  });
-}
-
-/**
- * Helper function to create and start agents for a game
- * @param game The game object containing agent data
- * @returns Array of initialized Agent instances
- */
-async function createAndStartAgents(game: PrismaGame) {
-  logger.info("🤖 Creating and starting agents...", {
-    gameId: game.gameId,
-    agentCount: game.agents.length,
-  });
-
-  const agents: Agent[] = [];
-
-  for (const agentData of game.agents) {
-    try {
-      const agent = new Agent(agentData, game.gameId);
-      await agent.start();
-      agents.push(agent);
-
-      logger.info(`✅ Agent initialized successfully`, {
-        name: agentData.name,
-        agentId: agentData.agentId,
-      });
-    } catch (error) {
-      logger.error(`❌ Failed to initialize agent`, {
-        name: agentData.name,
-        agentId: agentData.agentId,
-        error: (error as Error).message,
-      });
-    }
-  }
-
-  return agents;
-}
+};

@@ -20,10 +20,7 @@ type RegisterAgentResult = { tx: string; agentAccount: AgentAccount };
  * Handles game initialization, agent management, battles and alliances
  */
 export class GameService {
-  constructor(
-    private readonly program: Program<MiddleEarthAiProgram>,
-    private readonly connection: Connection
-  ) {
+  constructor(private readonly program: Program<MiddleEarthAiProgram>) {
     logger.info("🎮 GameService initialized and ready for action!");
   }
 
@@ -67,7 +64,7 @@ export class GameService {
           tokenMint: gameAccount.tokenMint.toString(),
           rewardsVault: gameAccount.rewardsVault.toString(),
           mapDiameter: gameAccount.mapDiameter,
-          dailyRewardTokens: gameAccount.dailyRewardTokens,
+          dailyRewardTokens: gameAccount.dailyRewardTokens.toNumber(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -106,11 +103,7 @@ export class GameService {
     );
 
     try {
-      const [gamePda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("game"), new BN(gameId).toBuffer("le", 4)],
-        this.program.programId
-      );
-
+      const [gamePda] = getGamePDA(this.program.programId, gameId);
       const [agentPda] = PublicKey.findProgramAddressSync(
         [Buffer.from("agent"), gamePda.toBuffer(), Uint8Array.of(agentId)],
         this.program.programId

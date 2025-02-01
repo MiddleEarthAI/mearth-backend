@@ -1,14 +1,9 @@
 import { logger } from "@/utils/logger";
 import { prisma } from "@/config/prisma";
-import {
-  TweetPublicMetricsV2,
-  TweetV2,
-  TwitterApi,
-  UserV2,
-} from "twitter-api-v2";
+import { TweetV2, TwitterApi } from "twitter-api-v2";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { generateText, LanguageModelV1 } from "ai";
-import { Agent as AgentModel } from "@prisma/client";
+import { generateText } from "ai";
+import { AgentModel } from "@/agent/Agent";
 
 // LLM Configuration
 const LLM_CONFIG = {
@@ -67,34 +62,37 @@ export class Twitter {
 
     // Initial check
     this.checkInteractions().catch((error) =>
-      logger.error(`Error in initial check for @${this.agent.xHandle}:`, error)
+      logger.error(
+        `Error in initial check for @${this.agent.agentProfile.xHandle}:`,
+        error
+      )
     );
 
     // Set up recurring checks
     this.monitoringInterval = setInterval(() => {
       this.checkInteractions().catch((error) =>
         logger.error(
-          `Error checking interactions for @${this.agent.xHandle}:`,
+          `Error checking interactions for @${this.agent.agentProfile.xHandle}:`,
           error
         )
       );
     }, this.CHECK_INTERVAL);
 
-    logger.info(`Started monitoring for @${this.agent.xHandle}`);
+    logger.info(`Started monitoring for @${this.agent.agentProfile.xHandle}`);
   }
 
   stop(): void {
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
-      logger.info(`Stopped monitoring for @${this.agent.xHandle}`);
+      logger.info(`Stopped monitoring for @${this.agent.agentProfile.xHandle}`);
     }
   }
 
   private async checkInteractions(): Promise<void> {
     try {
       const [mentions, qrts] = await Promise.all([
-        this.twitterApi.v2.search(`@${this.agent.xHandle}`, {
+        this.twitterApi.v2.search(`@${this.agent.agentProfile.xHandle}`, {
           "tweet.fields": [
             "created_at",
             "public_metrics",
@@ -111,17 +109,20 @@ export class Twitter {
           ],
           since_id: this.lastCheckedId || undefined,
         }),
-        this.twitterApi.v2.search(`url:"x.com/${this.agent.xHandle}"`, {
-          "tweet.fields": [
-            "created_at",
-            "public_metrics",
-            "referenced_tweets",
-            "conversation_id",
-          ],
-          "user.fields": ["public_metrics", "verified", "username"],
-          expansions: ["author_id", "referenced_tweets.id"],
-          since_id: this.lastCheckedId || undefined,
-        }),
+        this.twitterApi.v2.search(
+          `url:"x.com/${this.agent.agentProfile.xHandle}"`,
+          {
+            "tweet.fields": [
+              "created_at",
+              "public_metrics",
+              "referenced_tweets",
+              "conversation_id",
+            ],
+            "user.fields": ["public_metrics", "verified", "username"],
+            expansions: ["author_id", "referenced_tweets.id"],
+            since_id: this.lastCheckedId || undefined,
+          }
+        ),
       ]);
 
       const interactions = [
@@ -148,7 +149,7 @@ export class Twitter {
       }
     } catch (error) {
       logger.error(
-        `Error checking interactions for @${this.agent.xHandle}:`,
+        `Error checking interactions for @${this.agent.agentProfile.xHandle}:`,
         error
       );
       throw error;
@@ -164,12 +165,19 @@ export class Twitter {
     };
 
     const agent = await prisma.agent.findUnique({
-      where: { agentId: this.agent.agentId },
+      where: {
+        agentId_gameId: {
+          agentId: this.agent.agentId,
+          gameId: this.agent.gameId,
+        },
+      },
       include: {
-        personality: true,
-        currentAlliance: true,
+        agentProfile: true,
         location: true,
         strategy: true,
+        currentAlliance: true,
+        cooldowns: true,
+        state: true,
       },
     });
 
@@ -192,7 +200,7 @@ export class Twitter {
       }),
       this.suggestAction({
         text: tweet.text,
-        personality: agent.personality,
+        personality: agent.agentProfile,
         location: agent.location,
         deceptionLevel: agent.strategy?.deceptionLevel || 0,
       }),
@@ -393,7 +401,12 @@ Return ONLY a JSON object with:
     authorAnalysis: AuthorAnalysis
   ): Promise<void> {
     const agent = await prisma.agent.findUnique({
-      where: { agentId: this.agent.agentId },
+      where: {
+        agentId_gameId: {
+          agentId: this.agent.agentId,
+          gameId: this.agent.gameId,
+        },
+      },
       include: { community: true },
     });
 
@@ -513,7 +526,12 @@ Return ONLY a JSON object with:
 
   private async updateCommunityMetrics(analysis: TweetAnalysis): Promise<void> {
     const agent = await prisma.agent.findUnique({
-      where: { agentId: this.agent.agentId },
+      where: {
+        agentId_gameId: {
+          agentId: this.agent.agentId,
+          gameId: this.agent.gameId,
+        },
+      },
       include: { community: true },
     });
 

@@ -7,9 +7,9 @@ import { PublicKey } from "@solana/web3.js";
  * @param gameId The game ID
  * @returns [PDA, bump]
  */
-export const getGamePDA = (programId: PublicKey, gameId: BN) => {
+export const getGamePDA = (programId: PublicKey, gameId: number) => {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from("game"), gameId.toArrayLike(Buffer, "le", 4)],
+    [Buffer.from("game"), new BN(gameId).toArrayLike(Buffer, "le", 4)],
     programId
   );
 };

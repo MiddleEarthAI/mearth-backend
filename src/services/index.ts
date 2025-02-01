@@ -5,8 +5,8 @@ import { GameService } from "@/services/GameService";
 import { TerrainType } from "@prisma/client";
 import { logger } from "@/utils/logger";
 import type { Program } from "@coral-xyz/anchor";
-import type { Connection } from "@solana/web3.js";
 import { BattleResolutionService } from "./BattleResolutionService";
+import { getProgramWithWallet } from "@/utils/program";
 
 let gameService: GameService | null = null;
 
@@ -15,15 +15,12 @@ let battleResolutionService: BattleResolutionService | null = null;
 /**
  * Initialize all services
  * @param gameId Game ID
- * @param connection Solana connection
  * @param program Middle Earth program
  */
-export async function initializeServices(
-  connection: Connection,
-  program: Program<MiddleEarthAiProgram>
-): Promise<void> {
+export async function initializeServices(): Promise<void> {
+  const program = await getProgramWithWallet();
   try {
-    gameService = new GameService(program, connection);
+    gameService = new GameService(program);
     battleResolutionService = new BattleResolutionService(gameService, program);
     battleResolutionService.start();
 

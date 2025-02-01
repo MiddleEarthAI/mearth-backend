@@ -10,7 +10,7 @@ datasource db {
 
 model Game {
   id                String   @id @default(uuid())
-  gameId            Int      @unique // Unique identifier for the game instance
+  gameId            BigInt   @unique // onchain game id
   authority         String // Authority that controls the game
   tokenMint         String // Token mint used in the game
   rewardsVault      String // Vault that holds staking rewards
@@ -28,28 +28,50 @@ model Game {
   battles   Battle[] // One game has many battles
 }
 
-model Agent {
+model AgentProfile {
   id                  String   @id @default(uuid())
-  agentId             Int      @unique
+  onchainId           Int      @unique
   name                String
   xHandle             String   @unique
-  publicKey           String   @unique
   bio                 String[]
   lore                String[]
   characteristics     String[]
   knowledge           String[]
   influenceDifficulty String   @default("medium")
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+
+  // All personality traits must be between 0 and 100
+  aggressiveness   Int @db.Integer
+  trustworthiness  Int @db.Integer
+  manipulativeness Int @db.Integer
+  intelligence     Int @db.Integer
+  adaptability     Int @db.Integer
+
+  // Influence factors (all must be >= 0)
+  baseInfluence        Float   @db.DoublePrecision
+  followerMultiplier   Float   @db.DoublePrecision
+  engagementMultiplier Float   @db.DoublePrecision
+  consensusMultiplier  Float   @db.DoublePrecision
+  // Relations
+  agent                Agent[]
+}
+
+model Agent {
+  id             String       @id @default(uuid())
+  agentId        Int
+  publicKey      String
+  agentProfileId String
+  agentProfile   AgentProfile @relation(fields: [agentProfileId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  game            Game         @relation(fields: [gameId], references: [id])
+  game            Game        @relation(fields: [gameId], references: [id])
   gameId          String
   location        Location?
   currentAlliance Alliance?
   battles         Battle[]
   community       Community?
-  personality     Personality?
   state           AgentState?
   strategy        Strategy?
   cooldowns       Cooldown[]
@@ -57,6 +79,9 @@ model Agent {
   // Reverse relations
   alliedBy          Alliance[] @relation("AlliedAgent")
   battlesAsOpponent Battle[]   @relation("OpponentAgent")
+
+  // Composite unique constraints
+  @@unique([agentId, gameId])
 }
 
 model Location {
@@ -176,26 +201,6 @@ model Interaction {
   @@index([timestamp])
 }
 
-model Personality {
-  id               String @id @default(uuid())
-  // All personality traits must be between 0 and 100
-  aggressiveness   Int    @db.Integer
-  trustworthiness  Int    @db.Integer
-  manipulativeness Int    @db.Integer
-  intelligence     Int    @db.Integer
-  adaptability     Int    @db.Integer
-
-  // Influence factors (all must be >= 0)
-  baseInfluence        Float @db.DoublePrecision
-  followerMultiplier   Float @db.DoublePrecision
-  engagementMultiplier Float @db.DoublePrecision
-  consensusMultiplier  Float @db.DoublePrecision
-
-  // Relations
-  agent   Agent  @relation(fields: [agentId], references: [id])
-  agentId String @unique
-}
-
 model AgentState {
   id                String   @id @default(uuid())
   isAlive           Boolean  @default(true)
@@ -228,10 +233,9 @@ model Strategy {
   publicStrategy String @db.Text
   actualStrategy String @db.Text
   deceptionLevel Int
-
   // Relations
-  agent   Agent  @relation(fields: [agentId], references: [id])
-  agentId String @unique
+  agent          Agent  @relation(fields: [agentId], references: [id])
+  agentId        String @unique
 }
 
 enum TerrainType {

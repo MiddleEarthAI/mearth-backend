@@ -3,34 +3,20 @@ import { z } from "zod";
 import { prisma } from "@/config/prisma";
 import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
-import { getAgentPDA } from "@/utils/pda";
-import { BN } from "@coral-xyz/anchor";
-import { getGamePDA } from "@/utils/pda";
-import { getProgramWithWallet } from "@/utils/program";
+import { GenerateContextStringResult } from "@/agent/Agent";
 
 /**
  * Tool for breaking alliances between agents in Middle Earth
  */
-export const breakAllianceTool = async ({
-  gameId,
-  agentId,
-}: {
-  gameId: number;
-  agentId: number;
-}) => {
-  const gameService = getGameService();
-  // const program = await getProgramWithWallet();
-  // const [gamePda] = getGamePDA(program.programId, new BN(gameId));
-  // const [agentPda] = getAgentPDA(program.programId, gamePda, new BN(agentId));
-  // const agentAccount = await program.account.agent.fetch(agentPda);
-  const agent = await prisma.agent.findUnique({
-    where: { agentId },
-  });
-  if (!agent) {
-    throw new Error("Agent not found");
-  }
+export const breakAllianceTool = async (
+  result: GenerateContextStringResult
+) => {
+  const agent = result.currentAgent;
+  const gameId = Number(agent.gameId);
+  const agentId = Number(agent.agentId);
+
   return tool({
-    description: `This is a tool you @${agent?.xHandle} can use to break an alliance with another agent.
+    description: `This is a tool you @${agent?.agentProfile.xHandle} can use to break an alliance with another agent.
 
 CONTEXT:
 Breaking an alliance is a significant diplomatic action that:
@@ -68,20 +54,28 @@ EFFECTS:
     }),
 
     execute: async ({ targetAgentXHandle, reason }) => {
+      const gameService = getGameService();
       try {
         // Verify current agent state
         const targetAgent = await prisma.agent.findUnique({
-          where: { xHandle: targetAgentXHandle },
+          where: {
+            agentId_gameId: {
+              agentId: agentId,
+              gameId: agent.gameId,
+            },
+            currentAlliance: {
+              alliedAgent: {
+                agentProfile: {
+                  xHandle: targetAgentXHandle,
+                },
+              },
+            },
+          },
         });
         if (!targetAgent) {
           throw new Error("Target agent not found");
         }
-        // const targetAgentAccount = await gameStateService.getAgent(
-        //   targetAgent?.agentId,
-        //   gameId
-        // );
 
-        // Execute alliance break
         const result = await gameService.breakAlliance(
           gameId,
           agentId,

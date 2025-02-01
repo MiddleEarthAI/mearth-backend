@@ -1,3 +1,5 @@
+import { Agent } from "@/agent/Agent";
+import { prisma } from "@/config/prisma";
 import { validateZod } from "@/middleware/validateZod";
 import { registerAgentSchema } from "@/schemas/agent";
 import { getGameService } from "@/services";
@@ -49,46 +51,6 @@ router.post("/register", validateZod(registerAgentSchema), async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Failed to register agent",
-      details: (error as Error).message,
-    });
-  }
-});
-
-/**
- * Start a new agent
- */
-router.post("/start", async (req, res) => {
-  try {
-    const { gameId, agentId } = req.body as {
-      gameId: string;
-      agentId: string;
-    };
-
-    if (!agentId) {
-      logger.warn("🚫 Missing parameters for agent start");
-      return res.status(400).json({
-        success: false,
-        error: "Missing required parameters",
-        details: {
-          gameId: !gameId ? "Missing game ID" : undefined,
-          agentId: !agentId ? "Missing agent ID" : undefined,
-        },
-      });
-    }
-
-    res.json({
-      success: true,
-      message: `Agent ${agentId} started`,
-      data: {
-        agentId,
-        startTime: new Date().toISOString(),
-      },
-    });
-  } catch (error) {
-    logger.error("💥 Failed to start agent:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to start agent",
       details: (error as Error).message,
     });
   }
@@ -197,47 +159,6 @@ router.get("/:agentId", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Failed to fetch agent",
-      details: (error as Error).message,
-    });
-  }
-});
-
-/**
- * Stake tokens for an agent
- */
-router.post("/:agentId/stake", async (req, res) => {
-  try {
-    const { agentId } = req.params;
-    const { gameId, amount } = req.body;
-    if (!agentId || !gameId || !amount) {
-      logger.warn("🚫 Missing parameters for token staking");
-      return res.status(400).json({
-        success: false,
-        error: "Missing required parameters",
-        details: {
-          agentId: !agentId ? "Missing agent ID" : undefined,
-          amount: !amount ? "Missing stake amount" : undefined,
-        },
-      });
-    }
-
-    logger.info(
-      `💰 Successfully staked ${amount} tokens for agent ${agentId} in game ${gameId}`
-    );
-    res.json({
-      success: true,
-
-      data: {
-        agentId,
-        stakedAmount: amount,
-        stakeTime: new Date().toISOString(),
-      },
-    });
-  } catch (error) {
-    logger.error("💥 Failed to stake tokens:", error);
-    res.status(500).json({
-      success: false,
-      error: "Failed to stake tokens",
       details: (error as Error).message,
     });
   }

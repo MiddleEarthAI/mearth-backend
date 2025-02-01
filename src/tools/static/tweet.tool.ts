@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 import { TwitterApi } from "twitter-api-v2";
+import { GenerateContextStringResult } from "@/agent/Agent";
 
 export enum TweetType {
   BattleReport = "Battle Report",
@@ -18,39 +19,52 @@ export enum TweetType {
  * Integrates with onchain battle system and maintains social graph in database
  */
 export const tweetTool = async ({
-  agentId,
-  gameId,
+  result,
   twitterApi,
 }: {
-  agentId: number;
-  gameId: number;
+  result: GenerateContextStringResult;
   twitterApi: TwitterApi;
 }) => {
   // Fetch comprehensive agent state including battle/alliance history
-  const agent = await prisma.agent.findUnique({
-    where: { agentId },
-    include: {
-      location: true,
-      community: {
-        include: {
-          interactions: {
-            orderBy: { timestamp: "desc" },
-            take: 5,
-          },
-        },
-      },
-      currentAlliance: true,
-      battles: {
-        orderBy: { timestamp: "desc" },
-        take: 3,
-      },
+  // const agent = await prisma.agent.findUnique({
+  //   where: {
+  //     agentId_gameId: {
+  //       agentId: result.currentAgent.agentId,
+  //       gameId: result.currentAgent.gameId,
+  //     },
+  //   },
+  //   include: {
+  //     location: true,
+  //     agentProfile: true,
+  //     community: {
+  //       include: {
+  //         interactions: {
+  //           orderBy: { timestamp: "desc" },
+  //           take: 5,
+  //         },
+  //       },
+  //     },
+  //     currentAlliance: true,
+  //     battles: {
+  //       orderBy: { timestamp: "desc" },
+  //       take: 3,
+  //     },
+  //   },
+  // });
+  const agent = result.currentAgent;
+
+  if (!agent)
+    throw new Error(`Agent not found: ${result.currentAgent.agentId}`);
+  const battles = await prisma.battle.findMany({
+    where: {
+      gameId: agent.gameId,
     },
+    orderBy: { timestamp: "desc" },
+    take: 3,
   });
 
-  if (!agent) throw new Error(`Agent not found: ${agentId}`);
-
   // Format battle history for context
-  const recentBattles = agent.battles
+  const recentBattles = battles
     .map(
       (battle) =>
         `${battle.outcome.toUpperCase()} vs ${battle.opponentId} [${
@@ -80,11 +94,11 @@ export const tweetTool = async ({
     : null;
 
   const contextualDescription = `Strategic Communication tool for ${
-    agent.name
-  } (@${agent.xHandle})
+    agent.agentProfile.name
+  } (@${agent.agentProfile.xHandle})
 
 AGENT PROFILE:
-Influence Level: ${agent.influenceDifficulty}
+Influence Level: ${agent.agentProfile.influenceDifficulty}
 
 CURRENT STATE:
 ${territoryContext}
@@ -143,14 +157,14 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
         // Post tweet and get its ID
         const tweetId = await twitterApi.v2.tweet(content);
 
-        logger.info(`🐦 Agent ${agentId} is broadcasting message:
+        logger.info(`🐦 Agent ${agent.agentProfile.name} is broadcasting message:
         ╔════════════════════════════════════════════
         ║ ${content}
         ╚════════════════════════════════════════════`);
 
         return {
           success: true,
-          message: `Strategic communication deployed via @${agent.xHandle}`,
+          message: `Strategic communication deployed via @${agent.agentProfile.xHandle}`,
           // tweetId,
           coordinates,
         };

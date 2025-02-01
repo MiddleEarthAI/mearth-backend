@@ -6,12 +6,13 @@ import { MOVE_COOLDOWN_MS, getTerrainTypeByCoordinates } from "@/constants";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
+import { GenerateContextStringResult } from "@/agent/Agent";
 
 /**
  * Tool for agents to navigate the Middle Earth map
  */
-export const movementTool = (context: { gameId: number; agentId: number }) => {
-  const { gameId, agentId } = context;
+export const movementTool = (result: GenerateContextStringResult) => {
+  const currentAgent = result.currentAgent;
   const gameService = getGameService();
 
   return tool({
@@ -42,7 +43,12 @@ Features:
       try {
         // Get current agent state
         const agent = await prisma.agent.findUnique({
-          where: { agentId },
+          where: {
+            agentId_gameId: {
+              agentId: currentAgent.agentId,
+              gameId: currentAgent.gameId,
+            },
+          },
           include: {
             location: true,
             battles: {
@@ -57,12 +63,15 @@ Features:
         }
 
         const program = await getProgramWithWallet();
-        const [gamePda] = getGamePDA(program.programId, new BN(gameId));
+        const [gamePda] = getGamePDA(
+          program.programId,
+          new BN(Number(currentAgent.gameId))
+        );
 
         const [agentPda] = getAgentPDA(
           program.programId,
           gamePda,
-          new BN(agentId)
+          new BN(Number(agent.agentId))
         );
         const agentAccount = await program.account.agent.fetch(agentPda);
 
@@ -87,8 +96,8 @@ Features:
 
         // Execute movement
         const result = await gameService.moveAgent(
-          gameId,
-          agentId,
+          Number(currentAgent.gameId),
+          Number(currentAgent.agentId),
           destination.x,
           destination.y,
           terrainType

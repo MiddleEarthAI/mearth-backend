@@ -795,4 +795,14 @@ export const getTerrainTypeByCoordinates = (x: number, y: number) => {
   return { plain: {} };
 };
 
+export function getRandomCoordinatesWithTerrainType() {
+  const coordinates = Array.from(validCoordinates);
+  const randomIndex = Math.floor(Math.random() * coordinates.length);
+  const randomCoordinate = coordinates[randomIndex];
+  const x = parseInt(randomCoordinate.split(",")[0]);
+  const y = parseInt(randomCoordinate.split(",")[1]);
+  const terrainType = getTerrainTypeByCoordinates(x, y);
+  return { x, y, terrainType };
+}
+
 export const validCoordinatesArray = Array.from(validCoordinates);

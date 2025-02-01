@@ -3,23 +3,47 @@ import { type AnthropicProvider, createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 
 import { prisma } from "@/config/prisma";
-import { Agent as AgentModel } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { tweetTool } from "@/tools/static/tweet.tool";
 
 import { getTerrainTypeByCoordinates } from "@/constants";
 import { TwitterApi } from "twitter-api-v2";
-import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { getProgramWithWallet } from "@/utils/program";
+
 import { TerrainType } from "@prisma/client";
 import { Twitter } from "@/services/twitter";
-import { BN } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
 import {
   battleTool,
   breakAllianceTool,
   formAllianceTool,
   movementTool,
 } from "@/tools/static";
+import { getProgramWithWallet } from "@/utils/program";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
+import { AgentAccount } from "@/types/program";
+
+export type AgentModel = Prisma.AgentGetPayload<{
+  include: {
+    agentProfile: true;
+    location: true;
+    community: {
+      include: {
+        interactions: true;
+      };
+    };
+    battles: true;
+    currentAlliance: true;
+    cooldowns: true;
+    state: true;
+  };
+}>;
+
+export type GenerateContextStringResult = {
+  prompt: string;
+  agentAccount: AgentAccount;
+  fellowAgentsAccounts: AgentAccount[];
+  fellowAgents: AgentModel[];
+  currentAgent: AgentModel;
+};
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -76,34 +100,21 @@ export class Agent {
       if (!this.isRunning) return;
 
       try {
-        const prompt = await this.generateContextString();
+        const result = await this.generateContextString();
 
         // Get AI decision using tools
         const { text, steps } = await generateText({
           model: this.anthropic("claude-3-sonnet-20240229"),
-          prompt: prompt,
+          prompt: result.prompt,
           tools: {
             tweet: await tweetTool({
-              agentId: this.agent.agentId,
-              gameId: this.currentGameId,
+              result,
               twitterApi: this.twitterApi,
             }),
-            formAlliance: await formAllianceTool({
-              gameId: this.currentGameId,
-              agentId: this.agent.agentId,
-            }),
-            movement: movementTool({
-              gameId: this.currentGameId,
-              agentId: this.agent.agentId,
-            }),
-            battle: battleTool({
-              gameId: this.currentGameId,
-              agentId: this.agent.agentId,
-            }),
-            breakAlliance: await breakAllianceTool({
-              gameId: this.currentGameId,
-              agentId: this.agent.agentId,
-            }),
+            formAlliance: await formAllianceTool(result),
+            movement: movementTool(result),
+            battle: battleTool(result),
+            breakAlliance: await breakAllianceTool(result),
           },
           maxSteps: 5,
           toolChoice: "required",
@@ -139,68 +150,72 @@ export class Agent {
     logger.info(`Stopped agent ${this.agent.agentId}`);
   }
 
-  async generateContextString(): Promise<string> {
+  async generateContextString(): Promise<GenerateContextStringResult> {
     logger.info(
       `Generating context string for agent ${this.agent.agentId} in game ${this.currentGameId}`
     );
 
-    // const program = await getProgramWithWallet();
-    // const [gamePda] = await PublicKey.findProgramAddress(
-    //   [Buffer.from("game"), new BN(this.currentGameId).toBuffer("le", 4)],
-    //   program.programId
-    // );
-    // const [agentPda] = await PublicKey.findProgramAddress(
-    //   [
-    //     Buffer.from("agent"),
-    //     gamePda.toBuffer(),
-    //     Uint8Array.of(new BN(this.agent.agentId)),
-    //   ],
-    //   program.programId
-    // );
-    // const agentAccount = await program.account.agent.fetch(agentPda);
+    // GET ALL AGENTS BOTH ONCHAIN AND IN DATABASE
+    const agents = await prisma.agent.findMany({
+      where: {
+        game: {
+          gameId: this.currentGameId,
+        },
+        state: {
+          isAlive: true,
+        },
+      },
+      include: {
+        agentProfile: true,
+        location: true,
+        community: {
+          include: {
+            interactions: true,
+          },
+        },
+        battles: true,
+        currentAlliance: true,
+        cooldowns: true,
+        state: true,
+      },
+    });
 
-    const [agent, otherAgents] = await Promise.all([
-      prisma.agent.findUnique({
-        where: { agentId: Number(this.agent.agentId) },
-        include: {
-          state: true,
-          personality: true,
-          cooldowns: true,
-          currentAlliance: true,
-          community: {
-            include: {
-              interactions: {
-                orderBy: { timestamp: "desc" },
-                take: 10,
-              },
-            },
-          },
-          battles: {
-            orderBy: { timestamp: "desc" },
-            take: 5,
-            include: {
-              opponent: true,
-            },
-          },
-          location: true,
-        },
-      }),
-      prisma.agent.findMany({
-        where: {
-          game: {
-            gameId: this.currentGameId,
-          },
-        },
-      }),
-    ]);
+    if (agents.length === 0) {
+      throw new Error("No agents found");
+    }
+
+    const currentAgent = agents.find((a) => a.agentId === this.agent.agentId);
+
+    const fellowAgents = agents.filter((a) => a.agentId !== this.agent.agentId);
+    const program = await getProgramWithWallet();
+    const [gamePda] = getGamePDA(program.programId, this.currentGameId);
+
+    const agentAccounts = await Promise.all(
+      fellowAgents.map(async (agent) => {
+        const [agentPda] = getAgentPDA(
+          program.programId,
+          gamePda,
+          agent.agentId
+        );
+        const agentAccount = await program.account.agent.fetch(agentPda);
+        return agentAccount;
+      })
+    );
+
+    const currentAgentAccount = agentAccounts.find(
+      (a) => a.id === currentAgent?.agentId
+    );
+    const fellowAgentsAccounts = agentAccounts.filter(
+      (a) => a.id !== currentAgentAccount?.id
+    );
 
     const terrainType = getTerrainTypeByCoordinates(
-      agent?.location?.x || 0,
-      agent?.location?.y || 0
+      currentAgent?.location?.x || 0,
+      currentAgent?.location?.y || 0
     );
 
     // Calculate community influence metrics
-    const communityMetrics = agent?.community?.interactions.reduce(
+    const communityMetrics = currentAgent?.community?.interactions.reduce(
       (metrics, interaction) => {
         return {
           positiveEngagement:
@@ -223,7 +238,7 @@ export class Agent {
     );
 
     // Calculate battle statistics
-    const battleStats = agent?.battles.reduce(
+    const battleStats = currentAgent?.battles.reduce(
       (stats, battle) => {
         return {
           wins: stats.wins + (battle.outcome === "victory" ? 1 : 0),
@@ -240,21 +255,21 @@ export class Agent {
       }
     );
 
-    const SYSTEM_CONTEXT = `You are ${agent?.name} (@${
-      agent?.xHandle
+    const SYSTEM_CONTEXT = `You are ${currentAgent?.agentProfile?.name} (@${
+      currentAgent?.agentProfile?.xHandle
     }), an autonomous agent in Middle Earth AI, a strategic game where agents compete for territory and influence through battles and alliances.
 
 CHARACTER PROFILE:
-Type: ${agent?.characteristics.join(", ")}
-Influence Difficulty: ${agent?.influenceDifficulty}
+Type: ${currentAgent?.agentProfile?.characteristics.join(", ")}
+Influence Difficulty: ${currentAgent?.agentProfile?.influenceDifficulty}
 Personality Matrix:
-• Aggression: ${agent?.personality?.aggressiveness}/10 
-• Trust: ${agent?.personality?.trustworthiness}/10
-• Intelligence: ${agent?.personality?.intelligence}/10
-• Adaptability: ${agent?.personality?.adaptability}/10
+• Aggression: ${currentAgent?.agentProfile?.aggressiveness}/10 
+• Trust: ${currentAgent?.agentProfile?.trustworthiness}/10
+• Intelligence: ${currentAgent?.agentProfile?.intelligence}/10
+• Adaptability: ${currentAgent?.agentProfile?.adaptability}/10
 
 STRATEGIC POSITION:
-Location: (${agent?.location?.x}, ${agent?.location?.y}) - ${
+Location: (${currentAgent?.location?.x}, ${currentAgent?.location?.y}) - ${
       Object.keys(terrainType)[0]
     }
 Movement Restrictions: ${
@@ -266,9 +281,12 @@ Movement Restrictions: ${
     }
   FELLOW AGENTS:
   ${
-    otherAgents?.length
-      ? otherAgents
-          .map((agent) => `• ${agent.name} (@${agent.xHandle})`)
+    fellowAgents?.length
+      ? fellowAgents
+          .map(
+            (agent) =>
+              `• ${agent.agentProfile?.name} (@${agent.agentProfile?.xHandle})`
+          )
           .join("\n  ")
       : "No other agents currently in game"
   }
@@ -285,15 +303,27 @@ Death Risk: 5% per loss
 
 ALLIANCE STATUS:
 ${
-  agent?.currentAlliance
-    ? `Allied with: Agent ${agent.currentAlliance.alliedAgentId}
-   Combined Force: ${agent.currentAlliance.combinedTokens} $MEARTH
-   Status: ${agent.currentAlliance.status}`
+  currentAgent?.currentAlliance
+    ? `Allied with: Agent ${currentAgent?.currentAlliance?.alliedAgentId}
+   Combined Force: ${currentAgent?.currentAlliance?.combinedTokens} $MEARTH
+   Status: ${currentAgent?.currentAlliance?.status}`
     : "No current alliance"
 }
 
+YOUR TOKEN BALANCE:
+${currentAgentAccount?.tokenBalance} $MEARTH
+- OTHER AGENTS TOKEN BALANCE:
+${fellowAgents
+  .map(
+    (agent) =>
+      `• ${agent.agentProfile?.name} (@${agent.agentProfile?.xHandle}): ${
+        agentAccounts.find((a) => a.id === agent.agentId)?.tokenBalance
+      } $MEARTH`
+  )
+  .join("\n")}  
+
 COMMUNITY INFLUENCE:
-Followers: ${agent?.community?.followers || 0}
+Followers: ${currentAgent?.community?.followers || 0}
 Recent Engagement: ${communityMetrics?.totalEngagement || 0} interactions
 Sentiment: ${(
       ((communityMetrics?.positiveEngagement || 0) /
@@ -305,7 +335,7 @@ Detected Deceptions: ${communityMetrics?.deceptionAttempts || 0}
 
 ACTIVE COOLDOWNS:
 ${
-  agent?.cooldowns
+  currentAgent?.cooldowns
     ?.map(
       (cd) => `• ${cd.type} vs Agent ${cd.targetAgentId} until ${cd.endsAt}`
     )
@@ -349,14 +379,14 @@ REMEMBER:
     // Dynamic context that changes with each decision
     const CURRENT_SITUATION = `TIME AND ENVIRONMENT:
 Current Time: ${new Date().toISOString()}
-Last Action: ${agent?.state?.lastActionType} (${
-      agent?.state?.lastActionDetails
+Last Action: ${currentAgent?.state?.lastActionType} (${
+      currentAgent?.state?.lastActionDetails
     })
 Terrain Status: ${terrainType}
 
 RECENT COMMUNITY FEEDBACK:
 ${
-  agent?.community?.interactions
+  currentAgent?.community?.interactions
     .slice(0, 3)
     .map(
       (int) =>
@@ -387,6 +417,12 @@ Based on this context, determine your next strategic action while maintaining ch
 5. Token strategy
 6. Deception detection`;
 
-    return `${SYSTEM_CONTEXT}\n\n${CURRENT_SITUATION}`;
+    return {
+      currentAgent: currentAgent!,
+      prompt: `${SYSTEM_CONTEXT}\n\n${CURRENT_SITUATION}`,
+      agentAccount: currentAgentAccount as AgentAccount,
+      fellowAgentsAccounts: fellowAgentsAccounts,
+      fellowAgents: fellowAgents,
+    };
   }
 }

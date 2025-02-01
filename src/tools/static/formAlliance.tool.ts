@@ -3,23 +3,23 @@ import { z } from "zod";
 import { prisma } from "@/config/prisma";
 import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
+import { GenerateContextStringResult } from "@/agent/Agent";
 
 /**
  * Tool for forming strategic alliances between agents in Middle Earth
  */
-export const formAllianceTool = async ({
-  gameId,
-  agentId,
-}: {
-  gameId: number;
-  agentId: number;
-}) => {
-  const agent = await prisma.agent.findUnique({
-    where: { agentId },
+export const formAllianceTool = async (result: GenerateContextStringResult) => {
+  const agent = result.currentAgent;
+  const gameId = Number(agent.gameId);
+  const agentId = Number(agent.agentId);
+
+  const currentAlliance = agent.currentAlliance;
+  const ally = await prisma.agent.findUnique({
+    where: { agentId_gameId: { agentId, gameId: agent.gameId } },
   });
 
   return tool({
-    description: `This is a tool you(@${agent?.xHandle}) can use to form alliances with other agents.
+    description: `This is a tool you(@${agent.agentProfile.xHandle}) can use to form alliances with other agents.
 
 CONTEXT:
 Forming an alliance is a powerful diplomatic action that:
@@ -65,12 +65,17 @@ EFFECTS:
 
       try {
         // Prevent self-alliance
-        if (agent?.xHandle === targetAgentXHandle) {
+        if (agent.agentProfile.xHandle === targetAgentXHandle) {
           throw new Error("Cannot form alliance with oneself");
         }
 
         const targetAgent = await prisma.agent.findUnique({
-          where: { xHandle: targetAgentXHandle },
+          where: {
+            agentId_gameId: {
+              agentId: agentId,
+              gameId: agent.gameId,
+            },
+          },
         });
         if (!targetAgent) {
           throw new Error("Target agent not found");
