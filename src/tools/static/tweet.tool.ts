@@ -141,7 +141,7 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
         if (!twitterApi) throw new Error("Communication systems offline");
 
         // Post tweet and get its ID
-        const tweetId = await twitterApi.post(content);
+        const tweetId = await twitterApi.v2.tweet(content);
 
         logger.info(`🐦 Agent ${agentId} is broadcasting message:
         ╔════════════════════════════════════════════
