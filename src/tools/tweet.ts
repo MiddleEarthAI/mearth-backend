@@ -1,7 +1,7 @@
-import type { TwitterClient } from "@/agent/TwitterClient";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 import { tool } from "ai";
+import { TwitterApi } from "twitter-api-v2";
 import { z } from "zod";
 
 export interface TweetValidationResult {
@@ -25,11 +25,11 @@ enum TweetType {
  */
 export const tweetTool = async ({
   agentId,
-  twitterClient,
+  twitterApi,
 }: {
   gameId: number;
   agentId: number;
-  twitterClient: TwitterClient | null;
+  twitterApi: TwitterApi;
 }) => {
   // Fetch comprehensive agent state including battle/alliance history
   const agent = await prisma.agent.findUnique({
@@ -52,19 +52,25 @@ export const tweetTool = async ({
           opponent: true,
         },
       },
-      tokenomics: true,
       personality: true,
       strategy: true,
+    },
+  });
+  const battles = await prisma.battle.findMany({
+    where: {
+      agent: {
+        agentId,
+      },
     },
   });
 
   if (!agent) throw new Error(`Agent not found: ${agentId}`);
 
   // Format battle history for context
-  const recentBattles = agent.battles
+  const recentBattles = battles
     .map(
       (battle) =>
-        `${battle.outcome.toUpperCase()} vs ${battle.opponent.name} [${
+        `${battle.outcome.toUpperCase()} vs ${battle.opponentId} [${
           battle.tokensGained || -(battle?.tokensLost || 0)
         } tokens]`
     )
@@ -103,7 +109,7 @@ CURRENT STATE:
 ${territoryContext}
 Alliance Status: ${allianceStatus}
 Recent Battles: ${recentBattles}
-Token Holdings: ${agent.tokenomics?.stakedTokens || 0}
+
 
 SOCIAL CONTEXT:
 Influence Score: ${socialMetrics?.engagement || 0}
@@ -160,12 +166,11 @@ Your influence marks whether you win or lose!. Choose your words with wisdom.`;
 
     execute: async ({ content, type, coordinates }) => {
       try {
-        if (!twitterClient) throw new Error("Communication systems offline");
-
+        // Validate onchain state if relevant
         // Validate onchain state if relevant
 
         // Post tweet and update social metrics
-        await twitterClient.postTweet(content);
+        await twitterApi.v2.tweet(content);
 
         // Update agent's social metrics
         // await prisma.community.update({

@@ -1,11 +1,9 @@
 import { validateZod } from "@/middleware/validateZod";
 import { registerAgentSchema } from "@/schemas/agent";
-import {
-  getGameService,
-  getGameStateService,
-  getTokenService,
-} from "@/services";
+import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
+import { getProgramWithWallet } from "@/utils/program";
 import { Router } from "express";
 
 const router = Router();
@@ -170,11 +168,20 @@ router.get("/:agentId", async (req, res) => {
       });
     }
 
-    const stateService = getGameStateService();
-    const agent = await stateService.getAgent(
-      Number.parseInt(agentId),
+    const program = await getProgramWithWallet();
+
+    const [gamePda] = getGamePDA(
+      program.programId,
       Number.parseInt(gameId as string)
     );
+
+    const [agentPda] = getAgentPDA(
+      program.programId,
+      gamePda,
+      Number.parseInt(agentId)
+    );
+
+    const agent = await program.account.agent.fetch(agentPda);
 
     if (!agent) {
       logger.warn(`⚠️ Agent ${agentId} not found in game ${gameId}`);
@@ -220,19 +227,12 @@ router.post("/:agentId/stake", async (req, res) => {
       });
     }
 
-    const tokenService = getTokenService();
-    const tx = await tokenService.stakeTokens(
-      Number.parseInt(agentId),
-      Number.parseInt(gameId as string),
-      amount
-    );
-
     logger.info(
       `💰 Successfully staked ${amount} tokens for agent ${agentId} in game ${gameId}`
     );
     res.json({
       success: true,
-      transaction: tx,
+
       data: {
         agentId,
         stakedAmount: amount,

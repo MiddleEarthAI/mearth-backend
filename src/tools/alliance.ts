@@ -1,5 +1,5 @@
 import { prisma } from "@/config/prisma";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
 import { tool } from "ai";
 import { z } from "zod";
@@ -12,7 +12,7 @@ export interface AllianceValidationResult {
 }
 
 /**
- * Creates an alliance tool for diplomatic interactions
+ * Creates an alliance tool for diplomatic interactions between agents
  * Uses GameService for blockchain interactions and alliance mechanics
  */
 export const allianceTool = async ({
@@ -22,27 +22,39 @@ export const allianceTool = async ({
   gameId: number;
   agentId: number;
 }) => {
-  const gameStateService = getGameStateService();
   const gameService = getGameService();
-  const allianceInfo = await gameStateService.getAllianceInfo(agentId, gameId);
 
   const agent = await prisma.agent.findUnique({
     where: {
       agentId: agentId,
     },
     include: {
-      currentAlliance: true,
-      tokenomics: true,
       location: true,
+      currentAlliance: true,
+      state: true,
+      battles: {
+        take: 10,
+        orderBy: {
+          timestamp: "desc",
+        },
+      },
     },
   });
 
-  const contextualDescription = `Alliance System | Agent: ${agent?.xHandle}
+  if (!agent) {
+    throw new Error("Agent not found");
+  }
+
+  // Calculate win rate from battles
+  const totalBattles = agent.battles.length;
+  const victories = agent.battles.filter((b) => b.outcome === "victory").length;
+  const winRate = totalBattles > 0 ? victories / totalBattles : 0;
+
+  const contextualDescription = `Alliance System | Agent: ${agent.xHandle}
 
 CURRENT STATUS
-Position: (${allianceInfo?.agent.x ?? "-"}, ${allianceInfo?.agent.y ?? "-"})
-Resources: ${allianceInfo?.agent.tokenBalance ?? "-"} MEARTH
-Active Alliance: ${agent?.currentAlliance ? "Yes" : "None"}
+Position: (${agent.location?.x ?? "-"}, ${agent.location?.y ?? "-"})
+Active Alliance: ${agent.currentAlliance ? "Yes" : "None"}
 
 DIPLOMATIC FRAMEWORK
 Core Mechanics:
@@ -82,9 +94,9 @@ Risk Assessment:
 Consider your diplomatic moves carefully. Alliances shape the future of Middle Earth.
 
 Current Game State:
-- Map Position: ${allianceInfo?.agent.x ?? "-"}, ${allianceInfo?.agent.y ?? "-"}
-- Available Resources: ${allianceInfo?.agent.tokenBalance ?? "-"} MEARTH
-- Strategic Value: ${agent?.tokenomics?.winRate ?? 0}% victory rate
+- Map Position: (${agent.location?.x ?? "-"}, ${agent.location?.y ?? "-"})
+- Battle Record: ${victories}W - ${totalBattles - victories}L
+- Win Rate: ${(winRate * 100).toFixed(1)}%
 
 Your decisions echo through the realm. Choose wisely.`;
 
@@ -99,20 +111,12 @@ Your decisions echo through the realm. Choose wisely.`;
       reason: z
         .string()
         .describe(
-          "Detailed strategic rationale for alliance formation. Include military, economic, and political considerations. Analyze potential synergies and risk mitigation strategies."
+          "Detailed strategic rationale for alliance formation. Include military, economic, and political considerations."
         ),
     }),
 
     execute: async ({ allyXHandle, reason }) => {
-      if (!allianceInfo) {
-        return {
-          success: false,
-          message: "Alliance validation failed: Agent data unavailable",
-        };
-      }
-
-      // Validate existing alliance status
-      if (allianceInfo.isActive) {
+      if (agent.currentAlliance) {
         return {
           success: false,
           message: "Alliance formation blocked: Active alliance already exists",
@@ -122,16 +126,15 @@ Your decisions echo through the realm. Choose wisely.`;
       const ally = await prisma.agent.findUnique({
         where: { xHandle: allyXHandle },
         include: {
-          currentAlliance: true,
           location: true,
-          tokenomics: true,
+          currentAlliance: true,
         },
       });
 
-      if (!agent || !ally) {
+      if (!ally) {
         return {
           success: false,
-          message: "Alliance formation failed: Invalid agent credentials",
+          message: "Alliance formation failed: Target agent not found",
         };
       }
 
@@ -165,10 +168,8 @@ Your decisions echo through the realm. Choose wisely.`;
             gameId: gameId.toString(),
             agentId: agent.id,
             alliedAgentId: ally.id,
-            combinedTokens:
-              (agent.tokenomics?.stakedTokens ?? 0) +
-              (ally.tokenomics?.stakedTokens ?? 0),
-            canBreakAlliance: true,
+            combinedTokens: 0, // Initialize at 0, update via game service
+            status: "Active",
           },
         });
 
@@ -176,10 +177,7 @@ Your decisions echo through the realm. Choose wisely.`;
           success: true,
           message: `Alliance formed successfully between ${
             agent.xHandle
-          } and ${allyXHandle}. Combined strength: ${
-            (agent.tokenomics?.stakedTokens ?? 0) +
-            (ally.tokenomics?.stakedTokens ?? 0)
-          } MEARTH. Strategic basis: ${reason}. Timestamp: ${new Date().toISOString()}`,
+          } and ${allyXHandle}. Strategic basis: ${reason}. Timestamp: ${new Date().toISOString()}`,
           transactionId: tx,
         };
       } catch (error) {

@@ -1,12 +1,10 @@
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 import { GameService } from "./GameService";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { Program } from "@coral-xyz/anchor";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { CronJob } from "cron";
-import { BattleType } from "@prisma/client";
-import { GameStateService } from "./GameStateService";
 
 /**
  * Service for handling battle resolutions via cron

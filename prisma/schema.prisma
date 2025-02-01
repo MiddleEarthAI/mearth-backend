@@ -43,7 +43,7 @@ model Agent {
   updatedAt           DateTime @updatedAt
 
   // Relations
-  game            Game            @relation(fields: [gameId], references: [id])
+  game            Game         @relation(fields: [gameId], references: [id])
   gameId          String
   location        Location?
   currentAlliance Alliance?
@@ -51,7 +51,6 @@ model Agent {
   community       Community?
   personality     Personality?
   state           AgentState?
-  tokenomics      TokenEconomics?
   strategy        Strategy?
   cooldowns       Cooldown[]
 
@@ -61,11 +60,10 @@ model Agent {
 }
 
 model Location {
-  id                  String      @id @default(uuid())
-  x                   Int         @db.Integer
-  y                   Int         @db.Integer
-  terrainType         TerrainType // 'plain', 'mountain', 'river'
-  stuckTurnsRemaining Int         @default(0) @db.Integer // Must be >= 0
+  id          String      @id @default(uuid())
+  x           Int         @db.Integer
+  y           Int         @db.Integer
+  terrainType TerrainType // 'plain', 'mountain', 'river'
 
   // Relations
   agent   Agent  @relation(fields: [agentId], references: [id])
@@ -73,11 +71,10 @@ model Location {
 }
 
 model Alliance {
-  id               String         @id @default(uuid())
-  formedAt         DateTime       @default(now())
-  canBreakAlliance Boolean        @default(true)
-  combinedTokens   Float
-  status           AllianceStatus @default(Active)
+  id             String         @id @default(uuid())
+  formedAt       DateTime       @default(now())
+  combinedTokens Float
+  status         AllianceStatus @default(Active)
 
   // Relations
   game          Game   @relation(fields: [gameId], references: [id])
@@ -112,10 +109,12 @@ model Battle {
 }
 
 model Community {
-  id                String @id @default(uuid())
-  followers         Int    @default(0)
-  averageEngagement Float  @default(0)
-  supporterCount    Int    @default(0)
+  id                String   @id @default(uuid())
+  followers         Int      @default(0)
+  averageEngagement Float    @default(0)
+  supporterCount    Int      @default(0)
+  lastInfluenceTime DateTime @default(now())
+  influenceScore    Float    @default(0)
 
   // Relations
   agent        Agent         @relation(fields: [agentId], references: [id])
@@ -124,17 +123,57 @@ model Community {
 }
 
 model Interaction {
-  id              String   @id @default(uuid())
-  type            String // 'comment', 'quote', 'mention'
-  content         String   @db.Text
-  authorFollowers Int
-  engagement      Int
-  sentiment       String // 'positive', 'neutral', 'negative'
-  timestamp       DateTime @default(now())
-
-  // Relations
-  community   Community @relation(fields: [communityId], references: [id])
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  type        String // "comment", "quote", "mention"
+  content     String // The actual tweet content
   communityId String
+  community   Community @relation(fields: [communityId], references: [id])
+
+  // Author metrics
+  authorId         String // Twitter author ID
+  authorHandle     String // Twitter handle
+  authorFollowers  Int
+  authorIsVerified Boolean @default(false)
+
+  // Engagement metrics
+  engagement Int // Overall engagement score
+  likes      Int @default(0)
+  retweets   Int @default(0)
+  quotes     Int @default(0)
+  replies    Int @default(0)
+
+  // Content analysis
+  sentiment       String // "positive", "negative", "neutral"
+  influenceScore  Float // How influential this interaction is (0-1)
+  suggestedAction String? // Suggested action from the community
+  confidence      Float // Confidence in the analysis (0-1)
+
+  // Strategic analysis
+  isDeceptive    Boolean @default(false)
+  deceptionScore Float   @default(0) // Probability of deception (0-1)
+  intentType     String // "support", "oppose", "deceive", "inform", "question"
+
+  // Context
+  referencedTweet String? // ID of tweet being referenced (for QRTs/replies)
+  conversationId  String? // Twitter conversation ID
+  inReplyToId     String? // ID of tweet being replied to
+
+  // Community impact
+  communityAlignment Float // How aligned with community interests (-1 to 1)
+  impactScore        Float // Calculated impact on agent's decision making (0-1)
+
+  // Historical context
+  previousInteractions Int   @default(0) // Number of previous interactions from this author
+  authorReliability    Float @default(0.5) // Historical reliability score of author (0-1)
+
+  // Timestamps
+  timestamp   DateTime // When the interaction occurred
+  processedAt DateTime @default(now())
+
+  @@index([communityId])
+  @@index([authorId])
+  @@index([timestamp])
 }
 
 model Personality {
@@ -160,10 +199,11 @@ model Personality {
 model AgentState {
   id                String   @id @default(uuid())
   isAlive           Boolean  @default(true)
-  health            Int      @default(100)
   lastActionType    String // 'move', 'battle', 'alliance', 'ignore'
   lastActionTime    DateTime @default(now())
   lastActionDetails String   @db.Text
+  influencedByTweet String? // ID of tweet that influenced this action
+  influenceScore    Float    @default(0)
 
   // Relations
   agent   Agent  @relation(fields: [agentId], references: [id])
@@ -181,33 +221,6 @@ model Cooldown {
   targetAgentId String
 
   @@unique([agentId, targetAgentId, type])
-}
-
-model TokenEconomics {
-  id           String @id @default(uuid())
-  stakedTokens Float
-  totalStaked  Float
-  stakersCount Int
-
-  // Battle statistics
-  totalWon  Int   @default(0)
-  totalLost Int   @default(0)
-  winRate   Float @default(0)
-
-  // Relations
-  agent             Agent              @relation(fields: [agentId], references: [id])
-  agentId           String             @unique
-  unstakingRequests UnstakingRequest[]
-}
-
-model UnstakingRequest {
-  id         String   @id @default(uuid())
-  amount     Float
-  unlockTime DateTime
-
-  // Relations
-  tokenEconomics   TokenEconomics @relation(fields: [tokenEconomicsId], references: [id])
-  tokenEconomicsId String
 }
 
 model Strategy {

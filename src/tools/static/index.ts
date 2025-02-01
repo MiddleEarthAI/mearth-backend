@@ -1,5 +1,4 @@
 import type { CoreTool } from "ai";
-import type { TwitterClient } from "@/agent/TwitterClient";
 
 // Social tools
 import { tweetTool } from "./tweet.tool";
@@ -9,11 +8,12 @@ import { movementTool } from "./movement.tool";
 
 import { formAllianceTool } from "./formAlliance.tool";
 import { breakAllianceTool } from "./breakAlliance.tool";
+import { TwitterApi } from "twitter-api-v2";
 
 export interface ToolContext {
   agentId: number;
   gameId: number;
-  twitterClient?: TwitterClient | null;
+  twitterApi: TwitterApi;
 }
 
 /**
@@ -22,11 +22,11 @@ export interface ToolContext {
 export const getAgentTools = async (
   context: ToolContext
 ): Promise<Record<string, CoreTool>> => {
-  const { agentId, gameId, twitterClient } = context;
+  const { agentId, gameId, twitterApi } = context;
 
   return {
     // Social interaction tools
-    tweet: tweetTool(twitterClient || null),
+    tweet: await tweetTool({ agentId, gameId, twitterApi }),
     // World interaction tools
     move: movementTool({ gameId, agentId }),
     formAlliance: await formAllianceTool({ gameId, agentId }),

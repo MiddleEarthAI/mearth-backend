@@ -15,6 +15,8 @@ import { MearthProgram } from "@/types";
 
 import { Prisma } from "@prisma/client";
 import { Agent } from "@/agent/Agent";
+import { getProgramWithWallet } from "@/utils/program";
+import { program } from "@coral-xyz/anchor/dist/cjs/native/system";
 
 type PrismaAgent = Prisma.AgentGetPayload<{
   include: {
@@ -91,36 +93,7 @@ export async function setup(): Promise<void> {
       commitment: "confirmed",
     });
 
-    // Initialize wallet with error handling
-    let keypair: Keypair;
-
-    try {
-      const privateKey = bs58.decode(privateKeyString);
-      keypair = Keypair.fromSecretKey(privateKey);
-      logger.info("🔑 Authority wallet initialized", {
-        publicKey: keypair.publicKey.toBase58(),
-      });
-    } catch (error) {
-      const walletError = error as WalletError;
-      logger.error("❌ Wallet initialization failed", {
-        error: walletError.message,
-      });
-      throw new Error(`Failed to initialize wallet: ${walletError.message}`);
-    }
-
-    // Set up Anchor with optimized configuration
-    const wallet = new anchor.Wallet(keypair);
-
-    const provider = new anchor.AnchorProvider(connection, wallet, {
-      commitment: "confirmed",
-    });
-
-    logger.info("⚓ Anchor provider configured", {
-      commitment: provider.connection.commitment,
-      wallet: wallet.publicKey.toBase58(),
-    });
-
-    const program = await getProgram(provider);
+    const program = await getProgramWithWallet();
     logger.info("📦 Program initialized successfully", {
       programId: program.programId.toBase58(),
     });
@@ -136,8 +109,7 @@ export async function setup(): Promise<void> {
     logger.info("🔍 Looking for active game or creating new one...");
     const { mostRecentActiveGame, dbGame } = await getOrCreateGame(
       program,
-      gameAccounts,
-      keypair
+      gameAccounts
     );
 
     logger.info("✅ Game setup complete", {
@@ -182,7 +154,7 @@ export async function setup(): Promise<void> {
         unregistered: unregisteredAgents.length,
       });
 
-      await syncAgents(program, gamePda, dbGame, keypair);
+      await syncAgents(program, gamePda, dbGame);
     } else {
       logger.info("✅ All agents already registered", {
         totalAgents: registeredAgents.length,
@@ -210,8 +182,7 @@ export async function setup(): Promise<void> {
  */
 async function getOrCreateGame(
   program: MearthProgram,
-  gameAccounts: { publicKey: PublicKey; account: GameAccount }[],
-  keypair: Keypair
+  gameAccounts: { publicKey: PublicKey; account: GameAccount }[]
 ) {
   logger.info("🎲 Processing game accounts", {
     totalAccounts: gameAccounts.length,
@@ -232,7 +203,7 @@ async function getOrCreateGame(
 
   if (!mostRecentActiveGame) {
     logger.info("🆕 No active games found, creating new game");
-    return await createNewGame(program, sortedGames, keypair);
+    return await createNewGame(program, sortedGames);
   }
 
   logger.info("🔍 Looking up game in database", {
@@ -271,8 +242,8 @@ async function getOrCreateGame(
       dbGame = await createGameInDB(
         mostRecentActiveGame,
         mostRecentActiveGame.account.gameId,
-        keypair,
-        bump
+        bump,
+        program
       );
 
       logger.info("✅ Game synced to database successfully", {
@@ -298,8 +269,7 @@ async function getOrCreateGame(
  */
 async function createNewGame(
   program: MearthProgram,
-  existingGames: { publicKey: PublicKey; account: GameAccount }[],
-  keypair: Keypair
+  existingGames: { publicKey: PublicKey; account: GameAccount }[]
 ) {
   // Calculate new game ID
   const gameId =
@@ -326,10 +296,7 @@ async function createNewGame(
     }
 
     // Initialize game on-chain
-    await program.methods
-      .initializeGame(gameId, bump)
-      .accounts({ authority: keypair.publicKey })
-      .rpc();
+    await program.methods.initializeGame(gameId, bump).accounts({}).rpc();
 
     logger.info("✅ Game initialized on chain", {
       gamePda: gamePda.toBase58(),
@@ -354,8 +321,8 @@ async function createNewGame(
     const dbGame = await createGameInDB(
       mostRecentActiveGame,
       gameId,
-      keypair,
-      bump
+      bump,
+      program
     );
 
     logger.info("✅ Game created successfully", {
@@ -380,8 +347,7 @@ async function createNewGame(
 async function syncAgents(
   program: MearthProgram,
   gamePda: PublicKey,
-  dbGame: PrismaGame,
-  keypair: Keypair
+  dbGame: PrismaGame
 ) {
   logger.info("🔄 Starting agent synchronization process", {
     totalAgents: gameData.agents.length,
@@ -402,7 +368,7 @@ async function syncAgents(
         agentKeypair.secretKey
       )},${agentKeypair.publicKey.toBase58()}`;
 
-      await registerAgentOnChain(program, gamePda, agent, keypair);
+      await registerAgentOnChain(program, gamePda, agent);
 
       await createAgentInDB(agent, dbGame.id.toString(), walletInfo);
       logger.info(`✅ Agent synchronized successfully`, {
@@ -419,18 +385,17 @@ async function syncAgents(
 async function createGameInDB(
   mostRecentActiveGame: any,
   gameId: BN,
-  keypair: Keypair,
-  bump: number
+  bump: number,
+  program: MearthProgram
 ): Promise<PrismaGame> {
   logger.info("📝 Creating game record in database", {
     gameId: gameId.toString(),
-    authority: keypair.publicKey.toBase58(),
   });
 
   const game = await prisma.game.create({
     data: {
       gameId: gameId.toNumber(),
-      authority: keypair.publicKey.toBase58(),
+      authority: program.provider.publicKey?.toBase58() ?? "",
       tokenMint: mostRecentActiveGame.account.tokenMint.toBase58(),
       rewardsVault: mostRecentActiveGame.account.rewardsVault.toBase58(),
       mapDiameter: mostRecentActiveGame.account.mapDiameter,
@@ -467,8 +432,7 @@ async function createGameInDB(
 async function registerAgentOnChain(
   program: MearthProgram,
   gamePda: PublicKey,
-  agent: PrismaAgent,
-  keypair: Keypair
+  agent: PrismaAgent
 ) {
   logger.info(`⛓️ Registering agent on chain`, {
     name: agent.name,
@@ -489,7 +453,7 @@ async function registerAgentOnChain(
         agent.name
       )
       .accountsStrict({
-        authority: keypair.publicKey,
+        authority: program.provider.publicKey?.toBase58() ?? "",
         game: gamePda,
         agent: agentPda,
         systemProgram: SystemProgram.programId,
@@ -547,7 +511,6 @@ async function createAgentInDB(
           x: agent.location?.x || 0,
           y: agent.location?.y || 0,
           terrainType: agent.location?.terrainType || TerrainType.Plain,
-          stuckTurnsRemaining: agent.location?.stuckTurnsRemaining || 0,
         },
       },
       personality: {
@@ -566,7 +529,8 @@ async function createAgentInDB(
       state: {
         create: {
           isAlive: agent.state?.isAlive ?? true,
-          health: agent.state?.health ?? 100,
+          influencedByTweet: agent.state?.influencedByTweet || null,
+          influenceScore: agent.state?.influenceScore || 0,
           lastActionType: agent.state?.lastActionType || "spawn",
           lastActionDetails: agent.state?.lastActionDetails || "Initial spawn",
         },
@@ -585,7 +549,7 @@ async function createAgentInDB(
     name: agent.name,
     id: createdAgent.id,
     location: { x: agent.location?.x || 0, y: agent.location?.y || 0 },
-    health: agent.state?.health ?? 100,
+    influenceScore: agent.state?.influenceScore || 0,
   });
 }
 
@@ -604,7 +568,7 @@ async function createAndStartAgents(game: PrismaGame) {
 
   for (const agentData of game.agents) {
     try {
-      const agent = new Agent(agentData.agentId, game.gameId);
+      const agent = new Agent(agentData, game.gameId);
       await agent.start();
       agents.push(agent);
 

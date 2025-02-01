@@ -1,8 +1,12 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
+import { getAgentPDA } from "@/utils/pda";
+import { BN } from "@coral-xyz/anchor";
+import { getGamePDA } from "@/utils/pda";
+import { getProgramWithWallet } from "@/utils/program";
 
 /**
  * Tool for breaking alliances between agents in Middle Earth
@@ -15,7 +19,10 @@ export const breakAllianceTool = async ({
   agentId: number;
 }) => {
   const gameService = getGameService();
-  const gameStateService = getGameStateService();
+  // const program = await getProgramWithWallet();
+  // const [gamePda] = getGamePDA(program.programId, new BN(gameId));
+  // const [agentPda] = getAgentPDA(program.programId, gamePda, new BN(agentId));
+  // const agentAccount = await program.account.agent.fetch(agentPda);
   const agent = await prisma.agent.findUnique({
     where: { agentId },
   });

@@ -1,15 +1,17 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
 import { MOVE_COOLDOWN_MS, getTerrainTypeByCoordinates } from "@/constants";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
+import { getProgramWithWallet } from "@/utils/program";
+import { BN } from "@coral-xyz/anchor";
 
 /**
  * Tool for agents to navigate the Middle Earth map
  */
 export const movementTool = (context: { gameId: number; agentId: number }) => {
   const { gameId, agentId } = context;
-  const gameStateService = getGameStateService();
   const gameService = getGameService();
 
   return tool({
@@ -54,7 +56,15 @@ Features:
           throw new Error("Agent not found");
         }
 
-        const agentAccount = await gameStateService.getAgent(agentId, gameId);
+        const program = await getProgramWithWallet();
+        const [gamePda] = getGamePDA(program.programId, new BN(gameId));
+
+        const [agentPda] = getAgentPDA(
+          program.programId,
+          gamePda,
+          new BN(agentId)
+        );
+        const agentAccount = await program.account.agent.fetch(agentPda);
 
         // Check cooldown
         const lastMove = agentAccount?.lastMove || new Date(0);

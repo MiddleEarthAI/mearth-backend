@@ -6,13 +6,16 @@ import {
   plains,
   rivers,
 } from "@/constants";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
 import { TerrainType } from "@prisma/client";
 import { tool } from "ai";
 import { z } from "zod";
 import { calculateDistance } from "./utils";
 import { getAgentsBasicInfoById } from "@/config/game-data";
+import { getProgramWithWallet } from "@/utils/program";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
+import { BN } from "@coral-xyz/anchor";
 
 export interface MoveValidationResult {
   success: boolean;
@@ -33,14 +36,12 @@ export const movementTool = async ({
   agentId: number;
 }) => {
   logger.info(`Creating movement tool for agent ${agentId} in game ${gameId}`);
-  const gameStateService = getGameStateService();
+  const program = await getProgramWithWallet();
+  const [gamePda] = getGamePDA(program.programId, new BN(gameId));
   const gameService = getGameService();
 
-  const allAliveAgents = await gameStateService.getAllAliveAgents(gameId);
-  logger.info(
-    `All alive agents: ${allAliveAgents.map((a) => a.id).join(", ")}`
-  );
-  const agent = allAliveAgents.find((a) => a.id === agentId);
+  const [agentPda] = getAgentPDA(program.programId, gamePda, new BN(agentId));
+  const agent = await program.account.agent.fetch(agentPda);
 
   if (!agent) throw new Error("Agent not found onchain");
 
@@ -64,26 +65,26 @@ export const movementTool = async ({
 
   if (!dbAgent) throw new Error("Agent not found in database");
 
-  const nearbyInfo = allAliveAgents
-    .map((nearby) => {
-      const distance = calculateDistance(
-        agent.x ?? 0,
-        agent.y ?? 0,
-        nearby.x ?? 0,
-        nearby.y ?? 0
-      );
-      const isAlly = nearby.allianceWith === agent.allianceWith;
-      const strength = nearby.tokenBalance ?? 0;
-      const agentBasicInfo = getAgentsBasicInfoById[nearby.id];
+  // const nearbyInfo = allAliveAgents
+  //   .map((nearby) => {
+  //     const distance = calculateDistance(
+  //       agent.x ?? 0,
+  //       agent.y ?? 0,
+  //       nearby.x ?? 0,
+  //       nearby.y ?? 0
+  //     );
+  //     const isAlly = nearby.allianceWith === agent.allianceWith;
+  //     const strength = nearby.tokenBalance ?? 0;
+  //     const agentBasicInfo = getAgentsBasicInfoById[nearby.id];
 
-      return `[AGENT] ${agentBasicInfo?.name} (@${agentBasicInfo?.xHandle})
-        Location: (${nearby.x}, ${nearby.y})
-        Distance: ${distance.toFixed(1)} units
-        Status: ${nearby.isAlive ? "Active" : "Inactive"}
-        Relation: ${isAlly ? "Allied" : "Neutral/Hostile"}
-        Power: ${strength.toFixed(2)} MEARTH`;
-    })
-    .join("\n");
+  //     return `[AGENT] ${agentBasicInfo?.name} (@${agentBasicInfo?.xHandle})
+  //       Location: (${nearby.x}, ${nearby.y})
+  //       Distance: ${distance.toFixed(1)} units
+  //       Status: ${nearby.isAlive ? "Active" : "Inactive"}
+  //       Relation: ${isAlly ? "Allied" : "Neutral/Hostile"}
+  //       Power: ${strength.toFixed(2)} MEARTH`;
+  //   })
+  //   .join("\n");
 
   const contextualDescription = `MOVEMENT SYSTEM | ${dbAgent.name} (@${
     dbAgent.xHandle
@@ -93,10 +94,6 @@ AGENT STATUS
 -----------
 Position: (${agent.x ?? "?"}, ${agent.y ?? "?"})
 Current Terrain: ${dbAgent.location?.terrainType ?? "Unknown"}
-Health Status: ${dbAgent.state?.health ?? "?"}/100
-Movement Status: ${
-    dbAgent.location?.stuckTurnsRemaining ? "Restricted" : "Free"
-  }
 Alliance Status: ${dbAgent.currentAlliance ? "Active" : "Independent"}
 
 TERRAIN ANALYSIS
@@ -126,7 +123,7 @@ TERRAIN ANALYSIS
 
 TACTICAL ENVIRONMENT
 ------------------
-${nearbyInfo || "No detected entities in range"}
+
 
 STRATEGIC CONSIDERATIONS
 ----------------------
@@ -221,13 +218,11 @@ COMMAND GUIDANCE: Calculate optimal path based on strategic objectives and terra
               x,
               y,
               terrainType: terrain,
-              stuckTurnsRemaining: terrain === TerrainType.Plain ? 0 : 1,
             },
           }),
           prisma.agentState.update({
             where: { agentId: dbAgent.id },
             data: {
-              health: Math.max(0, (dbAgent.state?.health ?? 100) - healthLoss),
               lastActionType: "move",
               lastActionTime: new Date(),
               lastActionDetails: `Relocated to (${x},${y}) - Terrain: ${terrain}`,

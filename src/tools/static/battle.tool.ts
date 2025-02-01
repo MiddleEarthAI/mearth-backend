@@ -1,7 +1,11 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
+import { getAgentPDA } from "@/utils/pda";
+import { getProgramWithWallet } from "@/utils/program";
+import { BN } from "@coral-xyz/anchor";
+import { getGamePDA } from "@/utils/pda";
 
 export enum BattleOutcome {
   Victory = "Victory",
@@ -35,7 +39,8 @@ Features:
 
     execute: async ({ defenderXHandle }) => {
       const gameService = getGameService();
-      const gameStateService = getGameStateService();
+      const program = await getProgramWithWallet();
+      const [gamePda] = getGamePDA(program.programId, new BN(gameId));
 
       try {
         // Get agent states
@@ -44,7 +49,6 @@ Features:
             where: { agentId },
             include: {
               location: true,
-              tokenomics: true,
               battles: {
                 orderBy: { timestamp: "desc" },
                 take: 1,
@@ -55,7 +59,6 @@ Features:
             where: { xHandle: defenderXHandle },
             include: {
               location: true,
-              tokenomics: true,
             },
           }),
         ]);
@@ -66,13 +69,21 @@ Features:
           };
         }
 
-        const agent = await gameStateService.getAgent(agentId, gameId);
-        const defender = await gameStateService.getAgent(
-          defenderDb.agentId,
-          gameId
+        const [agentPda] = getAgentPDA(
+          program.programId,
+          gamePda,
+          new BN(agentId)
         );
 
-        const lastBattle = agent?.lastBattle;
+        const agentAccount = await program.account.agent.fetch(agentPda);
+        const [opponentPda] = getAgentPDA(
+          program.programId,
+          gamePda,
+          new BN(defenderDb.agentId)
+        );
+        const opponentAccount = await program.account.agent.fetch(opponentPda);
+
+        const lastBattle = agentAccount.lastBattle;
         if (lastBattle) {
           const cooldownPeriod = 3600;
           const timeSinceLastBattle =
@@ -90,23 +101,26 @@ Features:
           }
         }
 
-        if (agent?.allianceWith && defender?.allianceWith) {
+        if (agentAccount.allianceWith && opponentAccount.allianceWith) {
           gameService.startBattleAlliances(
             gameId,
-            agent.id,
-            agent.allianceWith,
-            defender.id,
-            defender.allianceWith
+            agentId,
+            agentAccount.allianceWith,
+            defenderDb.agentId,
+            opponentAccount.allianceWith
           );
-        } else if (!agent?.allianceWith && defender?.allianceWith) {
+        } else if (!agentAccount.allianceWith && opponentAccount.allianceWith) {
           gameService.startBattleAgentVsAlliance(
             gameId,
-            agent?.id,
-            defender.id,
-            defender.allianceWith
+            agentId,
+            defenderDb.agentId,
+            opponentAccount.allianceWith
           );
-        } else if (!agent?.allianceWith && !defender?.allianceWith) {
-          gameService.startBattle(gameId, agent?.id, defender?.id);
+        } else if (
+          !agentAccount.allianceWith &&
+          !opponentAccount.allianceWith
+        ) {
+          gameService.startBattle(gameId, agentId, defenderDb.agentId);
         }
 
         // Check cooldown period (3600 seconds = 1 hour)
@@ -122,7 +136,7 @@ Features:
           defenderDb: { agentId: defenderDb.agentId },
           gameId,
           type: BattleType.Simple,
-          stake: agent?.tokenBalance!,
+          stake: agentAccount.tokenBalance,
         };
 
         await gameService.startBattle(gameId, agentId, defenderDb.agentId);

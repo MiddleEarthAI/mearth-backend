@@ -1,9 +1,12 @@
 import { prisma } from "@/config/prisma";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
 import { tool } from "ai";
 import { z } from "zod";
 import { BN } from "@coral-xyz/anchor";
+import { getProgramWithWallet } from "@/utils/program";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
+import { PublicKey } from "@solana/web3.js";
 
 /**
  * Validates and executes battle transactions between agents
@@ -28,57 +31,48 @@ export const battleTool = async ({
   agentId: number;
 }) => {
   const gameService = getGameService();
-  const gameState = getGameStateService();
-
-  // Get comprehensive agent data including relationships and cooldowns
   const agent = await prisma.agent.findUnique({
     where: { agentId },
     include: {
       state: true,
-      location: true,
-      tokenomics: true,
+      cooldowns: true,
       currentAlliance: true,
-      cooldowns: {
-        where: {
-          type: "battle",
-          endsAt: { gt: new Date() },
-        },
-      },
-      battles: {
-        orderBy: { timestamp: "desc" },
-        take: 5,
-        include: {
-          opponent: {
-            select: {
-              name: true,
-              xHandle: true,
-              tokenomics: true,
-              currentAlliance: true,
-            },
-          },
-        },
+    },
+  });
+  const program = await getProgramWithWallet();
+  const [gamePda] = getGamePDA(program.programId, new BN(gameId));
+  const [agentPda] = getAgentPDA(program.programId, gamePda, new BN(agentId));
+  const agentAccount = await program.account.agent.fetch(agentPda);
+
+  // Get comprehensive agent data including relationships and cooldowns
+  const battles = await prisma.battle.findMany({
+    where: {
+      agent: {
+        agentId: agentId,
       },
     },
+    take: 5,
   });
 
   if (!agent) throw new Error("Agent not found");
 
   // Calculate advanced battle metrics
   const winRate =
-    agent.battles.filter((b) => b.outcome === "victory").length /
-    Math.max(1, agent.battles.length);
+    battles.filter((b) => b.outcome === "victory").length /
+    Math.max(1, battles.length);
   const avgTokensWon =
-    agent.battles
+    battles
+      .filter((b) => b.outcome === "victory")
       .filter((b) => b.outcome === "victory")
       .reduce((acc, b) => acc + (b.tokensGained || 0), 0) /
-    Math.max(1, agent.battles.filter((b) => b.outcome === "victory").length);
+    Math.max(1, battles.filter((b) => b.outcome === "victory").length);
   const avgTokensLost =
-    agent.battles
+    battles
       .filter((b) => b.outcome === "defeat")
       .reduce((acc, b) => acc + (b.tokensLost || 0), 0) /
-    Math.max(1, agent.battles.filter((b) => b.outcome === "defeat").length);
+    Math.max(1, battles.filter((b) => b.outcome === "defeat").length);
 
-  const recentBattles = agent.battles
+  const recentBattles = battles
     .map((b) => {
       const result = b.outcome === "victory" ? "Won" : "Lost";
       const tokenChange =
@@ -86,7 +80,7 @@ export const battleTool = async ({
           ? `+${b.tokensGained?.toFixed(2)}`
           : `-${b.tokensLost?.toFixed(2)}`;
       return `- vs @${
-        b.opponent.xHandle
+        b.opponentId
       }: ${result} (${tokenChange} MEARTH) [${new Date(
         b.timestamp
       ).toLocaleDateString()}]`;
@@ -99,13 +93,13 @@ export const battleTool = async ({
 
 Current Battle Analytics:
 ━━━━━━━━━━━━━━━━━━━━━━━━
-💰 Staked MEARTH: ${agent.tokenomics?.stakedTokens.toFixed(2)}
+💰 Staked MEARTH: ${agentAccount.tokenBalance.toFixed(2)}
 📊 Win Rate: ${(winRate * 100).toFixed(1)}%
 💫 Average Tokens Won: ${avgTokensWon.toFixed(2)} MEARTH
 💔 Average Tokens Lost: ${avgTokensLost.toFixed(2)} MEARTH
-🏆 Battle Record: ${
-    agent.battles.filter((b) => b.outcome === "victory").length
-  }W - ${agent.battles.filter((b) => b.outcome === "defeat").length}L
+🏆 Battle Record: ${battles.filter((b) => b.outcome === "victory").length}W - ${
+    battles.filter((b) => b.outcome === "defeat").length
+  }L
 
 Recent Combat History:
 ${recentBattles}
@@ -128,8 +122,7 @@ Strategic Parameters:
 
 Current Status:
 ━━━━━━━━━━━━━
-🌍 Position: (${agent.location?.x}, ${agent.location?.y})
-❤️ Health: ${agent.state?.health}/100
+🌍 Position: (${agentAccount.x}, ${agentAccount.y})
 ⚔️ Battle Ready: ${agent.cooldowns.length === 0 ? "Yes" : "No"}
 🤝 Alliance: ${agent.currentAlliance ? "Active" : "None"}
 
@@ -164,7 +157,6 @@ Choose your opponent and strategy wisely. Victory favors the prepared.`;
           where: { xHandle: opponentXHandle },
           include: {
             state: true,
-            tokenomics: true,
             currentAlliance: true,
             cooldowns: {
               where: {
@@ -199,9 +191,7 @@ Choose your opponent and strategy wisely. Victory favors the prepared.`;
         const stakeRatio = stakePercentage
           ? stakePercentage / 100
           : stakeRatios[strategy];
-        const battleStake = Math.floor(
-          agent.tokenomics!.stakedTokens * stakeRatio
-        );
+        const battleStake = Math.floor(agentAccount.tokenBalance * stakeRatio);
 
         // Execute battle transaction
         const tx = await gameService.startBattle(
@@ -221,6 +211,8 @@ Choose your opponent and strategy wisely. Victory favors the prepared.`;
             tokensLost: 0, // Will be updated on resolution
             tokensGained: 0,
             outcome: "pending",
+            startTime: new Date(),
+            resolutionTime: new Date(Date.now() + 3600000), // 1 hour cooldown
           },
         });
 

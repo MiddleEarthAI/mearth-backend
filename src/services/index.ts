@@ -1,8 +1,7 @@
 import { mountains, plains, rivers } from "@/constants";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { GameService } from "@/services/GameService";
-import { GameStateService } from "@/services/GameStateService";
-import { TokenService } from "@/services/TokenService";
+
 import { TerrainType } from "@prisma/client";
 import { logger } from "@/utils/logger";
 import type { Program } from "@coral-xyz/anchor";
@@ -10,8 +9,7 @@ import type { Connection } from "@solana/web3.js";
 import { BattleResolutionService } from "./BattleResolutionService";
 
 let gameService: GameService | null = null;
-let gameStateService: GameStateService | null = null;
-let tokenService: TokenService | null = null;
+
 let battleResolutionService: BattleResolutionService | null = null;
 
 /**
@@ -26,8 +24,6 @@ export async function initializeServices(
 ): Promise<void> {
   try {
     gameService = new GameService(program, connection);
-    gameStateService = new GameStateService(program, connection);
-    tokenService = new TokenService(program, connection);
     battleResolutionService = new BattleResolutionService(gameService, program);
     battleResolutionService.start();
 
@@ -46,26 +42,6 @@ export function getGameService(): GameService {
     throw new Error("GameService not initialized");
   }
   return gameService;
-}
-
-/**
- * Get the game state service instance
- */
-export function getGameStateService(): GameStateService {
-  if (!gameStateService) {
-    throw new Error("GameStateService not initialized");
-  }
-  return gameStateService;
-}
-
-/**
- * Get the token service instance
- */
-export function getTokenService(): TokenService {
-  if (!tokenService) {
-    throw new Error("TokenService not initialized");
-  }
-  return tokenService;
 }
 
 export function getTerrain(x: number, y: number): TerrainType | null {

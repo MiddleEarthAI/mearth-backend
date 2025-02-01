@@ -244,7 +244,6 @@ export class GameService {
                 x: newX,
                 y: newY,
                 terrainType,
-                stuckTurnsRemaining: stuckTurns,
               },
             },
             updatedAt: new Date(),
@@ -523,7 +522,8 @@ export class GameService {
           tokensLost: percentLoss,
           tokensGained: percentLoss,
           probability: 1.0, // Default value since we don't calculate it here
-          timestamp: new Date(),
+          startTime: new Date(),
+          resolutionTime: new Date(),
         },
       });
 
@@ -762,7 +762,6 @@ export class GameService {
             alliedAgentId: targetId.toString(),
             combinedTokens,
             formedAt: new Date(),
-            canBreakAlliance: true,
           },
         });
 
@@ -1090,7 +1089,8 @@ export class GameService {
         tokensLost: percentLoss,
         tokensGained: percentLoss,
         probability: 1.0,
-        timestamp: new Date(),
+        startTime: new Date(),
+        resolutionTime: new Date(),
       },
     });
   }

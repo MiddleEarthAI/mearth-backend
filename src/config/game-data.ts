@@ -53,7 +53,7 @@ export const gameData: {
         x: 6,
         y: 12,
         terrainType: TerrainType.Mountain,
-        stuckTurnsRemaining: 0,
+
         agentId: "2",
       },
       personality: {
@@ -73,10 +73,11 @@ export const gameData: {
         id: "2",
         agentId: "2",
         isAlive: true,
-        health: 100,
         lastActionType: "spawn",
         lastActionTime: new Date(),
         lastActionDetails: "Initial spawn",
+        influencedByTweet: null,
+        influenceScore: 0,
       },
       community: {
         id: "2",
@@ -84,6 +85,8 @@ export const gameData: {
         followers: 0,
         averageEngagement: 0,
         supporterCount: 0,
+        lastInfluenceTime: new Date(),
+        influenceScore: 0,
       },
     },
     {
@@ -131,7 +134,7 @@ export const gameData: {
         x: 27,
         y: 7,
         terrainType: TerrainType.River,
-        stuckTurnsRemaining: 0,
+
         agentId: "1",
       },
       personality: {
@@ -151,7 +154,8 @@ export const gameData: {
         id: "1",
         agentId: "1",
         isAlive: true,
-        health: 100,
+        influencedByTweet: null,
+        influenceScore: 0,
         lastActionType: "move",
         lastActionTime: new Date("2025-01-30T09:00:00Z"),
         lastActionDetails: "Moving north to seek alliance with Purrlock Paws",
@@ -162,6 +166,8 @@ export const gameData: {
         followers: 0,
         averageEngagement: 0,
         supporterCount: 0,
+        lastInfluenceTime: new Date(),
+        influenceScore: 0,
       },
     },
 
@@ -210,7 +216,7 @@ export const gameData: {
         x: 15,
         y: 21,
         terrainType: TerrainType.Plain,
-        stuckTurnsRemaining: 0,
+
         agentId: "3",
       },
       personality: {
@@ -230,7 +236,8 @@ export const gameData: {
         id: "3",
         agentId: "3",
         isAlive: true,
-        health: 100,
+        influencedByTweet: null,
+        influenceScore: 0,
         lastActionType: "spawn",
         lastActionTime: new Date(),
         lastActionDetails: "Initial spawn",
@@ -241,6 +248,8 @@ export const gameData: {
         followers: 0,
         averageEngagement: 0,
         supporterCount: 0,
+        lastInfluenceTime: new Date(),
+        influenceScore: 0,
       },
     },
     {
@@ -288,7 +297,7 @@ export const gameData: {
         x: 10,
         y: 24,
         terrainType: TerrainType.Plain,
-        stuckTurnsRemaining: 0,
+
         agentId: "4",
       },
       personality: {
@@ -308,7 +317,8 @@ export const gameData: {
         id: "4",
         agentId: "4",
         isAlive: true,
-        health: 100,
+        influencedByTweet: null,
+        influenceScore: 0,
         lastActionType: "spawn",
         lastActionTime: new Date(),
         lastActionDetails: "Initial spawn",
@@ -319,6 +329,8 @@ export const gameData: {
         followers: 0,
         averageEngagement: 0,
         supporterCount: 0,
+        lastInfluenceTime: new Date(),
+        influenceScore: 0,
       },
     },
   ],

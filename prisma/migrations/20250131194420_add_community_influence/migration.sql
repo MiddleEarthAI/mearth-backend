@@ -1,0 +1,12 @@
+-- AlterTable
+ALTER TABLE "AgentState" ADD COLUMN     "influenceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "influencedByTweet" TEXT;
+
+-- AlterTable
+ALTER TABLE "Community" ADD COLUMN     "influenceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "lastInfluenceTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "Interaction" ADD COLUMN     "confidence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "influenceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "suggestedAction" TEXT;

@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { getGameService, getGameStateService } from "@/services";
+import { getGameService } from "@/services";
 
 import { logger } from "@/utils/logger";
+import { getGamePDA } from "@/utils/pda";
+import { getProgramWithWallet } from "@/utils/program";
 
 const router = Router();
 
@@ -64,10 +66,11 @@ router.get("/:gameId", async (req, res) => {
     }
 
     logger.info(`🔍 Fetching state for game ${gameId}`);
-    const stateService = getGameStateService();
-    const state = await stateService.getGameState(Number.parseInt(gameId));
+    const program = await getProgramWithWallet();
+    const [gamePda] = getGamePDA(program.programId, Number.parseInt(gameId));
+    const game = await program.account.game.fetch(gamePda);
 
-    if (!state) {
+    if (!game) {
       logger.warn(`⚠️ Game ${gameId} not found`);
       return res.status(404).json({
         success: false,
@@ -84,7 +87,7 @@ router.get("/:gameId", async (req, res) => {
       success: true,
       data: {
         gameId,
-        state,
+        game,
         retrievalTime: new Date().toISOString(),
       },
     });
