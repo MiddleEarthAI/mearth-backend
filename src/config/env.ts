@@ -2,12 +2,7 @@ import { cleanEnv, str, num, url } from "envalid";
 import "dotenv/config";
 
 export const env = cleanEnv(process.env, {
-  // Server Configuration
-  NODE_ENV: str({ choices: ["development", "test", "production"] }),
   PORT: num({ default: 3001 }),
-
-  // Database Configuration
-  DATABASE_URL: url(),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: num({ default: 900000 }), // 15 minutes

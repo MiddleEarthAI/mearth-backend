@@ -297,7 +297,6 @@ Features:
       }
     },
   });
-
 interface BattleOutcomeResult {
   result: BattleOutcome;
   explanation: string;
