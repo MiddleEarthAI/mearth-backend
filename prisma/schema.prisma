@@ -3,6 +3,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Add seed configuration
+generator seed {
+  provider = "prisma-client-js"
+  output   = "./seed-data"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -26,6 +32,11 @@ model Game {
   agents    Agent[] // One game has many agents
   alliances Alliance[] // One game has many alliances
   battles   Battle[] // One game has many battles
+
+  // Add these new fields
+  ownerId  String
+  owner    User   @relation("GameOwner", fields: [ownerId], references: [id])
+  managers User[] @relation("GameManager")
 }
 
 model AgentProfile {
@@ -61,9 +72,9 @@ model Agent {
   publicKey      String
   agentProfileId String
   agentProfile   AgentProfile @relation(fields: [agentProfileId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  health         Int          @default(100)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   // Relations
   game            Game        @relation(fields: [gameId], references: [id])
@@ -79,6 +90,10 @@ model Agent {
   // Reverse relations
   alliedBy          Alliance[] @relation("AlliedAgent")
   battlesAsOpponent Battle[]   @relation("OpponentAgent")
+
+  // Add these new fields
+  ownerId String
+  owner   User   @relation("AgentOwner", fields: [ownerId], references: [id])
 
   // Composite unique constraints
   @@unique([agentId, gameId])
@@ -260,4 +275,25 @@ enum BattleType {
   Simple
   AgentVsAlliance
   AllianceVsAlliance
+}
+
+model User {
+  id            String   @id
+  privyUserId   String   @unique // The ID from Privy
+  role          UserRole @default(USER)
+  email         String?  @unique
+  walletAddress String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  ownedGames   Game[]  @relation("GameOwner")
+  managedGames Game[]  @relation("GameManager")
+  ownedAgents  Agent[] @relation("AgentOwner")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
 }

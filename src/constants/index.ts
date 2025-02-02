@@ -1,12 +1,15 @@
 import { TerrainType } from "@/types/program";
 
-export const BATTLE_RANGE = 2;
-export const TOKEN_BURN_MIN = 31;
-export const TOKEN_BURN_MAX = 50;
-export const DEATH_CHANCE = 0.05;
-export const BATTLE_COOLDOWN = 14400; // 4 hours in seconds
-export const MOVE_COOLDOWN_MS = 1000 * 60 * 60 * 1000; // 1 hour in milliseconds
-export const MOVE_UNITS_PER_HOUR = 10; // 1 units per hour
+export const BATTLE_RANGE = parseInt(process.env.BATTLE_RANGE || "2");
+export const TOKEN_BURN_MIN = parseInt(process.env.TOKEN_BURN_MIN || "31");
+export const TOKEN_BURN_MAX = parseInt(process.env.TOKEN_BURN_MAX || "50");
+export const DEATH_CHANCE = parseFloat(process.env.DEATH_CHANCE || "0.05");
+export const BATTLE_COOLDOWN = parseInt(process.env.BATTLE_COOLDOWN || "14400"); // 4 hours in seconds
+export const MOVE_COOLDOWN_MS =
+  parseInt(process.env.MOVE_COOLDOWN_MS || "1000") * 60 * 60 * 1000; // 1 hour in milliseconds
+export const MOVEMENT_UNITS_PER_HOUR = parseInt(
+  process.env.MOVEMENT_UNITS_PER_HOUR || "10"
+); // 1 units per hour
 
 export const rivers = {
   type: TerrainType.Rivers,
@@ -804,5 +807,4 @@ export function getRandomCoordinatesWithTerrainType() {
   const terrainType = getTerrainTypeByCoordinates(x, y);
   return { x, y, terrainType };
 }
-
 export const validCoordinatesArray = Array.from(validCoordinates);

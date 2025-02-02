@@ -3,6 +3,10 @@ import { mearthIdl } from "@/constants/middle_earth_ai_program_idl";
 import { logger } from "@/utils/logger";
 import { Program } from "@coral-xyz/anchor";
 import type { AnchorProvider } from "@coral-xyz/anchor";
+import { mountains, rivers } from "@/constants";
+import { TerrainType } from "@prisma/client";
+import { plains } from "@/constants";
+import { prisma } from "@/config/prisma";
 
 export function getAgentConfigById(id: number) {
   logger.info(`Getting agent config for id ${id}`);
@@ -44,7 +48,7 @@ export async function getProgram(
  * Uses a combination of timestamp and random number to ensure uniqueness
  * @returns {number} A unique game ID as a number (u16 compatible)
  */
-export function generateGameId(): number {
+export async function generateGameId(): Promise<number> {
   // Get last 8 bits of current timestamp
   const timestamp = Date.now() & 0xff;
 
@@ -69,4 +73,28 @@ export function isValidGameId(gameId: number): boolean {
   if (gameId < 0) return false;
   if (gameId >= 2 ** 16) return false;
   return true;
+}
+
+export function getTerrain(x: number, y: number): TerrainType | null {
+  if (mountains.coordinates.has(`${x},${y}`)) {
+    return TerrainType.Mountain;
+  } else if (plains.coordinates.has(`${x},${y}`)) {
+    return TerrainType.Plain;
+  } else if (rivers.coordinates.has(`${x},${y}`)) {
+    return TerrainType.River;
+  }
+
+  return null;
+}
+
+export async function checkDatabaseConnection() {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+  } catch (dbError) {
+    logger.error("💥 Database connection check failed:", dbError);
+    throw dbError;
+  }
+}
+export function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

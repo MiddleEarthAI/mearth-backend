@@ -2,27 +2,74 @@ import { logger } from "@/utils/logger";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-
+import { env } from "./config/env";
 import { prisma } from "./config/prisma";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
-import { config } from "dotenv";
-
-// Load environment variables
-config();
+import authRoutes from "./routes/auth";
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(helmet());
+// Security middleware
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+    crossOriginEmbedderPolicy: true,
+    crossOriginOpenerPolicy: true,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    dnsPrefetchControl: true,
+    frameguard: { action: "deny" },
+    hidePoweredBy: true,
+    hsts: true,
+    ieNoOpen: true,
+    noSniff: true,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    xssFilter: true,
+  })
+);
+
+// CORS configuration
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    maxAge: 86400, // 24 hours
+  })
+);
+
+// Body parsing middleware
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+// Rate limiting
 app.use(defaultRateLimiter);
 
-// Routes
-app.use(router);
+// API routes
+const apiRouter = express.Router();
+apiRouter.use("/auth", authRoutes);
+apiRouter.use("/", router);
 
-// Error handling
+// Mount API routes under API_PREFIX
+app.use(env.API_PREFIX, apiRouter);
+
+// 404 handler
+app.use((_req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Route not found",
+  });
+});
+
+// Global error handler
 app.use(
   (
     err: Error,
@@ -30,34 +77,67 @@ app.use(
     res: express.Response,
     _next: express.NextFunction
   ) => {
-    logger.error("Unhandled error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    logger.error("Unhandled error:", {
+      error: err.message,
+      stack: err.stack,
+    });
+
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      ...(env.NODE_ENV === "development" && { details: err.message }),
+    });
   }
 );
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 export async function startServer() {
   try {
-    app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
+    // Verify database connection
+    await prisma.$connect();
+    logger.info("Database connection established");
+
+    const server = app.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT} in ${env.NODE_ENV} mode`);
+      logger.info(`API available at ${env.API_PREFIX}`);
     });
+
+    // Graceful shutdown
+    const shutdown = async () => {
+      logger.info("Shutting down server...");
+
+      server.close(async () => {
+        logger.info("HTTP server closed");
+
+        try {
+          await prisma.$disconnect();
+          logger.info("Database connection closed");
+          process.exit(0);
+        } catch (error) {
+          logger.error("Error during shutdown:", error);
+          process.exit(1);
+        }
+      });
+
+      // Force shutdown after 10s
+      setTimeout(() => {
+        logger.error(
+          "Could not close connections in time, forcefully shutting down"
+        );
+        process.exit(1);
+      }, 10000);
+    };
+
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
   } catch (error) {
     logger.error("Failed to start server:", error);
     process.exit(1);
   }
 }
 
-process.on("SIGTERM", () => {
-  logger.info("SIGTERM received. Starting graceful shutdown...");
-  prisma.$disconnect();
-  process.exit(0);
-});
-
-process.on("SIGINT", () => {
-  logger.info("SIGINT received. Starting graceful shutdown...");
-  prisma.$disconnect();
-  process.exit(0);
-});
-
-startServer();
+// Start server if this file is run directly
+if (require.main === module) {
+  startServer();
+}

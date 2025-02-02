@@ -1,13 +1,21 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";
-import { getGameService } from "@/services";
-import { getAgentPDA } from "@/utils/pda";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
-import { getGamePDA } from "@/utils/pda";
 import { GenerateContextStringResult } from "@/agent/Agent";
-import { program } from "@coral-xyz/anchor/dist/cjs/native/system";
+import { logger } from "@/utils/logger";
+
+import { PublicKey } from "@solana/web3.js";
+import {
+  resolveSimpleBattle,
+  startAgentVsAllianceBattle,
+  startAllianceVsAllianceBattle,
+  startSimpleBattle,
+} from "@/instructionUtils/battle";
+import { BATTLE_COOLDOWN } from "@/constants";
+import { AgentAccount } from "@/types/program";
 
 export enum BattleOutcome {
   Victory = "Victory",
@@ -32,161 +40,257 @@ Features:
 - Calculate outcomes based on staked tokens
 - Transfer tokens between winners/losers
 - Track battle history`,
-
     parameters: z.object({
-      defenderXHandle: z
-        .string()
-        .describe("Twitter handle of the agent to battle"),
+      targetAgentXHandle: z
+        .enum(["scootlesAI", "purrlockpawsAI", "wanderleafAI", "sirgullihopAI"])
+        .transform((val) => val.toLowerCase())
+        .describe(
+          "Twitter handle of the agent you want to battle with. make sure they are close enough for your reach"
+        ),
     }),
 
-    execute: async ({ defenderXHandle }) => {
-      const gameService = getGameService();
+    execute: async ({ targetAgentXHandle }) => {
       const agent = result.currentAgent;
       const gameId = agent.gameId;
-      const game = await prisma.game.findUnique({
-        where: { id: gameId },
-      });
       const agentId = agent.agentId;
 
       try {
-        // Get agent states
+        // Get agent states with relations
         const [attackerDb, defenderDb] = await Promise.all([
           prisma.agent.findUnique({
             where: { agentId_gameId: { agentId, gameId } },
             include: {
-              location: true,
+              battles: {
+                orderBy: { timestamp: "desc" },
+                take: 1,
+              },
+              game: {
+                select: {
+                  id: true,
+                  gameId: true,
+                },
+              },
+            },
+          }),
+          prisma.agent.findFirst({
+            where: {
+              AND: [
+                { agentId: agentId },
+                { gameId: gameId },
+                {
+                  agentProfile: {
+                    xHandle: targetAgentXHandle,
+                  },
+                },
+              ],
+            },
+            include: {
               battles: {
                 orderBy: { timestamp: "desc" },
                 take: 1,
               },
             },
           }),
-          prisma.agent.findUnique({
-            where: {
-              agentId_gameId: {
-                agentId: Number(defenderXHandle),
-                gameId: gameId,
-              },
-            },
-            include: {
-              location: true,
-            },
-          }),
         ]);
 
         if (!attackerDb || !defenderDb) {
           return {
+            success: false,
             message: "The agent you are trying to battle is not available",
           };
         }
+
+        // Get program and PDAs
         const program = await getProgramWithWallet();
-        const [gamePda] = getGamePDA(program.programId, new BN(gameId));
-        const [agentPda] = getAgentPDA(
+
+        const [gamePda] = getGamePDA(
+          program.programId,
+          Number(attackerDb.game.gameId)
+        );
+
+        const [attackerPda] = getAgentPDA(
           program.programId,
           gamePda,
           new BN(agentId)
         );
 
-        const agentAccount = await program.account.agent.fetch(agentPda);
-        const [opponentPda] = getAgentPDA(
+        const [defenderPda] = getAgentPDA(
           program.programId,
           gamePda,
           new BN(defenderDb.agentId)
         );
-        const opponentAccount = await program.account.agent.fetch(opponentPda);
 
-        const lastBattle = agentAccount.lastBattle;
+        // Fetch on-chain accounts
+        const attackerAccount = await program.account.agent.fetch(attackerPda);
+        const defenderAccount = await program.account.agent.fetch(defenderPda);
+
+        if (!attackerAccount || !defenderAccount)
+          return {
+            success: false,
+            message:
+              "Agent not found on chain. You can not battle agents that are dead or not in the game.",
+          };
+
+        // Check cooldown period
+        const lastBattle = attackerAccount.lastBattle; // milliseconds
         if (lastBattle) {
-          const cooldownPeriod = 3600;
           const timeSinceLastBattle =
-            Math.floor(Date.now() / 1000) -
-            Math.floor(lastBattle.timestamp.getTime() / 1000);
+            Math.floor(Date.now() / 1000) - Math.floor(lastBattle / 1000); // milliseconds to seconds
 
-          if (timeSinceLastBattle < cooldownPeriod) {
+          if (timeSinceLastBattle < BATTLE_COOLDOWN) {
             return {
-              message: `Battle cooldown active. Please wait ${
-                cooldownPeriod - timeSinceLastBattle
-              } seconds. expires at ${new Date(
-                lastBattle.timestamp.getTime() + cooldownPeriod * 1000
+              success: false,
+              message: `Battle cooldown is still active. You must wait ${
+                BATTLE_COOLDOWN - timeSinceLastBattle
+              } seconds. Expires at ${new Date(
+                lastBattle.timestamp.getTime() + BATTLE_COOLDOWN * 1000
               ).toISOString()}`,
             };
           }
         }
 
-        if (agentAccount.allianceWith && opponentAccount.allianceWith) {
-          gameService.startBattleAlliances(
-            Number(game?.gameId),
-            agentId,
-            agentAccount.allianceWith,
-            defenderDb.agentId,
-            opponentAccount.allianceWith
+        let tx: string;
+        let battleType: BattleType;
+
+        // Determine battle type and start battle
+        if (attackerAccount.allianceWith && defenderAccount.allianceWith) {
+          const attackerAlliedAgentAccount = await program.account.agent.fetch(
+            attackerAccount.allianceWith
           );
-        } else if (!agentAccount.allianceWith && opponentAccount.allianceWith) {
-          gameService.startBattleAgentVsAlliance(
-            Number(game?.gameId),
-            agentId,
-            defenderDb.agentId,
-            opponentAccount.allianceWith
+          const defenderAlliedAgentAccount = await program.account.agent.fetch(
+            defenderAccount.allianceWith
           );
+          if (!attackerAlliedAgentAccount || !defenderAlliedAgentAccount) {
+            return {
+              success: false,
+              message:
+                "Allied agent not found on chain. You can not battle agents that are dead or not in the game.",
+            };
+          }
+          const attackerAllyAccount = await program.account.agent.fetch(
+            attackerAccount.allianceWith
+          );
+          const defenderAllyAccount = await program.account.agent.fetch(
+            defenderAccount.allianceWith
+          );
+          // Alliance vs Alliance battle
+          battleType = BattleType.AllianceVsAlliance;
+          const result = await startAllianceVsAllianceBattle(
+            Number(attackerDb.game.gameId),
+            agentId,
+            attackerAlliedAgentAccount.id,
+            defenderDb.agentId,
+            defenderAllyAccount.id
+          );
+          tx = result.tx;
         } else if (
-          !agentAccount.allianceWith &&
-          !opponentAccount.allianceWith
+          !attackerAccount.allianceWith &&
+          defenderAccount.allianceWith
         ) {
-          gameService.startBattle(
-            Number(game?.gameId),
-            agentId,
-            defenderDb.agentId
+          const defenderAllyAccount = await program.account.agent.fetch(
+            defenderAccount.allianceWith
           );
+          // Agent vs Alliance battle
+          battleType = BattleType.AgentVsAlliance;
+          const result = await startAgentVsAllianceBattle(
+            Number(attackerDb.game.gameId),
+            agentId,
+            defenderAccount.id,
+            defenderAllyAccount.id
+          );
+          tx = result.tx;
+        } else if (
+          attackerAccount.allianceWith &&
+          !defenderAccount.allianceWith
+        ) {
+          const attackerAllyAccount = await program.account.agent.fetch(
+            attackerAccount.allianceWith
+          );
+          // Agent vs Alliance battle
+          battleType = BattleType.AgentVsAlliance;
+          const result = await startAgentVsAllianceBattle(
+            Number(attackerDb.game.gameId),
+            agentId,
+            defenderAccount.id,
+            attackerAllyAccount.id
+          );
+          tx = result.tx;
+        } else {
+          // Simple 1v1 battle
+          battleType = BattleType.Simple;
+          const result = await startSimpleBattle(
+            Number(attackerDb.game.gameId),
+            agentId,
+            defenderAccount.id
+          );
+          tx = result.tx;
         }
 
-        // Check cooldown period (3600 seconds = 1 hour)
-
-        // Validate battle conditions
-        // if (agent?.tokenBalance! < stake) {
-        //   throw new Error("Insufficient tokens staked for battle");
-        // }
-
-        // Start battle based on type
-        const battleData = {
-          attackerDb: { agentId: attackerDb.agentId },
-          defenderDb: { agentId: defenderDb.agentId },
-          gameId: Number(game?.gameId),
-          type: BattleType.Simple,
-          stake: agentAccount.tokenBalance,
-        };
-
-        await gameService.startBattle(
-          Number(game?.gameId),
-          agentId,
-          defenderDb.agentId
+        // Calculate battle outcome
+        const outcome = calculateBattleOutcome(
+          attackerAccount,
+          defenderAccount
         );
 
-        // Calculate battle outcome
-        const outcome = calculateBattleOutcome(attackerDb, defenderDb);
+        // Record battle in database
+        const battle = await prisma.battle.create({
+          data: {
+            gameId: gameId.toString(),
+            type: battleType,
 
-        // Record battle result
-        // const battle = await prisma.battle.create({
-        //   data: {
-        //     outcome: outcome.result,
-        //     agent: { connect: { agentId: attackerDb.agentId } },
-        //     opponent: { connect: { agentId: defenderDb.agentId } },
-        //     game: { connect: { gameId } },
-        //     tokensGained:
-        //       outcome.result === BattleOutcome.Victory ? stake * 0.2 : 0,
-        //     tokensLost:
-        //       outcome.result === BattleOutcome.Defeat ? stake * 0.2 : 0,
-        //     probability: 0.8 + Math.random() * 0.4,
-        //   },
-        // });
+            outcome: outcome.result,
+
+            tokensGained:
+              outcome.result === BattleOutcome.Victory
+                ? outcome.tokenPercentage.attacker
+                : 0,
+            tokensLost:
+              outcome.result === BattleOutcome.Defeat
+                ? outcome.tokenPercentage.defender
+                : 0,
+            timestamp: new Date(),
+            opponentId: defenderDb.id,
+            agentId: attackerDb.id,
+            startTime: new Date(),
+            resolutionTime: new Date(),
+            probability: outcome.tokenPercentage.attacker,
+          },
+        });
+
+        // Resolve battle based on type
+        if (battleType === BattleType.Simple) {
+          if (!attackerAccount || !defenderAccount) {
+            throw new Error("Token accounts not found");
+          }
+
+          await resolveSimpleBattle(
+            Number(attackerDb.game.gameId),
+            agentId,
+            defenderDb.agentId,
+            outcome.tokenPercentage.attacker,
+            new PublicKey(defenderDb.publicKey),
+            new PublicKey(attackerAccount.authority),
+            new PublicKey(defenderAccount.authority)
+          );
+        } else if (battleType === BattleType.AgentVsAlliance) {
+          // Implement agent vs alliance resolution
+          // Add necessary parameters and logic
+        } else {
+          // Implement alliance vs alliance resolution
+          // Add necessary parameters and logic
+        }
 
         return {
-          // battleId: battle.id,
-          // outcome: outcome.result,
-          // tokensGained: battle.tokensGained,
-          // tokensLost: battle.tokensLost,
-          // explanation: outcome.explanation,
+          success: true,
+          battleId: battle.id,
+          outcome: outcome.result,
+          tokensGained: battle.tokensGained,
+          tokensLost: battle.tokensLost,
+          explanation: outcome.explanation,
+          transactionHash: tx,
         };
       } catch (error) {
+        logger.error("Battle execution failed:", error);
         throw new Error(
           error instanceof Error ? error.message : "Battle execution failed"
         );
@@ -197,35 +301,55 @@ Features:
 interface BattleOutcomeResult {
   result: BattleOutcome;
   explanation: string;
+  tokenPercentage: {
+    attacker: number;
+    defender: number;
+  };
 }
 
 function calculateBattleOutcome(
-  attackerDb: any,
-  defenderDb: any
+  attackerAccount: AgentAccount,
+  defenderAccount: AgentAccount,
+  battleType: BattleType = BattleType.Simple
 ): BattleOutcomeResult {
-  const attackerStrength = attackerDb.tokenomics?.stakedTokens || 0;
-  const defenderStrength = defenderDb.tokenomics?.stakedTokens || 0;
+  // Fixed 20% token transfer rate as shown in tests
+  const TOKEN_TRANSFER_PERCENTAGE = 20;
 
-  // Add randomness factor (0.8 to 1.2)
-  const randomFactor = 0.8 + Math.random() * 0.4;
+  // For simple battles, winner always gets 20% of loser's tokens
+  if (battleType === BattleType.Simple) {
+    const attackerStrength = attackerAccount?.tokenBalance || 0;
+    const defenderStrength = defenderAccount?.tokenBalance || 0;
 
-  const attackerScore = attackerStrength * randomFactor;
-  const defenderScore = defenderStrength;
-
-  if (attackerScore > defenderScore * 1.2) {
-    return {
-      result: BattleOutcome.Victory,
-      explanation: "Overwhelming victory due to superior strength",
-    };
-  } else if (attackerScore > defenderScore) {
-    return {
-      result: BattleOutcome.Victory,
-      explanation: "Narrow victory in a close battle",
-    };
-  } else {
-    return {
-      result: BattleOutcome.Defeat,
-      explanation: "Defeat against stronger defensive position",
-    };
+    // Simple comparison of token balances determines winner
+    if (attackerStrength > defenderStrength) {
+      return {
+        result: BattleOutcome.Victory,
+        explanation: "Victory - Attacker claims 20% of defender's tokens",
+        tokenPercentage: {
+          attacker: TOKEN_TRANSFER_PERCENTAGE / 100, // 0.2 for 20%
+          defender: TOKEN_TRANSFER_PERCENTAGE / 100,
+        },
+      };
+    } else {
+      return {
+        result: BattleOutcome.Defeat,
+        explanation: "Defeat - Attacker loses 20% of tokens to defender",
+        tokenPercentage: {
+          attacker: TOKEN_TRANSFER_PERCENTAGE / 100,
+          defender: TOKEN_TRANSFER_PERCENTAGE / 100,
+        },
+      };
+    }
   }
+
+  // For alliance battles, same 20% transfer logic applies
+  // but distributed among alliance members
+  return {
+    result: BattleOutcome.Victory,
+    explanation: "Alliance battle resolved with 20% token transfer",
+    tokenPercentage: {
+      attacker: TOKEN_TRANSFER_PERCENTAGE / 100,
+      defender: TOKEN_TRANSFER_PERCENTAGE / 100,
+    },
+  };
 }

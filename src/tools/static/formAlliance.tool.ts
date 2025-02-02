@@ -1,25 +1,16 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";
-import { getGameService } from "@/services";
 import { logger } from "@/utils/logger";
 import { GenerateContextStringResult } from "@/agent/Agent";
+import * as allianceUtils from "@/instructionUtils/alliance";
 
 /**
  * Tool for forming strategic alliances between agents in Middle Earth
  */
-export const formAllianceTool = async (result: GenerateContextStringResult) => {
-  const agent = result.currentAgent;
-  const gameId = Number(agent.gameId);
-  const agentId = Number(agent.agentId);
-
-  const currentAlliance = agent.currentAlliance;
-  const ally = await prisma.agent.findUnique({
-    where: { agentId_gameId: { agentId, gameId: agent.gameId } },
-  });
-
-  return tool({
-    description: `This is a tool you(@${agent.agentProfile.xHandle}) can use to form alliances with other agents.
+export const formAllianceTool = (result: GenerateContextStringResult) =>
+  tool({
+    description: `This is a tool you(@${result.currentAgent.agentProfile.xHandle}) can use to form alliances with other agents.
 
 CONTEXT:
 Forming an alliance is a powerful diplomatic action that:
@@ -31,7 +22,6 @@ Forming an alliance is a powerful diplomatic action that:
 REQUIREMENTS:
 - Neither agent can be in an existing alliance
 - Both agents must be alive and active
-- Agents must have sufficient tokens to stake
 - Cannot form alliance with oneself
 - Must be within proximity for alliance formation
 
@@ -61,67 +51,71 @@ EFFECTS:
     }),
 
     execute: async ({ targetAgentXHandle }) => {
-      const gameService = getGameService();
+      const agent = result.currentAgent;
 
       try {
         // Prevent self-alliance
         if (agent.agentProfile.xHandle === targetAgentXHandle) {
-          throw new Error("Cannot form alliance with oneself");
+          return {
+            message: `Cannot form alliance with oneself. you are @${agent.agentProfile.xHandle} on twitter so don't try to form alliance with your self`,
+          };
         }
 
-        const targetAgent = await prisma.agent.findUnique({
+        // Find target agent by XHandle
+        const targetAgent = await prisma.agent.findFirst({
           where: {
-            agentId_gameId: {
-              agentId: agentId,
-              gameId: agent.gameId,
+            agentProfile: {
+              xHandle: targetAgentXHandle,
+            },
+            gameId: agent.gameId,
+          },
+          include: {
+            location: true,
+            currentAlliance: true,
+            game: {
+              select: {
+                gameId: true,
+              },
             },
           },
         });
+
         if (!targetAgent) {
-          throw new Error("Target agent not found");
-        }
-        // Check existing alliances
-        const existingAlliances = await prisma.alliance.findMany({
-          where: {
-            OR: [
-              { agentId: agentId.toString() },
-              { agentId: targetAgent.id },
-              { alliedAgentId: agentId.toString() },
-              { alliedAgentId: targetAgent.id },
-            ],
-            status: "Active",
-          },
-        });
-
-        if (existingAlliances.length > 0) {
-          throw new Error("One or both agents are already in an alliance");
+          return {
+            success: false,
+            message: `Target agent not found. @${targetAgentXHandle} is not a valid agent in middle earth`,
+          };
         }
 
-        // // Check proximity if both have locations
-        // if (initiator.location && target.location) {
-        //   const distance = calculateDistance(
-        //     initiator.location,
-        //     target.location
-        //   );
-        //   if (distance > 2) {
-        //     throw new Error(
-        //       "Agents too far apart to form alliance (max 2 units)"
-        //     );
-        //   }
-        // }
+        // Check if agents can form alliance
+        const allianceCheck = await allianceUtils.canFormAlliance(
+          Number(targetAgent.game.gameId),
+          Number(agent.agentId),
+          Number(targetAgent.agentId)
+        );
+
+        console.log("allianceCheck", allianceCheck);
+
+        if (!allianceCheck.canForm) {
+          return {
+            success: false,
+            message: allianceCheck.reason || "Cannot form alliance",
+          };
+        }
 
         // Execute alliance formation
-        const result = await gameService.formAlliance(
-          gameId,
-          agentId,
-          targetAgent.agentId
+        const result = await allianceUtils.formAlliance(
+          Number(targetAgent.game.gameId),
+          Number(agent.agentId),
+          Number(targetAgent.agentId)
         );
 
         // Log the action
         logger.info(
-          `Alliance formed between ${agentId} and ${targetAgent.agentId}`,
+          `🤝 Alliance formed between ${agent.agentProfile.xHandle} and ${targetAgentXHandle}`,
           {
             tx: result.tx,
+            alliance: result.alliance,
           }
         );
 
@@ -133,6 +127,10 @@ EFFECTS:
             alliance: result.alliance,
             terms: {
               combinedTokens: result.alliance.combinedTokens,
+              location: {
+                initiator: agent.location,
+                target: targetAgent.location,
+              },
             },
           },
         };
@@ -141,8 +139,8 @@ EFFECTS:
           error instanceof Error ? error.message : "Failed to form alliance";
 
         logger.error(`Alliance formation failed: ${message}`, {
-          agentId,
-          targetAgentXHandle,
+          initiator: agent.agentProfile.xHandle,
+          target: targetAgentXHandle,
           error,
         });
 
@@ -150,4 +148,3 @@ EFFECTS:
       }
     },
   });
-};

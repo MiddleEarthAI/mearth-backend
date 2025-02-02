@@ -10,7 +10,6 @@ import { getTerrainTypeByCoordinates } from "@/constants";
 import { TwitterApi } from "twitter-api-v2";
 
 import { TerrainType } from "@prisma/client";
-import { Twitter } from "@/services/twitter";
 import {
   battleTool,
   breakAllianceTool,
@@ -20,6 +19,7 @@ import {
 import { getProgramWithWallet } from "@/utils/program";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { AgentAccount } from "@/types/program";
+import { EngagementMonitor } from "./EngagementMonitor";
 
 export type AgentModel = Prisma.AgentGetPayload<{
   include: {
@@ -53,7 +53,7 @@ export class Agent {
   private anthropic: AnthropicProvider;
   private isRunning = false;
   private twitterApi: TwitterApi;
-  private twitter: Twitter;
+  private twitter: EngagementMonitor;
   private agent: AgentModel;
 
   constructor(agent: AgentModel, currentGameId: number) {
@@ -68,7 +68,7 @@ export class Agent {
       process.env[`TWITTER_ACCESS_SECRET_${this.agent.agentId}`];
 
     if (!API_KEY || !API_SECRET || !ACCESS_TOKEN || !ACCESS_SECRET) {
-      throw new Error("Twitter credentials not found");
+      throw new Error("EngagementMonitor credentials not found");
     }
 
     this.anthropic = createAnthropic({
@@ -82,7 +82,7 @@ export class Agent {
       accessSecret: ACCESS_SECRET,
     });
 
-    this.twitter = new Twitter(this.twitterApi, this.agent);
+    this.twitter = new EngagementMonitor(this.twitterApi, this.agent);
   }
 
   /**
@@ -90,8 +90,10 @@ export class Agent {
    */
   async start(): Promise<void> {
     this.isRunning = true;
-    logger.info(`Starting agent ${this.agent.agentId}`);
-    this.twitter.start();
+    logger.info(
+      `🔥Starting agent ${this.agent.agentProfile.name} decision loop🔥`
+    );
+    // this.twitter.start();
 
     const MAX_ACTION_DELAY_MS = 60 * 70 * 1000; // 1hr 10 minutes
     const MIN_ACTION_DELAY_MS = 60 * 60 * 1000; // 1hr

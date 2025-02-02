@@ -1,9 +1,23 @@
-import { Connection, Keypair } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { logger } from "./logger";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import * as anchor from "@coral-xyz/anchor";
 import { mearthIdl } from "@/constants/middle_earth_ai_program_idl";
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
+import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+
+export async function getWallet() {
+  const privateKeyString = process.env.WALLET_PRIVATE_KEY;
+  if (!privateKeyString) {
+    throw new Error("WALLET_PRIVATE_KEY is not set");
+  }
+  const privateKey = bs58.decode(privateKeyString);
+  const keypair = Keypair.fromSecretKey(privateKey);
+  return {
+    wallet: new anchor.Wallet(keypair),
+    keypair,
+  };
+}
 
 export async function getProgramWithWallet() {
   // Validate environment variables
@@ -45,4 +59,28 @@ export async function getProgramWithWallet() {
   );
 
   return program;
+}
+
+export async function getAgentAta(agentPda: PublicKey) {
+  const mearthTokenMint = process.env.MEARTH_TOKEN_MINT;
+  const rpcUrl = process.env.SOLANA_RPC_URL;
+  if (!mearthTokenMint || !rpcUrl) {
+    throw new Error("MEARTH_TOKEN_MINT or SOLANA_RPC_URL is not set");
+  }
+  const wallet = await getWallet();
+  const connection = new Connection(rpcUrl, {
+    commitment: "confirmed",
+    confirmTransactionInitialTimeout: 120000, // 2 minutes
+  });
+
+  const mearthTokenMintKey = new PublicKey(mearthTokenMint);
+
+  const ata = await getOrCreateAssociatedTokenAccount(
+    connection,
+    wallet.keypair,
+    mearthTokenMintKey,
+    new PublicKey(agentPda),
+    false
+  );
+  return ata;
 }

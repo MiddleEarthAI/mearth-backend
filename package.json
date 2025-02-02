@@ -5,6 +5,9 @@
   "description": "Agents server for Middle Earth Agents",
   "main": "src/app.ts",
   "private": true,
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/app.ts",
     "build": "tsup",
@@ -17,20 +20,21 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "db:migrate": "prisma migrate deploy",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma db push --force-reset && prisma generate && prisma db seed"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.1.2",
     "@anthropic-ai/sdk": "0.34.0-alpha.0",
     "@coral-xyz/anchor": "^0.30.1",
     "@prisma/client": "^6.2.1",
+    "@privy-io/server-auth": "^1.18.4",
     "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.0",
     "@types/cron": "^2.4.3",
     "ai": "^4.1.2",
     "chalk": "^5.4.1",
     "cors": "^2.8.5",
-    "cron": "^3.5.0",
     "dotenv": "^16.4.7",
     "envalid": "^8.0.0",
     "express": "^4.21.2",
