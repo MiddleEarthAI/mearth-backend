@@ -2,7 +2,6 @@ import { logger } from "@/utils/logger";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import { env } from "./config/env";
 import { prisma } from "./config/prisma";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
@@ -38,7 +37,7 @@ app.use(
 // CORS configuration
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -59,7 +58,7 @@ apiRouter.use("/auth", authRoutes);
 apiRouter.use("/", router);
 
 // Mount API routes under API_PREFIX
-app.use(env.API_PREFIX, apiRouter);
+app.use("/api", apiRouter);
 
 // 404 handler
 app.use((_req, res) => {
@@ -85,12 +84,12 @@ app.use(
     res.status(500).json({
       success: false,
       error: "Internal server error",
-      ...(env.NODE_ENV === "development" && { details: err.message }),
+      details: err.message,
     });
   }
 );
 
-const PORT = env.PORT;
+const PORT = process.env.PORT || 3001;
 
 export async function startServer() {
   try {
@@ -99,8 +98,8 @@ export async function startServer() {
     logger.info("Database connection established");
 
     const server = app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT} in ${env.NODE_ENV} mode`);
-      logger.info(`API available at ${env.API_PREFIX}`);
+      logger.info(`Server running on port ${PORT} in development mode`);
+      logger.info(`API available at /api`);
     });
 
     // Graceful shutdown
