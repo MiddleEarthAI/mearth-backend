@@ -4,18 +4,9 @@ import { prisma } from "@/config/prisma";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
-import { GenerateContextStringResult } from "@/agent/Agent";
 import { logger } from "@/utils/logger";
 
-import { PublicKey } from "@solana/web3.js";
-import {
-  resolveSimpleBattle,
-  startAgentVsAllianceBattle,
-  startAllianceVsAllianceBattle,
-  startSimpleBattle,
-} from "@/instructionUtils/battle";
 import { BATTLE_COOLDOWN } from "@/constants";
-import { AgentAccount } from "@/types/program";
 
 export enum BattleOutcome {
   Victory = "Victory",
@@ -33,8 +24,10 @@ export enum BattleType {
  */
 export const battleTool = (
   agentId: number,
+  agentDbId: string,
   gameId: number,
   gameDbId: string,
+
   currentAgentXhandle: string
 ) =>
   tool({
@@ -67,6 +60,17 @@ Features:
             agentProfile: true,
           },
         });
+        const agent = await prisma.agent.findUnique({
+          where: {
+            id: agentDbId,
+          },
+        });
+        if (!agent || !targetAgent) {
+          return {
+            success: false,
+            message: "Agent not found",
+          };
+        }
 
         // Get program and PDAs
         const program = await getProgramWithWallet();
@@ -157,23 +161,13 @@ Features:
           await prisma.battle.create({
             data: {
               gameId: gameDbId,
-              agent: {
-                connect: {
-                  agentId_gameId: {
-                    agentId: agentId,
-                    gameId: gameDbId,
-                  },
-                },
-              },
-              targetAgent: {
-                connect: {
-                  agentId_gameId: {
-                    agentId: agentId,
-                    gameId: gameDbId,
-                  },
-                },
-              },
+              agentId: agentDbId,
+              opponentId: targetAgent?.id,
               outcome: BattleOutcome.Victory,
+              probability: 0,
+              type: BattleType.AllianceVsAlliance,
+              resolutionTime: new Date(Date.now() + BATTLE_COOLDOWN * 1000),
+              startTime: new Date(),
             },
           });
 
@@ -204,6 +198,19 @@ Features:
             })
             .rpc();
 
+          await prisma.battle.create({
+            data: {
+              gameId: gameDbId,
+              agentId: agentDbId,
+              opponentId: targetAgent?.id,
+              outcome: BattleOutcome.Victory,
+              probability: 0,
+              resolutionTime: new Date(Date.now() + BATTLE_COOLDOWN * 1000),
+              startTime: new Date(),
+              type: BattleType.AgentVsAlliance,
+            },
+          });
+
           return {
             success: true,
             message: `Battle started successfully. Battle ID: ${tx}. Battle Info: ${attackerAlly.id} vs ${defenderAccount.id} `,
@@ -231,6 +238,19 @@ Features:
             .rpc();
         }
 
+        await prisma.battle.create({
+          data: {
+            gameId: gameDbId,
+            agentId: agentDbId,
+            opponentId: targetAgent?.id,
+            outcome: BattleOutcome.Victory,
+            probability: 0,
+            startTime: new Date(),
+            resolutionTime: new Date(Date.now() + BATTLE_COOLDOWN * 1000),
+            type: BattleType.AgentVsAlliance,
+          },
+        });
+
         if (!attackerAccount.allianceWith && !defenderAccount.allianceWith) {
           const tx = await program.methods
             .startBattleSimple()
@@ -240,12 +260,39 @@ Features:
             })
             .rpc();
 
+          await prisma.battle.create({
+            data: {
+              gameId: gameDbId,
+              agentId: agentDbId,
+              opponentId: targetAgent?.id,
+              outcome: BattleOutcome.Victory,
+              probability: 0,
+              startTime: new Date(),
+              resolutionTime: new Date(Date.now() + BATTLE_COOLDOWN * 1000),
+              type: BattleType.Simple,
+            },
+          });
+
           return {
             success: true,
             message: "Battle started successfully. Battle ID: " + tx,
             transactionHash: tx,
           };
         }
+
+        await prisma.agent.update({
+          where: {
+            id: agentDbId,
+          },
+          data: {
+            state: {
+              update: {
+                lastActionType: "battle",
+                lastActionTime: new Date(),
+              },
+            },
+          },
+        });
 
         return {
           success: false,

@@ -151,9 +151,13 @@ what you can do:
         };
       } catch (error) {
         logger.error("Movement execution failed:", error);
-        throw new Error(
-          error instanceof Error ? error.message : "Movement failed"
-        );
+        return {
+          success: false,
+          message:
+            error instanceof Error
+              ? error.message
+              : "Movement failed for some reason. Try another strategy.",
+        };
       }
     },
   });

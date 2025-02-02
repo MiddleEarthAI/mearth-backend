@@ -37,6 +37,7 @@ model Game {
   // ownerId String
   // owner    User   @relation("GameOwner", fields: [ownerId], references: [id])
   // managers User[] @relation("GameManager")
+  Cooldown Cooldown[]
 }
 
 model AgentProfile {
@@ -231,16 +232,19 @@ model AgentState {
 }
 
 model Cooldown {
-  id     String   @id @default(uuid())
-  type   String // 'alliance', 'battle', 'ignore'
+  id     String       @id @default(uuid())
+  type   CooldownType // 'alliance', 'battle', 'ignore'
   endsAt DateTime
 
   // Relations
-  agent         Agent  @relation(fields: [agentId], references: [id])
+  agent         Agent   @relation(fields: [agentId], references: [id])
   agentId       String
-  targetAgentId String
+  targetAgentId String? // for alliance cooldown
 
-  @@unique([agentId, targetAgentId, type])
+  gameId String
+  game   Game   @relation(fields: [gameId], references: [id])
+
+  @@unique([agentId, type])
 }
 
 model Strategy {
@@ -296,4 +300,12 @@ enum UserRole {
   ADMIN
   MANAGER
   USER
+}
+
+enum CooldownType {
+  Alliance
+  Battle
+  Ignore
+  Tweet
+  Move
 }

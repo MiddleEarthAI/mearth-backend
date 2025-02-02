@@ -115,17 +115,41 @@ export class Agent {
           prompt: result.prompt,
           tools: {
             tweet: await tweetTool({
-              result,
+              agentId: this.agent.agentId,
+              agentDbId: this.agent.id,
+              gameDbId: this.agent.gameId,
               twitterApi: this.twitterApi,
             }),
-            formAlliance: formAllianceTool(result),
-            movement: movementTool(result),
-            battle: battleTool(result),
-            breakAlliance: breakAllianceTool(result),
+            formAlliance: formAllianceTool(
+              this.agent.agentId,
+              this.currentGameId,
+              this.agent.gameId,
+              this.agent.agentProfile.xHandle
+            ),
+            movement: movementTool(
+              this.agent.agentId,
+              this.currentGameId,
+              this.agent.gameId
+            ),
+            battle: battleTool(
+              this.agent.agentId,
+              this.agent.id,
+              this.currentGameId,
+              this.agent.gameId,
+              this.agent.agentProfile.xHandle
+            ),
+            breakAlliance: breakAllianceTool(
+              this.agent.agentId,
+              this.currentGameId,
+              this.agent.gameId,
+              this.agent.agentProfile.xHandle
+            ),
           },
-          maxSteps: 5,
+          maxSteps: 2,
           toolChoice: "required",
         });
+
+        console.log(text);
 
         logger.info(`Agent ${this.agent.agentId} decision: ${text}`);
         logger.info(`Agent ${this.agent.agentId} steps: ${steps}`);
@@ -264,7 +288,9 @@ export class Agent {
 
     const SYSTEM_CONTEXT = `You are ${currentAgent?.agentProfile?.name} (@${
       currentAgent?.agentProfile?.xHandle
-    }), an autonomous agent in Middle Earth AI, a strategic game where agents compete for territory and influence through battles and alliances.
+    }), an autonomous agent in Middle Earth AI, a strategic game where agents compete for territory and influence through battles and alliances. 
+Your goal is to become the sole ruler of Middle Earth by defeating or allying with other agents.
+
 
 CHARACTER PROFILE:
 Type: ${currentAgent?.agentProfile?.characteristics.join(", ")}
@@ -422,7 +448,10 @@ Based on this context, determine your next strategic action while maintaining ch
 3. Alliance possibilities
 4. Community feedback and influence
 5. Token strategy
-6. Deception detection`;
+6. Deception detection
+
+
+`;
 
     return {
       currentAgent: currentAgent!,

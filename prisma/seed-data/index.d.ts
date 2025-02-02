@@ -122,6 +122,17 @@ export const UserRole: {
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
+
+export const CooldownType: {
+  Alliance: 'Alliance',
+  Battle: 'Battle',
+  Ignore: 'Ignore',
+  Tweet: 'Tweet',
+  Move: 'Move'
+};
+
+export type CooldownType = (typeof CooldownType)[keyof typeof CooldownType]
+
 }
 
 export type TerrainType = $Enums.TerrainType
@@ -143,6 +154,10 @@ export const BattleType: typeof $Enums.BattleType
 export type UserRole = $Enums.UserRole
 
 export const UserRole: typeof $Enums.UserRole
+
+export type CooldownType = $Enums.CooldownType
+
+export const CooldownType: typeof $Enums.CooldownType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1940,12 +1955,14 @@ export namespace Prisma {
     agents: number
     alliances: number
     battles: number
+    Cooldown: number
   }
 
   export type GameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | GameCountOutputTypeCountAgentsArgs
     alliances?: boolean | GameCountOutputTypeCountAlliancesArgs
     battles?: boolean | GameCountOutputTypeCountBattlesArgs
+    Cooldown?: boolean | GameCountOutputTypeCountCooldownArgs
   }
 
   // Custom InputTypes
@@ -1978,6 +1995,13 @@ export namespace Prisma {
    */
   export type GameCountOutputTypeCountBattlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BattleWhereInput
+  }
+
+  /**
+   * GameCountOutputType without action
+   */
+  export type GameCountOutputTypeCountCooldownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CooldownWhereInput
   }
 
 
@@ -2374,6 +2398,7 @@ export namespace Prisma {
     agents?: boolean | Game$agentsArgs<ExtArgs>
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
+    Cooldown?: boolean | Game$CooldownArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
@@ -2427,6 +2452,7 @@ export namespace Prisma {
     agents?: boolean | Game$agentsArgs<ExtArgs>
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
+    Cooldown?: boolean | Game$CooldownArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2438,6 +2464,7 @@ export namespace Prisma {
       agents: Prisma.$AgentPayload<ExtArgs>[]
       alliances: Prisma.$AlliancePayload<ExtArgs>[]
       battles: Prisma.$BattlePayload<ExtArgs>[]
+      Cooldown: Prisma.$CooldownPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2849,6 +2876,7 @@ export namespace Prisma {
     agents<T extends Game$agentsArgs<ExtArgs> = {}>(args?: Subset<T, Game$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     alliances<T extends Game$alliancesArgs<ExtArgs> = {}>(args?: Subset<T, Game$alliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battles<T extends Game$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Game$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    Cooldown<T extends Game$CooldownArgs<ExtArgs> = {}>(args?: Subset<T, Game$CooldownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3335,6 +3363,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
+  }
+
+  /**
+   * Game.Cooldown
+   */
+  export type Game$CooldownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Cooldown
+     */
+    select?: CooldownSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Cooldown
+     */
+    omit?: CooldownOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CooldownInclude<ExtArgs> | null
+    where?: CooldownWhereInput
+    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
+    cursor?: CooldownWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CooldownScalarFieldEnum | CooldownScalarFieldEnum[]
   }
 
   /**
@@ -13156,18 +13208,20 @@ export namespace Prisma {
 
   export type CooldownMinAggregateOutputType = {
     id: string | null
-    type: string | null
+    type: $Enums.CooldownType | null
     endsAt: Date | null
     agentId: string | null
     targetAgentId: string | null
+    gameId: string | null
   }
 
   export type CooldownMaxAggregateOutputType = {
     id: string | null
-    type: string | null
+    type: $Enums.CooldownType | null
     endsAt: Date | null
     agentId: string | null
     targetAgentId: string | null
+    gameId: string | null
   }
 
   export type CooldownCountAggregateOutputType = {
@@ -13176,6 +13230,7 @@ export namespace Prisma {
     endsAt: number
     agentId: number
     targetAgentId: number
+    gameId: number
     _all: number
   }
 
@@ -13186,6 +13241,7 @@ export namespace Prisma {
     endsAt?: true
     agentId?: true
     targetAgentId?: true
+    gameId?: true
   }
 
   export type CooldownMaxAggregateInputType = {
@@ -13194,6 +13250,7 @@ export namespace Prisma {
     endsAt?: true
     agentId?: true
     targetAgentId?: true
+    gameId?: true
   }
 
   export type CooldownCountAggregateInputType = {
@@ -13202,6 +13259,7 @@ export namespace Prisma {
     endsAt?: true
     agentId?: true
     targetAgentId?: true
+    gameId?: true
     _all?: true
   }
 
@@ -13279,10 +13337,11 @@ export namespace Prisma {
 
   export type CooldownGroupByOutputType = {
     id: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date
     agentId: string
-    targetAgentId: string
+    targetAgentId: string | null
+    gameId: string
     _count: CooldownCountAggregateOutputType | null
     _min: CooldownMinAggregateOutputType | null
     _max: CooldownMaxAggregateOutputType | null
@@ -13308,7 +13367,9 @@ export namespace Prisma {
     endsAt?: boolean
     agentId?: boolean
     targetAgentId?: boolean
+    gameId?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["cooldown"]>
 
   export type CooldownSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -13317,7 +13378,9 @@ export namespace Prisma {
     endsAt?: boolean
     agentId?: boolean
     targetAgentId?: boolean
+    gameId?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["cooldown"]>
 
   export type CooldownSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -13326,7 +13389,9 @@ export namespace Prisma {
     endsAt?: boolean
     agentId?: boolean
     targetAgentId?: boolean
+    gameId?: boolean
     agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["cooldown"]>
 
   export type CooldownSelectScalar = {
@@ -13335,30 +13400,36 @@ export namespace Prisma {
     endsAt?: boolean
     agentId?: boolean
     targetAgentId?: boolean
+    gameId?: boolean
   }
 
-  export type CooldownOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "endsAt" | "agentId" | "targetAgentId", ExtArgs["result"]["cooldown"]>
+  export type CooldownOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "endsAt" | "agentId" | "targetAgentId" | "gameId", ExtArgs["result"]["cooldown"]>
   export type CooldownInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
   }
   export type CooldownIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
   }
   export type CooldownIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
   }
 
   export type $CooldownPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Cooldown"
     objects: {
       agent: Prisma.$AgentPayload<ExtArgs>
+      game: Prisma.$GamePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      type: string
+      type: $Enums.CooldownType
       endsAt: Date
       agentId: string
-      targetAgentId: string
+      targetAgentId: string | null
+      gameId: string
     }, ExtArgs["result"]["cooldown"]>
     composites: {}
   }
@@ -13754,6 +13825,7 @@ export namespace Prisma {
   export interface Prisma__CooldownClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13784,10 +13856,11 @@ export namespace Prisma {
    */ 
   interface CooldownFieldRefs {
     readonly id: FieldRef<"Cooldown", 'String'>
-    readonly type: FieldRef<"Cooldown", 'String'>
+    readonly type: FieldRef<"Cooldown", 'CooldownType'>
     readonly endsAt: FieldRef<"Cooldown", 'DateTime'>
     readonly agentId: FieldRef<"Cooldown", 'String'>
     readonly targetAgentId: FieldRef<"Cooldown", 'String'>
+    readonly gameId: FieldRef<"Cooldown", 'String'>
   }
     
 
@@ -16461,7 +16534,8 @@ export namespace Prisma {
     type: 'type',
     endsAt: 'endsAt',
     agentId: 'agentId',
-    targetAgentId: 'targetAgentId'
+    targetAgentId: 'targetAgentId',
+    gameId: 'gameId'
   };
 
   export type CooldownScalarFieldEnum = (typeof CooldownScalarFieldEnum)[keyof typeof CooldownScalarFieldEnum]
@@ -16654,6 +16728,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'CooldownType'
+   */
+  export type EnumCooldownTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CooldownType'>
+    
+
+
+  /**
+   * Reference to a field of type 'CooldownType[]'
+   */
+  export type ListEnumCooldownTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CooldownType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'UserRole'
    */
   export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -16689,6 +16777,7 @@ export namespace Prisma {
     agents?: AgentListRelationFilter
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
+    Cooldown?: CooldownListRelationFilter
   }
 
   export type GameOrderByWithRelationInput = {
@@ -16707,6 +16796,7 @@ export namespace Prisma {
     agents?: AgentOrderByRelationAggregateInput
     alliances?: AllianceOrderByRelationAggregateInput
     battles?: BattleOrderByRelationAggregateInput
+    Cooldown?: CooldownOrderByRelationAggregateInput
   }
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
@@ -16728,6 +16818,7 @@ export namespace Prisma {
     agents?: AgentListRelationFilter
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
+    Cooldown?: CooldownListRelationFilter
   }, "id" | "gameId">
 
   export type GameOrderByWithAggregationInput = {
@@ -17560,11 +17651,13 @@ export namespace Prisma {
     OR?: CooldownWhereInput[]
     NOT?: CooldownWhereInput | CooldownWhereInput[]
     id?: StringFilter<"Cooldown"> | string
-    type?: StringFilter<"Cooldown"> | string
+    type?: EnumCooldownTypeFilter<"Cooldown"> | $Enums.CooldownType
     endsAt?: DateTimeFilter<"Cooldown"> | Date | string
     agentId?: StringFilter<"Cooldown"> | string
-    targetAgentId?: StringFilter<"Cooldown"> | string
+    targetAgentId?: StringNullableFilter<"Cooldown"> | string | null
+    gameId?: StringFilter<"Cooldown"> | string
     agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    game?: XOR<GameScalarRelationFilter, GameWhereInput>
   }
 
   export type CooldownOrderByWithRelationInput = {
@@ -17572,29 +17665,34 @@ export namespace Prisma {
     type?: SortOrder
     endsAt?: SortOrder
     agentId?: SortOrder
-    targetAgentId?: SortOrder
+    targetAgentId?: SortOrderInput | SortOrder
+    gameId?: SortOrder
     agent?: AgentOrderByWithRelationInput
+    game?: GameOrderByWithRelationInput
   }
 
   export type CooldownWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    agentId_targetAgentId_type?: CooldownAgentIdTargetAgentIdTypeCompoundUniqueInput
+    agentId_type?: CooldownAgentIdTypeCompoundUniqueInput
     AND?: CooldownWhereInput | CooldownWhereInput[]
     OR?: CooldownWhereInput[]
     NOT?: CooldownWhereInput | CooldownWhereInput[]
-    type?: StringFilter<"Cooldown"> | string
+    type?: EnumCooldownTypeFilter<"Cooldown"> | $Enums.CooldownType
     endsAt?: DateTimeFilter<"Cooldown"> | Date | string
     agentId?: StringFilter<"Cooldown"> | string
-    targetAgentId?: StringFilter<"Cooldown"> | string
+    targetAgentId?: StringNullableFilter<"Cooldown"> | string | null
+    gameId?: StringFilter<"Cooldown"> | string
     agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }, "id" | "agentId_targetAgentId_type">
+    game?: XOR<GameScalarRelationFilter, GameWhereInput>
+  }, "id" | "agentId_type">
 
   export type CooldownOrderByWithAggregationInput = {
     id?: SortOrder
     type?: SortOrder
     endsAt?: SortOrder
     agentId?: SortOrder
-    targetAgentId?: SortOrder
+    targetAgentId?: SortOrderInput | SortOrder
+    gameId?: SortOrder
     _count?: CooldownCountOrderByAggregateInput
     _max?: CooldownMaxOrderByAggregateInput
     _min?: CooldownMinOrderByAggregateInput
@@ -17605,10 +17703,11 @@ export namespace Prisma {
     OR?: CooldownScalarWhereWithAggregatesInput[]
     NOT?: CooldownScalarWhereWithAggregatesInput | CooldownScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Cooldown"> | string
-    type?: StringWithAggregatesFilter<"Cooldown"> | string
+    type?: EnumCooldownTypeWithAggregatesFilter<"Cooldown"> | $Enums.CooldownType
     endsAt?: DateTimeWithAggregatesFilter<"Cooldown"> | Date | string
     agentId?: StringWithAggregatesFilter<"Cooldown"> | string
-    targetAgentId?: StringWithAggregatesFilter<"Cooldown"> | string
+    targetAgentId?: StringNullableWithAggregatesFilter<"Cooldown"> | string | null
+    gameId?: StringWithAggregatesFilter<"Cooldown"> | string
   }
 
   export type StrategyWhereInput = {
@@ -17746,6 +17845,7 @@ export namespace Prisma {
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateInput = {
@@ -17764,6 +17864,7 @@ export namespace Prisma {
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameUpdateInput = {
@@ -17782,6 +17883,7 @@ export namespace Prisma {
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateInput = {
@@ -17800,6 +17902,7 @@ export namespace Prisma {
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type GameCreateManyInput = {
@@ -18728,57 +18831,63 @@ export namespace Prisma {
 
   export type CooldownCreateInput = {
     id?: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date | string
-    targetAgentId: string
+    targetAgentId?: string | null
     agent: AgentCreateNestedOneWithoutCooldownsInput
+    game: GameCreateNestedOneWithoutCooldownInput
   }
 
   export type CooldownUncheckedCreateInput = {
     id?: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date | string
     agentId: string
-    targetAgentId: string
+    targetAgentId?: string | null
+    gameId: string
   }
 
   export type CooldownUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
     agent?: AgentUpdateOneRequiredWithoutCooldownsNestedInput
+    game?: GameUpdateOneRequiredWithoutCooldownNestedInput
   }
 
   export type CooldownUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentId?: StringFieldUpdateOperationsInput | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
   }
 
   export type CooldownCreateManyInput = {
     id?: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date | string
     agentId: string
-    targetAgentId: string
+    targetAgentId?: string | null
+    gameId: string
   }
 
   export type CooldownUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CooldownUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agentId?: StringFieldUpdateOperationsInput | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
   }
 
   export type StrategyCreateInput = {
@@ -18988,6 +19097,12 @@ export namespace Prisma {
     none?: BattleWhereInput
   }
 
+  export type CooldownListRelationFilter = {
+    every?: CooldownWhereInput
+    some?: CooldownWhereInput
+    none?: CooldownWhereInput
+  }
+
   export type AgentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -18997,6 +19112,10 @@ export namespace Prisma {
   }
 
   export type BattleOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CooldownOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19269,16 +19388,6 @@ export namespace Prisma {
   export type StrategyNullableScalarRelationFilter = {
     is?: StrategyWhereInput | null
     isNot?: StrategyWhereInput | null
-  }
-
-  export type CooldownListRelationFilter = {
-    every?: CooldownWhereInput
-    some?: CooldownWhereInput
-    none?: CooldownWhereInput
-  }
-
-  export type CooldownOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type AgentAgentIdGameIdCompoundUniqueInput = {
@@ -19858,10 +19967,16 @@ export namespace Prisma {
     influenceScore?: SortOrder
   }
 
-  export type CooldownAgentIdTargetAgentIdTypeCompoundUniqueInput = {
+  export type EnumCooldownTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CooldownType | EnumCooldownTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCooldownTypeFilter<$PrismaModel> | $Enums.CooldownType
+  }
+
+  export type CooldownAgentIdTypeCompoundUniqueInput = {
     agentId: string
-    targetAgentId: string
-    type: string
+    type: $Enums.CooldownType
   }
 
   export type CooldownCountOrderByAggregateInput = {
@@ -19870,6 +19985,7 @@ export namespace Prisma {
     endsAt?: SortOrder
     agentId?: SortOrder
     targetAgentId?: SortOrder
+    gameId?: SortOrder
   }
 
   export type CooldownMaxOrderByAggregateInput = {
@@ -19878,6 +19994,7 @@ export namespace Prisma {
     endsAt?: SortOrder
     agentId?: SortOrder
     targetAgentId?: SortOrder
+    gameId?: SortOrder
   }
 
   export type CooldownMinOrderByAggregateInput = {
@@ -19886,6 +20003,17 @@ export namespace Prisma {
     endsAt?: SortOrder
     agentId?: SortOrder
     targetAgentId?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type EnumCooldownTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CooldownType | EnumCooldownTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCooldownTypeWithAggregatesFilter<$PrismaModel> | $Enums.CooldownType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCooldownTypeFilter<$PrismaModel>
+    _max?: NestedEnumCooldownTypeFilter<$PrismaModel>
   }
 
   export type StrategyCountOrderByAggregateInput = {
@@ -19988,6 +20116,13 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
+  export type CooldownCreateNestedManyWithoutGameInput = {
+    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
+    createMany?: CooldownCreateManyGameInputEnvelope
+    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+  }
+
   export type AgentUncheckedCreateNestedManyWithoutGameInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -20007,6 +20142,13 @@ export namespace Prisma {
     connectOrCreate?: BattleCreateOrConnectWithoutGameInput | BattleCreateOrConnectWithoutGameInput[]
     createMany?: BattleCreateManyGameInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+  }
+
+  export type CooldownUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
+    createMany?: CooldownCreateManyGameInputEnvelope
+    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -20087,6 +20229,20 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
+  export type CooldownUpdateManyWithoutGameNestedInput = {
+    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
+    upsert?: CooldownUpsertWithWhereUniqueWithoutGameInput | CooldownUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: CooldownCreateManyGameInputEnvelope
+    set?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    disconnect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    delete?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    update?: CooldownUpdateWithWhereUniqueWithoutGameInput | CooldownUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: CooldownUpdateManyWithWhereWithoutGameInput | CooldownUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+  }
+
   export type AgentUncheckedUpdateManyWithoutGameNestedInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -20127,6 +20283,20 @@ export namespace Prisma {
     update?: BattleUpdateWithWhereUniqueWithoutGameInput | BattleUpdateWithWhereUniqueWithoutGameInput[]
     updateMany?: BattleUpdateManyWithWhereWithoutGameInput | BattleUpdateManyWithWhereWithoutGameInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
+  export type CooldownUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
+    upsert?: CooldownUpsertWithWhereUniqueWithoutGameInput | CooldownUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: CooldownCreateManyGameInputEnvelope
+    set?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    disconnect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    delete?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+    update?: CooldownUpdateWithWhereUniqueWithoutGameInput | CooldownUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: CooldownUpdateManyWithWhereWithoutGameInput | CooldownUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
   }
 
   export type AgentProfileCreatebioInput = {
@@ -20783,12 +20953,30 @@ export namespace Prisma {
     connect?: AgentWhereUniqueInput
   }
 
+  export type GameCreateNestedOneWithoutCooldownInput = {
+    create?: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
+    connectOrCreate?: GameCreateOrConnectWithoutCooldownInput
+    connect?: GameWhereUniqueInput
+  }
+
+  export type EnumCooldownTypeFieldUpdateOperationsInput = {
+    set?: $Enums.CooldownType
+  }
+
   export type AgentUpdateOneRequiredWithoutCooldownsNestedInput = {
     create?: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
     connectOrCreate?: AgentCreateOrConnectWithoutCooldownsInput
     upsert?: AgentUpsertWithoutCooldownsInput
     connect?: AgentWhereUniqueInput
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutCooldownsInput, AgentUpdateWithoutCooldownsInput>, AgentUncheckedUpdateWithoutCooldownsInput>
+  }
+
+  export type GameUpdateOneRequiredWithoutCooldownNestedInput = {
+    create?: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
+    connectOrCreate?: GameCreateOrConnectWithoutCooldownInput
+    upsert?: GameUpsertWithoutCooldownInput
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutCooldownInput, GameUpdateWithoutCooldownInput>, GameUncheckedUpdateWithoutCooldownInput>
   }
 
   export type AgentCreateNestedOneWithoutStrategyInput = {
@@ -21121,6 +21309,23 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumCooldownTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CooldownType | EnumCooldownTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCooldownTypeFilter<$PrismaModel> | $Enums.CooldownType
+  }
+
+  export type NestedEnumCooldownTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CooldownType | EnumCooldownTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCooldownTypeWithAggregatesFilter<$PrismaModel> | $Enums.CooldownType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCooldownTypeFilter<$PrismaModel>
+    _max?: NestedEnumCooldownTypeFilter<$PrismaModel>
+  }
+
   export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
     equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
     in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
@@ -21256,6 +21461,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CooldownCreateWithoutGameInput = {
+    id?: string
+    type: $Enums.CooldownType
+    endsAt: Date | string
+    targetAgentId?: string | null
+    agent: AgentCreateNestedOneWithoutCooldownsInput
+  }
+
+  export type CooldownUncheckedCreateWithoutGameInput = {
+    id?: string
+    type: $Enums.CooldownType
+    endsAt: Date | string
+    agentId: string
+    targetAgentId?: string | null
+  }
+
+  export type CooldownCreateOrConnectWithoutGameInput = {
+    where: CooldownWhereUniqueInput
+    create: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput>
+  }
+
+  export type CooldownCreateManyGameInputEnvelope = {
+    data: CooldownCreateManyGameInput | CooldownCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AgentUpsertWithWhereUniqueWithoutGameInput = {
     where: AgentWhereUniqueInput
     update: XOR<AgentUpdateWithoutGameInput, AgentUncheckedUpdateWithoutGameInput>
@@ -21349,6 +21580,34 @@ export namespace Prisma {
     startTime?: DateTimeFilter<"Battle"> | Date | string
     resolutionTime?: DateTimeFilter<"Battle"> | Date | string
     resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
+  }
+
+  export type CooldownUpsertWithWhereUniqueWithoutGameInput = {
+    where: CooldownWhereUniqueInput
+    update: XOR<CooldownUpdateWithoutGameInput, CooldownUncheckedUpdateWithoutGameInput>
+    create: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput>
+  }
+
+  export type CooldownUpdateWithWhereUniqueWithoutGameInput = {
+    where: CooldownWhereUniqueInput
+    data: XOR<CooldownUpdateWithoutGameInput, CooldownUncheckedUpdateWithoutGameInput>
+  }
+
+  export type CooldownUpdateManyWithWhereWithoutGameInput = {
+    where: CooldownScalarWhereInput
+    data: XOR<CooldownUpdateManyMutationInput, CooldownUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type CooldownScalarWhereInput = {
+    AND?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+    OR?: CooldownScalarWhereInput[]
+    NOT?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+    id?: StringFilter<"Cooldown"> | string
+    type?: EnumCooldownTypeFilter<"Cooldown"> | $Enums.CooldownType
+    endsAt?: DateTimeFilter<"Cooldown"> | Date | string
+    agentId?: StringFilter<"Cooldown"> | string
+    targetAgentId?: StringNullableFilter<"Cooldown"> | string | null
+    gameId?: StringFilter<"Cooldown"> | string
   }
 
   export type AgentCreateWithoutAgentProfileInput = {
@@ -21477,6 +21736,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAgentsInput = {
@@ -21494,6 +21754,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAgentsInput = {
@@ -21656,16 +21917,18 @@ export namespace Prisma {
 
   export type CooldownCreateWithoutAgentInput = {
     id?: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date | string
-    targetAgentId: string
+    targetAgentId?: string | null
+    game: GameCreateNestedOneWithoutCooldownInput
   }
 
   export type CooldownUncheckedCreateWithoutAgentInput = {
     id?: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date | string
-    targetAgentId: string
+    targetAgentId?: string | null
+    gameId: string
   }
 
   export type CooldownCreateOrConnectWithoutAgentInput = {
@@ -21827,6 +22090,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAgentsInput = {
@@ -21844,6 +22108,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type LocationUpsertWithoutAgentInput = {
@@ -22019,17 +22284,6 @@ export namespace Prisma {
     data: XOR<CooldownUpdateManyMutationInput, CooldownUncheckedUpdateManyWithoutAgentInput>
   }
 
-  export type CooldownScalarWhereInput = {
-    AND?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
-    OR?: CooldownScalarWhereInput[]
-    NOT?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
-    id?: StringFilter<"Cooldown"> | string
-    type?: StringFilter<"Cooldown"> | string
-    endsAt?: DateTimeFilter<"Cooldown"> | Date | string
-    agentId?: StringFilter<"Cooldown"> | string
-    targetAgentId?: StringFilter<"Cooldown"> | string
-  }
-
   export type AllianceUpsertWithWhereUniqueWithoutAlliedAgentInput = {
     where: AllianceWhereUniqueInput
     update: XOR<AllianceUpdateWithoutAlliedAgentInput, AllianceUncheckedUpdateWithoutAlliedAgentInput>
@@ -22169,6 +22423,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAlliancesInput = {
@@ -22186,6 +22441,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAlliancesInput = {
@@ -22305,6 +22561,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAlliancesInput = {
@@ -22322,6 +22579,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutCurrentAllianceInput = {
@@ -22437,6 +22695,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutBattlesInput = {
@@ -22454,6 +22713,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
+    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutBattlesInput = {
@@ -22573,6 +22833,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutBattlesInput = {
@@ -22590,6 +22851,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
+    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutBattlesInput = {
@@ -23099,6 +23361,47 @@ export namespace Prisma {
     create: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
   }
 
+  export type GameCreateWithoutCooldownInput = {
+    id?: string
+    gameId: bigint | number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agents?: AgentCreateNestedManyWithoutGameInput
+    alliances?: AllianceCreateNestedManyWithoutGameInput
+    battles?: BattleCreateNestedManyWithoutGameInput
+  }
+
+  export type GameUncheckedCreateWithoutCooldownInput = {
+    id?: string
+    gameId: bigint | number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agents?: AgentUncheckedCreateNestedManyWithoutGameInput
+    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
+    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type GameCreateOrConnectWithoutCooldownInput = {
+    where: GameWhereUniqueInput
+    create: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
+  }
+
   export type AgentUpsertWithoutCooldownsInput = {
     update: XOR<AgentUpdateWithoutCooldownsInput, AgentUncheckedUpdateWithoutCooldownsInput>
     create: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
@@ -23146,6 +23449,53 @@ export namespace Prisma {
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+  }
+
+  export type GameUpsertWithoutCooldownInput = {
+    update: XOR<GameUpdateWithoutCooldownInput, GameUncheckedUpdateWithoutCooldownInput>
+    create: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
+    where?: GameWhereInput
+  }
+
+  export type GameUpdateToOneWithWhereWithoutCooldownInput = {
+    where?: GameWhereInput
+    data: XOR<GameUpdateWithoutCooldownInput, GameUncheckedUpdateWithoutCooldownInput>
+  }
+
+  export type GameUpdateWithoutCooldownInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agents?: AgentUpdateManyWithoutGameNestedInput
+    alliances?: AllianceUpdateManyWithoutGameNestedInput
+    battles?: BattleUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameUncheckedUpdateWithoutCooldownInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
+    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
+    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentCreateWithoutStrategyInput = {
@@ -23275,6 +23625,14 @@ export namespace Prisma {
     resolvedAt?: Date | string | null
   }
 
+  export type CooldownCreateManyGameInput = {
+    id?: string
+    type: $Enums.CooldownType
+    endsAt: Date | string
+    agentId: string
+    targetAgentId?: string | null
+  }
+
   export type AgentUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     agentId?: IntFieldUpdateOperationsInput | number
@@ -23398,6 +23756,30 @@ export namespace Prisma {
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type CooldownUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    agent?: AgentUpdateOneRequiredWithoutCooldownsNestedInput
+  }
+
+  export type CooldownUncheckedUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type CooldownUncheckedUpdateManyWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type AgentCreateManyAgentProfileInput = {
     id?: string
     agentId: number
@@ -23474,9 +23856,10 @@ export namespace Prisma {
 
   export type CooldownCreateManyAgentInput = {
     id?: string
-    type: string
+    type: $Enums.CooldownType
     endsAt: Date | string
-    targetAgentId: string
+    targetAgentId?: string | null
+    gameId: string
   }
 
   export type AllianceCreateManyAlliedAgentInput = {
@@ -23554,23 +23937,26 @@ export namespace Prisma {
 
   export type CooldownUpdateWithoutAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    game?: GameUpdateOneRequiredWithoutCooldownNestedInput
   }
 
   export type CooldownUncheckedUpdateWithoutAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
   }
 
   export type CooldownUncheckedUpdateManyWithoutAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: StringFieldUpdateOperationsInput | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceUpdateWithoutAlliedAgentInput = {

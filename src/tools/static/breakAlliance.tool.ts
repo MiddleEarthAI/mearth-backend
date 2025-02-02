@@ -2,8 +2,6 @@ import { tool } from "ai";
 import { z } from "zod";
 import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
-import { GenerateContextStringResult } from "@/agent/Agent";
-import * as allianceUtils from "@/instructionUtils/alliance";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { ALLIANCE_COOLDOWN } from "@/types/program";

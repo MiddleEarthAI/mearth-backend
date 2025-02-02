@@ -258,7 +258,8 @@ exports.Prisma.CooldownScalarFieldEnum = {
   type: 'type',
   endsAt: 'endsAt',
   agentId: 'agentId',
-  targetAgentId: 'targetAgentId'
+  targetAgentId: 'targetAgentId',
+  gameId: 'gameId'
 };
 
 exports.Prisma.StrategyScalarFieldEnum = {
@@ -315,6 +316,14 @@ exports.BattleStatus = exports.$Enums.BattleStatus = {
   Active: 'Active',
   Resolved: 'Resolved',
   Failed: 'Failed'
+};
+
+exports.CooldownType = exports.$Enums.CooldownType = {
+  Alliance: 'Alliance',
+  Battle: 'Battle',
+  Ignore: 'Ignore',
+  Tweet: 'Tweet',
+  Move: 'Move'
 };
 
 exports.UserRole = exports.$Enums.UserRole = {

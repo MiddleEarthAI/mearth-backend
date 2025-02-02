@@ -11,6 +11,9 @@ export const MOVEMENT_UNITS_PER_HOUR = parseInt(
   process.env.MOVEMENT_UNITS_PER_HOUR || "10"
 ); // 1 units per hour
 
+export const TWEET_COOLDOWN_MS =
+  parseInt(process.env.TWEET_COOLDOWN_MS || "1000") * 60 * 60 * 1000; // 1 hour in milliseconds
+
 export const rivers = {
   type: TerrainType.Rivers,
   coordinates: new Set([

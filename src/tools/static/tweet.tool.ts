@@ -2,7 +2,8 @@ import { tool } from "ai";
 import { z } from "zod";
 import { logger } from "@/utils/logger";
 import { TwitterApi } from "twitter-api-v2";
-import { GenerateContextStringResult } from "@/agent/Agent";
+import { prisma } from "@/config/prisma";
+import { TWEET_COOLDOWN_MS } from "@/constants";
 
 export enum TweetType {
   BattleReport = "Battle Report",
@@ -19,14 +20,28 @@ export enum TweetType {
  */
 
 export const tweetTool = async ({
-  result,
+  agentId,
+  agentDbId,
+  gameDbId,
   twitterApi,
 }: {
-  result: GenerateContextStringResult;
+  agentId: number;
+  agentDbId: string;
+  gameDbId: string;
   twitterApi: TwitterApi;
 }) => {
-  const contextualDescription = `Strategic Communication tool for ${result.currentAgent.agentProfile.name} (@${result.currentAgent.agentProfile.xHandle})
-Your influence marks whether you win or lose! Choose your words with wisdom.`;
+  const cooldown = await prisma.cooldown.findUnique({
+    where: {
+      agentId_type: {
+        agentId: agentDbId,
+        type: "Tweet",
+      },
+    },
+  });
+  const contextualDescription = `Tool/action you can use to POST TWEETS
+Engage with the community to shape your destiny in Middle Earth. Your tweets influence battles, alliances and survival.
+Every interaction from humans can alter your path - use your words wisely to gain support and $mearth tokens. You can only make your next tweet post at ${cooldown?.endsAt.toLocaleString()}
+`;
 
   return tool({
     description: contextualDescription,
@@ -44,11 +59,29 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
       try {
         if (!twitterApi) throw new Error("Communication systems offline");
 
+        const cooldown = await prisma.cooldown.upsert({
+          where: {
+            agentId_type: {
+              agentId: agentDbId,
+              type: "Tweet",
+            },
+          },
+          update: {
+            endsAt: new Date(Date.now() + TWEET_COOLDOWN_MS), //
+          },
+          create: {
+            agentId: agentDbId,
+            gameId: gameDbId,
+            type: "Tweet",
+            endsAt: new Date(Date.now() + TWEET_COOLDOWN_MS),
+          },
+        });
+
         // Post tweet and get its ID
         // const tweetId = await twitterApi.v2.tweet(content);
         logger.info(`
         🐦 ═══════════════════════════════════════════════════════════════════════
-           Agent: ${result.currentAgent.agentProfile.name}
+           Agent: ${agentId}
         ───────────────────────────────────────────────────────────────────────────
            Message:
            ${content
@@ -59,7 +92,7 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
 
         return {
           success: true,
-          message: `Strategic communication deployed via @${result.currentAgent.agentProfile.xHandle}`,
+          message: `Tweet deployed via @${agentId}. You can make your next tweet post at ${cooldown?.endsAt.toLocaleString()}`,
           // tweetId,
         };
       } catch (error) {
