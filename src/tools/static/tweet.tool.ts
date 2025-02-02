@@ -1,6 +1,5 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 import { TwitterApi } from "twitter-api-v2";
 import { GenerateContextStringResult } from "@/agent/Agent";
@@ -39,19 +38,9 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
         .describe(
           "Strategic message conforming to Middle Earth diplomatic protocols"
         ),
-      type: z
-        .nativeEnum(TweetType)
-        .describe("Message classification for strategic context"),
-      coordinates: z
-        .object({
-          x: z.number(),
-          y: z.number(),
-        })
-        .optional()
-        .describe("Tactical position reference"),
     }),
 
-    execute: async ({ content, type, coordinates }) => {
+    execute: async ({ content }) => {
       try {
         if (!twitterApi) throw new Error("Communication systems offline");
 
@@ -72,7 +61,6 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
           success: true,
           message: `Strategic communication deployed via @${result.currentAgent.agentProfile.xHandle}`,
           // tweetId,
-          coordinates,
         };
       } catch (error) {
         logger.error("Communication failure:", error);
