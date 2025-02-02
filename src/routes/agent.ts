@@ -42,7 +42,7 @@ router.post(
           id: agentId.toString(),
           ownerId: req.user!.id,
           gameId: gameId.toString(),
-          // Add other agent fields here
+          publicKey: "",
         },
       });
 

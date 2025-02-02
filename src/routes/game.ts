@@ -19,7 +19,7 @@ const router = Router();
  */
 router.post(
   "/init",
-  [privyAuth, requireAdmin],
+  // [privyAuth, requireAdmin],
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       await checkDatabaseConnection();
@@ -53,7 +53,7 @@ router.post(
  */
 router.post(
   "/start",
-  [privyAuth, requireGameAccess],
+  // [privyAuth, requireGameAccess],
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       await checkDatabaseConnection();
