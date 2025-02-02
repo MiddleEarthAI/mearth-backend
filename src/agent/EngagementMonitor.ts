@@ -2,8 +2,17 @@ import { logger } from "@/utils/logger";
 import { prisma } from "@/config/prisma";
 import { TweetV2, TwitterApi } from "twitter-api-v2";
 import { createAnthropic } from "@ai-sdk/anthropic";
+
+import natural from "natural";
 import { generateText } from "ai";
-import { AgentModel } from "@/agent/Agent";
+
+// Initialize sentiment analyzer
+const analyzer = new natural.SentimentAnalyzer(
+  "English",
+  natural.PorterStemmer,
+  "afinn"
+);
+const tokenizer = new natural.WordTokenizer();
 
 // LLM Configuration
 const LLM_CONFIG = {
@@ -20,6 +29,143 @@ Always consider the fantasy context and strategic nature of the game in your ana
     MEDIUM: 150, // For analysis
   },
 };
+
+// Game-specific keywords for better sentiment analysis
+const GAME_KEYWORDS = {
+  positive: [
+    "alliance",
+    "friend",
+    "support",
+    "help",
+    "join",
+    "together",
+    "peace",
+    "victory",
+    "win",
+    "strong",
+  ],
+  negative: [
+    "battle",
+    "attack",
+    "fight",
+    "enemy",
+    "defeat",
+    "betrayal",
+    "war",
+    "threat",
+    "danger",
+    "death",
+  ],
+  neutral: [
+    "move",
+    "position",
+    "location",
+    "status",
+    "report",
+    "update",
+    "observe",
+    "watch",
+    "wait",
+    "plan",
+  ],
+};
+
+// Game-specific deception indicators
+const DECEPTION_PATTERNS = {
+  contradictions: [
+    {
+      claim: ["friend", "ally", "alliance"],
+      opposite: ["attack", "battle", "fight"],
+    },
+    { claim: ["peace", "truce"], opposite: ["war", "battle", "attack"] },
+    { claim: ["trust", "honest"], opposite: ["betray", "deceive", "lie"] },
+  ],
+  uncertaintyWords: [
+    "maybe",
+    "perhaps",
+    "possibly",
+    "might",
+    "could",
+    "probably",
+    "supposedly",
+    "apparently",
+    "seem",
+    "guess",
+    "think",
+  ],
+  deceptiveIntentWords: [
+    "trick",
+    "deceive",
+    "fool",
+    "trap",
+    "ambush",
+    "mislead",
+    "pretend",
+    "fake",
+    "false",
+    "lie",
+  ],
+  evasiveWords: [
+    "whatever",
+    "anyway",
+    "somehow",
+    "somewhere",
+    "sometime",
+    "someone",
+    "something",
+  ],
+};
+
+interface DeceptionIndicators {
+  hasContradictions: boolean;
+  uncertaintyScore: number;
+  deceptiveIntentScore: number;
+  evasiveScore: number;
+  contextMismatch: boolean;
+}
+
+/**
+ * Enhanced sentiment analysis that considers game-specific context
+ */
+function analyzeGameSentiment(text: string): { type: string; score: number } {
+  // Tokenize and clean the text
+  const tokens = tokenizer.tokenize(text.toLowerCase());
+  if (!tokens) return { type: "neutral", score: 0.5 };
+
+  // Get base sentiment score
+  const baseSentiment = analyzer.getSentiment(tokens);
+
+  // Count game-specific keywords
+  const keywordCounts = {
+    positive: tokens.filter((token) => GAME_KEYWORDS.positive.includes(token))
+      .length,
+    negative: tokens.filter((token) => GAME_KEYWORDS.negative.includes(token))
+      .length,
+    neutral: tokens.filter((token) => GAME_KEYWORDS.neutral.includes(token))
+      .length,
+  };
+
+  // Adjust score based on game-specific keywords
+  let adjustedScore = baseSentiment;
+  adjustedScore += keywordCounts.positive * 0.2;
+  adjustedScore -= keywordCounts.negative * 0.2;
+
+  // Normalize score to be between -1 and 1
+  adjustedScore = Math.max(-1, Math.min(1, adjustedScore));
+
+  // Convert to 0-1 range
+  const normalizedScore = (adjustedScore + 1) / 2;
+
+  // Determine sentiment type
+  let type = "neutral";
+  if (normalizedScore > 0.6) type = "positive";
+  else if (normalizedScore < 0.4) type = "negative";
+
+  return {
+    type,
+    score: normalizedScore,
+  };
+}
 
 interface TweetAnalysis {
   engagementScore: number;
@@ -51,48 +197,47 @@ export class EngagementMonitor {
 
   constructor(
     private readonly twitterApi: TwitterApi,
-    private readonly agent: AgentModel
+    private readonly agentXHandle: string,
+    private readonly agentId: number,
+    private readonly gameId: string
   ) {}
 
   async start(): Promise<void> {
     if (this.monitoringInterval) {
-      logger.warn(`Monitoring already active for @${this.agent.agentId}`);
+      logger.warn(`Monitoring already active for @${this.agentXHandle}`);
       return;
     }
 
     // Initial check
     this.checkInteractions().catch((error) =>
-      logger.error(
-        `Error in initial check for @${this.agent.agentProfile.xHandle}:`,
-        error
-      )
+      logger.error(`Error in initial check for @${this.agentXHandle}:`, error)
     );
 
     // Set up recurring checks
     this.monitoringInterval = setInterval(() => {
       this.checkInteractions().catch((error) =>
         logger.error(
-          `Error checking interactions for @${this.agent.agentProfile.xHandle}:`,
+          `Error checking interactions for @${this.agentXHandle}:`,
           error
         )
       );
     }, this.CHECK_INTERVAL);
 
-    logger.info(`Started monitoring for @${this.agent.agentProfile.xHandle}`);
+    logger.info(`Started monitoring for @${this.agentXHandle}`);
   }
 
   stop(): void {
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
-      logger.info(`Stopped monitoring for @${this.agent.agentProfile.xHandle}`);
+      logger.info(`Stopped monitoring for @${this.agentXHandle}`);
     }
   }
 
   private async checkInteractions(): Promise<void> {
     try {
       const [mentions, qrts] = await Promise.all([
-        this.twitterApi.v2.search(`@${this.agent.agentProfile.xHandle}`, {
+        this.twitterApi.v2.search(`@${this.agentXHandle}`, {
           "tweet.fields": [
             "created_at",
             "public_metrics",
@@ -109,20 +254,17 @@ export class EngagementMonitor {
           ],
           since_id: this.lastCheckedId || undefined,
         }),
-        this.twitterApi.v2.search(
-          `url:"x.com/${this.agent.agentProfile.xHandle}"`,
-          {
-            "tweet.fields": [
-              "created_at",
-              "public_metrics",
-              "referenced_tweets",
-              "conversation_id",
-            ],
-            "user.fields": ["public_metrics", "verified", "username"],
-            expansions: ["author_id", "referenced_tweets.id"],
-            since_id: this.lastCheckedId || undefined,
-          }
-        ),
+        this.twitterApi.v2.search(`url:"x.com/${this.agentXHandle}"`, {
+          "tweet.fields": [
+            "created_at",
+            "public_metrics",
+            "referenced_tweets",
+            "conversation_id",
+          ],
+          "user.fields": ["public_metrics", "verified", "username"],
+          expansions: ["author_id", "referenced_tweets.id"],
+          since_id: this.lastCheckedId || undefined,
+        }),
       ]);
 
       const interactions = [
@@ -149,7 +291,7 @@ export class EngagementMonitor {
       }
     } catch (error) {
       logger.error(
-        `Error checking interactions for @${this.agent.agentProfile.xHandle}:`,
+        `Error checking interactions for @${this.agentXHandle}:`,
         error
       );
       throw error;
@@ -167,8 +309,8 @@ export class EngagementMonitor {
     const agent = await prisma.agent.findUnique({
       where: {
         agentId_gameId: {
-          agentId: this.agent.agentId,
-          gameId: this.agent.gameId,
+          agentId: this.agentId,
+          gameId: this.gameId,
         },
       },
       include: {
@@ -232,23 +374,7 @@ export class EngagementMonitor {
     text: string
   ): Promise<{ type: string; score: number }> {
     try {
-      const completion = await generateText({
-        model: this.anthropic("claude-3-sonnet"),
-        prompt: `Analyze the sentiment of this Middle Earth tweet:
-"${text}"
-
-Return ONLY a JSON object with:
-{
-  "type": "positive" | "negative" | "neutral",
-  "score": number between 0 and 1
-}`,
-      });
-
-      const result = JSON.parse(completion.text || "{}");
-      return {
-        type: result.type || "neutral",
-        score: result.score || 0.5,
-      };
+      return analyzeGameSentiment(text);
     } catch (error) {
       logger.error("Error analyzing sentiment:", error);
       return { type: "neutral", score: 0.5 };
@@ -268,41 +394,23 @@ Return ONLY a JSON object with:
     intent: string;
   }> {
     try {
-      const completion = await generateText({
-        model: this.anthropic("claude-3-sonnet"),
-        prompt: `Analyze this Middle Earth tweet for deception:
-"${text}"
+      const indicators = analyzeDeceptionIndicators(text, context);
 
-Context:
-${
-  context.location
-    ? `Current Location: (${context.location.x}, ${context.location.y})`
-    : ""
-}
-${context.alliance ? `Current Alliance: ${context.alliance}` : ""}
-${
-  context.previousStatements
-    ? `Previous statements:\n${context.previousStatements
-        .map((s) => `- ${s}`)
-        .join("\n")}`
-    : ""
-}
+      // Calculate overall deception score
+      const deceptionScore =
+        (indicators.hasContradictions ? 0.3 : 0) +
+        indicators.uncertaintyScore * 0.2 +
+        indicators.deceptiveIntentScore * 0.3 +
+        indicators.evasiveScore * 0.1 +
+        (indicators.contextMismatch ? 0.1 : 0);
 
-Return a JSON object with:
-{
-  "isDeceptive": boolean,
-  "score": number between 0 and 1,
-  "intent": "support" | "oppose" | "deceive" | "inform" | "question"
-}`,
-        temperature: LLM_CONFIG.TEMPERATURE.ANALYSIS,
-        maxTokens: LLM_CONFIG.MAX_TOKENS.MEDIUM,
-      });
+      // Determine intent
+      const intent = determineIntent(text, deceptionScore);
 
-      const result = JSON.parse(completion.text || "{}");
       return {
-        isDeceptive: result.isDeceptive || false,
-        score: result.score || 0,
-        intent: result.intent || "inform",
+        isDeceptive: deceptionScore > 0.5,
+        score: deceptionScore,
+        intent,
       };
     } catch (error) {
       logger.error("Error analyzing deception:", error);
@@ -403,8 +511,8 @@ Return ONLY a JSON object with:
     const agent = await prisma.agent.findUnique({
       where: {
         agentId_gameId: {
-          agentId: this.agent.agentId,
-          gameId: this.agent.gameId,
+          agentId: this.agentId,
+          gameId: this.gameId,
         },
       },
       include: { community: true },
@@ -528,8 +636,8 @@ Return ONLY a JSON object with:
     const agent = await prisma.agent.findUnique({
       where: {
         agentId_gameId: {
-          agentId: this.agent.agentId,
-          gameId: this.agent.gameId,
+          agentId: this.agentId,
+          gameId: this.gameId,
         },
       },
       include: { community: true },
@@ -551,4 +659,127 @@ Return ONLY a JSON object with:
       },
     });
   }
+}
+
+/**
+ * Analyzes text for potential deception based on various linguistic indicators
+ */
+function analyzeDeceptionIndicators(
+  text: string,
+  context: {
+    location?: { x: number; y: number };
+    alliance?: string;
+    previousStatements?: string[];
+  }
+): DeceptionIndicators {
+  const tokens = tokenizer.tokenize(text.toLowerCase());
+  if (!tokens) {
+    return {
+      hasContradictions: false,
+      uncertaintyScore: 0,
+      deceptiveIntentScore: 0,
+      evasiveScore: 0,
+      contextMismatch: false,
+    };
+  }
+
+  // Check for contradictions
+  const hasContradictions = DECEPTION_PATTERNS.contradictions.some(
+    (pattern) => {
+      const hasClaim = pattern.claim.some((word) => tokens.includes(word));
+      const hasOpposite = pattern.opposite.some((word) =>
+        tokens.includes(word)
+      );
+      return hasClaim && hasOpposite;
+    }
+  );
+
+  // Calculate various deception scores
+  const uncertaintyScore =
+    DECEPTION_PATTERNS.uncertaintyWords.filter((word) => tokens.includes(word))
+      .length / tokens.length;
+
+  const deceptiveIntentScore =
+    DECEPTION_PATTERNS.deceptiveIntentWords.filter((word) =>
+      tokens.includes(word)
+    ).length / tokens.length;
+
+  const evasiveScore =
+    DECEPTION_PATTERNS.evasiveWords.filter((word) => tokens.includes(word))
+      .length / tokens.length;
+
+  // Check for context mismatches with previous statements
+  let contextMismatch = false;
+  if (context.previousStatements && context.previousStatements.length > 0) {
+    const previousTokens = context.previousStatements
+      .map((stmt) => tokenizer.tokenize(stmt.toLowerCase()))
+      .flat();
+
+    // Look for direct contradictions with previous statements
+    contextMismatch = DECEPTION_PATTERNS.contradictions.some((pattern) => {
+      const previousHasClaim = pattern.claim.some((word) =>
+        previousTokens.includes(word)
+      );
+      const currentHasOpposite = pattern.opposite.some((word) =>
+        tokens.includes(word)
+      );
+      return (
+        (previousHasClaim && currentHasOpposite) ||
+        (previousTokens.includes("alliance") && tokens.includes("enemy"))
+      );
+    });
+  }
+
+  return {
+    hasContradictions,
+    uncertaintyScore,
+    deceptiveIntentScore,
+    evasiveScore,
+    contextMismatch,
+  };
+}
+
+/**
+ * Determines intent type based on text content and context
+ */
+function determineIntent(
+  text: string,
+  deceptionScore: number
+): "support" | "oppose" | "deceive" | "inform" | "question" {
+  const tokens = tokenizer.tokenize(text.toLowerCase());
+  if (!tokens) return "inform";
+
+  // Check for question marks or question words
+  if (
+    text.includes("?") ||
+    ["what", "when", "where", "who", "why", "how"].some((q) =>
+      tokens.includes(q)
+    )
+  ) {
+    return "question";
+  }
+
+  // High deception score indicates deceptive intent
+  if (deceptionScore > 0.6) {
+    return "deceive";
+  }
+
+  // Check for supportive or opposing language
+  const supportWords = GAME_KEYWORDS.positive;
+  const opposeWords = GAME_KEYWORDS.negative;
+
+  const supportScore = supportWords.filter((word) =>
+    tokens.includes(word)
+  ).length;
+  const opposeScore = opposeWords.filter((word) =>
+    tokens.includes(word)
+  ).length;
+
+  if (supportScore > opposeScore) {
+    return "support";
+  } else if (opposeScore > supportScore) {
+    return "oppose";
+  }
+
+  return "inform";
 }

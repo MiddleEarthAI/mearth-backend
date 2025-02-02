@@ -4,40 +4,13 @@ import { prisma } from "@/config/prisma";
 import { logger } from "@/utils/logger";
 import { GenerateContextStringResult } from "@/agent/Agent";
 import * as allianceUtils from "@/instructionUtils/alliance";
-import { AllianceStatus } from "@prisma/client";
 
 /**
  * Tool for breaking alliances between agents in Middle Earth
  */
 export const breakAllianceTool = (result: GenerateContextStringResult) =>
   tool({
-    description: `This is a tool you (@${result.currentAgent?.agentProfile.xHandle}) can use to break an alliance with another agent that you are allied with.
-
-CONTEXT:
-Breaking an alliance is a significant diplomatic action that:
-- Immediately ends all shared resource benefits
-- Releases staked tokens back to both parties
-- May impact reputation and future alliance opportunities
-- Can be initiated by either party unilaterally
-- Triggers a 24-hour cooldown period
-
-CONSIDERATIONS:
-- Breaking an alliance has diplomatic consequences
-- Both agents will be on cooldown for 24 hours
-- Other agents will be notified of the break
-- Token balances will be recalculated
-
-REQUIREMENTS:
-- Must have an active alliance
-- Both agents must be alive
-- Cannot break non-existent alliances
-
-EFFECTS:
-- Ends resource sharing immediately
-- Returns staked tokens to respective parties
-- Updates diplomatic status
-- Creates cooldown records
-- Triggers notification to affected agent`,
+    description: `This is a tool you (@${result.currentAgent?.agentProfile.xHandle}) can use to break an alliance with another agent that you are allied with.`,
 
     parameters: z.object({
       targetAgentXHandle: z

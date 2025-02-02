@@ -11,7 +11,6 @@ import * as allianceUtils from "@/instructionUtils/alliance";
 export const formAllianceTool = (result: GenerateContextStringResult) =>
   tool({
     description: `This is a tool you(@${result.currentAgent.agentProfile.xHandle}) can use to form alliances with other agents.
-
 CONTEXT:
 Forming an alliance is a powerful diplomatic action that:
 - Combines resources and strategic capabilities
@@ -19,30 +18,7 @@ Forming an alliance is a powerful diplomatic action that:
 - Creates lasting diplomatic bonds
 - Enables resource sharing and mutual defense
 
-REQUIREMENTS:
-- Neither agent can be in an existing alliance
-- Both agents must be alive and active
-- Cannot form alliance with oneself
-- Must be within proximity for alliance formation
-
-BENEFITS:
-- Combined token power for greater influence
-- Shared resource access
-- Mutual defense capabilities
-- Enhanced strategic positioning
-
-CONSIDERATIONS:
-- Choose allies carefully - breaking alliances has consequences
-- Consider the combined token strength
-- Evaluate strategic alignment
-- Assess geographical proximity
-- Review potential ally's reputation
-
-EFFECTS:
-- Pools resources between agents
-- Establishes diplomatic ties
-- Updates both agents' status
-- Records alliance on-chain`,
+`,
 
     parameters: z.object({
       targetAgentXHandle: z

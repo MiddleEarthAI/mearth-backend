@@ -129,8 +129,7 @@ exports.Prisma.GameScalarFieldEnum = {
   bump: 'bump',
   dailyRewardTokens: 'dailyRewardTokens',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  ownerId: 'ownerId'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AgentProfileScalarFieldEnum = {
@@ -162,8 +161,7 @@ exports.Prisma.AgentScalarFieldEnum = {
   health: 'health',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  gameId: 'gameId',
-  ownerId: 'ownerId'
+  gameId: 'gameId'
 };
 
 exports.Prisma.LocationScalarFieldEnum = {

@@ -82,7 +82,12 @@ export class Agent {
       accessSecret: ACCESS_SECRET,
     });
 
-    this.twitter = new EngagementMonitor(this.twitterApi, this.agent);
+    this.twitter = new EngagementMonitor(
+      this.twitterApi,
+      this.agent.agentProfile.xHandle,
+      this.agent.agentId,
+      this.agent.gameId
+    );
   }
 
   /**
@@ -113,10 +118,10 @@ export class Agent {
               result,
               twitterApi: this.twitterApi,
             }),
-            formAlliance: await formAllianceTool(result),
+            formAlliance: formAllianceTool(result),
             movement: movementTool(result),
             battle: battleTool(result),
-            breakAlliance: await breakAllianceTool(result),
+            breakAlliance: breakAllianceTool(result),
           },
           maxSteps: 5,
           toolChoice: "required",
@@ -281,7 +286,7 @@ Movement Restrictions: ${
         ? "1 turn stuck"
         : "None"
     }
-  FELLOW AGENTS:
+FELLOW AGENTS:
   ${
     fellowAgents?.length
       ? fellowAgents

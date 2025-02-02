@@ -10,6 +10,7 @@ import { createNextGame } from "@/config/setup";
 import { Agent } from "@/agent/Agent";
 import { prisma } from "@/config/prisma";
 import { checkDatabaseConnection } from "@/utils";
+import { BattleResolver } from "@/BattleResolver";
 
 const router = Router();
 
@@ -24,6 +25,12 @@ router.post(
     try {
       await checkDatabaseConnection();
       const { tx, gameAccount } = await createNextGame();
+
+      if (tx) {
+        const program = await getProgramWithWallet();
+        const battleResolver = new BattleResolver(gameAccount.gameId, program);
+        battleResolver.start();
+      }
 
       logger.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
       res.json({

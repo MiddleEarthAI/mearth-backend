@@ -5,7 +5,6 @@ import helmet from "helmet";
 import { prisma } from "./config/prisma";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
-import authRoutes from "./routes/auth";
 
 const app = express();
 
@@ -54,7 +53,6 @@ app.use(defaultRateLimiter);
 
 // API routes
 const apiRouter = express.Router();
-apiRouter.use("/auth", authRoutes);
 apiRouter.use("/", router);
 
 // Mount API routes under API_PREFIX

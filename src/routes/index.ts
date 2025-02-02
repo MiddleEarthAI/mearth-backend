@@ -14,7 +14,19 @@ router.get("/health", (_, res: Response) => {
 });
 
 // Protected routes
-router.use("/game", privyAuth, gameRoutes);
-router.use("/agent", privyAuth, agentRoutes);
+router.use(
+  "/game",
+
+  privyAuth,
+
+  gameRoutes
+);
+router.use(
+  "/agent",
+
+  privyAuth,
+
+  agentRoutes
+);
 
 export default router;

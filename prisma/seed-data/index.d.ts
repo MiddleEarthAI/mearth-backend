@@ -1940,14 +1940,12 @@ export namespace Prisma {
     agents: number
     alliances: number
     battles: number
-    managers: number
   }
 
   export type GameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | GameCountOutputTypeCountAgentsArgs
     alliances?: boolean | GameCountOutputTypeCountAlliancesArgs
     battles?: boolean | GameCountOutputTypeCountBattlesArgs
-    managers?: boolean | GameCountOutputTypeCountManagersArgs
   }
 
   // Custom InputTypes
@@ -1980,13 +1978,6 @@ export namespace Prisma {
    */
   export type GameCountOutputTypeCountBattlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BattleWhereInput
-  }
-
-  /**
-   * GameCountOutputType without action
-   */
-  export type GameCountOutputTypeCountManagersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserWhereInput
   }
 
 
@@ -2111,55 +2102,6 @@ export namespace Prisma {
 
 
   /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    ownedGames: number
-    managedGames: number
-    ownedAgents: number
-  }
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    ownedGames?: boolean | UserCountOutputTypeCountOwnedGamesArgs
-    managedGames?: boolean | UserCountOutputTypeCountManagedGamesArgs
-    ownedAgents?: boolean | UserCountOutputTypeCountOwnedAgentsArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountOwnedGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: GameWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountManagedGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: GameWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountOwnedAgentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AgentWhereInput
-  }
-
-
-  /**
    * Models
    */
 
@@ -2202,7 +2144,6 @@ export namespace Prisma {
     dailyRewardTokens: number | null
     createdAt: Date | null
     updatedAt: Date | null
-    ownerId: string | null
   }
 
   export type GameMaxAggregateOutputType = {
@@ -2218,7 +2159,6 @@ export namespace Prisma {
     dailyRewardTokens: number | null
     createdAt: Date | null
     updatedAt: Date | null
-    ownerId: string | null
   }
 
   export type GameCountAggregateOutputType = {
@@ -2234,7 +2174,6 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt: number
     updatedAt: number
-    ownerId: number
     _all: number
   }
 
@@ -2266,7 +2205,6 @@ export namespace Prisma {
     dailyRewardTokens?: true
     createdAt?: true
     updatedAt?: true
-    ownerId?: true
   }
 
   export type GameMaxAggregateInputType = {
@@ -2282,7 +2220,6 @@ export namespace Prisma {
     dailyRewardTokens?: true
     createdAt?: true
     updatedAt?: true
-    ownerId?: true
   }
 
   export type GameCountAggregateInputType = {
@@ -2298,7 +2235,6 @@ export namespace Prisma {
     dailyRewardTokens?: true
     createdAt?: true
     updatedAt?: true
-    ownerId?: true
     _all?: true
   }
 
@@ -2401,7 +2337,6 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt: Date
     updatedAt: Date
-    ownerId: string
     _count: GameCountAggregateOutputType | null
     _avg: GameAvgAggregateOutputType | null
     _sum: GameSumAggregateOutputType | null
@@ -2436,12 +2371,9 @@ export namespace Prisma {
     dailyRewardTokens?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    ownerId?: boolean
     agents?: boolean | Game$agentsArgs<ExtArgs>
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
-    managers?: boolean | Game$managersArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
@@ -2458,8 +2390,6 @@ export namespace Prisma {
     dailyRewardTokens?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    ownerId?: boolean
-    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
   export type GameSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2475,8 +2405,6 @@ export namespace Prisma {
     dailyRewardTokens?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    ownerId?: boolean
-    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
   export type GameSelectScalar = {
@@ -2492,24 +2420,17 @@ export namespace Prisma {
     dailyRewardTokens?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    ownerId?: boolean
   }
 
-  export type GameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gameId" | "authority" | "tokenMint" | "rewardsVault" | "mapDiameter" | "isActive" | "lastUpdate" | "bump" | "dailyRewardTokens" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["game"]>
+  export type GameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gameId" | "authority" | "tokenMint" | "rewardsVault" | "mapDiameter" | "isActive" | "lastUpdate" | "bump" | "dailyRewardTokens" | "createdAt" | "updatedAt", ExtArgs["result"]["game"]>
   export type GameInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | Game$agentsArgs<ExtArgs>
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
-    managers?: boolean | Game$managersArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    owner?: boolean | UserDefaultArgs<ExtArgs>
-  }
-  export type GameIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    owner?: boolean | UserDefaultArgs<ExtArgs>
-  }
+  export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type GameIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $GamePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Game"
@@ -2517,8 +2438,6 @@ export namespace Prisma {
       agents: Prisma.$AgentPayload<ExtArgs>[]
       alliances: Prisma.$AlliancePayload<ExtArgs>[]
       battles: Prisma.$BattlePayload<ExtArgs>[]
-      owner: Prisma.$UserPayload<ExtArgs>
-      managers: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2533,7 +2452,6 @@ export namespace Prisma {
       dailyRewardTokens: number
       createdAt: Date
       updatedAt: Date
-      ownerId: string
     }, ExtArgs["result"]["game"]>
     composites: {}
   }
@@ -2931,8 +2849,6 @@ export namespace Prisma {
     agents<T extends Game$agentsArgs<ExtArgs> = {}>(args?: Subset<T, Game$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     alliances<T extends Game$alliancesArgs<ExtArgs> = {}>(args?: Subset<T, Game$alliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battles<T extends Game$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Game$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    managers<T extends Game$managersArgs<ExtArgs> = {}>(args?: Subset<T, Game$managersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2974,7 +2890,6 @@ export namespace Prisma {
     readonly dailyRewardTokens: FieldRef<"Game", 'Float'>
     readonly createdAt: FieldRef<"Game", 'DateTime'>
     readonly updatedAt: FieldRef<"Game", 'DateTime'>
-    readonly ownerId: FieldRef<"Game", 'String'>
   }
     
 
@@ -3224,10 +3139,6 @@ export namespace Prisma {
      */
     data: GameCreateManyInput | GameCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GameIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3290,10 +3201,6 @@ export namespace Prisma {
      * Filter which Games to update
      */
     where?: GameWhereInput
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GameIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3428,30 +3335,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
-  }
-
-  /**
-   * Game.managers
-   */
-  export type Game$managersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the User
-     */
-    omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
-    cursor?: UserWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -4785,7 +4668,6 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     gameId: string | null
-    ownerId: string | null
   }
 
   export type AgentMaxAggregateOutputType = {
@@ -4797,7 +4679,6 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     gameId: string | null
-    ownerId: string | null
   }
 
   export type AgentCountAggregateOutputType = {
@@ -4809,7 +4690,6 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     gameId: number
-    ownerId: number
     _all: number
   }
 
@@ -4833,7 +4713,6 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     gameId?: true
-    ownerId?: true
   }
 
   export type AgentMaxAggregateInputType = {
@@ -4845,7 +4724,6 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     gameId?: true
-    ownerId?: true
   }
 
   export type AgentCountAggregateInputType = {
@@ -4857,7 +4735,6 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     gameId?: true
-    ownerId?: true
     _all?: true
   }
 
@@ -4956,7 +4833,6 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     gameId: string
-    ownerId: string
     _count: AgentCountAggregateOutputType | null
     _avg: AgentAvgAggregateOutputType | null
     _sum: AgentSumAggregateOutputType | null
@@ -4987,7 +4863,6 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     gameId?: boolean
-    ownerId?: boolean
     agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
     location?: boolean | Agent$locationArgs<ExtArgs>
@@ -4999,7 +4874,6 @@ export namespace Prisma {
     cooldowns?: boolean | Agent$cooldownsArgs<ExtArgs>
     alliedBy?: boolean | Agent$alliedByArgs<ExtArgs>
     battlesAsOpponent?: boolean | Agent$battlesAsOpponentArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -5012,10 +4886,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     gameId?: boolean
-    ownerId?: boolean
     agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5027,10 +4899,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     gameId?: boolean
-    ownerId?: boolean
     agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectScalar = {
@@ -5042,10 +4912,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     gameId?: boolean
-    ownerId?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "publicKey" | "agentProfileId" | "health" | "createdAt" | "updatedAt" | "gameId" | "ownerId", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "publicKey" | "agentProfileId" | "health" | "createdAt" | "updatedAt" | "gameId", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
@@ -5058,18 +4927,15 @@ export namespace Prisma {
     cooldowns?: boolean | Agent$cooldownsArgs<ExtArgs>
     alliedBy?: boolean | Agent$alliedByArgs<ExtArgs>
     battlesAsOpponent?: boolean | Agent$battlesAsOpponentArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type AgentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    owner?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $AgentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5086,7 +4952,6 @@ export namespace Prisma {
       cooldowns: Prisma.$CooldownPayload<ExtArgs>[]
       alliedBy: Prisma.$AlliancePayload<ExtArgs>[]
       battlesAsOpponent: Prisma.$BattlePayload<ExtArgs>[]
-      owner: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5097,7 +4962,6 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       gameId: string
-      ownerId: string
     }, ExtArgs["result"]["agent"]>
     composites: {}
   }
@@ -5503,7 +5367,6 @@ export namespace Prisma {
     cooldowns<T extends Agent$cooldownsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$cooldownsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     alliedBy<T extends Agent$alliedByArgs<ExtArgs> = {}>(args?: Subset<T, Agent$alliedByArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battlesAsOpponent<T extends Agent$battlesAsOpponentArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsOpponentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5541,7 +5404,6 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Agent", 'DateTime'>
     readonly updatedAt: FieldRef<"Agent", 'DateTime'>
     readonly gameId: FieldRef<"Agent", 'String'>
-    readonly ownerId: FieldRef<"Agent", 'String'>
   }
     
 
@@ -15588,10 +15450,6 @@ export namespace Prisma {
     walletAddress?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    ownedGames?: boolean | User$ownedGamesArgs<ExtArgs>
-    managedGames?: boolean | User$managedGamesArgs<ExtArgs>
-    ownedAgents?: boolean | User$ownedAgentsArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -15625,22 +15483,10 @@ export namespace Prisma {
   }
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "privyUserId" | "role" | "email" | "walletAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
-  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    ownedGames?: boolean | User$ownedGamesArgs<ExtArgs>
-    managedGames?: boolean | User$managedGamesArgs<ExtArgs>
-    ownedAgents?: boolean | User$ownedAgentsArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {
-      ownedGames: Prisma.$GamePayload<ExtArgs>[]
-      managedGames: Prisma.$GamePayload<ExtArgs>[]
-      ownedAgents: Prisma.$AgentPayload<ExtArgs>[]
-    }
+    objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
       privyUserId: string
@@ -16043,9 +15889,6 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    ownedGames<T extends User$ownedGamesArgs<ExtArgs> = {}>(args?: Subset<T, User$ownedGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    managedGames<T extends User$managedGamesArgs<ExtArgs> = {}>(args?: Subset<T, User$managedGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    ownedAgents<T extends User$ownedAgentsArgs<ExtArgs> = {}>(args?: Subset<T, User$ownedAgentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16099,10 +15942,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -16121,10 +15960,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -16142,10 +15977,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -16195,10 +16026,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -16247,10 +16074,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -16293,10 +16116,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
@@ -16345,10 +16164,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -16408,10 +16223,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -16438,10 +16249,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -16458,78 +16265,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.ownedGames
-   */
-  export type User$ownedGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Game
-     */
-    select?: GameSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Game
-     */
-    omit?: GameOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GameInclude<ExtArgs> | null
-    where?: GameWhereInput
-    orderBy?: GameOrderByWithRelationInput | GameOrderByWithRelationInput[]
-    cursor?: GameWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: GameScalarFieldEnum | GameScalarFieldEnum[]
-  }
-
-  /**
-   * User.managedGames
-   */
-  export type User$managedGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Game
-     */
-    select?: GameSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Game
-     */
-    omit?: GameOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GameInclude<ExtArgs> | null
-    where?: GameWhereInput
-    orderBy?: GameOrderByWithRelationInput | GameOrderByWithRelationInput[]
-    cursor?: GameWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: GameScalarFieldEnum | GameScalarFieldEnum[]
-  }
-
-  /**
-   * User.ownedAgents
-   */
-  export type User$ownedAgentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Agent
-     */
-    select?: AgentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Agent
-     */
-    omit?: AgentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentInclude<ExtArgs> | null
-    where?: AgentWhereInput
-    orderBy?: AgentOrderByWithRelationInput | AgentOrderByWithRelationInput[]
-    cursor?: AgentWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: AgentScalarFieldEnum | AgentScalarFieldEnum[]
-  }
-
-  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16541,10 +16276,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -16574,8 +16305,7 @@ export namespace Prisma {
     bump: 'bump',
     dailyRewardTokens: 'dailyRewardTokens',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    ownerId: 'ownerId'
+    updatedAt: 'updatedAt'
   };
 
   export type GameScalarFieldEnum = (typeof GameScalarFieldEnum)[keyof typeof GameScalarFieldEnum]
@@ -16613,8 +16343,7 @@ export namespace Prisma {
     health: 'health',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    gameId: 'gameId',
-    ownerId: 'ownerId'
+    gameId: 'gameId'
   };
 
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
@@ -16957,12 +16686,9 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFilter<"Game"> | number
     createdAt?: DateTimeFilter<"Game"> | Date | string
     updatedAt?: DateTimeFilter<"Game"> | Date | string
-    ownerId?: StringFilter<"Game"> | string
     agents?: AgentListRelationFilter
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
-    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
-    managers?: UserListRelationFilter
   }
 
   export type GameOrderByWithRelationInput = {
@@ -16978,12 +16704,9 @@ export namespace Prisma {
     dailyRewardTokens?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
     agents?: AgentOrderByRelationAggregateInput
     alliances?: AllianceOrderByRelationAggregateInput
     battles?: BattleOrderByRelationAggregateInput
-    owner?: UserOrderByWithRelationInput
-    managers?: UserOrderByRelationAggregateInput
   }
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
@@ -17002,12 +16725,9 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFilter<"Game"> | number
     createdAt?: DateTimeFilter<"Game"> | Date | string
     updatedAt?: DateTimeFilter<"Game"> | Date | string
-    ownerId?: StringFilter<"Game"> | string
     agents?: AgentListRelationFilter
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
-    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
-    managers?: UserListRelationFilter
   }, "id" | "gameId">
 
   export type GameOrderByWithAggregationInput = {
@@ -17023,7 +16743,6 @@ export namespace Prisma {
     dailyRewardTokens?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
     _count?: GameCountOrderByAggregateInput
     _avg?: GameAvgOrderByAggregateInput
     _max?: GameMaxOrderByAggregateInput
@@ -17047,7 +16766,6 @@ export namespace Prisma {
     dailyRewardTokens?: FloatWithAggregatesFilter<"Game"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Game"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Game"> | Date | string
-    ownerId?: StringWithAggregatesFilter<"Game"> | string
   }
 
   export type AgentProfileWhereInput = {
@@ -17184,7 +16902,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Agent"> | Date | string
     updatedAt?: DateTimeFilter<"Agent"> | Date | string
     gameId?: StringFilter<"Agent"> | string
-    ownerId?: StringFilter<"Agent"> | string
     agentProfile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     location?: XOR<LocationNullableScalarRelationFilter, LocationWhereInput> | null
@@ -17196,7 +16913,6 @@ export namespace Prisma {
     cooldowns?: CooldownListRelationFilter
     alliedBy?: AllianceListRelationFilter
     battlesAsOpponent?: BattleListRelationFilter
-    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -17208,7 +16924,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     gameId?: SortOrder
-    ownerId?: SortOrder
     agentProfile?: AgentProfileOrderByWithRelationInput
     game?: GameOrderByWithRelationInput
     location?: LocationOrderByWithRelationInput
@@ -17220,7 +16935,6 @@ export namespace Prisma {
     cooldowns?: CooldownOrderByRelationAggregateInput
     alliedBy?: AllianceOrderByRelationAggregateInput
     battlesAsOpponent?: BattleOrderByRelationAggregateInput
-    owner?: UserOrderByWithRelationInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -17236,7 +16950,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Agent"> | Date | string
     updatedAt?: DateTimeFilter<"Agent"> | Date | string
     gameId?: StringFilter<"Agent"> | string
-    ownerId?: StringFilter<"Agent"> | string
     agentProfile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     location?: XOR<LocationNullableScalarRelationFilter, LocationWhereInput> | null
@@ -17248,7 +16961,6 @@ export namespace Prisma {
     cooldowns?: CooldownListRelationFilter
     alliedBy?: AllianceListRelationFilter
     battlesAsOpponent?: BattleListRelationFilter
-    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "agentId_gameId">
 
   export type AgentOrderByWithAggregationInput = {
@@ -17260,7 +16972,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     gameId?: SortOrder
-    ownerId?: SortOrder
     _count?: AgentCountOrderByAggregateInput
     _avg?: AgentAvgOrderByAggregateInput
     _max?: AgentMaxOrderByAggregateInput
@@ -17280,7 +16991,6 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Agent"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Agent"> | Date | string
     gameId?: StringWithAggregatesFilter<"Agent"> | string
-    ownerId?: StringWithAggregatesFilter<"Agent"> | string
   }
 
   export type LocationWhereInput = {
@@ -17969,9 +17679,6 @@ export namespace Prisma {
     walletAddress?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    ownedGames?: GameListRelationFilter
-    managedGames?: GameListRelationFilter
-    ownedAgents?: AgentListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -17982,9 +17689,6 @@ export namespace Prisma {
     walletAddress?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownedGames?: GameOrderByRelationAggregateInput
-    managedGames?: GameOrderByRelationAggregateInput
-    ownedAgents?: AgentOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -17998,9 +17702,6 @@ export namespace Prisma {
     walletAddress?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    ownedGames?: GameListRelationFilter
-    managedGames?: GameListRelationFilter
-    ownedAgents?: AgentListRelationFilter
   }, "id" | "privyUserId" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -18045,8 +17746,6 @@ export namespace Prisma {
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
-    owner: UserCreateNestedOneWithoutOwnedGamesInput
-    managers?: UserCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameUncheckedCreateInput = {
@@ -18062,11 +17761,9 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    managers?: UserUncheckedCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameUpdateInput = {
@@ -18085,8 +17782,6 @@ export namespace Prisma {
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedGamesNestedInput
-    managers?: UserUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type GameUncheckedUpdateInput = {
@@ -18102,11 +17797,9 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    managers?: UserUncheckedUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type GameCreateManyInput = {
@@ -18122,7 +17815,6 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
   }
 
   export type GameUpdateManyMutationInput = {
@@ -18153,7 +17845,6 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AgentProfileCreateInput = {
@@ -18325,7 +18016,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -18337,7 +18027,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -18367,7 +18056,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -18379,7 +18067,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -18400,7 +18087,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
   }
 
   export type AgentUpdateManyMutationInput = {
@@ -18421,7 +18107,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type LocationCreateInput = {
@@ -19159,9 +18844,6 @@ export namespace Prisma {
     walletAddress?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownedGames?: GameCreateNestedManyWithoutOwnerInput
-    managedGames?: GameCreateNestedManyWithoutManagersInput
-    ownedAgents?: AgentCreateNestedManyWithoutOwnerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -19172,9 +18854,6 @@ export namespace Prisma {
     walletAddress?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownedGames?: GameUncheckedCreateNestedManyWithoutOwnerInput
-    managedGames?: GameUncheckedCreateNestedManyWithoutManagersInput
-    ownedAgents?: AgentUncheckedCreateNestedManyWithoutOwnerInput
   }
 
   export type UserUpdateInput = {
@@ -19185,9 +18864,6 @@ export namespace Prisma {
     walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownedGames?: GameUpdateManyWithoutOwnerNestedInput
-    managedGames?: GameUpdateManyWithoutManagersNestedInput
-    ownedAgents?: AgentUpdateManyWithoutOwnerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -19198,9 +18874,6 @@ export namespace Prisma {
     walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownedGames?: GameUncheckedUpdateManyWithoutOwnerNestedInput
-    managedGames?: GameUncheckedUpdateManyWithoutManagersNestedInput
-    ownedAgents?: AgentUncheckedUpdateManyWithoutOwnerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -19315,17 +18988,6 @@ export namespace Prisma {
     none?: BattleWhereInput
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
-  }
-
-  export type UserListRelationFilter = {
-    every?: UserWhereInput
-    some?: UserWhereInput
-    none?: UserWhereInput
-  }
-
   export type AgentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -19335,10 +18997,6 @@ export namespace Prisma {
   }
 
   export type BattleOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19355,7 +19013,6 @@ export namespace Prisma {
     dailyRewardTokens?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
   }
 
   export type GameAvgOrderByAggregateInput = {
@@ -19378,7 +19035,6 @@ export namespace Prisma {
     dailyRewardTokens?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
   }
 
   export type GameMinOrderByAggregateInput = {
@@ -19394,7 +19050,6 @@ export namespace Prisma {
     dailyRewardTokens?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
   }
 
   export type GameSumOrderByAggregateInput = {
@@ -19640,7 +19295,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     gameId?: SortOrder
-    ownerId?: SortOrder
   }
 
   export type AgentAvgOrderByAggregateInput = {
@@ -19657,7 +19311,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     gameId?: SortOrder
-    ownerId?: SortOrder
   }
 
   export type AgentMinOrderByAggregateInput = {
@@ -19669,7 +19322,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     gameId?: SortOrder
-    ownerId?: SortOrder
   }
 
   export type AgentSumOrderByAggregateInput = {
@@ -20275,16 +19927,6 @@ export namespace Prisma {
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
   }
 
-  export type GameListRelationFilter = {
-    every?: GameWhereInput
-    some?: GameWhereInput
-    none?: GameWhereInput
-  }
-
-  export type GameOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     privyUserId?: SortOrder
@@ -20346,18 +19988,6 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type UserCreateNestedOneWithoutOwnedGamesInput = {
-    create?: XOR<UserCreateWithoutOwnedGamesInput, UserUncheckedCreateWithoutOwnedGamesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutOwnedGamesInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type UserCreateNestedManyWithoutManagedGamesInput = {
-    create?: XOR<UserCreateWithoutManagedGamesInput, UserUncheckedCreateWithoutManagedGamesInput> | UserCreateWithoutManagedGamesInput[] | UserUncheckedCreateWithoutManagedGamesInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutManagedGamesInput | UserCreateOrConnectWithoutManagedGamesInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-  }
-
   export type AgentUncheckedCreateNestedManyWithoutGameInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -20377,12 +20007,6 @@ export namespace Prisma {
     connectOrCreate?: BattleCreateOrConnectWithoutGameInput | BattleCreateOrConnectWithoutGameInput[]
     createMany?: BattleCreateManyGameInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-  }
-
-  export type UserUncheckedCreateNestedManyWithoutManagedGamesInput = {
-    create?: XOR<UserCreateWithoutManagedGamesInput, UserUncheckedCreateWithoutManagedGamesInput> | UserCreateWithoutManagedGamesInput[] | UserUncheckedCreateWithoutManagedGamesInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutManagedGamesInput | UserCreateOrConnectWithoutManagedGamesInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -20463,27 +20087,6 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type UserUpdateOneRequiredWithoutOwnedGamesNestedInput = {
-    create?: XOR<UserCreateWithoutOwnedGamesInput, UserUncheckedCreateWithoutOwnedGamesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutOwnedGamesInput
-    upsert?: UserUpsertWithoutOwnedGamesInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOwnedGamesInput, UserUpdateWithoutOwnedGamesInput>, UserUncheckedUpdateWithoutOwnedGamesInput>
-  }
-
-  export type UserUpdateManyWithoutManagedGamesNestedInput = {
-    create?: XOR<UserCreateWithoutManagedGamesInput, UserUncheckedCreateWithoutManagedGamesInput> | UserCreateWithoutManagedGamesInput[] | UserUncheckedCreateWithoutManagedGamesInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutManagedGamesInput | UserCreateOrConnectWithoutManagedGamesInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutManagedGamesInput | UserUpsertWithWhereUniqueWithoutManagedGamesInput[]
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutManagedGamesInput | UserUpdateWithWhereUniqueWithoutManagedGamesInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutManagedGamesInput | UserUpdateManyWithWhereWithoutManagedGamesInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
-  }
-
   export type AgentUncheckedUpdateManyWithoutGameNestedInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -20524,19 +20127,6 @@ export namespace Prisma {
     update?: BattleUpdateWithWhereUniqueWithoutGameInput | BattleUpdateWithWhereUniqueWithoutGameInput[]
     updateMany?: BattleUpdateManyWithWhereWithoutGameInput | BattleUpdateManyWithWhereWithoutGameInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
-  }
-
-  export type UserUncheckedUpdateManyWithoutManagedGamesNestedInput = {
-    create?: XOR<UserCreateWithoutManagedGamesInput, UserUncheckedCreateWithoutManagedGamesInput> | UserCreateWithoutManagedGamesInput[] | UserUncheckedCreateWithoutManagedGamesInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutManagedGamesInput | UserCreateOrConnectWithoutManagedGamesInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutManagedGamesInput | UserUpsertWithWhereUniqueWithoutManagedGamesInput[]
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutManagedGamesInput | UserUpdateWithWhereUniqueWithoutManagedGamesInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutManagedGamesInput | UserUpdateManyWithWhereWithoutManagedGamesInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type AgentProfileCreatebioInput = {
@@ -20685,12 +20275,6 @@ export namespace Prisma {
     connectOrCreate?: BattleCreateOrConnectWithoutOpponentInput | BattleCreateOrConnectWithoutOpponentInput[]
     createMany?: BattleCreateManyOpponentInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-  }
-
-  export type UserCreateNestedOneWithoutOwnedAgentsInput = {
-    create?: XOR<UserCreateWithoutOwnedAgentsInput, UserUncheckedCreateWithoutOwnedAgentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutOwnedAgentsInput
-    connect?: UserWhereUniqueInput
   }
 
   export type LocationUncheckedCreateNestedOneWithoutAgentInput = {
@@ -20871,14 +20455,6 @@ export namespace Prisma {
     update?: BattleUpdateWithWhereUniqueWithoutOpponentInput | BattleUpdateWithWhereUniqueWithoutOpponentInput[]
     updateMany?: BattleUpdateManyWithWhereWithoutOpponentInput | BattleUpdateManyWithWhereWithoutOpponentInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
-  }
-
-  export type UserUpdateOneRequiredWithoutOwnedAgentsNestedInput = {
-    create?: XOR<UserCreateWithoutOwnedAgentsInput, UserUncheckedCreateWithoutOwnedAgentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutOwnedAgentsInput
-    upsert?: UserUpsertWithoutOwnedAgentsInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOwnedAgentsInput, UserUpdateWithoutOwnedAgentsInput>, UserUncheckedUpdateWithoutOwnedAgentsInput>
   }
 
   export type LocationUncheckedUpdateOneWithoutAgentNestedInput = {
@@ -21229,130 +20805,8 @@ export namespace Prisma {
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutStrategyInput, AgentUpdateWithoutStrategyInput>, AgentUncheckedUpdateWithoutStrategyInput>
   }
 
-  export type GameCreateNestedManyWithoutOwnerInput = {
-    create?: XOR<GameCreateWithoutOwnerInput, GameUncheckedCreateWithoutOwnerInput> | GameCreateWithoutOwnerInput[] | GameUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutOwnerInput | GameCreateOrConnectWithoutOwnerInput[]
-    createMany?: GameCreateManyOwnerInputEnvelope
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-  }
-
-  export type GameCreateNestedManyWithoutManagersInput = {
-    create?: XOR<GameCreateWithoutManagersInput, GameUncheckedCreateWithoutManagersInput> | GameCreateWithoutManagersInput[] | GameUncheckedCreateWithoutManagersInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutManagersInput | GameCreateOrConnectWithoutManagersInput[]
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-  }
-
-  export type AgentCreateNestedManyWithoutOwnerInput = {
-    create?: XOR<AgentCreateWithoutOwnerInput, AgentUncheckedCreateWithoutOwnerInput> | AgentCreateWithoutOwnerInput[] | AgentUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutOwnerInput | AgentCreateOrConnectWithoutOwnerInput[]
-    createMany?: AgentCreateManyOwnerInputEnvelope
-    connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-  }
-
-  export type GameUncheckedCreateNestedManyWithoutOwnerInput = {
-    create?: XOR<GameCreateWithoutOwnerInput, GameUncheckedCreateWithoutOwnerInput> | GameCreateWithoutOwnerInput[] | GameUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutOwnerInput | GameCreateOrConnectWithoutOwnerInput[]
-    createMany?: GameCreateManyOwnerInputEnvelope
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-  }
-
-  export type GameUncheckedCreateNestedManyWithoutManagersInput = {
-    create?: XOR<GameCreateWithoutManagersInput, GameUncheckedCreateWithoutManagersInput> | GameCreateWithoutManagersInput[] | GameUncheckedCreateWithoutManagersInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutManagersInput | GameCreateOrConnectWithoutManagersInput[]
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-  }
-
-  export type AgentUncheckedCreateNestedManyWithoutOwnerInput = {
-    create?: XOR<AgentCreateWithoutOwnerInput, AgentUncheckedCreateWithoutOwnerInput> | AgentCreateWithoutOwnerInput[] | AgentUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutOwnerInput | AgentCreateOrConnectWithoutOwnerInput[]
-    createMany?: AgentCreateManyOwnerInputEnvelope
-    connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-  }
-
   export type EnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole
-  }
-
-  export type GameUpdateManyWithoutOwnerNestedInput = {
-    create?: XOR<GameCreateWithoutOwnerInput, GameUncheckedCreateWithoutOwnerInput> | GameCreateWithoutOwnerInput[] | GameUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutOwnerInput | GameCreateOrConnectWithoutOwnerInput[]
-    upsert?: GameUpsertWithWhereUniqueWithoutOwnerInput | GameUpsertWithWhereUniqueWithoutOwnerInput[]
-    createMany?: GameCreateManyOwnerInputEnvelope
-    set?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    disconnect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    delete?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    update?: GameUpdateWithWhereUniqueWithoutOwnerInput | GameUpdateWithWhereUniqueWithoutOwnerInput[]
-    updateMany?: GameUpdateManyWithWhereWithoutOwnerInput | GameUpdateManyWithWhereWithoutOwnerInput[]
-    deleteMany?: GameScalarWhereInput | GameScalarWhereInput[]
-  }
-
-  export type GameUpdateManyWithoutManagersNestedInput = {
-    create?: XOR<GameCreateWithoutManagersInput, GameUncheckedCreateWithoutManagersInput> | GameCreateWithoutManagersInput[] | GameUncheckedCreateWithoutManagersInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutManagersInput | GameCreateOrConnectWithoutManagersInput[]
-    upsert?: GameUpsertWithWhereUniqueWithoutManagersInput | GameUpsertWithWhereUniqueWithoutManagersInput[]
-    set?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    disconnect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    delete?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    update?: GameUpdateWithWhereUniqueWithoutManagersInput | GameUpdateWithWhereUniqueWithoutManagersInput[]
-    updateMany?: GameUpdateManyWithWhereWithoutManagersInput | GameUpdateManyWithWhereWithoutManagersInput[]
-    deleteMany?: GameScalarWhereInput | GameScalarWhereInput[]
-  }
-
-  export type AgentUpdateManyWithoutOwnerNestedInput = {
-    create?: XOR<AgentCreateWithoutOwnerInput, AgentUncheckedCreateWithoutOwnerInput> | AgentCreateWithoutOwnerInput[] | AgentUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutOwnerInput | AgentCreateOrConnectWithoutOwnerInput[]
-    upsert?: AgentUpsertWithWhereUniqueWithoutOwnerInput | AgentUpsertWithWhereUniqueWithoutOwnerInput[]
-    createMany?: AgentCreateManyOwnerInputEnvelope
-    set?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    disconnect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    delete?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    update?: AgentUpdateWithWhereUniqueWithoutOwnerInput | AgentUpdateWithWhereUniqueWithoutOwnerInput[]
-    updateMany?: AgentUpdateManyWithWhereWithoutOwnerInput | AgentUpdateManyWithWhereWithoutOwnerInput[]
-    deleteMany?: AgentScalarWhereInput | AgentScalarWhereInput[]
-  }
-
-  export type GameUncheckedUpdateManyWithoutOwnerNestedInput = {
-    create?: XOR<GameCreateWithoutOwnerInput, GameUncheckedCreateWithoutOwnerInput> | GameCreateWithoutOwnerInput[] | GameUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutOwnerInput | GameCreateOrConnectWithoutOwnerInput[]
-    upsert?: GameUpsertWithWhereUniqueWithoutOwnerInput | GameUpsertWithWhereUniqueWithoutOwnerInput[]
-    createMany?: GameCreateManyOwnerInputEnvelope
-    set?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    disconnect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    delete?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    update?: GameUpdateWithWhereUniqueWithoutOwnerInput | GameUpdateWithWhereUniqueWithoutOwnerInput[]
-    updateMany?: GameUpdateManyWithWhereWithoutOwnerInput | GameUpdateManyWithWhereWithoutOwnerInput[]
-    deleteMany?: GameScalarWhereInput | GameScalarWhereInput[]
-  }
-
-  export type GameUncheckedUpdateManyWithoutManagersNestedInput = {
-    create?: XOR<GameCreateWithoutManagersInput, GameUncheckedCreateWithoutManagersInput> | GameCreateWithoutManagersInput[] | GameUncheckedCreateWithoutManagersInput[]
-    connectOrCreate?: GameCreateOrConnectWithoutManagersInput | GameCreateOrConnectWithoutManagersInput[]
-    upsert?: GameUpsertWithWhereUniqueWithoutManagersInput | GameUpsertWithWhereUniqueWithoutManagersInput[]
-    set?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    disconnect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    delete?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    connect?: GameWhereUniqueInput | GameWhereUniqueInput[]
-    update?: GameUpdateWithWhereUniqueWithoutManagersInput | GameUpdateWithWhereUniqueWithoutManagersInput[]
-    updateMany?: GameUpdateManyWithWhereWithoutManagersInput | GameUpdateManyWithWhereWithoutManagersInput[]
-    deleteMany?: GameScalarWhereInput | GameScalarWhereInput[]
-  }
-
-  export type AgentUncheckedUpdateManyWithoutOwnerNestedInput = {
-    create?: XOR<AgentCreateWithoutOwnerInput, AgentUncheckedCreateWithoutOwnerInput> | AgentCreateWithoutOwnerInput[] | AgentUncheckedCreateWithoutOwnerInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutOwnerInput | AgentCreateOrConnectWithoutOwnerInput[]
-    upsert?: AgentUpsertWithWhereUniqueWithoutOwnerInput | AgentUpsertWithWhereUniqueWithoutOwnerInput[]
-    createMany?: AgentCreateManyOwnerInputEnvelope
-    set?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    disconnect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    delete?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    update?: AgentUpdateWithWhereUniqueWithoutOwnerInput | AgentUpdateWithWhereUniqueWithoutOwnerInput[]
-    updateMany?: AgentUpdateManyWithWhereWithoutOwnerInput | AgentUpdateManyWithWhereWithoutOwnerInput[]
-    deleteMany?: AgentScalarWhereInput | AgentScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -21701,7 +21155,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
@@ -21712,7 +21165,6 @@ export namespace Prisma {
     health?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -21804,64 +21256,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserCreateWithoutOwnedGamesInput = {
-    id: string
-    privyUserId: string
-    role?: $Enums.UserRole
-    email?: string | null
-    walletAddress?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    managedGames?: GameCreateNestedManyWithoutManagersInput
-    ownedAgents?: AgentCreateNestedManyWithoutOwnerInput
-  }
-
-  export type UserUncheckedCreateWithoutOwnedGamesInput = {
-    id: string
-    privyUserId: string
-    role?: $Enums.UserRole
-    email?: string | null
-    walletAddress?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    managedGames?: GameUncheckedCreateNestedManyWithoutManagersInput
-    ownedAgents?: AgentUncheckedCreateNestedManyWithoutOwnerInput
-  }
-
-  export type UserCreateOrConnectWithoutOwnedGamesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutOwnedGamesInput, UserUncheckedCreateWithoutOwnedGamesInput>
-  }
-
-  export type UserCreateWithoutManagedGamesInput = {
-    id: string
-    privyUserId: string
-    role?: $Enums.UserRole
-    email?: string | null
-    walletAddress?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    ownedGames?: GameCreateNestedManyWithoutOwnerInput
-    ownedAgents?: AgentCreateNestedManyWithoutOwnerInput
-  }
-
-  export type UserUncheckedCreateWithoutManagedGamesInput = {
-    id: string
-    privyUserId: string
-    role?: $Enums.UserRole
-    email?: string | null
-    walletAddress?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    ownedGames?: GameUncheckedCreateNestedManyWithoutOwnerInput
-    ownedAgents?: AgentUncheckedCreateNestedManyWithoutOwnerInput
-  }
-
-  export type UserCreateOrConnectWithoutManagedGamesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutManagedGamesInput, UserUncheckedCreateWithoutManagedGamesInput>
-  }
-
   export type AgentUpsertWithWhereUniqueWithoutGameInput = {
     where: AgentWhereUniqueInput
     update: XOR<AgentUpdateWithoutGameInput, AgentUncheckedUpdateWithoutGameInput>
@@ -21890,7 +21284,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Agent"> | Date | string
     updatedAt?: DateTimeFilter<"Agent"> | Date | string
     gameId?: StringFilter<"Agent"> | string
-    ownerId?: StringFilter<"Agent"> | string
   }
 
   export type AllianceUpsertWithWhereUniqueWithoutGameInput = {
@@ -21958,70 +21351,6 @@ export namespace Prisma {
     resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
   }
 
-  export type UserUpsertWithoutOwnedGamesInput = {
-    update: XOR<UserUpdateWithoutOwnedGamesInput, UserUncheckedUpdateWithoutOwnedGamesInput>
-    create: XOR<UserCreateWithoutOwnedGamesInput, UserUncheckedCreateWithoutOwnedGamesInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutOwnedGamesInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutOwnedGamesInput, UserUncheckedUpdateWithoutOwnedGamesInput>
-  }
-
-  export type UserUpdateWithoutOwnedGamesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    managedGames?: GameUpdateManyWithoutManagersNestedInput
-    ownedAgents?: AgentUpdateManyWithoutOwnerNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutOwnedGamesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    managedGames?: GameUncheckedUpdateManyWithoutManagersNestedInput
-    ownedAgents?: AgentUncheckedUpdateManyWithoutOwnerNestedInput
-  }
-
-  export type UserUpsertWithWhereUniqueWithoutManagedGamesInput = {
-    where: UserWhereUniqueInput
-    update: XOR<UserUpdateWithoutManagedGamesInput, UserUncheckedUpdateWithoutManagedGamesInput>
-    create: XOR<UserCreateWithoutManagedGamesInput, UserUncheckedCreateWithoutManagedGamesInput>
-  }
-
-  export type UserUpdateWithWhereUniqueWithoutManagedGamesInput = {
-    where: UserWhereUniqueInput
-    data: XOR<UserUpdateWithoutManagedGamesInput, UserUncheckedUpdateWithoutManagedGamesInput>
-  }
-
-  export type UserUpdateManyWithWhereWithoutManagedGamesInput = {
-    where: UserScalarWhereInput
-    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutManagedGamesInput>
-  }
-
-  export type UserScalarWhereInput = {
-    AND?: UserScalarWhereInput | UserScalarWhereInput[]
-    OR?: UserScalarWhereInput[]
-    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
-    id?: StringFilter<"User"> | string
-    privyUserId?: StringFilter<"User"> | string
-    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
-    email?: StringNullableFilter<"User"> | string | null
-    walletAddress?: StringNullableFilter<"User"> | string | null
-    createdAt?: DateTimeFilter<"User"> | Date | string
-    updatedAt?: DateTimeFilter<"User"> | Date | string
-  }
-
   export type AgentCreateWithoutAgentProfileInput = {
     id?: string
     agentId: number
@@ -22039,7 +21368,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutAgentProfileInput = {
@@ -22050,7 +21378,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -22150,8 +21477,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
-    owner: UserCreateNestedOneWithoutOwnedGamesInput
-    managers?: UserCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameUncheckedCreateWithoutAgentsInput = {
@@ -22167,10 +21492,8 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    managers?: UserUncheckedCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameCreateOrConnectWithoutAgentsInput = {
@@ -22425,35 +21748,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserCreateWithoutOwnedAgentsInput = {
-    id: string
-    privyUserId: string
-    role?: $Enums.UserRole
-    email?: string | null
-    walletAddress?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    ownedGames?: GameCreateNestedManyWithoutOwnerInput
-    managedGames?: GameCreateNestedManyWithoutManagersInput
-  }
-
-  export type UserUncheckedCreateWithoutOwnedAgentsInput = {
-    id: string
-    privyUserId: string
-    role?: $Enums.UserRole
-    email?: string | null
-    walletAddress?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    ownedGames?: GameUncheckedCreateNestedManyWithoutOwnerInput
-    managedGames?: GameUncheckedCreateNestedManyWithoutManagersInput
-  }
-
-  export type UserCreateOrConnectWithoutOwnedAgentsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutOwnedAgentsInput, UserUncheckedCreateWithoutOwnedAgentsInput>
-  }
-
   export type AgentProfileUpsertWithoutAgentInput = {
     update: XOR<AgentProfileUpdateWithoutAgentInput, AgentProfileUncheckedUpdateWithoutAgentInput>
     create: XOR<AgentProfileCreateWithoutAgentInput, AgentProfileUncheckedCreateWithoutAgentInput>
@@ -22533,8 +21827,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedGamesNestedInput
-    managers?: UserUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAgentsInput = {
@@ -22550,10 +21842,8 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    managers?: UserUncheckedUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type LocationUpsertWithoutAgentInput = {
@@ -22772,41 +22062,6 @@ export namespace Prisma {
     data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutOpponentInput>
   }
 
-  export type UserUpsertWithoutOwnedAgentsInput = {
-    update: XOR<UserUpdateWithoutOwnedAgentsInput, UserUncheckedUpdateWithoutOwnedAgentsInput>
-    create: XOR<UserCreateWithoutOwnedAgentsInput, UserUncheckedCreateWithoutOwnedAgentsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutOwnedAgentsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutOwnedAgentsInput, UserUncheckedUpdateWithoutOwnedAgentsInput>
-  }
-
-  export type UserUpdateWithoutOwnedAgentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownedGames?: GameUpdateManyWithoutOwnerNestedInput
-    managedGames?: GameUpdateManyWithoutManagersNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutOwnedAgentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownedGames?: GameUncheckedUpdateManyWithoutOwnerNestedInput
-    managedGames?: GameUncheckedUpdateManyWithoutManagersNestedInput
-  }
-
   export type AgentCreateWithoutLocationInput = {
     id?: string
     agentId: number
@@ -22824,7 +22079,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutLocationInput = {
@@ -22836,7 +22090,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
     community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
@@ -22880,7 +22133,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutLocationInput = {
@@ -22892,7 +22144,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
     community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
@@ -22918,8 +22169,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
-    owner: UserCreateNestedOneWithoutOwnedGamesInput
-    managers?: UserCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameUncheckedCreateWithoutAlliancesInput = {
@@ -22935,10 +22184,8 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    managers?: UserUncheckedCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameCreateOrConnectWithoutAlliancesInput = {
@@ -22963,7 +22210,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutCurrentAllianceInput = {
@@ -22975,7 +22221,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
     community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
@@ -23008,7 +22253,6 @@ export namespace Prisma {
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutAlliedByInput = {
@@ -23020,7 +22264,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -23062,8 +22305,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedGamesNestedInput
-    managers?: UserUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAlliancesInput = {
@@ -23079,10 +22320,8 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    managers?: UserUncheckedUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type AgentUpsertWithoutCurrentAllianceInput = {
@@ -23113,7 +22352,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCurrentAllianceInput = {
@@ -23125,7 +22363,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
     community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
@@ -23164,7 +22401,6 @@ export namespace Prisma {
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutAlliedByInput = {
@@ -23176,7 +22412,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -23202,8 +22437,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
-    owner: UserCreateNestedOneWithoutOwnedGamesInput
-    managers?: UserCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameUncheckedCreateWithoutBattlesInput = {
@@ -23219,10 +22452,8 @@ export namespace Prisma {
     dailyRewardTokens: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
-    managers?: UserUncheckedCreateNestedManyWithoutManagedGamesInput
   }
 
   export type GameCreateOrConnectWithoutBattlesInput = {
@@ -23247,7 +22478,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesInput = {
@@ -23259,7 +22489,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
@@ -23292,7 +22521,6 @@ export namespace Prisma {
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsOpponentInput = {
@@ -23304,7 +22532,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -23346,8 +22573,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedGamesNestedInput
-    managers?: UserUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type GameUncheckedUpdateWithoutBattlesInput = {
@@ -23363,10 +22588,8 @@ export namespace Prisma {
     dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
-    managers?: UserUncheckedUpdateManyWithoutManagedGamesNestedInput
   }
 
   export type AgentUpsertWithoutBattlesInput = {
@@ -23397,7 +22620,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesInput = {
@@ -23409,7 +22631,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
@@ -23448,7 +22669,6 @@ export namespace Prisma {
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsOpponentInput = {
@@ -23460,7 +22680,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -23488,7 +22707,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutCommunityInput = {
@@ -23500,7 +22718,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -23618,7 +22835,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCommunityInput = {
@@ -23630,7 +22846,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -23766,7 +22981,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutStateInput = {
@@ -23778,7 +22992,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -23822,7 +23035,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutStateInput = {
@@ -23834,7 +23046,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -23862,7 +23073,6 @@ export namespace Prisma {
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutCooldownsInput = {
@@ -23874,7 +23084,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -23918,7 +23127,6 @@ export namespace Prisma {
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCooldownsInput = {
@@ -23930,7 +23138,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -23958,7 +23165,6 @@ export namespace Prisma {
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    owner: UserCreateNestedOneWithoutOwnedAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutStrategyInput = {
@@ -23970,7 +23176,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
@@ -24014,7 +23219,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutStrategyInput = {
@@ -24026,7 +23230,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -24037,214 +23240,6 @@ export namespace Prisma {
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
   }
 
-  export type GameCreateWithoutOwnerInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agents?: AgentCreateNestedManyWithoutGameInput
-    alliances?: AllianceCreateNestedManyWithoutGameInput
-    battles?: BattleCreateNestedManyWithoutGameInput
-    managers?: UserCreateNestedManyWithoutManagedGamesInput
-  }
-
-  export type GameUncheckedCreateWithoutOwnerInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agents?: AgentUncheckedCreateNestedManyWithoutGameInput
-    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
-    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    managers?: UserUncheckedCreateNestedManyWithoutManagedGamesInput
-  }
-
-  export type GameCreateOrConnectWithoutOwnerInput = {
-    where: GameWhereUniqueInput
-    create: XOR<GameCreateWithoutOwnerInput, GameUncheckedCreateWithoutOwnerInput>
-  }
-
-  export type GameCreateManyOwnerInputEnvelope = {
-    data: GameCreateManyOwnerInput | GameCreateManyOwnerInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type GameCreateWithoutManagersInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agents?: AgentCreateNestedManyWithoutGameInput
-    alliances?: AllianceCreateNestedManyWithoutGameInput
-    battles?: BattleCreateNestedManyWithoutGameInput
-    owner: UserCreateNestedOneWithoutOwnedGamesInput
-  }
-
-  export type GameUncheckedCreateWithoutManagersInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    ownerId: string
-    agents?: AgentUncheckedCreateNestedManyWithoutGameInput
-    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
-    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-  }
-
-  export type GameCreateOrConnectWithoutManagersInput = {
-    where: GameWhereUniqueInput
-    create: XOR<GameCreateWithoutManagersInput, GameUncheckedCreateWithoutManagersInput>
-  }
-
-  export type AgentCreateWithoutOwnerInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-  }
-
-  export type AgentUncheckedCreateWithoutOwnerInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-  }
-
-  export type AgentCreateOrConnectWithoutOwnerInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutOwnerInput, AgentUncheckedCreateWithoutOwnerInput>
-  }
-
-  export type AgentCreateManyOwnerInputEnvelope = {
-    data: AgentCreateManyOwnerInput | AgentCreateManyOwnerInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type GameUpsertWithWhereUniqueWithoutOwnerInput = {
-    where: GameWhereUniqueInput
-    update: XOR<GameUpdateWithoutOwnerInput, GameUncheckedUpdateWithoutOwnerInput>
-    create: XOR<GameCreateWithoutOwnerInput, GameUncheckedCreateWithoutOwnerInput>
-  }
-
-  export type GameUpdateWithWhereUniqueWithoutOwnerInput = {
-    where: GameWhereUniqueInput
-    data: XOR<GameUpdateWithoutOwnerInput, GameUncheckedUpdateWithoutOwnerInput>
-  }
-
-  export type GameUpdateManyWithWhereWithoutOwnerInput = {
-    where: GameScalarWhereInput
-    data: XOR<GameUpdateManyMutationInput, GameUncheckedUpdateManyWithoutOwnerInput>
-  }
-
-  export type GameScalarWhereInput = {
-    AND?: GameScalarWhereInput | GameScalarWhereInput[]
-    OR?: GameScalarWhereInput[]
-    NOT?: GameScalarWhereInput | GameScalarWhereInput[]
-    id?: StringFilter<"Game"> | string
-    gameId?: BigIntFilter<"Game"> | bigint | number
-    authority?: StringFilter<"Game"> | string
-    tokenMint?: StringFilter<"Game"> | string
-    rewardsVault?: StringFilter<"Game"> | string
-    mapDiameter?: IntFilter<"Game"> | number
-    isActive?: BoolFilter<"Game"> | boolean
-    lastUpdate?: DateTimeFilter<"Game"> | Date | string
-    bump?: IntFilter<"Game"> | number
-    dailyRewardTokens?: FloatFilter<"Game"> | number
-    createdAt?: DateTimeFilter<"Game"> | Date | string
-    updatedAt?: DateTimeFilter<"Game"> | Date | string
-    ownerId?: StringFilter<"Game"> | string
-  }
-
-  export type GameUpsertWithWhereUniqueWithoutManagersInput = {
-    where: GameWhereUniqueInput
-    update: XOR<GameUpdateWithoutManagersInput, GameUncheckedUpdateWithoutManagersInput>
-    create: XOR<GameCreateWithoutManagersInput, GameUncheckedCreateWithoutManagersInput>
-  }
-
-  export type GameUpdateWithWhereUniqueWithoutManagersInput = {
-    where: GameWhereUniqueInput
-    data: XOR<GameUpdateWithoutManagersInput, GameUncheckedUpdateWithoutManagersInput>
-  }
-
-  export type GameUpdateManyWithWhereWithoutManagersInput = {
-    where: GameScalarWhereInput
-    data: XOR<GameUpdateManyMutationInput, GameUncheckedUpdateManyWithoutManagersInput>
-  }
-
-  export type AgentUpsertWithWhereUniqueWithoutOwnerInput = {
-    where: AgentWhereUniqueInput
-    update: XOR<AgentUpdateWithoutOwnerInput, AgentUncheckedUpdateWithoutOwnerInput>
-    create: XOR<AgentCreateWithoutOwnerInput, AgentUncheckedCreateWithoutOwnerInput>
-  }
-
-  export type AgentUpdateWithWhereUniqueWithoutOwnerInput = {
-    where: AgentWhereUniqueInput
-    data: XOR<AgentUpdateWithoutOwnerInput, AgentUncheckedUpdateWithoutOwnerInput>
-  }
-
-  export type AgentUpdateManyWithWhereWithoutOwnerInput = {
-    where: AgentScalarWhereInput
-    data: XOR<AgentUpdateManyMutationInput, AgentUncheckedUpdateManyWithoutOwnerInput>
-  }
-
   export type AgentCreateManyGameInput = {
     id?: string
     agentId: number
@@ -24253,7 +23248,6 @@ export namespace Prisma {
     health?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
   }
 
   export type AllianceCreateManyGameInput = {
@@ -24298,7 +23292,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
@@ -24309,7 +23302,6 @@ export namespace Prisma {
     health?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -24329,7 +23321,6 @@ export namespace Prisma {
     health?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceUpdateWithoutGameInput = {
@@ -24407,40 +23398,6 @@ export namespace Prisma {
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type UserUpdateWithoutManagedGamesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownedGames?: GameUpdateManyWithoutOwnerNestedInput
-    ownedAgents?: AgentUpdateManyWithoutOwnerNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutManagedGamesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownedGames?: GameUncheckedUpdateManyWithoutOwnerNestedInput
-    ownedAgents?: AgentUncheckedUpdateManyWithoutOwnerNestedInput
-  }
-
-  export type UserUncheckedUpdateManyWithoutManagedGamesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    privyUserId?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type AgentCreateManyAgentProfileInput = {
     id?: string
     agentId: number
@@ -24449,7 +23406,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     gameId: string
-    ownerId: string
   }
 
   export type AgentUpdateWithoutAgentProfileInput = {
@@ -24469,7 +23425,6 @@ export namespace Prisma {
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutAgentProfileInput = {
@@ -24480,7 +23435,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
@@ -24500,7 +23454,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type BattleCreateManyAgentInput = {
@@ -24821,190 +23774,6 @@ export namespace Prisma {
     authorReliability?: FloatFieldUpdateOperationsInput | number
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type GameCreateManyOwnerInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type AgentCreateManyOwnerInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-  }
-
-  export type GameUpdateWithoutOwnerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agents?: AgentUpdateManyWithoutGameNestedInput
-    alliances?: AllianceUpdateManyWithoutGameNestedInput
-    battles?: BattleUpdateManyWithoutGameNestedInput
-    managers?: UserUpdateManyWithoutManagedGamesNestedInput
-  }
-
-  export type GameUncheckedUpdateWithoutOwnerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
-    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    managers?: UserUncheckedUpdateManyWithoutManagedGamesNestedInput
-  }
-
-  export type GameUncheckedUpdateManyWithoutOwnerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type GameUpdateWithoutManagersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agents?: AgentUpdateManyWithoutGameNestedInput
-    alliances?: AllianceUpdateManyWithoutGameNestedInput
-    battles?: BattleUpdateManyWithoutGameNestedInput
-    owner?: UserUpdateOneRequiredWithoutOwnedGamesNestedInput
-  }
-
-  export type GameUncheckedUpdateWithoutManagersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
-    agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
-    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-  }
-
-  export type GameUncheckedUpdateManyWithoutManagersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type AgentUpdateWithoutOwnerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutOwnerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-  }
-
-  export type AgentUncheckedUpdateManyWithoutOwnerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
   }
 
 

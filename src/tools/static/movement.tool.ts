@@ -18,30 +18,11 @@ export const movementTool = (result: GenerateContextStringResult) => {
 
   return tool({
     description: `Movement Tool for navigating Middle Earth's game world.
-
-Features:
+what you can do:
 - Move to specific coordinates
 - Navigate different terrains (plains, mountains, rivers)
-- Calculate movement costs
-- Handle movement cooldowns
-- Avoid obstacles and other agents
 - Strategic positioning
-
-TERRAIN EFFECTS:
-- Plains: Normal movement
-- Mountains: Slower movement, defensive advantage
-- Rivers: Restricted movement, strategic crossing points
-
-COOLDOWN:
-- Each movement has a cooldown period
-- Cooldown varies by terrain type
-- Must wait for cooldown to expire before next move
-
-STRATEGIC CONSIDERATIONS:
-- Position affects battle outcomes
-- Terrain provides tactical advantages
-- Movement reveals position to others
-- Consider alliance proximity`,
+`,
 
     parameters: z.object({
       destination: z

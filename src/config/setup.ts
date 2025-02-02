@@ -7,6 +7,7 @@ import { prisma } from "./prisma";
 import { TerrainType, UserRole } from "@prisma/client";
 import { getRandomCoordinatesWithTerrainType } from "@/constants";
 import { prismaUUID, profiles } from "./game-data";
+const randTest = prismaUUID();
 
 export const createNextGame = async () => {
   logger.info(`🎮 Initializing new game world`);
@@ -46,7 +47,6 @@ export const createNextGame = async () => {
             dailyRewardTokens: gameAccount.dailyRewardTokens.toNumber(),
             createdAt: new Date(),
             updatedAt: new Date(),
-            ownerId: "1",
           },
         });
 
@@ -114,17 +114,6 @@ export const createNextGame = async () => {
                   supporterCount: 0,
                   lastInfluenceTime: new Date(),
                   influenceScore: 0,
-                },
-              },
-              owner: {
-                create: {
-                  id: prismaUUID(),
-                  privyUserId: `Random-${Math.random()
-                    .toString(36)
-                    .substring(2, 15)}`,
-                  role: UserRole.ADMIN,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
                 },
               },
             },

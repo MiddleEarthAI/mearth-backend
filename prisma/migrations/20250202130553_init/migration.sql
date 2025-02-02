@@ -10,10 +10,13 @@ CREATE TYPE "BattleStatus" AS ENUM ('Active', 'Resolved', 'Failed');
 -- CreateEnum
 CREATE TYPE "BattleType" AS ENUM ('Simple', 'AgentVsAlliance', 'AllianceVsAlliance');
 
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'MANAGER', 'USER');
+
 -- CreateTable
 CREATE TABLE "Game" (
     "id" TEXT NOT NULL,
-    "gameId" INTEGER NOT NULL,
+    "gameId" BIGINT NOT NULL,
     "authority" TEXT NOT NULL,
     "tokenMint" TEXT NOT NULL,
     "rewardsVault" TEXT NOT NULL,
@@ -31,6 +34,7 @@ CREATE TABLE "Game" (
 -- CreateTable
 CREATE TABLE "AgentProfile" (
     "id" TEXT NOT NULL,
+    "onchainId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "xHandle" TEXT NOT NULL,
     "bio" TEXT[],
@@ -47,7 +51,6 @@ CREATE TABLE "AgentProfile" (
     "followerMultiplier" DOUBLE PRECISION NOT NULL,
     "engagementMultiplier" DOUBLE PRECISION NOT NULL,
     "consensusMultiplier" DOUBLE PRECISION NOT NULL,
-    "agentId" TEXT NOT NULL,
 
     CONSTRAINT "AgentProfile_pkey" PRIMARY KEY ("id")
 );
@@ -56,9 +59,9 @@ CREATE TABLE "AgentProfile" (
 CREATE TABLE "Agent" (
     "id" TEXT NOT NULL,
     "agentId" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
     "publicKey" TEXT NOT NULL,
     "agentProfileId" TEXT NOT NULL,
+    "health" INTEGER NOT NULL DEFAULT 100,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "gameId" TEXT NOT NULL,
@@ -195,14 +198,27 @@ CREATE TABLE "Strategy" (
     CONSTRAINT "Strategy_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "privyUserId" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "email" TEXT,
+    "walletAddress" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Game_gameId_key" ON "Game"("gameId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AgentProfile_xHandle_key" ON "AgentProfile"("xHandle");
+CREATE UNIQUE INDEX "AgentProfile_onchainId_key" ON "AgentProfile"("onchainId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AgentProfile_agentId_key" ON "AgentProfile"("agentId");
+CREATE UNIQUE INDEX "AgentProfile_xHandle_key" ON "AgentProfile"("xHandle");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Agent_agentId_gameId_key" ON "Agent"("agentId", "gameId");
@@ -233,6 +249,12 @@ CREATE UNIQUE INDEX "Cooldown_agentId_targetAgentId_type_key" ON "Cooldown"("age
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Strategy_agentId_key" ON "Strategy"("agentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_privyUserId_key" ON "User"("privyUserId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_agentProfileId_fkey" FOREIGN KEY ("agentProfileId") REFERENCES "AgentProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

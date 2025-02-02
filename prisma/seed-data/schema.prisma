@@ -34,9 +34,9 @@ model Game {
   battles   Battle[] // One game has many battles
 
   // Add these new fields
-  ownerId  String
-  owner    User   @relation("GameOwner", fields: [ownerId], references: [id])
-  managers User[] @relation("GameManager")
+  // ownerId String
+  // owner    User   @relation("GameOwner", fields: [ownerId], references: [id])
+  // managers User[] @relation("GameManager")
 }
 
 model AgentProfile {
@@ -92,8 +92,8 @@ model Agent {
   battlesAsOpponent Battle[]   @relation("OpponentAgent")
 
   // Add these new fields
-  ownerId String
-  owner   User   @relation("AgentOwner", fields: [ownerId], references: [id])
+  // ownerId String
+  // owner   User   @relation("AgentOwner", fields: [ownerId], references: [id])
 
   // Composite unique constraints
   @@unique([agentId, gameId])
@@ -287,9 +287,9 @@ model User {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  ownedGames   Game[]  @relation("GameOwner")
-  managedGames Game[]  @relation("GameManager")
-  ownedAgents  Agent[] @relation("AgentOwner")
+  // ownedGames   Game[]  @relation("GameOwner")
+  // managedGames Game[]  @relation("GameManager")
+  // ownedAgents  Agent[] @relation("AgentOwner")
 }
 
 enum UserRole {

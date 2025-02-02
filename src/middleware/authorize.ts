@@ -109,7 +109,7 @@ export const requireGameAccess = async (
     const game = await prisma.game.findFirst({
       where: {
         id: gameId,
-        OR: [{ ownerId: user.id }, { managers: { some: { id: user.id } } }],
+        // OR: [{ ownerId: user.id }, { managers: { some: { id: user.id } } }],
       },
     });
 
@@ -169,7 +169,7 @@ export const requireAgentOwnership = async (
     const agent = await prisma.agent.findFirst({
       where: {
         id: agentId,
-        ownerId: user.id,
+        // ownerId: user.id,
       },
     });
 

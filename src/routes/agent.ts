@@ -1,17 +1,12 @@
 import { registerAgent } from "@/instructionUtils/agent";
-import { validateZod } from "@/middleware/validateZod";
 import { privyAuth, AuthenticatedRequest } from "@/middleware/privy-auth";
-import {
-  requireGameAccess,
-  requireAgentOwnership,
-} from "@/middleware/authorize";
+import { requireAgentOwnership } from "@/middleware/authorize";
 import { registerAgentSchema } from "@/schemas/agent";
 import { logger } from "@/utils/logger";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 import { Router, Response } from "express";
-import { prisma } from "@/config/prisma";
 
 const router = Router();
 
@@ -28,23 +23,13 @@ const router = Router();
  */
 router.post(
   "/register",
-  [privyAuth, requireGameAccess, validateZod(registerAgentSchema)],
+  // [privyAuth, requireGameAccess, validateZod(registerAgentSchema)],
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { gameId, agentId, x, y, name } = req.body;
       const program = await getProgramWithWallet();
 
       const tx = await registerAgent(gameId, agentId, x, y, name);
-
-      // Create agent record with ownership
-      await prisma.agent.create({
-        data: {
-          id: agentId.toString(),
-          ownerId: req.user!.id,
-          gameId: gameId.toString(),
-          publicKey: "",
-        },
-      });
 
       logger.info(`✨ Successfully registered agent ${name} (ID: ${agentId})`);
       res.json({

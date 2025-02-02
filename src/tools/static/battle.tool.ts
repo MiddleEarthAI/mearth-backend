@@ -37,9 +37,7 @@ export const battleTool = (result: GenerateContextStringResult) =>
 Features:
 - Initiate battles (Simple, Agent vs Alliance, Alliance vs Alliance)
 - Enforce cooldown periods between battles (1 hour)
-- Calculate outcomes based on staked tokens
-- Transfer tokens between winners/losers
-- Track battle history`,
+`,
     parameters: z.object({
       targetAgentXHandle: z
         .enum(["scootlesAI", "purrlockpawsAI", "wanderleafAI", "sirgullihopAI"])

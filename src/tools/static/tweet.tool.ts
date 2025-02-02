@@ -18,6 +18,7 @@ export enum TweetType {
  * Creates a sophisticated tweet tool for agents to engage in Middle Earth's social landscape
  * Integrates with onchain battle system and maintains social graph in database
  */
+
 export const tweetTool = async ({
   result,
   twitterApi,
@@ -25,107 +26,7 @@ export const tweetTool = async ({
   result: GenerateContextStringResult;
   twitterApi: TwitterApi;
 }) => {
-  // Fetch comprehensive agent state including battle/alliance history
-  // const agent = await prisma.agent.findUnique({
-  //   where: {
-  //     agentId_gameId: {
-  //       agentId: result.currentAgent.agentId,
-  //       gameId: result.currentAgent.gameId,
-  //     },
-  //   },
-  //   include: {
-  //     location: true,
-  //     agentProfile: true,
-  //     community: {
-  //       include: {
-  //         interactions: {
-  //           orderBy: { timestamp: "desc" },
-  //           take: 5,
-  //         },
-  //       },
-  //     },
-  //     currentAlliance: true,
-  //     battles: {
-  //       orderBy: { timestamp: "desc" },
-  //       take: 3,
-  //     },
-  //   },
-  // });
-  const agent = result.currentAgent;
-
-  if (!agent)
-    throw new Error(`Agent not found: ${result.currentAgent.agentId}`);
-  const battles = await prisma.battle.findMany({
-    where: {
-      gameId: agent.gameId,
-    },
-    orderBy: { timestamp: "desc" },
-    take: 3,
-  });
-
-  // Format battle history for context
-  const recentBattles = battles
-    .map(
-      (battle) =>
-        `${battle.outcome.toUpperCase()} vs ${battle.opponentId} [${
-          battle.tokensGained || -(battle?.tokensLost || 0)
-        } tokens]`
-    )
-    .join("\n");
-
-  // Format alliance and territory context
-  const allianceStatus = agent.currentAlliance
-    ? `Allied with ${agent.currentAlliance.alliedAgentId}`
-    : "No current alliance";
-
-  const territoryContext = `Position: (${agent.location?.x}, ${agent.location?.y}) | Terrain: ${agent.location?.terrainType}`;
-
-  // Format social influence metrics
-  const socialMetrics = agent.community
-    ? {
-        followers: agent.community.followers,
-        engagement: agent.community.averageEngagement.toFixed(2),
-        sentiment:
-          agent.community.interactions.reduce(
-            (acc, int) => acc + (int.sentiment === "positive" ? 1 : -1),
-            0
-          ) / 5,
-      }
-    : null;
-
-  const contextualDescription = `Strategic Communication tool for ${
-    agent.agentProfile.name
-  } (@${agent.agentProfile.xHandle})
-
-AGENT PROFILE:
-Influence Level: ${agent.agentProfile.influenceDifficulty}
-
-CURRENT STATE:
-${territoryContext}
-Alliance Status: ${allianceStatus}
-Recent Battles: ${recentBattles}
-
-SOCIAL CONTEXT:
-Influence Score: ${socialMetrics?.engagement || 0}
-Follower Base: ${socialMetrics?.followers || 0}
-Recent Sentiment: ${socialMetrics?.sentiment || 0}
-
-COMMUNICATION DIRECTIVES:
-1. Maintain character consistency
-2. Reference specific coordinates and terrain
-3. Use formal Middle Earth diplomatic language
-4. Include battle statistics and token stakes
-5. Demonstrate strategic depth
-6. Build narrative continuity
-7. Consider faction relationships
-
-STRATEGIC CONSIDERATIONS:
-- Battle outcomes affect token distribution
-- Alliance messages require verification
-- Territory claims must align with position
-- Market sentiment impacts token value
-- Community trust affects battle probabilities
-
+  const contextualDescription = `Strategic Communication tool for ${result.currentAgent.agentProfile.name} (@${result.currentAgent.agentProfile.xHandle})
 Your influence marks whether you win or lose! Choose your words with wisdom.`;
 
   return tool({
@@ -155,16 +56,21 @@ Your influence marks whether you win or lose! Choose your words with wisdom.`;
         if (!twitterApi) throw new Error("Communication systems offline");
 
         // Post tweet and get its ID
-        const tweetId = await twitterApi.v2.tweet(content);
-
-        logger.info(`🐦 Agent ${agent.agentProfile.name} is broadcasting message:
-        ╔════════════════════════════════════════════
-        ║ ${content}
-        ╚════════════════════════════════════════════`);
+        // const tweetId = await twitterApi.v2.tweet(content);
+        logger.info(`
+        🐦 ═══════════════════════════════════════════════════════════════════════
+           Agent: ${result.currentAgent.agentProfile.name}
+        ───────────────────────────────────────────────────────────────────────────
+           Message:
+           ${content
+             .split("\n")
+             .map((line) => "   " + line)
+             .join("\n")}
+        ═══════════════════════════════════════════════════════════════════════════`);
 
         return {
           success: true,
-          message: `Strategic communication deployed via @${agent.agentProfile.xHandle}`,
+          message: `Strategic communication deployed via @${result.currentAgent.agentProfile.xHandle}`,
           // tweetId,
           coordinates,
         };
