@@ -73,65 +73,65 @@ export const requireAdmin = async (
   }
 };
 
-/**
- * Check if user owns or manages the game
- */
-export const requireGameAccess = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    if (!req.user?.id) {
-      return res.status(401).json({
-        success: false,
-        error: "Authentication required",
-      });
-    }
+// /**
+//  * Check if user owns or manages the game
+//  */
+// export const requireGameAccess = async (
+//   req: AuthenticatedRequest,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     if (!req.user?.id) {
+//       return res.status(401).json({
+//         success: false,
+//         error: "Authentication required",
+//       });
+//     }
 
-    const user = await getOrCreateUser(req.user.id);
-    const gameId = req.params.gameId || req.body.gameId || req.query.gameId;
+//     const user = await getOrCreateUser(req.user.id);
+//     const gameId = req.params.gameId || req.body.gameId || req.query.gameId;
 
-    if (!gameId) {
-      return res.status(400).json({
-        success: false,
-        error: "Game ID is required",
-      });
-    }
+//     if (!gameId) {
+//       return res.status(400).json({
+//         success: false,
+//         error: "Game ID is required",
+//       });
+//     }
 
-    // Check if user is admin (admins have access to all games)
-    if (user.role === UserRole.ADMIN) {
-      req.user = { ...req.user, ...user };
-      return next();
-    }
+//     // Check if user is admin (admins have access to all games)
+//     if (user.role === UserRole.ADMIN) {
+//       req.user = { ...req.user, ...user };
+//       return next();
+//     }
 
-    // Check if user owns or manages the game
-    const game = await prisma.game.findFirst({
-      where: {
-        id: gameId,
-        // OR: [{ ownerId: user.id }, { managers: { some: { id: user.id } } }],
-      },
-    });
+//     // Check if user owns or manages the game
+//     const game = await prisma.game.findFirst({
+//       where: {
+//         id: gameId,
+//         // OR: [{ ownerId: user.id }, { managers: { some: { id: user.id } } }],
+//       },
+//     });
 
-    if (!game) {
-      return res.status(403).json({
-        success: false,
-        error: "You don't have access to this game",
-      });
-    }
+//     if (!game) {
+//       return res.status(403).json({
+//         success: false,
+//         error: "You don't have access to this game",
+//       });
+//     }
 
-    // Attach full user object to request
-    req.user = { ...req.user, ...user };
-    next();
-  } catch (error) {
-    logger.error("Game authorization error:", error);
-    res.status(500).json({
-      success: false,
-      error: "Authorization failed",
-      details: (error as Error).message,
-    });
-  }
-};
+//     // Attach full user object to request
+//     req.user = { ...req.user, ...user };
+//     next();
+//   } catch (error) {
+//     logger.error("Game authorization error:", error);
+//     res.status(500).json({
+//       success: false,
+//       error: "Authorization failed",
+//       details: (error as Error).message,
+//     });
+//   }
+// };
 
 /**
  * Check if user owns the agent

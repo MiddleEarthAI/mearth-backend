@@ -51,12 +51,7 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 // Rate limiting
 app.use(defaultRateLimiter);
 
-// API routes
-const apiRouter = express.Router();
-apiRouter.use("/", router);
-
-// Mount API routes under API_PREFIX
-app.use("/api", apiRouter);
+app.use("/api", router);
 
 // 404 handler
 app.use((_req, res) => {

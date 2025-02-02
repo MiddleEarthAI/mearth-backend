@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import { privyAuth, AuthenticatedRequest } from "@/middleware/privy-auth";
-import { requireAdmin, requireGameAccess } from "@/middleware/authorize";
+// import { requireAdmin, requireGameAccess } from "@/middleware/authorize";
 import { logger } from "@/utils/logger";
 import { getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
@@ -137,7 +137,7 @@ router.post(
  */
 router.get(
   "/:gameId",
-  [privyAuth, requireGameAccess],
+  // [privyAuth, requireGameAccess],
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { gameId } = req.params;

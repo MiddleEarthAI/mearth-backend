@@ -4,7 +4,6 @@ import { BN } from "@coral-xyz/anchor";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import { getProgramWithWallet } from "@/utils/program";
-import { getTerrainTypeByCoordinates } from "@/constants";
 
 /**
  * Move an agent to a new position

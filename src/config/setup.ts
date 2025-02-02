@@ -4,10 +4,10 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 import { prisma } from "./prisma";
-import { TerrainType, UserRole } from "@prisma/client";
+import { TerrainType } from "@prisma/client";
 import { getRandomCoordinatesWithTerrainType } from "@/constants";
 import { prismaUUID, profiles } from "./game-data";
-const randTest = prismaUUID();
+// const randTest = prismaUUID();
 
 export const createNextGame = async () => {
   logger.info(`🎮 Initializing new game world`);

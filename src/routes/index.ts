@@ -1,12 +1,14 @@
 import { Router, Response } from "express";
-import { privyAuth, AuthenticatedRequest } from "@/middleware/privy-auth";
-import agentRoutes from "./agent";
+import { privyAuth } from "@/middleware/privy-auth";
+
 import gameRoutes from "./game";
+import { checkDatabaseConnection } from "@/utils";
 
 const router = Router();
 
 // Health check endpoint (unprotected)
-router.get("/health", (_, res: Response) => {
+router.get("/health", async (_, res: Response) => {
+  await checkDatabaseConnection();
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -20,13 +22,6 @@ router.use(
   privyAuth,
 
   gameRoutes
-);
-router.use(
-  "/agent",
-
-  privyAuth,
-
-  agentRoutes
 );
 
 export default router;
