@@ -151,18 +151,28 @@ export const breakAllianceTool = (
         await Promise.all([
           prisma.cooldown.create({
             data: {
-              type: "alliance",
+              type: "Alliance",
               endsAt: cooldownEndsAt,
               agent: { connect: { id: agent.id } },
               targetAgentId: targetAgent.id,
+              game: {
+                connect: {
+                  id: gameDbId,
+                },
+              },
             },
           }),
           prisma.cooldown.create({
             data: {
-              type: "alliance",
+              type: "Alliance",
               endsAt: cooldownEndsAt,
               agent: { connect: { id: targetAgent.id } },
               targetAgentId: agent.id,
+              game: {
+                connect: {
+                  id: gameDbId,
+                },
+              },
             },
           }),
         ]);

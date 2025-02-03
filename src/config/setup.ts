@@ -7,6 +7,7 @@ import { prisma } from "./prisma";
 import { TerrainType } from "@prisma/client";
 import { getRandomCoordinatesWithTerrainType } from "@/constants";
 import { prismaUUID, profiles } from "./game-data";
+import { AgentAccount } from "@/types/program";
 // const randTest = prismaUUID();
 
 export const createNextGame = async () => {
@@ -52,79 +53,74 @@ export const createNextGame = async () => {
 
         logger.info(`✨ Game ${nextGameId} initialized successfully`);
 
-        // Create all agents atomically
-        for (const profile of profiles) {
-          const [gamePda] = getGamePDA(program.programId, new BN(nextGameId));
-          const [agentPda] = getAgentPDA(
-            program.programId,
-            gamePda,
-            new BN(profile.onchainId)
-          );
-          const { x, y, terrainType } = getRandomCoordinatesWithTerrainType();
+        const agents = await Promise.all(
+          profiles.map(async (profile) => {
+            const [agentPda] = getAgentPDA(
+              program.programId,
+              gamePda,
+              new BN(profile.onchainId)
+            );
+            const { x, y, terrainType } = getRandomCoordinatesWithTerrainType();
+            // Register agent on-chain
+            await program.methods
+              .registerAgent(
+                new BN(profile.onchainId),
+                new BN(x),
+                new BN(y),
+                profile.name
+              )
+              .accounts({
+                game: gamePda,
+                agent: agentPda,
+                authority: program.provider.publicKey,
+              })
+              .rpc();
+            const agentAccount = await program.account.agent.fetch(agentPda);
 
-          // Register agent on-chain
-          await program.methods
-            .registerAgent(
-              new BN(profile.onchainId),
-              new BN(x),
-              new BN(y),
-              profile.name
-            )
-            .accounts({
-              game: gamePda,
-              agent: agentPda,
-              authority: program.provider.publicKey,
-            })
-            .rpc();
-          const agentAccount = await program.account.agent.fetch(agentPda);
+            // Create agent in database
+            const agentDb = await prismaClient.agent.create({
+              data: {
+                agentId: profile.onchainId,
+                game: { connect: { id: dbGame.id } },
+                location: {
+                  create: {
+                    x,
+                    y,
+                    terrainType:
+                      Object.keys(terrainType)[0] == "plain"
+                        ? TerrainType.Plain
+                        : Object.keys(terrainType)[0] == "mountain"
+                        ? TerrainType.Mountain
+                        : TerrainType.River,
+                  },
+                },
+                agentProfile: { connect: { onchainId: profile.onchainId } },
+                publicKey: agentAccount.authority.toString(),
+                state: {
+                  create: {
+                    isAlive: true,
+                    lastActionType: "spawn",
+                    lastActionTime: new Date(),
+                    lastActionDetails: "Initial spawn",
+                    influencedByTweet: null,
+                    influenceScore: 0,
+                  },
+                },
+              },
+            });
+            logger.info(
+              `✅ Agent ${profile.onchainId} created in database successfully`
+            );
 
-          // Create agent in database
-          await prismaClient.agent.create({
-            data: {
-              agentId: profile.onchainId,
-              game: { connect: { id: dbGame.id } },
-              location: {
-                create: {
-                  x,
-                  y,
-                  terrainType:
-                    Object.keys(terrainType)[0] == "plain"
-                      ? TerrainType.Plain
-                      : Object.keys(terrainType)[0] == "mountain"
-                      ? TerrainType.Mountain
-                      : TerrainType.River,
-                },
-              },
-              agentProfile: { connect: { onchainId: profile.onchainId } },
-              publicKey: agentAccount.authority.toString(),
-              state: {
-                create: {
-                  isAlive: true,
-                  lastActionType: "spawn",
-                  lastActionTime: new Date(),
-                  lastActionDetails: "Initial spawn",
-                  influencedByTweet: null,
-                  influenceScore: 0,
-                },
-              },
-              community: {
-                create: {
-                  followers: 0,
-                  averageEngagement: 0,
-                  supporterCount: 0,
-                  lastInfluenceTime: new Date(),
-                  influenceScore: 0,
-                },
-              },
-            },
-          });
-          logger.info(
-            `✅ Agent ${profile.onchainId} created in database successfully`
-          );
-        }
+            return {
+              account: agentAccount,
+              agent: agentDb,
+            };
+          })
+        );
 
         return {
-          tx,
+          agents,
           gameAccount: await program.account.game.fetch(gamePda),
         };
       },

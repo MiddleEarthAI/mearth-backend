@@ -7,10 +7,18 @@ import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 
 import { createNextGame } from "@/config/setup";
-import { Agent } from "@/agent/Agent";
+import { GameOrchestrator } from "@/agent/GameOrchestrator";
 import { prisma } from "@/config/prisma";
 import { checkDatabaseConnection } from "@/utils";
-import { BattleResolver } from "@/BattleResolver";
+import { BattleResolver } from "@/agent/BattleResolver";
+import { PrismaClient } from "@prisma/client";
+import TwitterApi from "twitter-api-v2";
+import { EventEmitter } from "events";
+import TwitterManager, { AgentId } from "@/agent/TwitterManager";
+import CacheManager from "@/agent/CacheManager";
+import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
+import { DecisionEngine } from "@/ideation/DecisionEngine";
+import { HealthMonitor } from "@/agent/HealthMonitor";
 
 const router = Router();
 
@@ -24,12 +32,72 @@ router.post(
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       await checkDatabaseConnection();
-      const { tx, gameAccount } = await createNextGame();
 
-      if (tx) {
-        const program = await getProgramWithWallet();
-        const battleResolver = new BattleResolver(gameAccount.gameId, program);
-        battleResolver.start();
+      const { tx, gameAccount, agentAccounts } = await createNextGame();
+      const program = await getProgramWithWallet();
+      const prisma = new PrismaClient();
+
+      const agentTwitterClients = agentAccounts.map((agent) => {
+        const apiKey = process.env.TWITTER_API_KEY;
+        const apiSecret = process.env.TWITTER_API_SECRET;
+
+        if (!apiKey || !apiSecret) {
+          throw new Error("Twitter API keys are not set");
+        }
+
+        const agentId = agent.id.toNumber();
+        const twitterAccessToken =
+          process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
+        const twitterAccessSecret =
+          process.env[`TWITTER_ACCESS_TOKEN_SECRET_${agentId}`];
+        if (!twitterAccessToken || !twitterAccessSecret) {
+          throw new Error("Twitter API keys are not set");
+        }
+        return [
+          agent.id.toNumber(),
+          new TwitterApi({
+            appKey: apiKey,
+            appSecret: apiSecret,
+            accessToken: twitterAccessToken,
+            accessSecret: twitterAccessSecret,
+          }),
+        ];
+      });
+
+      const _twitterClients = new Map<AgentId, TwitterApi>();
+      agentTwitterClients.forEach(([agentId, twitterClient]) => {
+        _twitterClients.set(agentId, twitterClient);
+      });
+
+      const twitter = new TwitterManager(_twitterClients);
+      const cache = new CacheManager();
+      const calculator = new InfluenceCalculator();
+      const eventEmitter = new EventEmitter();
+      const engine = new DecisionEngine(prisma, eventEmitter);
+
+      const battleResolver = new BattleResolver(gameAccount.gameId, program);
+
+      const orchestrator = new GameOrchestrator(
+        gameAccount.gameId,
+        program,
+        twitter,
+        cache,
+        calculator,
+        engine,
+        prisma,
+        eventEmitter,
+
+        battleResolver
+      );
+
+      const healthMonitor = new HealthMonitor(orchestrator, prisma, cache);
+      try {
+        await orchestrator.start();
+        await healthMonitor.startMonitoring();
+        logger.info("System started successfully");
+      } catch (error) {
+        logger.error("Failed to start system", { error });
+        process.exit(1);
       }
 
       logger.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
@@ -87,11 +155,6 @@ router.post(
         include: {
           agentProfile: true,
           location: true,
-          community: {
-            include: {
-              interactions: true,
-            },
-          },
           battles: true,
           currentAlliance: true,
           cooldowns: true,
@@ -107,10 +170,7 @@ router.post(
           gameId,
         });
       }
-      for (const dbAgent of agents) {
-        const agent = new Agent(dbAgent, Number(gameId));
-        agent.start();
-      }
+
       res.json({
         success: true,
         message: `Agents started for game ${gameId}`,

@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { AgentProfile } from ".";
 
 const prisma = new PrismaClient();
 
-const profiles = [
+const profiles: AgentProfile[] = [
   {
     id: "1",
     onchainId: 1,
@@ -43,23 +44,20 @@ const profiles = [
       "Strategic thinker",
       "Ruthless in combat",
     ],
-    aggressiveness: 90,
-    trustworthiness: 20,
-    manipulativeness: 85,
-    intelligence: 95,
-    adaptability: 60,
-    baseInfluence: 20,
-    followerMultiplier: 0.8,
-    engagementMultiplier: 0.7,
-    consensusMultiplier: 0.6,
-    influenceDifficulty: "hard",
+    traits: [
+      { name: "aggressiveness", value: 90 },
+      { name: "trustworthiness", value: 20 },
+      { name: "manipulativeness", value: 85 },
+      { name: "intelligence", value: 95 },
+      { name: "adaptability", value: 60 },
+      { name: "baseInfluence", value: 20 },
+    ],
   },
   {
     id: "2",
     onchainId: 2,
     name: "Scootles",
     xHandle: "ScootlesAI",
-    influenceDifficulty: "hard",
     bio: [
       "A former kitchen worker turned relentless pursuer of truth in Middle Earth",
       "Transformed from humble beginnings to a determined seeker of justice",
@@ -95,15 +93,34 @@ const profiles = [
       "Willing to form alliances",
       "Driven by revenge",
     ],
-    aggressiveness: 75,
-    trustworthiness: 85,
-    manipulativeness: 30,
-    intelligence: 70,
-    adaptability: 80,
-    baseInfluence: 50,
-    followerMultiplier: 1.2,
-    engagementMultiplier: 1.3,
-    consensusMultiplier: 1.1,
+    traits: [
+      { name: "influenceDifficulty", value: "hard" },
+      {
+        name: "aggressiveness",
+        value: 75,
+        description: "Defines how aggressive the agent is",
+      },
+      {
+        name: "trustworthiness",
+        value: 85,
+        description: "Defines how trustworthy the agent is",
+      },
+      {
+        name: "manipulativeness",
+        value: 30,
+        description: "Defines how manipulative the agent is",
+      },
+      {
+        name: "intelligence",
+        value: 70,
+        description: "Defines how intelligent the agent is",
+      },
+      {
+        name: "adaptability",
+        value: 80,
+        description: "Defines how adaptable the agent is",
+      },
+    ],
   },
   {
     id: "3",
@@ -145,16 +162,33 @@ const profiles = [
       "Eager for alliances",
       "Avoids confrontation",
     ],
-    aggressiveness: 20,
-    trustworthiness: 95,
-    manipulativeness: 15,
-    intelligence: 70,
-    adaptability: 70,
-    baseInfluence: 80,
-    followerMultiplier: 1.5,
-    engagementMultiplier: 1.4,
-    consensusMultiplier: 1.6,
-    influenceDifficulty: "medium",
+    traits: [
+      {
+        name: "aggressiveness",
+        value: 20,
+        description: "Defines how aggressive the agent is",
+      },
+      {
+        name: "trustworthiness",
+        value: 95,
+        description: "Defines how trustworthy the agent is",
+      },
+      {
+        name: "manipulativeness",
+        value: 15,
+        description: "Defines how manipulative the agent is",
+      },
+      {
+        name: "intelligence",
+        value: 70,
+        description: "Defines how intelligent the agent is",
+      },
+      {
+        name: "adaptability",
+        value: 70,
+        description: "Defines how adaptable the agent is",
+      },
+    ],
   },
   {
     id: "4",
@@ -196,16 +230,33 @@ const profiles = [
       "Memory issues",
       "Wisdom from experience",
     ],
-    aggressiveness: 30,
-    trustworthiness: 80,
-    manipulativeness: 20,
-    intelligence: 75,
-    adaptability: 85,
-    baseInfluence: 80,
-    followerMultiplier: 1.8,
-    engagementMultiplier: 1.7,
-    consensusMultiplier: 1.9,
-    influenceDifficulty: "easy",
+    traits: [
+      {
+        name: "aggressiveness",
+        value: 30,
+        description: "Defines how aggressive the agent is",
+      },
+      {
+        name: "trustworthiness",
+        value: 80,
+        description: "Defines how trustworthy the agent is",
+      },
+      {
+        name: "manipulativeness",
+        value: 20,
+        description: "Defines how manipulative the agent is",
+      },
+      {
+        name: "intelligence",
+        value: 75,
+        description: "Defines how intelligent the agent is",
+      },
+      {
+        name: "adaptability",
+        value: 85,
+        description: "Defines how adaptable the agent is",
+      },
+    ],
   },
 ];
 
@@ -228,16 +279,7 @@ async function seedAgentProfiles() {
           lore,
           characteristics,
           knowledge,
-          influenceDifficulty,
-          aggressiveness,
-          trustworthiness,
-          manipulativeness,
-          intelligence,
-          adaptability,
-          baseInfluence,
-          followerMultiplier,
-          engagementMultiplier,
-          consensusMultiplier,
+          traits,
         } = profile;
 
         return prisma.agentProfile.create({
@@ -250,16 +292,9 @@ async function seedAgentProfiles() {
             lore,
             characteristics,
             knowledge,
-            influenceDifficulty,
-            aggressiveness,
-            trustworthiness,
-            manipulativeness,
-            intelligence,
-            adaptability,
-            baseInfluence,
-            followerMultiplier,
-            engagementMultiplier,
-            consensusMultiplier,
+            traits: {
+              toJSON: () => traits,
+            },
           },
         });
       })

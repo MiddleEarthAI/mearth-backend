@@ -29,6 +29,11 @@ export type AgentProfile = $Result.DefaultSelection<Prisma.$AgentProfilePayload>
  */
 export type Agent = $Result.DefaultSelection<Prisma.$AgentPayload>
 /**
+ * Model Tweet
+ * 
+ */
+export type Tweet = $Result.DefaultSelection<Prisma.$TweetPayload>
+/**
  * Model Location
  * 
  */
@@ -43,11 +48,6 @@ export type Alliance = $Result.DefaultSelection<Prisma.$AlliancePayload>
  * 
  */
 export type Battle = $Result.DefaultSelection<Prisma.$BattlePayload>
-/**
- * Model Community
- * 
- */
-export type Community = $Result.DefaultSelection<Prisma.$CommunityPayload>
 /**
  * Model Interaction
  * 
@@ -315,6 +315,16 @@ export class PrismaClient<
   get agent(): Prisma.AgentDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.tweet`: Exposes CRUD operations for the **Tweet** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Tweets
+    * const tweets = await prisma.tweet.findMany()
+    * ```
+    */
+  get tweet(): Prisma.TweetDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.location`: Exposes CRUD operations for the **Location** model.
     * Example usage:
     * ```ts
@@ -343,16 +353,6 @@ export class PrismaClient<
     * ```
     */
   get battle(): Prisma.BattleDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.community`: Exposes CRUD operations for the **Community** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Communities
-    * const communities = await prisma.community.findMany()
-    * ```
-    */
-  get community(): Prisma.CommunityDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.interaction`: Exposes CRUD operations for the **Interaction** model.
@@ -846,10 +846,10 @@ export namespace Prisma {
     Game: 'Game',
     AgentProfile: 'AgentProfile',
     Agent: 'Agent',
+    Tweet: 'Tweet',
     Location: 'Location',
     Alliance: 'Alliance',
     Battle: 'Battle',
-    Community: 'Community',
     Interaction: 'Interaction',
     AgentState: 'AgentState',
     Cooldown: 'Cooldown',
@@ -870,7 +870,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "game" | "agentProfile" | "agent" | "location" | "alliance" | "battle" | "community" | "interaction" | "agentState" | "cooldown" | "strategy" | "user"
+      modelProps: "game" | "agentProfile" | "agent" | "tweet" | "location" | "alliance" | "battle" | "interaction" | "agentState" | "cooldown" | "strategy" | "user"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1096,6 +1096,80 @@ export namespace Prisma {
           }
         }
       }
+      Tweet: {
+        payload: Prisma.$TweetPayload<ExtArgs>
+        fields: Prisma.TweetFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TweetFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TweetFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>
+          }
+          findFirst: {
+            args: Prisma.TweetFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TweetFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>
+          }
+          findMany: {
+            args: Prisma.TweetFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>[]
+          }
+          create: {
+            args: Prisma.TweetCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>
+          }
+          createMany: {
+            args: Prisma.TweetCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TweetCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>[]
+          }
+          delete: {
+            args: Prisma.TweetDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>
+          }
+          update: {
+            args: Prisma.TweetUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>
+          }
+          deleteMany: {
+            args: Prisma.TweetDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TweetUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TweetUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>[]
+          }
+          upsert: {
+            args: Prisma.TweetUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TweetPayload>
+          }
+          aggregate: {
+            args: Prisma.TweetAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTweet>
+          }
+          groupBy: {
+            args: Prisma.TweetGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TweetGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TweetCountArgs<ExtArgs>
+            result: $Utils.Optional<TweetCountAggregateOutputType> | number
+          }
+        }
+      }
       Location: {
         payload: Prisma.$LocationPayload<ExtArgs>
         fields: Prisma.LocationFieldRefs
@@ -1315,80 +1389,6 @@ export namespace Prisma {
           count: {
             args: Prisma.BattleCountArgs<ExtArgs>
             result: $Utils.Optional<BattleCountAggregateOutputType> | number
-          }
-        }
-      }
-      Community: {
-        payload: Prisma.$CommunityPayload<ExtArgs>
-        fields: Prisma.CommunityFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.CommunityFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.CommunityFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>
-          }
-          findFirst: {
-            args: Prisma.CommunityFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.CommunityFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>
-          }
-          findMany: {
-            args: Prisma.CommunityFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>[]
-          }
-          create: {
-            args: Prisma.CommunityCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>
-          }
-          createMany: {
-            args: Prisma.CommunityCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.CommunityCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>[]
-          }
-          delete: {
-            args: Prisma.CommunityDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>
-          }
-          update: {
-            args: Prisma.CommunityUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>
-          }
-          deleteMany: {
-            args: Prisma.CommunityDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.CommunityUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.CommunityUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>[]
-          }
-          upsert: {
-            args: Prisma.CommunityUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CommunityPayload>
-          }
-          aggregate: {
-            args: Prisma.CommunityAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateCommunity>
-          }
-          groupBy: {
-            args: Prisma.CommunityGroupByArgs<ExtArgs>
-            result: $Utils.Optional<CommunityGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.CommunityCountArgs<ExtArgs>
-            result: $Utils.Optional<CommunityCountAggregateOutputType> | number
           }
         }
       }
@@ -1849,10 +1849,10 @@ export namespace Prisma {
     game?: GameOmit
     agentProfile?: AgentProfileOmit
     agent?: AgentOmit
+    tweet?: TweetOmit
     location?: LocationOmit
     alliance?: AllianceOmit
     battle?: BattleOmit
-    community?: CommunityOmit
     interaction?: InteractionOmit
     agentState?: AgentStateOmit
     cooldown?: CooldownOmit
@@ -2045,6 +2045,7 @@ export namespace Prisma {
     cooldowns: number
     alliedBy: number
     battlesAsOpponent: number
+    Tweet: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2052,6 +2053,7 @@ export namespace Prisma {
     cooldowns?: boolean | AgentCountOutputTypeCountCooldownsArgs
     alliedBy?: boolean | AgentCountOutputTypeCountAlliedByArgs
     battlesAsOpponent?: boolean | AgentCountOutputTypeCountBattlesAsOpponentArgs
+    Tweet?: boolean | AgentCountOutputTypeCountTweetArgs
   }
 
   // Custom InputTypes
@@ -2093,34 +2095,41 @@ export namespace Prisma {
     where?: BattleWhereInput
   }
 
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountTweetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TweetWhereInput
+  }
+
 
   /**
-   * Count Type CommunityCountOutputType
+   * Count Type TweetCountOutputType
    */
 
-  export type CommunityCountOutputType = {
+  export type TweetCountOutputType = {
     interactions: number
   }
 
-  export type CommunityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    interactions?: boolean | CommunityCountOutputTypeCountInteractionsArgs
+  export type TweetCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    interactions?: boolean | TweetCountOutputTypeCountInteractionsArgs
   }
 
   // Custom InputTypes
   /**
-   * CommunityCountOutputType without action
+   * TweetCountOutputType without action
    */
-  export type CommunityCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TweetCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the CommunityCountOutputType
+     * Select specific fields to fetch from the TweetCountOutputType
      */
-    select?: CommunityCountOutputTypeSelect<ExtArgs> | null
+    select?: TweetCountOutputTypeSelect<ExtArgs> | null
   }
 
   /**
-   * CommunityCountOutputType without action
+   * TweetCountOutputType without action
    */
-  export type CommunityCountOutputTypeCountInteractionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type TweetCountOutputTypeCountInteractionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InteractionWhereInput
   }
 
@@ -3422,28 +3431,10 @@ export namespace Prisma {
 
   export type AgentProfileAvgAggregateOutputType = {
     onchainId: number | null
-    aggressiveness: number | null
-    trustworthiness: number | null
-    manipulativeness: number | null
-    intelligence: number | null
-    adaptability: number | null
-    baseInfluence: number | null
-    followerMultiplier: number | null
-    engagementMultiplier: number | null
-    consensusMultiplier: number | null
   }
 
   export type AgentProfileSumAggregateOutputType = {
     onchainId: number | null
-    aggressiveness: number | null
-    trustworthiness: number | null
-    manipulativeness: number | null
-    intelligence: number | null
-    adaptability: number | null
-    baseInfluence: number | null
-    followerMultiplier: number | null
-    engagementMultiplier: number | null
-    consensusMultiplier: number | null
   }
 
   export type AgentProfileMinAggregateOutputType = {
@@ -3451,16 +3442,6 @@ export namespace Prisma {
     onchainId: number | null
     name: string | null
     xHandle: string | null
-    influenceDifficulty: string | null
-    aggressiveness: number | null
-    trustworthiness: number | null
-    manipulativeness: number | null
-    intelligence: number | null
-    adaptability: number | null
-    baseInfluence: number | null
-    followerMultiplier: number | null
-    engagementMultiplier: number | null
-    consensusMultiplier: number | null
   }
 
   export type AgentProfileMaxAggregateOutputType = {
@@ -3468,16 +3449,6 @@ export namespace Prisma {
     onchainId: number | null
     name: string | null
     xHandle: string | null
-    influenceDifficulty: string | null
-    aggressiveness: number | null
-    trustworthiness: number | null
-    manipulativeness: number | null
-    intelligence: number | null
-    adaptability: number | null
-    baseInfluence: number | null
-    followerMultiplier: number | null
-    engagementMultiplier: number | null
-    consensusMultiplier: number | null
   }
 
   export type AgentProfileCountAggregateOutputType = {
@@ -3489,44 +3460,17 @@ export namespace Prisma {
     lore: number
     characteristics: number
     knowledge: number
-    influenceDifficulty: number
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: number
     _all: number
   }
 
 
   export type AgentProfileAvgAggregateInputType = {
     onchainId?: true
-    aggressiveness?: true
-    trustworthiness?: true
-    manipulativeness?: true
-    intelligence?: true
-    adaptability?: true
-    baseInfluence?: true
-    followerMultiplier?: true
-    engagementMultiplier?: true
-    consensusMultiplier?: true
   }
 
   export type AgentProfileSumAggregateInputType = {
     onchainId?: true
-    aggressiveness?: true
-    trustworthiness?: true
-    manipulativeness?: true
-    intelligence?: true
-    adaptability?: true
-    baseInfluence?: true
-    followerMultiplier?: true
-    engagementMultiplier?: true
-    consensusMultiplier?: true
   }
 
   export type AgentProfileMinAggregateInputType = {
@@ -3534,16 +3478,6 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
-    influenceDifficulty?: true
-    aggressiveness?: true
-    trustworthiness?: true
-    manipulativeness?: true
-    intelligence?: true
-    adaptability?: true
-    baseInfluence?: true
-    followerMultiplier?: true
-    engagementMultiplier?: true
-    consensusMultiplier?: true
   }
 
   export type AgentProfileMaxAggregateInputType = {
@@ -3551,16 +3485,6 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
-    influenceDifficulty?: true
-    aggressiveness?: true
-    trustworthiness?: true
-    manipulativeness?: true
-    intelligence?: true
-    adaptability?: true
-    baseInfluence?: true
-    followerMultiplier?: true
-    engagementMultiplier?: true
-    consensusMultiplier?: true
   }
 
   export type AgentProfileCountAggregateInputType = {
@@ -3572,16 +3496,7 @@ export namespace Prisma {
     lore?: true
     characteristics?: true
     knowledge?: true
-    influenceDifficulty?: true
-    aggressiveness?: true
-    trustworthiness?: true
-    manipulativeness?: true
-    intelligence?: true
-    adaptability?: true
-    baseInfluence?: true
-    followerMultiplier?: true
-    engagementMultiplier?: true
-    consensusMultiplier?: true
+    traits?: true
     _all?: true
   }
 
@@ -3680,16 +3595,7 @@ export namespace Prisma {
     lore: string[]
     characteristics: string[]
     knowledge: string[]
-    influenceDifficulty: string
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: JsonValue
     _count: AgentProfileCountAggregateOutputType | null
     _avg: AgentProfileAvgAggregateOutputType | null
     _sum: AgentProfileSumAggregateOutputType | null
@@ -3720,16 +3626,7 @@ export namespace Prisma {
     lore?: boolean
     characteristics?: boolean
     knowledge?: boolean
-    influenceDifficulty?: boolean
-    aggressiveness?: boolean
-    trustworthiness?: boolean
-    manipulativeness?: boolean
-    intelligence?: boolean
-    adaptability?: boolean
-    baseInfluence?: boolean
-    followerMultiplier?: boolean
-    engagementMultiplier?: boolean
-    consensusMultiplier?: boolean
+    traits?: boolean
     agent?: boolean | AgentProfile$agentArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agentProfile"]>
@@ -3743,16 +3640,7 @@ export namespace Prisma {
     lore?: boolean
     characteristics?: boolean
     knowledge?: boolean
-    influenceDifficulty?: boolean
-    aggressiveness?: boolean
-    trustworthiness?: boolean
-    manipulativeness?: boolean
-    intelligence?: boolean
-    adaptability?: boolean
-    baseInfluence?: boolean
-    followerMultiplier?: boolean
-    engagementMultiplier?: boolean
-    consensusMultiplier?: boolean
+    traits?: boolean
   }, ExtArgs["result"]["agentProfile"]>
 
   export type AgentProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3764,16 +3652,7 @@ export namespace Prisma {
     lore?: boolean
     characteristics?: boolean
     knowledge?: boolean
-    influenceDifficulty?: boolean
-    aggressiveness?: boolean
-    trustworthiness?: boolean
-    manipulativeness?: boolean
-    intelligence?: boolean
-    adaptability?: boolean
-    baseInfluence?: boolean
-    followerMultiplier?: boolean
-    engagementMultiplier?: boolean
-    consensusMultiplier?: boolean
+    traits?: boolean
   }, ExtArgs["result"]["agentProfile"]>
 
   export type AgentProfileSelectScalar = {
@@ -3785,19 +3664,10 @@ export namespace Prisma {
     lore?: boolean
     characteristics?: boolean
     knowledge?: boolean
-    influenceDifficulty?: boolean
-    aggressiveness?: boolean
-    trustworthiness?: boolean
-    manipulativeness?: boolean
-    intelligence?: boolean
-    adaptability?: boolean
-    baseInfluence?: boolean
-    followerMultiplier?: boolean
-    engagementMultiplier?: boolean
-    consensusMultiplier?: boolean
+    traits?: boolean
   }
 
-  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "bio" | "lore" | "characteristics" | "knowledge" | "influenceDifficulty" | "aggressiveness" | "trustworthiness" | "manipulativeness" | "intelligence" | "adaptability" | "baseInfluence" | "followerMultiplier" | "engagementMultiplier" | "consensusMultiplier", ExtArgs["result"]["agentProfile"]>
+  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "bio" | "lore" | "characteristics" | "knowledge" | "traits", ExtArgs["result"]["agentProfile"]>
   export type AgentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agent?: boolean | AgentProfile$agentArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -3819,16 +3689,7 @@ export namespace Prisma {
       lore: string[]
       characteristics: string[]
       knowledge: string[]
-      influenceDifficulty: string
-      aggressiveness: number
-      trustworthiness: number
-      manipulativeness: number
-      intelligence: number
-      adaptability: number
-      baseInfluence: number
-      followerMultiplier: number
-      engagementMultiplier: number
-      consensusMultiplier: number
+      traits: Prisma.JsonValue
     }, ExtArgs["result"]["agentProfile"]>
     composites: {}
   }
@@ -4261,16 +4122,7 @@ export namespace Prisma {
     readonly lore: FieldRef<"AgentProfile", 'String[]'>
     readonly characteristics: FieldRef<"AgentProfile", 'String[]'>
     readonly knowledge: FieldRef<"AgentProfile", 'String[]'>
-    readonly influenceDifficulty: FieldRef<"AgentProfile", 'String'>
-    readonly aggressiveness: FieldRef<"AgentProfile", 'Int'>
-    readonly trustworthiness: FieldRef<"AgentProfile", 'Int'>
-    readonly manipulativeness: FieldRef<"AgentProfile", 'Int'>
-    readonly intelligence: FieldRef<"AgentProfile", 'Int'>
-    readonly adaptability: FieldRef<"AgentProfile", 'Int'>
-    readonly baseInfluence: FieldRef<"AgentProfile", 'Float'>
-    readonly followerMultiplier: FieldRef<"AgentProfile", 'Float'>
-    readonly engagementMultiplier: FieldRef<"AgentProfile", 'Float'>
-    readonly consensusMultiplier: FieldRef<"AgentProfile", 'Float'>
+    readonly traits: FieldRef<"AgentProfile", 'Json'>
   }
     
 
@@ -4920,12 +4772,12 @@ export namespace Prisma {
     location?: boolean | Agent$locationArgs<ExtArgs>
     currentAlliance?: boolean | Agent$currentAllianceArgs<ExtArgs>
     battles?: boolean | Agent$battlesArgs<ExtArgs>
-    community?: boolean | Agent$communityArgs<ExtArgs>
     state?: boolean | Agent$stateArgs<ExtArgs>
     strategy?: boolean | Agent$strategyArgs<ExtArgs>
     cooldowns?: boolean | Agent$cooldownsArgs<ExtArgs>
     alliedBy?: boolean | Agent$alliedByArgs<ExtArgs>
     battlesAsOpponent?: boolean | Agent$battlesAsOpponentArgs<ExtArgs>
+    Tweet?: boolean | Agent$TweetArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -4973,12 +4825,12 @@ export namespace Prisma {
     location?: boolean | Agent$locationArgs<ExtArgs>
     currentAlliance?: boolean | Agent$currentAllianceArgs<ExtArgs>
     battles?: boolean | Agent$battlesArgs<ExtArgs>
-    community?: boolean | Agent$communityArgs<ExtArgs>
     state?: boolean | Agent$stateArgs<ExtArgs>
     strategy?: boolean | Agent$strategyArgs<ExtArgs>
     cooldowns?: boolean | Agent$cooldownsArgs<ExtArgs>
     alliedBy?: boolean | Agent$alliedByArgs<ExtArgs>
     battlesAsOpponent?: boolean | Agent$battlesAsOpponentArgs<ExtArgs>
+    Tweet?: boolean | Agent$TweetArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4998,12 +4850,12 @@ export namespace Prisma {
       location: Prisma.$LocationPayload<ExtArgs> | null
       currentAlliance: Prisma.$AlliancePayload<ExtArgs> | null
       battles: Prisma.$BattlePayload<ExtArgs>[]
-      community: Prisma.$CommunityPayload<ExtArgs> | null
       state: Prisma.$AgentStatePayload<ExtArgs> | null
       strategy: Prisma.$StrategyPayload<ExtArgs> | null
       cooldowns: Prisma.$CooldownPayload<ExtArgs>[]
       alliedBy: Prisma.$AlliancePayload<ExtArgs>[]
       battlesAsOpponent: Prisma.$BattlePayload<ExtArgs>[]
+      Tweet: Prisma.$TweetPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5413,12 +5265,12 @@ export namespace Prisma {
     location<T extends Agent$locationArgs<ExtArgs> = {}>(args?: Subset<T, Agent$locationArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     currentAlliance<T extends Agent$currentAllianceArgs<ExtArgs> = {}>(args?: Subset<T, Agent$currentAllianceArgs<ExtArgs>>): Prisma__AllianceClient<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     battles<T extends Agent$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    community<T extends Agent$communityArgs<ExtArgs> = {}>(args?: Subset<T, Agent$communityArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     state<T extends Agent$stateArgs<ExtArgs> = {}>(args?: Subset<T, Agent$stateArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     strategy<T extends Agent$strategyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$strategyArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     cooldowns<T extends Agent$cooldownsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$cooldownsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     alliedBy<T extends Agent$alliedByArgs<ExtArgs> = {}>(args?: Subset<T, Agent$alliedByArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battlesAsOpponent<T extends Agent$battlesAsOpponentArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsOpponentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    Tweet<T extends Agent$TweetArgs<ExtArgs> = {}>(args?: Subset<T, Agent$TweetArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5902,25 +5754,6 @@ export namespace Prisma {
   }
 
   /**
-   * Agent.community
-   */
-  export type Agent$communityArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    where?: CommunityWhereInput
-  }
-
-  /**
    * Agent.state
    */
   export type Agent$stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6031,6 +5864,30 @@ export namespace Prisma {
   }
 
   /**
+   * Agent.Tweet
+   */
+  export type Agent$TweetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    where?: TweetWhereInput
+    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
+    cursor?: TweetWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TweetScalarFieldEnum | TweetScalarFieldEnum[]
+  }
+
+  /**
    * Agent without action
    */
   export type AgentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6046,6 +5903,1095 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: AgentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Tweet
+   */
+
+  export type AggregateTweet = {
+    _count: TweetCountAggregateOutputType | null
+    _min: TweetMinAggregateOutputType | null
+    _max: TweetMaxAggregateOutputType | null
+  }
+
+  export type TweetMinAggregateOutputType = {
+    id: string | null
+    agentId: string | null
+    content: string | null
+    type: string | null
+    timestamp: Date | null
+    conversationId: string | null
+  }
+
+  export type TweetMaxAggregateOutputType = {
+    id: string | null
+    agentId: string | null
+    content: string | null
+    type: string | null
+    timestamp: Date | null
+    conversationId: string | null
+  }
+
+  export type TweetCountAggregateOutputType = {
+    id: number
+    agentId: number
+    content: number
+    type: number
+    timestamp: number
+    conversationId: number
+    _all: number
+  }
+
+
+  export type TweetMinAggregateInputType = {
+    id?: true
+    agentId?: true
+    content?: true
+    type?: true
+    timestamp?: true
+    conversationId?: true
+  }
+
+  export type TweetMaxAggregateInputType = {
+    id?: true
+    agentId?: true
+    content?: true
+    type?: true
+    timestamp?: true
+    conversationId?: true
+  }
+
+  export type TweetCountAggregateInputType = {
+    id?: true
+    agentId?: true
+    content?: true
+    type?: true
+    timestamp?: true
+    conversationId?: true
+    _all?: true
+  }
+
+  export type TweetAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Tweet to aggregate.
+     */
+    where?: TweetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tweets to fetch.
+     */
+    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TweetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tweets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tweets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Tweets
+    **/
+    _count?: true | TweetCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TweetMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TweetMaxAggregateInputType
+  }
+
+  export type GetTweetAggregateType<T extends TweetAggregateArgs> = {
+        [P in keyof T & keyof AggregateTweet]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTweet[P]>
+      : GetScalarType<T[P], AggregateTweet[P]>
+  }
+
+
+
+
+  export type TweetGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TweetWhereInput
+    orderBy?: TweetOrderByWithAggregationInput | TweetOrderByWithAggregationInput[]
+    by: TweetScalarFieldEnum[] | TweetScalarFieldEnum
+    having?: TweetScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TweetCountAggregateInputType | true
+    _min?: TweetMinAggregateInputType
+    _max?: TweetMaxAggregateInputType
+  }
+
+  export type TweetGroupByOutputType = {
+    id: string
+    agentId: string
+    content: string
+    type: string
+    timestamp: Date
+    conversationId: string | null
+    _count: TweetCountAggregateOutputType | null
+    _min: TweetMinAggregateOutputType | null
+    _max: TweetMaxAggregateOutputType | null
+  }
+
+  type GetTweetGroupByPayload<T extends TweetGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TweetGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TweetGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TweetGroupByOutputType[P]>
+            : GetScalarType<T[P], TweetGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TweetSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    content?: boolean
+    type?: boolean
+    timestamp?: boolean
+    conversationId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    interactions?: boolean | Tweet$interactionsArgs<ExtArgs>
+    _count?: boolean | TweetCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tweet"]>
+
+  export type TweetSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    content?: boolean
+    type?: boolean
+    timestamp?: boolean
+    conversationId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tweet"]>
+
+  export type TweetSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    content?: boolean
+    type?: boolean
+    timestamp?: boolean
+    conversationId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tweet"]>
+
+  export type TweetSelectScalar = {
+    id?: boolean
+    agentId?: boolean
+    content?: boolean
+    type?: boolean
+    timestamp?: boolean
+    conversationId?: boolean
+  }
+
+  export type TweetOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "content" | "type" | "timestamp" | "conversationId", ExtArgs["result"]["tweet"]>
+  export type TweetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    interactions?: boolean | Tweet$interactionsArgs<ExtArgs>
+    _count?: boolean | TweetCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type TweetIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type TweetIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+
+  export type $TweetPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Tweet"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs>
+      interactions: Prisma.$InteractionPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      agentId: string
+      content: string
+      type: string
+      timestamp: Date
+      conversationId: string | null
+    }, ExtArgs["result"]["tweet"]>
+    composites: {}
+  }
+
+  type TweetGetPayload<S extends boolean | null | undefined | TweetDefaultArgs> = $Result.GetResult<Prisma.$TweetPayload, S>
+
+  type TweetCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TweetFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TweetCountAggregateInputType | true
+    }
+
+  export interface TweetDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Tweet'], meta: { name: 'Tweet' } }
+    /**
+     * Find zero or one Tweet that matches the filter.
+     * @param {TweetFindUniqueArgs} args - Arguments to find a Tweet
+     * @example
+     * // Get one Tweet
+     * const tweet = await prisma.tweet.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TweetFindUniqueArgs>(args: SelectSubset<T, TweetFindUniqueArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find one Tweet that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TweetFindUniqueOrThrowArgs} args - Arguments to find a Tweet
+     * @example
+     * // Get one Tweet
+     * const tweet = await prisma.tweet.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TweetFindUniqueOrThrowArgs>(args: SelectSubset<T, TweetFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first Tweet that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetFindFirstArgs} args - Arguments to find a Tweet
+     * @example
+     * // Get one Tweet
+     * const tweet = await prisma.tweet.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TweetFindFirstArgs>(args?: SelectSubset<T, TweetFindFirstArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first Tweet that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetFindFirstOrThrowArgs} args - Arguments to find a Tweet
+     * @example
+     * // Get one Tweet
+     * const tweet = await prisma.tweet.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TweetFindFirstOrThrowArgs>(args?: SelectSubset<T, TweetFindFirstOrThrowArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find zero or more Tweets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Tweets
+     * const tweets = await prisma.tweet.findMany()
+     * 
+     * // Get first 10 Tweets
+     * const tweets = await prisma.tweet.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const tweetWithIdOnly = await prisma.tweet.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TweetFindManyArgs>(args?: SelectSubset<T, TweetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findMany", ClientOptions>>
+
+    /**
+     * Create a Tweet.
+     * @param {TweetCreateArgs} args - Arguments to create a Tweet.
+     * @example
+     * // Create one Tweet
+     * const Tweet = await prisma.tweet.create({
+     *   data: {
+     *     // ... data to create a Tweet
+     *   }
+     * })
+     * 
+     */
+    create<T extends TweetCreateArgs>(args: SelectSubset<T, TweetCreateArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Create many Tweets.
+     * @param {TweetCreateManyArgs} args - Arguments to create many Tweets.
+     * @example
+     * // Create many Tweets
+     * const tweet = await prisma.tweet.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TweetCreateManyArgs>(args?: SelectSubset<T, TweetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Tweets and returns the data saved in the database.
+     * @param {TweetCreateManyAndReturnArgs} args - Arguments to create many Tweets.
+     * @example
+     * // Create many Tweets
+     * const tweet = await prisma.tweet.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Tweets and only return the `id`
+     * const tweetWithIdOnly = await prisma.tweet.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TweetCreateManyAndReturnArgs>(args?: SelectSubset<T, TweetCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+
+    /**
+     * Delete a Tweet.
+     * @param {TweetDeleteArgs} args - Arguments to delete one Tweet.
+     * @example
+     * // Delete one Tweet
+     * const Tweet = await prisma.tweet.delete({
+     *   where: {
+     *     // ... filter to delete one Tweet
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TweetDeleteArgs>(args: SelectSubset<T, TweetDeleteArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Update one Tweet.
+     * @param {TweetUpdateArgs} args - Arguments to update one Tweet.
+     * @example
+     * // Update one Tweet
+     * const tweet = await prisma.tweet.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TweetUpdateArgs>(args: SelectSubset<T, TweetUpdateArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Delete zero or more Tweets.
+     * @param {TweetDeleteManyArgs} args - Arguments to filter Tweets to delete.
+     * @example
+     * // Delete a few Tweets
+     * const { count } = await prisma.tweet.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TweetDeleteManyArgs>(args?: SelectSubset<T, TweetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Tweets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Tweets
+     * const tweet = await prisma.tweet.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TweetUpdateManyArgs>(args: SelectSubset<T, TweetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Tweets and returns the data updated in the database.
+     * @param {TweetUpdateManyAndReturnArgs} args - Arguments to update many Tweets.
+     * @example
+     * // Update many Tweets
+     * const tweet = await prisma.tweet.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Tweets and only return the `id`
+     * const tweetWithIdOnly = await prisma.tweet.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TweetUpdateManyAndReturnArgs>(args: SelectSubset<T, TweetUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+
+    /**
+     * Create or update one Tweet.
+     * @param {TweetUpsertArgs} args - Arguments to update or create a Tweet.
+     * @example
+     * // Update or create a Tweet
+     * const tweet = await prisma.tweet.upsert({
+     *   create: {
+     *     // ... data to create a Tweet
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Tweet we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TweetUpsertArgs>(args: SelectSubset<T, TweetUpsertArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+
+
+    /**
+     * Count the number of Tweets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetCountArgs} args - Arguments to filter Tweets to count.
+     * @example
+     * // Count the number of Tweets
+     * const count = await prisma.tweet.count({
+     *   where: {
+     *     // ... the filter for the Tweets we want to count
+     *   }
+     * })
+    **/
+    count<T extends TweetCountArgs>(
+      args?: Subset<T, TweetCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TweetCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Tweet.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TweetAggregateArgs>(args: Subset<T, TweetAggregateArgs>): Prisma.PrismaPromise<GetTweetAggregateType<T>>
+
+    /**
+     * Group by Tweet.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TweetGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TweetGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TweetGroupByArgs['orderBy'] }
+        : { orderBy?: TweetGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TweetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTweetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Tweet model
+   */
+  readonly fields: TweetFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Tweet.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TweetClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    interactions<T extends Tweet$interactionsArgs<ExtArgs> = {}>(args?: Subset<T, Tweet$interactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InteractionPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Tweet model
+   */ 
+  interface TweetFieldRefs {
+    readonly id: FieldRef<"Tweet", 'String'>
+    readonly agentId: FieldRef<"Tweet", 'String'>
+    readonly content: FieldRef<"Tweet", 'String'>
+    readonly type: FieldRef<"Tweet", 'String'>
+    readonly timestamp: FieldRef<"Tweet", 'DateTime'>
+    readonly conversationId: FieldRef<"Tweet", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Tweet findUnique
+   */
+  export type TweetFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * Filter, which Tweet to fetch.
+     */
+    where: TweetWhereUniqueInput
+  }
+
+  /**
+   * Tweet findUniqueOrThrow
+   */
+  export type TweetFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * Filter, which Tweet to fetch.
+     */
+    where: TweetWhereUniqueInput
+  }
+
+  /**
+   * Tweet findFirst
+   */
+  export type TweetFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * Filter, which Tweet to fetch.
+     */
+    where?: TweetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tweets to fetch.
+     */
+    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Tweets.
+     */
+    cursor?: TweetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tweets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tweets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Tweets.
+     */
+    distinct?: TweetScalarFieldEnum | TweetScalarFieldEnum[]
+  }
+
+  /**
+   * Tweet findFirstOrThrow
+   */
+  export type TweetFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * Filter, which Tweet to fetch.
+     */
+    where?: TweetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tweets to fetch.
+     */
+    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Tweets.
+     */
+    cursor?: TweetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tweets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tweets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Tweets.
+     */
+    distinct?: TweetScalarFieldEnum | TweetScalarFieldEnum[]
+  }
+
+  /**
+   * Tweet findMany
+   */
+  export type TweetFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * Filter, which Tweets to fetch.
+     */
+    where?: TweetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tweets to fetch.
+     */
+    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Tweets.
+     */
+    cursor?: TweetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tweets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tweets.
+     */
+    skip?: number
+    distinct?: TweetScalarFieldEnum | TweetScalarFieldEnum[]
+  }
+
+  /**
+   * Tweet create
+   */
+  export type TweetCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Tweet.
+     */
+    data: XOR<TweetCreateInput, TweetUncheckedCreateInput>
+  }
+
+  /**
+   * Tweet createMany
+   */
+  export type TweetCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Tweets.
+     */
+    data: TweetCreateManyInput | TweetCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Tweet createManyAndReturn
+   */
+  export type TweetCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * The data used to create many Tweets.
+     */
+    data: TweetCreateManyInput | TweetCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Tweet update
+   */
+  export type TweetUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Tweet.
+     */
+    data: XOR<TweetUpdateInput, TweetUncheckedUpdateInput>
+    /**
+     * Choose, which Tweet to update.
+     */
+    where: TweetWhereUniqueInput
+  }
+
+  /**
+   * Tweet updateMany
+   */
+  export type TweetUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Tweets.
+     */
+    data: XOR<TweetUpdateManyMutationInput, TweetUncheckedUpdateManyInput>
+    /**
+     * Filter which Tweets to update
+     */
+    where?: TweetWhereInput
+  }
+
+  /**
+   * Tweet updateManyAndReturn
+   */
+  export type TweetUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * The data used to update Tweets.
+     */
+    data: XOR<TweetUpdateManyMutationInput, TweetUncheckedUpdateManyInput>
+    /**
+     * Filter which Tweets to update
+     */
+    where?: TweetWhereInput
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Tweet upsert
+   */
+  export type TweetUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Tweet to update in case it exists.
+     */
+    where: TweetWhereUniqueInput
+    /**
+     * In case the Tweet found by the `where` argument doesn't exist, create a new Tweet with this data.
+     */
+    create: XOR<TweetCreateInput, TweetUncheckedCreateInput>
+    /**
+     * In case the Tweet was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TweetUpdateInput, TweetUncheckedUpdateInput>
+  }
+
+  /**
+   * Tweet delete
+   */
+  export type TweetDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
+    /**
+     * Filter which Tweet to delete.
+     */
+    where: TweetWhereUniqueInput
+  }
+
+  /**
+   * Tweet deleteMany
+   */
+  export type TweetDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Tweets to delete
+     */
+    where?: TweetWhereInput
+  }
+
+  /**
+   * Tweet.interactions
+   */
+  export type Tweet$interactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Interaction
+     */
+    select?: InteractionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Interaction
+     */
+    omit?: InteractionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InteractionInclude<ExtArgs> | null
+    where?: InteractionWhereInput
+    orderBy?: InteractionOrderByWithRelationInput | InteractionOrderByWithRelationInput[]
+    cursor?: InteractionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InteractionScalarFieldEnum | InteractionScalarFieldEnum[]
+  }
+
+  /**
+   * Tweet without action
+   */
+  export type TweetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tweet
+     */
+    select?: TweetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tweet
+     */
+    omit?: TweetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TweetInclude<ExtArgs> | null
   }
 
 
@@ -9477,1427 +10423,71 @@ export namespace Prisma {
 
 
   /**
-   * Model Community
-   */
-
-  export type AggregateCommunity = {
-    _count: CommunityCountAggregateOutputType | null
-    _avg: CommunityAvgAggregateOutputType | null
-    _sum: CommunitySumAggregateOutputType | null
-    _min: CommunityMinAggregateOutputType | null
-    _max: CommunityMaxAggregateOutputType | null
-  }
-
-  export type CommunityAvgAggregateOutputType = {
-    followers: number | null
-    averageEngagement: number | null
-    supporterCount: number | null
-    influenceScore: number | null
-  }
-
-  export type CommunitySumAggregateOutputType = {
-    followers: number | null
-    averageEngagement: number | null
-    supporterCount: number | null
-    influenceScore: number | null
-  }
-
-  export type CommunityMinAggregateOutputType = {
-    id: string | null
-    followers: number | null
-    averageEngagement: number | null
-    supporterCount: number | null
-    lastInfluenceTime: Date | null
-    influenceScore: number | null
-    agentId: string | null
-  }
-
-  export type CommunityMaxAggregateOutputType = {
-    id: string | null
-    followers: number | null
-    averageEngagement: number | null
-    supporterCount: number | null
-    lastInfluenceTime: Date | null
-    influenceScore: number | null
-    agentId: string | null
-  }
-
-  export type CommunityCountAggregateOutputType = {
-    id: number
-    followers: number
-    averageEngagement: number
-    supporterCount: number
-    lastInfluenceTime: number
-    influenceScore: number
-    agentId: number
-    _all: number
-  }
-
-
-  export type CommunityAvgAggregateInputType = {
-    followers?: true
-    averageEngagement?: true
-    supporterCount?: true
-    influenceScore?: true
-  }
-
-  export type CommunitySumAggregateInputType = {
-    followers?: true
-    averageEngagement?: true
-    supporterCount?: true
-    influenceScore?: true
-  }
-
-  export type CommunityMinAggregateInputType = {
-    id?: true
-    followers?: true
-    averageEngagement?: true
-    supporterCount?: true
-    lastInfluenceTime?: true
-    influenceScore?: true
-    agentId?: true
-  }
-
-  export type CommunityMaxAggregateInputType = {
-    id?: true
-    followers?: true
-    averageEngagement?: true
-    supporterCount?: true
-    lastInfluenceTime?: true
-    influenceScore?: true
-    agentId?: true
-  }
-
-  export type CommunityCountAggregateInputType = {
-    id?: true
-    followers?: true
-    averageEngagement?: true
-    supporterCount?: true
-    lastInfluenceTime?: true
-    influenceScore?: true
-    agentId?: true
-    _all?: true
-  }
-
-  export type CommunityAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Community to aggregate.
-     */
-    where?: CommunityWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Communities to fetch.
-     */
-    orderBy?: CommunityOrderByWithRelationInput | CommunityOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: CommunityWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Communities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Communities.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Communities
-    **/
-    _count?: true | CommunityCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: CommunityAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: CommunitySumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: CommunityMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: CommunityMaxAggregateInputType
-  }
-
-  export type GetCommunityAggregateType<T extends CommunityAggregateArgs> = {
-        [P in keyof T & keyof AggregateCommunity]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateCommunity[P]>
-      : GetScalarType<T[P], AggregateCommunity[P]>
-  }
-
-
-
-
-  export type CommunityGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: CommunityWhereInput
-    orderBy?: CommunityOrderByWithAggregationInput | CommunityOrderByWithAggregationInput[]
-    by: CommunityScalarFieldEnum[] | CommunityScalarFieldEnum
-    having?: CommunityScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: CommunityCountAggregateInputType | true
-    _avg?: CommunityAvgAggregateInputType
-    _sum?: CommunitySumAggregateInputType
-    _min?: CommunityMinAggregateInputType
-    _max?: CommunityMaxAggregateInputType
-  }
-
-  export type CommunityGroupByOutputType = {
-    id: string
-    followers: number
-    averageEngagement: number
-    supporterCount: number
-    lastInfluenceTime: Date
-    influenceScore: number
-    agentId: string
-    _count: CommunityCountAggregateOutputType | null
-    _avg: CommunityAvgAggregateOutputType | null
-    _sum: CommunitySumAggregateOutputType | null
-    _min: CommunityMinAggregateOutputType | null
-    _max: CommunityMaxAggregateOutputType | null
-  }
-
-  type GetCommunityGroupByPayload<T extends CommunityGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<CommunityGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof CommunityGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], CommunityGroupByOutputType[P]>
-            : GetScalarType<T[P], CommunityGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type CommunitySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    followers?: boolean
-    averageEngagement?: boolean
-    supporterCount?: boolean
-    lastInfluenceTime?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    interactions?: boolean | Community$interactionsArgs<ExtArgs>
-    _count?: boolean | CommunityCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["community"]>
-
-  export type CommunitySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    followers?: boolean
-    averageEngagement?: boolean
-    supporterCount?: boolean
-    lastInfluenceTime?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["community"]>
-
-  export type CommunitySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    followers?: boolean
-    averageEngagement?: boolean
-    supporterCount?: boolean
-    lastInfluenceTime?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["community"]>
-
-  export type CommunitySelectScalar = {
-    id?: boolean
-    followers?: boolean
-    averageEngagement?: boolean
-    supporterCount?: boolean
-    lastInfluenceTime?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-  }
-
-  export type CommunityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "followers" | "averageEngagement" | "supporterCount" | "lastInfluenceTime" | "influenceScore" | "agentId", ExtArgs["result"]["community"]>
-  export type CommunityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    interactions?: boolean | Community$interactionsArgs<ExtArgs>
-    _count?: boolean | CommunityCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type CommunityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-  export type CommunityIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-
-  export type $CommunityPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Community"
-    objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>
-      interactions: Prisma.$InteractionPayload<ExtArgs>[]
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      followers: number
-      averageEngagement: number
-      supporterCount: number
-      lastInfluenceTime: Date
-      influenceScore: number
-      agentId: string
-    }, ExtArgs["result"]["community"]>
-    composites: {}
-  }
-
-  type CommunityGetPayload<S extends boolean | null | undefined | CommunityDefaultArgs> = $Result.GetResult<Prisma.$CommunityPayload, S>
-
-  type CommunityCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<CommunityFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: CommunityCountAggregateInputType | true
-    }
-
-  export interface CommunityDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Community'], meta: { name: 'Community' } }
-    /**
-     * Find zero or one Community that matches the filter.
-     * @param {CommunityFindUniqueArgs} args - Arguments to find a Community
-     * @example
-     * // Get one Community
-     * const community = await prisma.community.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends CommunityFindUniqueArgs>(args: SelectSubset<T, CommunityFindUniqueArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find one Community that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {CommunityFindUniqueOrThrowArgs} args - Arguments to find a Community
-     * @example
-     * // Get one Community
-     * const community = await prisma.community.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends CommunityFindUniqueOrThrowArgs>(args: SelectSubset<T, CommunityFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first Community that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityFindFirstArgs} args - Arguments to find a Community
-     * @example
-     * // Get one Community
-     * const community = await prisma.community.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends CommunityFindFirstArgs>(args?: SelectSubset<T, CommunityFindFirstArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first Community that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityFindFirstOrThrowArgs} args - Arguments to find a Community
-     * @example
-     * // Get one Community
-     * const community = await prisma.community.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends CommunityFindFirstOrThrowArgs>(args?: SelectSubset<T, CommunityFindFirstOrThrowArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find zero or more Communities that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Communities
-     * const communities = await prisma.community.findMany()
-     * 
-     * // Get first 10 Communities
-     * const communities = await prisma.community.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const communityWithIdOnly = await prisma.community.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends CommunityFindManyArgs>(args?: SelectSubset<T, CommunityFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findMany", ClientOptions>>
-
-    /**
-     * Create a Community.
-     * @param {CommunityCreateArgs} args - Arguments to create a Community.
-     * @example
-     * // Create one Community
-     * const Community = await prisma.community.create({
-     *   data: {
-     *     // ... data to create a Community
-     *   }
-     * })
-     * 
-     */
-    create<T extends CommunityCreateArgs>(args: SelectSubset<T, CommunityCreateArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Create many Communities.
-     * @param {CommunityCreateManyArgs} args - Arguments to create many Communities.
-     * @example
-     * // Create many Communities
-     * const community = await prisma.community.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends CommunityCreateManyArgs>(args?: SelectSubset<T, CommunityCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Communities and returns the data saved in the database.
-     * @param {CommunityCreateManyAndReturnArgs} args - Arguments to create many Communities.
-     * @example
-     * // Create many Communities
-     * const community = await prisma.community.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Communities and only return the `id`
-     * const communityWithIdOnly = await prisma.community.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends CommunityCreateManyAndReturnArgs>(args?: SelectSubset<T, CommunityCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
-
-    /**
-     * Delete a Community.
-     * @param {CommunityDeleteArgs} args - Arguments to delete one Community.
-     * @example
-     * // Delete one Community
-     * const Community = await prisma.community.delete({
-     *   where: {
-     *     // ... filter to delete one Community
-     *   }
-     * })
-     * 
-     */
-    delete<T extends CommunityDeleteArgs>(args: SelectSubset<T, CommunityDeleteArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Update one Community.
-     * @param {CommunityUpdateArgs} args - Arguments to update one Community.
-     * @example
-     * // Update one Community
-     * const community = await prisma.community.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends CommunityUpdateArgs>(args: SelectSubset<T, CommunityUpdateArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Delete zero or more Communities.
-     * @param {CommunityDeleteManyArgs} args - Arguments to filter Communities to delete.
-     * @example
-     * // Delete a few Communities
-     * const { count } = await prisma.community.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends CommunityDeleteManyArgs>(args?: SelectSubset<T, CommunityDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Communities.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Communities
-     * const community = await prisma.community.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends CommunityUpdateManyArgs>(args: SelectSubset<T, CommunityUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Communities and returns the data updated in the database.
-     * @param {CommunityUpdateManyAndReturnArgs} args - Arguments to update many Communities.
-     * @example
-     * // Update many Communities
-     * const community = await prisma.community.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Communities and only return the `id`
-     * const communityWithIdOnly = await prisma.community.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends CommunityUpdateManyAndReturnArgs>(args: SelectSubset<T, CommunityUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
-
-    /**
-     * Create or update one Community.
-     * @param {CommunityUpsertArgs} args - Arguments to update or create a Community.
-     * @example
-     * // Update or create a Community
-     * const community = await prisma.community.upsert({
-     *   create: {
-     *     // ... data to create a Community
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Community we want to update
-     *   }
-     * })
-     */
-    upsert<T extends CommunityUpsertArgs>(args: SelectSubset<T, CommunityUpsertArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
-
-
-    /**
-     * Count the number of Communities.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityCountArgs} args - Arguments to filter Communities to count.
-     * @example
-     * // Count the number of Communities
-     * const count = await prisma.community.count({
-     *   where: {
-     *     // ... the filter for the Communities we want to count
-     *   }
-     * })
-    **/
-    count<T extends CommunityCountArgs>(
-      args?: Subset<T, CommunityCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], CommunityCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Community.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends CommunityAggregateArgs>(args: Subset<T, CommunityAggregateArgs>): Prisma.PrismaPromise<GetCommunityAggregateType<T>>
-
-    /**
-     * Group by Community.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {CommunityGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends CommunityGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: CommunityGroupByArgs['orderBy'] }
-        : { orderBy?: CommunityGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, CommunityGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunityGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Community model
-   */
-  readonly fields: CommunityFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Community.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__CommunityClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    interactions<T extends Community$interactionsArgs<ExtArgs> = {}>(args?: Subset<T, Community$interactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InteractionPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Community model
-   */ 
-  interface CommunityFieldRefs {
-    readonly id: FieldRef<"Community", 'String'>
-    readonly followers: FieldRef<"Community", 'Int'>
-    readonly averageEngagement: FieldRef<"Community", 'Float'>
-    readonly supporterCount: FieldRef<"Community", 'Int'>
-    readonly lastInfluenceTime: FieldRef<"Community", 'DateTime'>
-    readonly influenceScore: FieldRef<"Community", 'Float'>
-    readonly agentId: FieldRef<"Community", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Community findUnique
-   */
-  export type CommunityFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * Filter, which Community to fetch.
-     */
-    where: CommunityWhereUniqueInput
-  }
-
-  /**
-   * Community findUniqueOrThrow
-   */
-  export type CommunityFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * Filter, which Community to fetch.
-     */
-    where: CommunityWhereUniqueInput
-  }
-
-  /**
-   * Community findFirst
-   */
-  export type CommunityFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * Filter, which Community to fetch.
-     */
-    where?: CommunityWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Communities to fetch.
-     */
-    orderBy?: CommunityOrderByWithRelationInput | CommunityOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Communities.
-     */
-    cursor?: CommunityWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Communities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Communities.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Communities.
-     */
-    distinct?: CommunityScalarFieldEnum | CommunityScalarFieldEnum[]
-  }
-
-  /**
-   * Community findFirstOrThrow
-   */
-  export type CommunityFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * Filter, which Community to fetch.
-     */
-    where?: CommunityWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Communities to fetch.
-     */
-    orderBy?: CommunityOrderByWithRelationInput | CommunityOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Communities.
-     */
-    cursor?: CommunityWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Communities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Communities.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Communities.
-     */
-    distinct?: CommunityScalarFieldEnum | CommunityScalarFieldEnum[]
-  }
-
-  /**
-   * Community findMany
-   */
-  export type CommunityFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * Filter, which Communities to fetch.
-     */
-    where?: CommunityWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Communities to fetch.
-     */
-    orderBy?: CommunityOrderByWithRelationInput | CommunityOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Communities.
-     */
-    cursor?: CommunityWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Communities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Communities.
-     */
-    skip?: number
-    distinct?: CommunityScalarFieldEnum | CommunityScalarFieldEnum[]
-  }
-
-  /**
-   * Community create
-   */
-  export type CommunityCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Community.
-     */
-    data: XOR<CommunityCreateInput, CommunityUncheckedCreateInput>
-  }
-
-  /**
-   * Community createMany
-   */
-  export type CommunityCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Communities.
-     */
-    data: CommunityCreateManyInput | CommunityCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Community createManyAndReturn
-   */
-  export type CommunityCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * The data used to create many Communities.
-     */
-    data: CommunityCreateManyInput | CommunityCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Community update
-   */
-  export type CommunityUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Community.
-     */
-    data: XOR<CommunityUpdateInput, CommunityUncheckedUpdateInput>
-    /**
-     * Choose, which Community to update.
-     */
-    where: CommunityWhereUniqueInput
-  }
-
-  /**
-   * Community updateMany
-   */
-  export type CommunityUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Communities.
-     */
-    data: XOR<CommunityUpdateManyMutationInput, CommunityUncheckedUpdateManyInput>
-    /**
-     * Filter which Communities to update
-     */
-    where?: CommunityWhereInput
-  }
-
-  /**
-   * Community updateManyAndReturn
-   */
-  export type CommunityUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * The data used to update Communities.
-     */
-    data: XOR<CommunityUpdateManyMutationInput, CommunityUncheckedUpdateManyInput>
-    /**
-     * Filter which Communities to update
-     */
-    where?: CommunityWhereInput
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Community upsert
-   */
-  export type CommunityUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Community to update in case it exists.
-     */
-    where: CommunityWhereUniqueInput
-    /**
-     * In case the Community found by the `where` argument doesn't exist, create a new Community with this data.
-     */
-    create: XOR<CommunityCreateInput, CommunityUncheckedCreateInput>
-    /**
-     * In case the Community was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<CommunityUpdateInput, CommunityUncheckedUpdateInput>
-  }
-
-  /**
-   * Community delete
-   */
-  export type CommunityDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-    /**
-     * Filter which Community to delete.
-     */
-    where: CommunityWhereUniqueInput
-  }
-
-  /**
-   * Community deleteMany
-   */
-  export type CommunityDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Communities to delete
-     */
-    where?: CommunityWhereInput
-  }
-
-  /**
-   * Community.interactions
-   */
-  export type Community$interactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Interaction
-     */
-    select?: InteractionSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Interaction
-     */
-    omit?: InteractionOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InteractionInclude<ExtArgs> | null
-    where?: InteractionWhereInput
-    orderBy?: InteractionOrderByWithRelationInput | InteractionOrderByWithRelationInput[]
-    cursor?: InteractionWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: InteractionScalarFieldEnum | InteractionScalarFieldEnum[]
-  }
-
-  /**
-   * Community without action
-   */
-  export type CommunityDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Community
-     */
-    select?: CommunitySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Community
-     */
-    omit?: CommunityOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CommunityInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Model Interaction
    */
 
   export type AggregateInteraction = {
     _count: InteractionCountAggregateOutputType | null
-    _avg: InteractionAvgAggregateOutputType | null
-    _sum: InteractionSumAggregateOutputType | null
     _min: InteractionMinAggregateOutputType | null
     _max: InteractionMaxAggregateOutputType | null
   }
 
-  export type InteractionAvgAggregateOutputType = {
-    authorFollowers: number | null
-    engagement: number | null
-    likes: number | null
-    retweets: number | null
-    quotes: number | null
-    replies: number | null
-    influenceScore: number | null
-    confidence: number | null
-    deceptionScore: number | null
-    communityAlignment: number | null
-    impactScore: number | null
-    previousInteractions: number | null
-    authorReliability: number | null
-  }
-
-  export type InteractionSumAggregateOutputType = {
-    authorFollowers: number | null
-    engagement: number | null
-    likes: number | null
-    retweets: number | null
-    quotes: number | null
-    replies: number | null
-    influenceScore: number | null
-    confidence: number | null
-    deceptionScore: number | null
-    communityAlignment: number | null
-    impactScore: number | null
-    previousInteractions: number | null
-    authorReliability: number | null
-  }
-
   export type InteractionMinAggregateOutputType = {
     id: string | null
-    createdAt: Date | null
+    tweetId: string | null
+    userId: string | null
     type: string | null
     content: string | null
-    communityId: string | null
-    authorId: string | null
-    authorHandle: string | null
-    authorFollowers: number | null
-    authorIsVerified: boolean | null
-    engagement: number | null
-    likes: number | null
-    retweets: number | null
-    quotes: number | null
-    replies: number | null
-    sentiment: string | null
-    influenceScore: number | null
-    suggestedAction: string | null
-    confidence: number | null
-    isDeceptive: boolean | null
-    deceptionScore: number | null
-    intentType: string | null
-    referencedTweet: string | null
-    conversationId: string | null
-    inReplyToId: string | null
-    communityAlignment: number | null
-    impactScore: number | null
-    previousInteractions: number | null
-    authorReliability: number | null
     timestamp: Date | null
-    processedAt: Date | null
   }
 
   export type InteractionMaxAggregateOutputType = {
     id: string | null
-    createdAt: Date | null
+    tweetId: string | null
+    userId: string | null
     type: string | null
     content: string | null
-    communityId: string | null
-    authorId: string | null
-    authorHandle: string | null
-    authorFollowers: number | null
-    authorIsVerified: boolean | null
-    engagement: number | null
-    likes: number | null
-    retweets: number | null
-    quotes: number | null
-    replies: number | null
-    sentiment: string | null
-    influenceScore: number | null
-    suggestedAction: string | null
-    confidence: number | null
-    isDeceptive: boolean | null
-    deceptionScore: number | null
-    intentType: string | null
-    referencedTweet: string | null
-    conversationId: string | null
-    inReplyToId: string | null
-    communityAlignment: number | null
-    impactScore: number | null
-    previousInteractions: number | null
-    authorReliability: number | null
     timestamp: Date | null
-    processedAt: Date | null
   }
 
   export type InteractionCountAggregateOutputType = {
     id: number
-    createdAt: number
+    tweetId: number
+    userId: number
     type: number
     content: number
-    communityId: number
-    authorId: number
-    authorHandle: number
-    authorFollowers: number
-    authorIsVerified: number
-    engagement: number
-    likes: number
-    retweets: number
-    quotes: number
-    replies: number
-    sentiment: number
-    influenceScore: number
-    suggestedAction: number
-    confidence: number
-    isDeceptive: number
-    deceptionScore: number
-    intentType: number
-    referencedTweet: number
-    conversationId: number
-    inReplyToId: number
-    communityAlignment: number
-    impactScore: number
-    previousInteractions: number
-    authorReliability: number
     timestamp: number
-    processedAt: number
+    userMetrics: number
     _all: number
   }
 
 
-  export type InteractionAvgAggregateInputType = {
-    authorFollowers?: true
-    engagement?: true
-    likes?: true
-    retweets?: true
-    quotes?: true
-    replies?: true
-    influenceScore?: true
-    confidence?: true
-    deceptionScore?: true
-    communityAlignment?: true
-    impactScore?: true
-    previousInteractions?: true
-    authorReliability?: true
-  }
-
-  export type InteractionSumAggregateInputType = {
-    authorFollowers?: true
-    engagement?: true
-    likes?: true
-    retweets?: true
-    quotes?: true
-    replies?: true
-    influenceScore?: true
-    confidence?: true
-    deceptionScore?: true
-    communityAlignment?: true
-    impactScore?: true
-    previousInteractions?: true
-    authorReliability?: true
-  }
-
   export type InteractionMinAggregateInputType = {
     id?: true
-    createdAt?: true
+    tweetId?: true
+    userId?: true
     type?: true
     content?: true
-    communityId?: true
-    authorId?: true
-    authorHandle?: true
-    authorFollowers?: true
-    authorIsVerified?: true
-    engagement?: true
-    likes?: true
-    retweets?: true
-    quotes?: true
-    replies?: true
-    sentiment?: true
-    influenceScore?: true
-    suggestedAction?: true
-    confidence?: true
-    isDeceptive?: true
-    deceptionScore?: true
-    intentType?: true
-    referencedTweet?: true
-    conversationId?: true
-    inReplyToId?: true
-    communityAlignment?: true
-    impactScore?: true
-    previousInteractions?: true
-    authorReliability?: true
     timestamp?: true
-    processedAt?: true
   }
 
   export type InteractionMaxAggregateInputType = {
     id?: true
-    createdAt?: true
+    tweetId?: true
+    userId?: true
     type?: true
     content?: true
-    communityId?: true
-    authorId?: true
-    authorHandle?: true
-    authorFollowers?: true
-    authorIsVerified?: true
-    engagement?: true
-    likes?: true
-    retweets?: true
-    quotes?: true
-    replies?: true
-    sentiment?: true
-    influenceScore?: true
-    suggestedAction?: true
-    confidence?: true
-    isDeceptive?: true
-    deceptionScore?: true
-    intentType?: true
-    referencedTweet?: true
-    conversationId?: true
-    inReplyToId?: true
-    communityAlignment?: true
-    impactScore?: true
-    previousInteractions?: true
-    authorReliability?: true
     timestamp?: true
-    processedAt?: true
   }
 
   export type InteractionCountAggregateInputType = {
     id?: true
-    createdAt?: true
+    tweetId?: true
+    userId?: true
     type?: true
     content?: true
-    communityId?: true
-    authorId?: true
-    authorHandle?: true
-    authorFollowers?: true
-    authorIsVerified?: true
-    engagement?: true
-    likes?: true
-    retweets?: true
-    quotes?: true
-    replies?: true
-    sentiment?: true
-    influenceScore?: true
-    suggestedAction?: true
-    confidence?: true
-    isDeceptive?: true
-    deceptionScore?: true
-    intentType?: true
-    referencedTweet?: true
-    conversationId?: true
-    inReplyToId?: true
-    communityAlignment?: true
-    impactScore?: true
-    previousInteractions?: true
-    authorReliability?: true
     timestamp?: true
-    processedAt?: true
+    userMetrics?: true
     _all?: true
   }
 
@@ -10939,18 +10529,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: InteractionAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: InteractionSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: InteractionMinAggregateInputType
@@ -10981,46 +10559,19 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: InteractionCountAggregateInputType | true
-    _avg?: InteractionAvgAggregateInputType
-    _sum?: InteractionSumAggregateInputType
     _min?: InteractionMinAggregateInputType
     _max?: InteractionMaxAggregateInputType
   }
 
   export type InteractionGroupByOutputType = {
     id: string
-    createdAt: Date
+    tweetId: string
+    userId: string
     type: string
-    content: string
-    communityId: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified: boolean
-    engagement: number
-    likes: number
-    retweets: number
-    quotes: number
-    replies: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction: string | null
-    confidence: number
-    isDeceptive: boolean
-    deceptionScore: number
-    intentType: string
-    referencedTweet: string | null
-    conversationId: string | null
-    inReplyToId: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions: number
-    authorReliability: number
+    content: string | null
     timestamp: Date
-    processedAt: Date
+    userMetrics: JsonValue
     _count: InteractionCountAggregateOutputType | null
-    _avg: InteractionAvgAggregateOutputType | null
-    _sum: InteractionSumAggregateOutputType | null
     _min: InteractionMinAggregateOutputType | null
     _max: InteractionMaxAggregateOutputType | null
   }
@@ -11041,186 +10592,71 @@ export namespace Prisma {
 
   export type InteractionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    createdAt?: boolean
+    tweetId?: boolean
+    userId?: boolean
     type?: boolean
     content?: boolean
-    communityId?: boolean
-    authorId?: boolean
-    authorHandle?: boolean
-    authorFollowers?: boolean
-    authorIsVerified?: boolean
-    engagement?: boolean
-    likes?: boolean
-    retweets?: boolean
-    quotes?: boolean
-    replies?: boolean
-    sentiment?: boolean
-    influenceScore?: boolean
-    suggestedAction?: boolean
-    confidence?: boolean
-    isDeceptive?: boolean
-    deceptionScore?: boolean
-    intentType?: boolean
-    referencedTweet?: boolean
-    conversationId?: boolean
-    inReplyToId?: boolean
-    communityAlignment?: boolean
-    impactScore?: boolean
-    previousInteractions?: boolean
-    authorReliability?: boolean
     timestamp?: boolean
-    processedAt?: boolean
-    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    userMetrics?: boolean
+    tweet?: boolean | TweetDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["interaction"]>
 
   export type InteractionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    createdAt?: boolean
+    tweetId?: boolean
+    userId?: boolean
     type?: boolean
     content?: boolean
-    communityId?: boolean
-    authorId?: boolean
-    authorHandle?: boolean
-    authorFollowers?: boolean
-    authorIsVerified?: boolean
-    engagement?: boolean
-    likes?: boolean
-    retweets?: boolean
-    quotes?: boolean
-    replies?: boolean
-    sentiment?: boolean
-    influenceScore?: boolean
-    suggestedAction?: boolean
-    confidence?: boolean
-    isDeceptive?: boolean
-    deceptionScore?: boolean
-    intentType?: boolean
-    referencedTweet?: boolean
-    conversationId?: boolean
-    inReplyToId?: boolean
-    communityAlignment?: boolean
-    impactScore?: boolean
-    previousInteractions?: boolean
-    authorReliability?: boolean
     timestamp?: boolean
-    processedAt?: boolean
-    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    userMetrics?: boolean
+    tweet?: boolean | TweetDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["interaction"]>
 
   export type InteractionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    createdAt?: boolean
+    tweetId?: boolean
+    userId?: boolean
     type?: boolean
     content?: boolean
-    communityId?: boolean
-    authorId?: boolean
-    authorHandle?: boolean
-    authorFollowers?: boolean
-    authorIsVerified?: boolean
-    engagement?: boolean
-    likes?: boolean
-    retweets?: boolean
-    quotes?: boolean
-    replies?: boolean
-    sentiment?: boolean
-    influenceScore?: boolean
-    suggestedAction?: boolean
-    confidence?: boolean
-    isDeceptive?: boolean
-    deceptionScore?: boolean
-    intentType?: boolean
-    referencedTweet?: boolean
-    conversationId?: boolean
-    inReplyToId?: boolean
-    communityAlignment?: boolean
-    impactScore?: boolean
-    previousInteractions?: boolean
-    authorReliability?: boolean
     timestamp?: boolean
-    processedAt?: boolean
-    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    userMetrics?: boolean
+    tweet?: boolean | TweetDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["interaction"]>
 
   export type InteractionSelectScalar = {
     id?: boolean
-    createdAt?: boolean
+    tweetId?: boolean
+    userId?: boolean
     type?: boolean
     content?: boolean
-    communityId?: boolean
-    authorId?: boolean
-    authorHandle?: boolean
-    authorFollowers?: boolean
-    authorIsVerified?: boolean
-    engagement?: boolean
-    likes?: boolean
-    retweets?: boolean
-    quotes?: boolean
-    replies?: boolean
-    sentiment?: boolean
-    influenceScore?: boolean
-    suggestedAction?: boolean
-    confidence?: boolean
-    isDeceptive?: boolean
-    deceptionScore?: boolean
-    intentType?: boolean
-    referencedTweet?: boolean
-    conversationId?: boolean
-    inReplyToId?: boolean
-    communityAlignment?: boolean
-    impactScore?: boolean
-    previousInteractions?: boolean
-    authorReliability?: boolean
     timestamp?: boolean
-    processedAt?: boolean
+    userMetrics?: boolean
   }
 
-  export type InteractionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "type" | "content" | "communityId" | "authorId" | "authorHandle" | "authorFollowers" | "authorIsVerified" | "engagement" | "likes" | "retweets" | "quotes" | "replies" | "sentiment" | "influenceScore" | "suggestedAction" | "confidence" | "isDeceptive" | "deceptionScore" | "intentType" | "referencedTweet" | "conversationId" | "inReplyToId" | "communityAlignment" | "impactScore" | "previousInteractions" | "authorReliability" | "timestamp" | "processedAt", ExtArgs["result"]["interaction"]>
+  export type InteractionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tweetId" | "userId" | "type" | "content" | "timestamp" | "userMetrics", ExtArgs["result"]["interaction"]>
   export type InteractionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    tweet?: boolean | TweetDefaultArgs<ExtArgs>
   }
   export type InteractionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    tweet?: boolean | TweetDefaultArgs<ExtArgs>
   }
   export type InteractionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    community?: boolean | CommunityDefaultArgs<ExtArgs>
+    tweet?: boolean | TweetDefaultArgs<ExtArgs>
   }
 
   export type $InteractionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Interaction"
     objects: {
-      community: Prisma.$CommunityPayload<ExtArgs>
+      tweet: Prisma.$TweetPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      createdAt: Date
+      tweetId: string
+      userId: string
       type: string
-      content: string
-      communityId: string
-      authorId: string
-      authorHandle: string
-      authorFollowers: number
-      authorIsVerified: boolean
-      engagement: number
-      likes: number
-      retweets: number
-      quotes: number
-      replies: number
-      sentiment: string
-      influenceScore: number
-      suggestedAction: string | null
-      confidence: number
-      isDeceptive: boolean
-      deceptionScore: number
-      intentType: string
-      referencedTweet: string | null
-      conversationId: string | null
-      inReplyToId: string | null
-      communityAlignment: number
-      impactScore: number
-      previousInteractions: number
-      authorReliability: number
+      content: string | null
       timestamp: Date
-      processedAt: Date
+      userMetrics: Prisma.JsonValue
     }, ExtArgs["result"]["interaction"]>
     composites: {}
   }
@@ -11615,7 +11051,7 @@ export namespace Prisma {
    */
   export interface Prisma__InteractionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    community<T extends CommunityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CommunityDefaultArgs<ExtArgs>>): Prisma__CommunityClient<$Result.GetResult<Prisma.$CommunityPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    tweet<T extends TweetDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TweetDefaultArgs<ExtArgs>>): Prisma__TweetClient<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11646,35 +11082,12 @@ export namespace Prisma {
    */ 
   interface InteractionFieldRefs {
     readonly id: FieldRef<"Interaction", 'String'>
-    readonly createdAt: FieldRef<"Interaction", 'DateTime'>
+    readonly tweetId: FieldRef<"Interaction", 'String'>
+    readonly userId: FieldRef<"Interaction", 'String'>
     readonly type: FieldRef<"Interaction", 'String'>
     readonly content: FieldRef<"Interaction", 'String'>
-    readonly communityId: FieldRef<"Interaction", 'String'>
-    readonly authorId: FieldRef<"Interaction", 'String'>
-    readonly authorHandle: FieldRef<"Interaction", 'String'>
-    readonly authorFollowers: FieldRef<"Interaction", 'Int'>
-    readonly authorIsVerified: FieldRef<"Interaction", 'Boolean'>
-    readonly engagement: FieldRef<"Interaction", 'Int'>
-    readonly likes: FieldRef<"Interaction", 'Int'>
-    readonly retweets: FieldRef<"Interaction", 'Int'>
-    readonly quotes: FieldRef<"Interaction", 'Int'>
-    readonly replies: FieldRef<"Interaction", 'Int'>
-    readonly sentiment: FieldRef<"Interaction", 'String'>
-    readonly influenceScore: FieldRef<"Interaction", 'Float'>
-    readonly suggestedAction: FieldRef<"Interaction", 'String'>
-    readonly confidence: FieldRef<"Interaction", 'Float'>
-    readonly isDeceptive: FieldRef<"Interaction", 'Boolean'>
-    readonly deceptionScore: FieldRef<"Interaction", 'Float'>
-    readonly intentType: FieldRef<"Interaction", 'String'>
-    readonly referencedTweet: FieldRef<"Interaction", 'String'>
-    readonly conversationId: FieldRef<"Interaction", 'String'>
-    readonly inReplyToId: FieldRef<"Interaction", 'String'>
-    readonly communityAlignment: FieldRef<"Interaction", 'Float'>
-    readonly impactScore: FieldRef<"Interaction", 'Float'>
-    readonly previousInteractions: FieldRef<"Interaction", 'Int'>
-    readonly authorReliability: FieldRef<"Interaction", 'Float'>
     readonly timestamp: FieldRef<"Interaction", 'DateTime'>
-    readonly processedAt: FieldRef<"Interaction", 'DateTime'>
+    readonly userMetrics: FieldRef<"Interaction", 'Json'>
   }
     
 
@@ -16393,16 +15806,7 @@ export namespace Prisma {
     lore: 'lore',
     characteristics: 'characteristics',
     knowledge: 'knowledge',
-    influenceDifficulty: 'influenceDifficulty',
-    aggressiveness: 'aggressiveness',
-    trustworthiness: 'trustworthiness',
-    manipulativeness: 'manipulativeness',
-    intelligence: 'intelligence',
-    adaptability: 'adaptability',
-    baseInfluence: 'baseInfluence',
-    followerMultiplier: 'followerMultiplier',
-    engagementMultiplier: 'engagementMultiplier',
-    consensusMultiplier: 'consensusMultiplier'
+    traits: 'traits'
   };
 
   export type AgentProfileScalarFieldEnum = (typeof AgentProfileScalarFieldEnum)[keyof typeof AgentProfileScalarFieldEnum]
@@ -16420,6 +15824,18 @@ export namespace Prisma {
   };
 
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
+
+
+  export const TweetScalarFieldEnum: {
+    id: 'id',
+    agentId: 'agentId',
+    content: 'content',
+    type: 'type',
+    timestamp: 'timestamp',
+    conversationId: 'conversationId'
+  };
+
+  export type TweetScalarFieldEnum = (typeof TweetScalarFieldEnum)[keyof typeof TweetScalarFieldEnum]
 
 
   export const LocationScalarFieldEnum: {
@@ -16466,50 +15882,14 @@ export namespace Prisma {
   export type BattleScalarFieldEnum = (typeof BattleScalarFieldEnum)[keyof typeof BattleScalarFieldEnum]
 
 
-  export const CommunityScalarFieldEnum: {
-    id: 'id',
-    followers: 'followers',
-    averageEngagement: 'averageEngagement',
-    supporterCount: 'supporterCount',
-    lastInfluenceTime: 'lastInfluenceTime',
-    influenceScore: 'influenceScore',
-    agentId: 'agentId'
-  };
-
-  export type CommunityScalarFieldEnum = (typeof CommunityScalarFieldEnum)[keyof typeof CommunityScalarFieldEnum]
-
-
   export const InteractionScalarFieldEnum: {
     id: 'id',
-    createdAt: 'createdAt',
+    tweetId: 'tweetId',
+    userId: 'userId',
     type: 'type',
     content: 'content',
-    communityId: 'communityId',
-    authorId: 'authorId',
-    authorHandle: 'authorHandle',
-    authorFollowers: 'authorFollowers',
-    authorIsVerified: 'authorIsVerified',
-    engagement: 'engagement',
-    likes: 'likes',
-    retweets: 'retweets',
-    quotes: 'quotes',
-    replies: 'replies',
-    sentiment: 'sentiment',
-    influenceScore: 'influenceScore',
-    suggestedAction: 'suggestedAction',
-    confidence: 'confidence',
-    isDeceptive: 'isDeceptive',
-    deceptionScore: 'deceptionScore',
-    intentType: 'intentType',
-    referencedTweet: 'referencedTweet',
-    conversationId: 'conversationId',
-    inReplyToId: 'inReplyToId',
-    communityAlignment: 'communityAlignment',
-    impactScore: 'impactScore',
-    previousInteractions: 'previousInteractions',
-    authorReliability: 'authorReliability',
     timestamp: 'timestamp',
-    processedAt: 'processedAt'
+    userMetrics: 'userMetrics'
   };
 
   export type InteractionScalarFieldEnum = (typeof InteractionScalarFieldEnum)[keyof typeof InteractionScalarFieldEnum]
@@ -16573,12 +15953,28 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   export const NullsOrder: {
@@ -16668,6 +16064,13 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
     
 
 
@@ -16871,16 +16274,7 @@ export namespace Prisma {
     lore?: StringNullableListFilter<"AgentProfile">
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
-    influenceDifficulty?: StringFilter<"AgentProfile"> | string
-    aggressiveness?: IntFilter<"AgentProfile"> | number
-    trustworthiness?: IntFilter<"AgentProfile"> | number
-    manipulativeness?: IntFilter<"AgentProfile"> | number
-    intelligence?: IntFilter<"AgentProfile"> | number
-    adaptability?: IntFilter<"AgentProfile"> | number
-    baseInfluence?: FloatFilter<"AgentProfile"> | number
-    followerMultiplier?: FloatFilter<"AgentProfile"> | number
-    engagementMultiplier?: FloatFilter<"AgentProfile"> | number
-    consensusMultiplier?: FloatFilter<"AgentProfile"> | number
+    traits?: JsonFilter<"AgentProfile">
     agent?: AgentListRelationFilter
   }
 
@@ -16893,16 +16287,7 @@ export namespace Prisma {
     lore?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
-    influenceDifficulty?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
+    traits?: SortOrder
     agent?: AgentOrderByRelationAggregateInput
   }
 
@@ -16918,16 +16303,7 @@ export namespace Prisma {
     lore?: StringNullableListFilter<"AgentProfile">
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
-    influenceDifficulty?: StringFilter<"AgentProfile"> | string
-    aggressiveness?: IntFilter<"AgentProfile"> | number
-    trustworthiness?: IntFilter<"AgentProfile"> | number
-    manipulativeness?: IntFilter<"AgentProfile"> | number
-    intelligence?: IntFilter<"AgentProfile"> | number
-    adaptability?: IntFilter<"AgentProfile"> | number
-    baseInfluence?: FloatFilter<"AgentProfile"> | number
-    followerMultiplier?: FloatFilter<"AgentProfile"> | number
-    engagementMultiplier?: FloatFilter<"AgentProfile"> | number
-    consensusMultiplier?: FloatFilter<"AgentProfile"> | number
+    traits?: JsonFilter<"AgentProfile">
     agent?: AgentListRelationFilter
   }, "id" | "onchainId" | "xHandle">
 
@@ -16940,16 +16316,7 @@ export namespace Prisma {
     lore?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
-    influenceDifficulty?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
+    traits?: SortOrder
     _count?: AgentProfileCountOrderByAggregateInput
     _avg?: AgentProfileAvgOrderByAggregateInput
     _max?: AgentProfileMaxOrderByAggregateInput
@@ -16969,16 +16336,7 @@ export namespace Prisma {
     lore?: StringNullableListFilter<"AgentProfile">
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
-    influenceDifficulty?: StringWithAggregatesFilter<"AgentProfile"> | string
-    aggressiveness?: IntWithAggregatesFilter<"AgentProfile"> | number
-    trustworthiness?: IntWithAggregatesFilter<"AgentProfile"> | number
-    manipulativeness?: IntWithAggregatesFilter<"AgentProfile"> | number
-    intelligence?: IntWithAggregatesFilter<"AgentProfile"> | number
-    adaptability?: IntWithAggregatesFilter<"AgentProfile"> | number
-    baseInfluence?: FloatWithAggregatesFilter<"AgentProfile"> | number
-    followerMultiplier?: FloatWithAggregatesFilter<"AgentProfile"> | number
-    engagementMultiplier?: FloatWithAggregatesFilter<"AgentProfile"> | number
-    consensusMultiplier?: FloatWithAggregatesFilter<"AgentProfile"> | number
+    traits?: JsonWithAggregatesFilter<"AgentProfile">
   }
 
   export type AgentWhereInput = {
@@ -16998,12 +16356,12 @@ export namespace Prisma {
     location?: XOR<LocationNullableScalarRelationFilter, LocationWhereInput> | null
     currentAlliance?: XOR<AllianceNullableScalarRelationFilter, AllianceWhereInput> | null
     battles?: BattleListRelationFilter
-    community?: XOR<CommunityNullableScalarRelationFilter, CommunityWhereInput> | null
     state?: XOR<AgentStateNullableScalarRelationFilter, AgentStateWhereInput> | null
     strategy?: XOR<StrategyNullableScalarRelationFilter, StrategyWhereInput> | null
     cooldowns?: CooldownListRelationFilter
     alliedBy?: AllianceListRelationFilter
     battlesAsOpponent?: BattleListRelationFilter
+    Tweet?: TweetListRelationFilter
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -17020,12 +16378,12 @@ export namespace Prisma {
     location?: LocationOrderByWithRelationInput
     currentAlliance?: AllianceOrderByWithRelationInput
     battles?: BattleOrderByRelationAggregateInput
-    community?: CommunityOrderByWithRelationInput
     state?: AgentStateOrderByWithRelationInput
     strategy?: StrategyOrderByWithRelationInput
     cooldowns?: CooldownOrderByRelationAggregateInput
     alliedBy?: AllianceOrderByRelationAggregateInput
     battlesAsOpponent?: BattleOrderByRelationAggregateInput
+    Tweet?: TweetOrderByRelationAggregateInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -17046,12 +16404,12 @@ export namespace Prisma {
     location?: XOR<LocationNullableScalarRelationFilter, LocationWhereInput> | null
     currentAlliance?: XOR<AllianceNullableScalarRelationFilter, AllianceWhereInput> | null
     battles?: BattleListRelationFilter
-    community?: XOR<CommunityNullableScalarRelationFilter, CommunityWhereInput> | null
     state?: XOR<AgentStateNullableScalarRelationFilter, AgentStateWhereInput> | null
     strategy?: XOR<StrategyNullableScalarRelationFilter, StrategyWhereInput> | null
     cooldowns?: CooldownListRelationFilter
     alliedBy?: AllianceListRelationFilter
     battlesAsOpponent?: BattleListRelationFilter
+    Tweet?: TweetListRelationFilter
   }, "id" | "agentId_gameId">
 
   export type AgentOrderByWithAggregationInput = {
@@ -17082,6 +16440,69 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Agent"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Agent"> | Date | string
     gameId?: StringWithAggregatesFilter<"Agent"> | string
+  }
+
+  export type TweetWhereInput = {
+    AND?: TweetWhereInput | TweetWhereInput[]
+    OR?: TweetWhereInput[]
+    NOT?: TweetWhereInput | TweetWhereInput[]
+    id?: StringFilter<"Tweet"> | string
+    agentId?: StringFilter<"Tweet"> | string
+    content?: StringFilter<"Tweet"> | string
+    type?: StringFilter<"Tweet"> | string
+    timestamp?: DateTimeFilter<"Tweet"> | Date | string
+    conversationId?: StringNullableFilter<"Tweet"> | string | null
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    interactions?: InteractionListRelationFilter
+  }
+
+  export type TweetOrderByWithRelationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    content?: SortOrder
+    type?: SortOrder
+    timestamp?: SortOrder
+    conversationId?: SortOrderInput | SortOrder
+    agent?: AgentOrderByWithRelationInput
+    interactions?: InteractionOrderByRelationAggregateInput
+  }
+
+  export type TweetWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TweetWhereInput | TweetWhereInput[]
+    OR?: TweetWhereInput[]
+    NOT?: TweetWhereInput | TweetWhereInput[]
+    agentId?: StringFilter<"Tweet"> | string
+    content?: StringFilter<"Tweet"> | string
+    type?: StringFilter<"Tweet"> | string
+    timestamp?: DateTimeFilter<"Tweet"> | Date | string
+    conversationId?: StringNullableFilter<"Tweet"> | string | null
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    interactions?: InteractionListRelationFilter
+  }, "id">
+
+  export type TweetOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    content?: SortOrder
+    type?: SortOrder
+    timestamp?: SortOrder
+    conversationId?: SortOrderInput | SortOrder
+    _count?: TweetCountOrderByAggregateInput
+    _max?: TweetMaxOrderByAggregateInput
+    _min?: TweetMinOrderByAggregateInput
+  }
+
+  export type TweetScalarWhereWithAggregatesInput = {
+    AND?: TweetScalarWhereWithAggregatesInput | TweetScalarWhereWithAggregatesInput[]
+    OR?: TweetScalarWhereWithAggregatesInput[]
+    NOT?: TweetScalarWhereWithAggregatesInput | TweetScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Tweet"> | string
+    agentId?: StringWithAggregatesFilter<"Tweet"> | string
+    content?: StringWithAggregatesFilter<"Tweet"> | string
+    type?: StringWithAggregatesFilter<"Tweet"> | string
+    timestamp?: DateTimeWithAggregatesFilter<"Tweet"> | Date | string
+    conversationId?: StringNullableWithAggregatesFilter<"Tweet"> | string | null
   }
 
   export type LocationWhereInput = {
@@ -17322,145 +16743,29 @@ export namespace Prisma {
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"Battle"> | Date | string | null
   }
 
-  export type CommunityWhereInput = {
-    AND?: CommunityWhereInput | CommunityWhereInput[]
-    OR?: CommunityWhereInput[]
-    NOT?: CommunityWhereInput | CommunityWhereInput[]
-    id?: StringFilter<"Community"> | string
-    followers?: IntFilter<"Community"> | number
-    averageEngagement?: FloatFilter<"Community"> | number
-    supporterCount?: IntFilter<"Community"> | number
-    lastInfluenceTime?: DateTimeFilter<"Community"> | Date | string
-    influenceScore?: FloatFilter<"Community"> | number
-    agentId?: StringFilter<"Community"> | string
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    interactions?: InteractionListRelationFilter
-  }
-
-  export type CommunityOrderByWithRelationInput = {
-    id?: SortOrder
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    lastInfluenceTime?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
-    agent?: AgentOrderByWithRelationInput
-    interactions?: InteractionOrderByRelationAggregateInput
-  }
-
-  export type CommunityWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    agentId?: string
-    AND?: CommunityWhereInput | CommunityWhereInput[]
-    OR?: CommunityWhereInput[]
-    NOT?: CommunityWhereInput | CommunityWhereInput[]
-    followers?: IntFilter<"Community"> | number
-    averageEngagement?: FloatFilter<"Community"> | number
-    supporterCount?: IntFilter<"Community"> | number
-    lastInfluenceTime?: DateTimeFilter<"Community"> | Date | string
-    influenceScore?: FloatFilter<"Community"> | number
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    interactions?: InteractionListRelationFilter
-  }, "id" | "agentId">
-
-  export type CommunityOrderByWithAggregationInput = {
-    id?: SortOrder
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    lastInfluenceTime?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
-    _count?: CommunityCountOrderByAggregateInput
-    _avg?: CommunityAvgOrderByAggregateInput
-    _max?: CommunityMaxOrderByAggregateInput
-    _min?: CommunityMinOrderByAggregateInput
-    _sum?: CommunitySumOrderByAggregateInput
-  }
-
-  export type CommunityScalarWhereWithAggregatesInput = {
-    AND?: CommunityScalarWhereWithAggregatesInput | CommunityScalarWhereWithAggregatesInput[]
-    OR?: CommunityScalarWhereWithAggregatesInput[]
-    NOT?: CommunityScalarWhereWithAggregatesInput | CommunityScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Community"> | string
-    followers?: IntWithAggregatesFilter<"Community"> | number
-    averageEngagement?: FloatWithAggregatesFilter<"Community"> | number
-    supporterCount?: IntWithAggregatesFilter<"Community"> | number
-    lastInfluenceTime?: DateTimeWithAggregatesFilter<"Community"> | Date | string
-    influenceScore?: FloatWithAggregatesFilter<"Community"> | number
-    agentId?: StringWithAggregatesFilter<"Community"> | string
-  }
-
   export type InteractionWhereInput = {
     AND?: InteractionWhereInput | InteractionWhereInput[]
     OR?: InteractionWhereInput[]
     NOT?: InteractionWhereInput | InteractionWhereInput[]
     id?: StringFilter<"Interaction"> | string
-    createdAt?: DateTimeFilter<"Interaction"> | Date | string
+    tweetId?: StringFilter<"Interaction"> | string
+    userId?: StringFilter<"Interaction"> | string
     type?: StringFilter<"Interaction"> | string
-    content?: StringFilter<"Interaction"> | string
-    communityId?: StringFilter<"Interaction"> | string
-    authorId?: StringFilter<"Interaction"> | string
-    authorHandle?: StringFilter<"Interaction"> | string
-    authorFollowers?: IntFilter<"Interaction"> | number
-    authorIsVerified?: BoolFilter<"Interaction"> | boolean
-    engagement?: IntFilter<"Interaction"> | number
-    likes?: IntFilter<"Interaction"> | number
-    retweets?: IntFilter<"Interaction"> | number
-    quotes?: IntFilter<"Interaction"> | number
-    replies?: IntFilter<"Interaction"> | number
-    sentiment?: StringFilter<"Interaction"> | string
-    influenceScore?: FloatFilter<"Interaction"> | number
-    suggestedAction?: StringNullableFilter<"Interaction"> | string | null
-    confidence?: FloatFilter<"Interaction"> | number
-    isDeceptive?: BoolFilter<"Interaction"> | boolean
-    deceptionScore?: FloatFilter<"Interaction"> | number
-    intentType?: StringFilter<"Interaction"> | string
-    referencedTweet?: StringNullableFilter<"Interaction"> | string | null
-    conversationId?: StringNullableFilter<"Interaction"> | string | null
-    inReplyToId?: StringNullableFilter<"Interaction"> | string | null
-    communityAlignment?: FloatFilter<"Interaction"> | number
-    impactScore?: FloatFilter<"Interaction"> | number
-    previousInteractions?: IntFilter<"Interaction"> | number
-    authorReliability?: FloatFilter<"Interaction"> | number
+    content?: StringNullableFilter<"Interaction"> | string | null
     timestamp?: DateTimeFilter<"Interaction"> | Date | string
-    processedAt?: DateTimeFilter<"Interaction"> | Date | string
-    community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
+    userMetrics?: JsonFilter<"Interaction">
+    tweet?: XOR<TweetScalarRelationFilter, TweetWhereInput>
   }
 
   export type InteractionOrderByWithRelationInput = {
     id?: SortOrder
-    createdAt?: SortOrder
+    tweetId?: SortOrder
+    userId?: SortOrder
     type?: SortOrder
-    content?: SortOrder
-    communityId?: SortOrder
-    authorId?: SortOrder
-    authorHandle?: SortOrder
-    authorFollowers?: SortOrder
-    authorIsVerified?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    sentiment?: SortOrder
-    influenceScore?: SortOrder
-    suggestedAction?: SortOrderInput | SortOrder
-    confidence?: SortOrder
-    isDeceptive?: SortOrder
-    deceptionScore?: SortOrder
-    intentType?: SortOrder
-    referencedTweet?: SortOrderInput | SortOrder
-    conversationId?: SortOrderInput | SortOrder
-    inReplyToId?: SortOrderInput | SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
+    content?: SortOrderInput | SortOrder
     timestamp?: SortOrder
-    processedAt?: SortOrder
-    community?: CommunityOrderByWithRelationInput
+    userMetrics?: SortOrder
+    tweet?: TweetOrderByWithRelationInput
   }
 
   export type InteractionWhereUniqueInput = Prisma.AtLeast<{
@@ -17468,74 +16773,26 @@ export namespace Prisma {
     AND?: InteractionWhereInput | InteractionWhereInput[]
     OR?: InteractionWhereInput[]
     NOT?: InteractionWhereInput | InteractionWhereInput[]
-    createdAt?: DateTimeFilter<"Interaction"> | Date | string
+    tweetId?: StringFilter<"Interaction"> | string
+    userId?: StringFilter<"Interaction"> | string
     type?: StringFilter<"Interaction"> | string
-    content?: StringFilter<"Interaction"> | string
-    communityId?: StringFilter<"Interaction"> | string
-    authorId?: StringFilter<"Interaction"> | string
-    authorHandle?: StringFilter<"Interaction"> | string
-    authorFollowers?: IntFilter<"Interaction"> | number
-    authorIsVerified?: BoolFilter<"Interaction"> | boolean
-    engagement?: IntFilter<"Interaction"> | number
-    likes?: IntFilter<"Interaction"> | number
-    retweets?: IntFilter<"Interaction"> | number
-    quotes?: IntFilter<"Interaction"> | number
-    replies?: IntFilter<"Interaction"> | number
-    sentiment?: StringFilter<"Interaction"> | string
-    influenceScore?: FloatFilter<"Interaction"> | number
-    suggestedAction?: StringNullableFilter<"Interaction"> | string | null
-    confidence?: FloatFilter<"Interaction"> | number
-    isDeceptive?: BoolFilter<"Interaction"> | boolean
-    deceptionScore?: FloatFilter<"Interaction"> | number
-    intentType?: StringFilter<"Interaction"> | string
-    referencedTweet?: StringNullableFilter<"Interaction"> | string | null
-    conversationId?: StringNullableFilter<"Interaction"> | string | null
-    inReplyToId?: StringNullableFilter<"Interaction"> | string | null
-    communityAlignment?: FloatFilter<"Interaction"> | number
-    impactScore?: FloatFilter<"Interaction"> | number
-    previousInteractions?: IntFilter<"Interaction"> | number
-    authorReliability?: FloatFilter<"Interaction"> | number
+    content?: StringNullableFilter<"Interaction"> | string | null
     timestamp?: DateTimeFilter<"Interaction"> | Date | string
-    processedAt?: DateTimeFilter<"Interaction"> | Date | string
-    community?: XOR<CommunityScalarRelationFilter, CommunityWhereInput>
+    userMetrics?: JsonFilter<"Interaction">
+    tweet?: XOR<TweetScalarRelationFilter, TweetWhereInput>
   }, "id">
 
   export type InteractionOrderByWithAggregationInput = {
     id?: SortOrder
-    createdAt?: SortOrder
+    tweetId?: SortOrder
+    userId?: SortOrder
     type?: SortOrder
-    content?: SortOrder
-    communityId?: SortOrder
-    authorId?: SortOrder
-    authorHandle?: SortOrder
-    authorFollowers?: SortOrder
-    authorIsVerified?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    sentiment?: SortOrder
-    influenceScore?: SortOrder
-    suggestedAction?: SortOrderInput | SortOrder
-    confidence?: SortOrder
-    isDeceptive?: SortOrder
-    deceptionScore?: SortOrder
-    intentType?: SortOrder
-    referencedTweet?: SortOrderInput | SortOrder
-    conversationId?: SortOrderInput | SortOrder
-    inReplyToId?: SortOrderInput | SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
+    content?: SortOrderInput | SortOrder
     timestamp?: SortOrder
-    processedAt?: SortOrder
+    userMetrics?: SortOrder
     _count?: InteractionCountOrderByAggregateInput
-    _avg?: InteractionAvgOrderByAggregateInput
     _max?: InteractionMaxOrderByAggregateInput
     _min?: InteractionMinOrderByAggregateInput
-    _sum?: InteractionSumOrderByAggregateInput
   }
 
   export type InteractionScalarWhereWithAggregatesInput = {
@@ -17543,35 +16800,12 @@ export namespace Prisma {
     OR?: InteractionScalarWhereWithAggregatesInput[]
     NOT?: InteractionScalarWhereWithAggregatesInput | InteractionScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Interaction"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"Interaction"> | Date | string
+    tweetId?: StringWithAggregatesFilter<"Interaction"> | string
+    userId?: StringWithAggregatesFilter<"Interaction"> | string
     type?: StringWithAggregatesFilter<"Interaction"> | string
-    content?: StringWithAggregatesFilter<"Interaction"> | string
-    communityId?: StringWithAggregatesFilter<"Interaction"> | string
-    authorId?: StringWithAggregatesFilter<"Interaction"> | string
-    authorHandle?: StringWithAggregatesFilter<"Interaction"> | string
-    authorFollowers?: IntWithAggregatesFilter<"Interaction"> | number
-    authorIsVerified?: BoolWithAggregatesFilter<"Interaction"> | boolean
-    engagement?: IntWithAggregatesFilter<"Interaction"> | number
-    likes?: IntWithAggregatesFilter<"Interaction"> | number
-    retweets?: IntWithAggregatesFilter<"Interaction"> | number
-    quotes?: IntWithAggregatesFilter<"Interaction"> | number
-    replies?: IntWithAggregatesFilter<"Interaction"> | number
-    sentiment?: StringWithAggregatesFilter<"Interaction"> | string
-    influenceScore?: FloatWithAggregatesFilter<"Interaction"> | number
-    suggestedAction?: StringNullableWithAggregatesFilter<"Interaction"> | string | null
-    confidence?: FloatWithAggregatesFilter<"Interaction"> | number
-    isDeceptive?: BoolWithAggregatesFilter<"Interaction"> | boolean
-    deceptionScore?: FloatWithAggregatesFilter<"Interaction"> | number
-    intentType?: StringWithAggregatesFilter<"Interaction"> | string
-    referencedTweet?: StringNullableWithAggregatesFilter<"Interaction"> | string | null
-    conversationId?: StringNullableWithAggregatesFilter<"Interaction"> | string | null
-    inReplyToId?: StringNullableWithAggregatesFilter<"Interaction"> | string | null
-    communityAlignment?: FloatWithAggregatesFilter<"Interaction"> | number
-    impactScore?: FloatWithAggregatesFilter<"Interaction"> | number
-    previousInteractions?: IntWithAggregatesFilter<"Interaction"> | number
-    authorReliability?: FloatWithAggregatesFilter<"Interaction"> | number
+    content?: StringNullableWithAggregatesFilter<"Interaction"> | string | null
     timestamp?: DateTimeWithAggregatesFilter<"Interaction"> | Date | string
-    processedAt?: DateTimeWithAggregatesFilter<"Interaction"> | Date | string
+    userMetrics?: JsonWithAggregatesFilter<"Interaction">
   }
 
   export type AgentStateWhereInput = {
@@ -17959,16 +17193,7 @@ export namespace Prisma {
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
-    influenceDifficulty?: string
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: JsonNullValueInput | InputJsonValue
     agent?: AgentCreateNestedManyWithoutAgentProfileInput
   }
 
@@ -17981,16 +17206,7 @@ export namespace Prisma {
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
-    influenceDifficulty?: string
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: JsonNullValueInput | InputJsonValue
     agent?: AgentUncheckedCreateNestedManyWithoutAgentProfileInput
   }
 
@@ -18003,16 +17219,7 @@ export namespace Prisma {
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    influenceDifficulty?: StringFieldUpdateOperationsInput | string
-    aggressiveness?: IntFieldUpdateOperationsInput | number
-    trustworthiness?: IntFieldUpdateOperationsInput | number
-    manipulativeness?: IntFieldUpdateOperationsInput | number
-    intelligence?: IntFieldUpdateOperationsInput | number
-    adaptability?: IntFieldUpdateOperationsInput | number
-    baseInfluence?: FloatFieldUpdateOperationsInput | number
-    followerMultiplier?: FloatFieldUpdateOperationsInput | number
-    engagementMultiplier?: FloatFieldUpdateOperationsInput | number
-    consensusMultiplier?: FloatFieldUpdateOperationsInput | number
+    traits?: JsonNullValueInput | InputJsonValue
     agent?: AgentUpdateManyWithoutAgentProfileNestedInput
   }
 
@@ -18025,16 +17232,7 @@ export namespace Prisma {
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    influenceDifficulty?: StringFieldUpdateOperationsInput | string
-    aggressiveness?: IntFieldUpdateOperationsInput | number
-    trustworthiness?: IntFieldUpdateOperationsInput | number
-    manipulativeness?: IntFieldUpdateOperationsInput | number
-    intelligence?: IntFieldUpdateOperationsInput | number
-    adaptability?: IntFieldUpdateOperationsInput | number
-    baseInfluence?: FloatFieldUpdateOperationsInput | number
-    followerMultiplier?: FloatFieldUpdateOperationsInput | number
-    engagementMultiplier?: FloatFieldUpdateOperationsInput | number
-    consensusMultiplier?: FloatFieldUpdateOperationsInput | number
+    traits?: JsonNullValueInput | InputJsonValue
     agent?: AgentUncheckedUpdateManyWithoutAgentProfileNestedInput
   }
 
@@ -18047,16 +17245,7 @@ export namespace Prisma {
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
-    influenceDifficulty?: string
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentProfileUpdateManyMutationInput = {
@@ -18068,16 +17257,7 @@ export namespace Prisma {
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    influenceDifficulty?: StringFieldUpdateOperationsInput | string
-    aggressiveness?: IntFieldUpdateOperationsInput | number
-    trustworthiness?: IntFieldUpdateOperationsInput | number
-    manipulativeness?: IntFieldUpdateOperationsInput | number
-    intelligence?: IntFieldUpdateOperationsInput | number
-    adaptability?: IntFieldUpdateOperationsInput | number
-    baseInfluence?: FloatFieldUpdateOperationsInput | number
-    followerMultiplier?: FloatFieldUpdateOperationsInput | number
-    engagementMultiplier?: FloatFieldUpdateOperationsInput | number
-    consensusMultiplier?: FloatFieldUpdateOperationsInput | number
+    traits?: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentProfileUncheckedUpdateManyInput = {
@@ -18089,16 +17269,7 @@ export namespace Prisma {
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    influenceDifficulty?: StringFieldUpdateOperationsInput | string
-    aggressiveness?: IntFieldUpdateOperationsInput | number
-    trustworthiness?: IntFieldUpdateOperationsInput | number
-    manipulativeness?: IntFieldUpdateOperationsInput | number
-    intelligence?: IntFieldUpdateOperationsInput | number
-    adaptability?: IntFieldUpdateOperationsInput | number
-    baseInfluence?: FloatFieldUpdateOperationsInput | number
-    followerMultiplier?: FloatFieldUpdateOperationsInput | number
-    engagementMultiplier?: FloatFieldUpdateOperationsInput | number
-    consensusMultiplier?: FloatFieldUpdateOperationsInput | number
+    traits?: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentCreateInput = {
@@ -18113,12 +17284,12 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -18133,12 +17304,12 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUpdateInput = {
@@ -18153,12 +17324,12 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -18173,12 +17344,12 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
@@ -18210,6 +17381,72 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TweetCreateInput = {
+    id?: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
+    agent: AgentCreateNestedOneWithoutTweetInput
+    interactions?: InteractionCreateNestedManyWithoutTweetInput
+  }
+
+  export type TweetUncheckedCreateInput = {
+    id?: string
+    agentId: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
+    interactions?: InteractionUncheckedCreateNestedManyWithoutTweetInput
+  }
+
+  export type TweetUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+    agent?: AgentUpdateOneRequiredWithoutTweetNestedInput
+    interactions?: InteractionUpdateManyWithoutTweetNestedInput
+  }
+
+  export type TweetUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+    interactions?: InteractionUncheckedUpdateManyWithoutTweetNestedInput
+  }
+
+  export type TweetCreateManyInput = {
+    id?: string
+    agentId: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
+  }
+
+  export type TweetUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type TweetUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type LocationCreateInput = {
@@ -18450,307 +17687,73 @@ export namespace Prisma {
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type CommunityCreateInput = {
-    id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
-    agent: AgentCreateNestedOneWithoutCommunityInput
-    interactions?: InteractionCreateNestedManyWithoutCommunityInput
-  }
-
-  export type CommunityUncheckedCreateInput = {
-    id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
-    agentId: string
-    interactions?: InteractionUncheckedCreateNestedManyWithoutCommunityInput
-  }
-
-  export type CommunityUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agent?: AgentUpdateOneRequiredWithoutCommunityNestedInput
-    interactions?: InteractionUpdateManyWithoutCommunityNestedInput
-  }
-
-  export type CommunityUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
-    interactions?: InteractionUncheckedUpdateManyWithoutCommunityNestedInput
-  }
-
-  export type CommunityCreateManyInput = {
-    id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
-    agentId: string
-  }
-
-  export type CommunityUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-  }
-
-  export type CommunityUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
-  }
-
   export type InteractionCreateInput = {
     id?: string
-    createdAt?: Date | string
+    userId: string
     type: string
-    content: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified?: boolean
-    engagement: number
-    likes?: number
-    retweets?: number
-    quotes?: number
-    replies?: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction?: string | null
-    confidence: number
-    isDeceptive?: boolean
-    deceptionScore?: number
-    intentType: string
-    referencedTweet?: string | null
-    conversationId?: string | null
-    inReplyToId?: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions?: number
-    authorReliability?: number
+    content?: string | null
     timestamp: Date | string
-    processedAt?: Date | string
-    community: CommunityCreateNestedOneWithoutInteractionsInput
+    userMetrics: JsonNullValueInput | InputJsonValue
+    tweet: TweetCreateNestedOneWithoutInteractionsInput
   }
 
   export type InteractionUncheckedCreateInput = {
     id?: string
-    createdAt?: Date | string
+    tweetId: string
+    userId: string
     type: string
-    content: string
-    communityId: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified?: boolean
-    engagement: number
-    likes?: number
-    retweets?: number
-    quotes?: number
-    replies?: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction?: string | null
-    confidence: number
-    isDeceptive?: boolean
-    deceptionScore?: number
-    intentType: string
-    referencedTweet?: string | null
-    conversationId?: string | null
-    inReplyToId?: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions?: number
-    authorReliability?: number
+    content?: string | null
     timestamp: Date | string
-    processedAt?: Date | string
+    userMetrics: JsonNullValueInput | InputJsonValue
   }
 
   export type InteractionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    community?: CommunityUpdateOneRequiredWithoutInteractionsNestedInput
+    userMetrics?: JsonNullValueInput | InputJsonValue
+    tweet?: TweetUpdateOneRequiredWithoutInteractionsNestedInput
   }
 
   export type InteractionUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tweetId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    communityId?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
   export type InteractionCreateManyInput = {
     id?: string
-    createdAt?: Date | string
+    tweetId: string
+    userId: string
     type: string
-    content: string
-    communityId: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified?: boolean
-    engagement: number
-    likes?: number
-    retweets?: number
-    quotes?: number
-    replies?: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction?: string | null
-    confidence: number
-    isDeceptive?: boolean
-    deceptionScore?: number
-    intentType: string
-    referencedTweet?: string | null
-    conversationId?: string | null
-    inReplyToId?: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions?: number
-    authorReliability?: number
+    content?: string | null
     timestamp: Date | string
-    processedAt?: Date | string
+    userMetrics: JsonNullValueInput | InputJsonValue
   }
 
   export type InteractionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
   export type InteractionUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tweetId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    communityId?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentStateCreateInput = {
@@ -19273,6 +18276,28 @@ export namespace Prisma {
     hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
     isEmpty?: boolean
   }
+  export type JsonFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type AgentProfileCountOrderByAggregateInput = {
     id?: SortOrder
@@ -19283,29 +18308,11 @@ export namespace Prisma {
     lore?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
-    influenceDifficulty?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
+    traits?: SortOrder
   }
 
   export type AgentProfileAvgOrderByAggregateInput = {
     onchainId?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
   }
 
   export type AgentProfileMaxOrderByAggregateInput = {
@@ -19313,16 +18320,6 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
-    influenceDifficulty?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
   }
 
   export type AgentProfileMinOrderByAggregateInput = {
@@ -19330,29 +18327,35 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
-    influenceDifficulty?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
   }
 
   export type AgentProfileSumOrderByAggregateInput = {
     onchainId?: SortOrder
-    aggressiveness?: SortOrder
-    trustworthiness?: SortOrder
-    manipulativeness?: SortOrder
-    intelligence?: SortOrder
-    adaptability?: SortOrder
-    baseInfluence?: SortOrder
-    followerMultiplier?: SortOrder
-    engagementMultiplier?: SortOrder
-    consensusMultiplier?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type AgentProfileScalarRelationFilter = {
@@ -19375,11 +18378,6 @@ export namespace Prisma {
     isNot?: AllianceWhereInput | null
   }
 
-  export type CommunityNullableScalarRelationFilter = {
-    is?: CommunityWhereInput | null
-    isNot?: CommunityWhereInput | null
-  }
-
   export type AgentStateNullableScalarRelationFilter = {
     is?: AgentStateWhereInput | null
     isNot?: AgentStateWhereInput | null
@@ -19388,6 +18386,16 @@ export namespace Prisma {
   export type StrategyNullableScalarRelationFilter = {
     is?: StrategyWhereInput | null
     isNot?: StrategyWhereInput | null
+  }
+
+  export type TweetListRelationFilter = {
+    every?: TweetWhereInput
+    some?: TweetWhereInput
+    none?: TweetWhereInput
+  }
+
+  export type TweetOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type AgentAgentIdGameIdCompoundUniqueInput = {
@@ -19438,16 +18446,91 @@ export namespace Prisma {
     health?: SortOrder
   }
 
-  export type EnumTerrainTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type AgentScalarRelationFilter = {
     is?: AgentWhereInput
     isNot?: AgentWhereInput
+  }
+
+  export type InteractionListRelationFilter = {
+    every?: InteractionWhereInput
+    some?: InteractionWhereInput
+    none?: InteractionWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type InteractionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TweetCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    content?: SortOrder
+    type?: SortOrder
+    timestamp?: SortOrder
+    conversationId?: SortOrder
+  }
+
+  export type TweetMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    content?: SortOrder
+    type?: SortOrder
+    timestamp?: SortOrder
+    conversationId?: SortOrder
+  }
+
+  export type TweetMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    content?: SortOrder
+    type?: SortOrder
+    timestamp?: SortOrder
+    conversationId?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type EnumTerrainTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
   }
 
   export type LocationCountOrderByAggregateInput = {
@@ -19585,11 +18668,6 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
   export type BattleCountOrderByAggregateInput = {
     id?: SortOrder
     timestamp?: SortOrder
@@ -19703,227 +18781,37 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type InteractionListRelationFilter = {
-    every?: InteractionWhereInput
-    some?: InteractionWhereInput
-    none?: InteractionWhereInput
-  }
-
-  export type InteractionOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type CommunityCountOrderByAggregateInput = {
-    id?: SortOrder
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    lastInfluenceTime?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type CommunityAvgOrderByAggregateInput = {
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    influenceScore?: SortOrder
-  }
-
-  export type CommunityMaxOrderByAggregateInput = {
-    id?: SortOrder
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    lastInfluenceTime?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type CommunityMinOrderByAggregateInput = {
-    id?: SortOrder
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    lastInfluenceTime?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type CommunitySumOrderByAggregateInput = {
-    followers?: SortOrder
-    averageEngagement?: SortOrder
-    supporterCount?: SortOrder
-    influenceScore?: SortOrder
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type CommunityScalarRelationFilter = {
-    is?: CommunityWhereInput
-    isNot?: CommunityWhereInput
+  export type TweetScalarRelationFilter = {
+    is?: TweetWhereInput
+    isNot?: TweetWhereInput
   }
 
   export type InteractionCountOrderByAggregateInput = {
     id?: SortOrder
-    createdAt?: SortOrder
+    tweetId?: SortOrder
+    userId?: SortOrder
     type?: SortOrder
     content?: SortOrder
-    communityId?: SortOrder
-    authorId?: SortOrder
-    authorHandle?: SortOrder
-    authorFollowers?: SortOrder
-    authorIsVerified?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    sentiment?: SortOrder
-    influenceScore?: SortOrder
-    suggestedAction?: SortOrder
-    confidence?: SortOrder
-    isDeceptive?: SortOrder
-    deceptionScore?: SortOrder
-    intentType?: SortOrder
-    referencedTweet?: SortOrder
-    conversationId?: SortOrder
-    inReplyToId?: SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
     timestamp?: SortOrder
-    processedAt?: SortOrder
-  }
-
-  export type InteractionAvgOrderByAggregateInput = {
-    authorFollowers?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    influenceScore?: SortOrder
-    confidence?: SortOrder
-    deceptionScore?: SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
+    userMetrics?: SortOrder
   }
 
   export type InteractionMaxOrderByAggregateInput = {
     id?: SortOrder
-    createdAt?: SortOrder
+    tweetId?: SortOrder
+    userId?: SortOrder
     type?: SortOrder
     content?: SortOrder
-    communityId?: SortOrder
-    authorId?: SortOrder
-    authorHandle?: SortOrder
-    authorFollowers?: SortOrder
-    authorIsVerified?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    sentiment?: SortOrder
-    influenceScore?: SortOrder
-    suggestedAction?: SortOrder
-    confidence?: SortOrder
-    isDeceptive?: SortOrder
-    deceptionScore?: SortOrder
-    intentType?: SortOrder
-    referencedTweet?: SortOrder
-    conversationId?: SortOrder
-    inReplyToId?: SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
     timestamp?: SortOrder
-    processedAt?: SortOrder
   }
 
   export type InteractionMinOrderByAggregateInput = {
     id?: SortOrder
-    createdAt?: SortOrder
+    tweetId?: SortOrder
+    userId?: SortOrder
     type?: SortOrder
     content?: SortOrder
-    communityId?: SortOrder
-    authorId?: SortOrder
-    authorHandle?: SortOrder
-    authorFollowers?: SortOrder
-    authorIsVerified?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    sentiment?: SortOrder
-    influenceScore?: SortOrder
-    suggestedAction?: SortOrder
-    confidence?: SortOrder
-    isDeceptive?: SortOrder
-    deceptionScore?: SortOrder
-    intentType?: SortOrder
-    referencedTweet?: SortOrder
-    conversationId?: SortOrder
-    inReplyToId?: SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
     timestamp?: SortOrder
-    processedAt?: SortOrder
-  }
-
-  export type InteractionSumOrderByAggregateInput = {
-    authorFollowers?: SortOrder
-    engagement?: SortOrder
-    likes?: SortOrder
-    retweets?: SortOrder
-    quotes?: SortOrder
-    replies?: SortOrder
-    influenceScore?: SortOrder
-    confidence?: SortOrder
-    deceptionScore?: SortOrder
-    communityAlignment?: SortOrder
-    impactScore?: SortOrder
-    previousInteractions?: SortOrder
-    authorReliability?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type AgentStateCountOrderByAggregateInput = {
@@ -20408,12 +19296,6 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type CommunityCreateNestedOneWithoutAgentInput = {
-    create?: XOR<CommunityCreateWithoutAgentInput, CommunityUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: CommunityCreateOrConnectWithoutAgentInput
-    connect?: CommunityWhereUniqueInput
-  }
-
   export type AgentStateCreateNestedOneWithoutAgentInput = {
     create?: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
     connectOrCreate?: AgentStateCreateOrConnectWithoutAgentInput
@@ -20447,6 +19329,13 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
+  export type TweetCreateNestedManyWithoutAgentInput = {
+    create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
+    createMany?: TweetCreateManyAgentInputEnvelope
+    connect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+  }
+
   export type LocationUncheckedCreateNestedOneWithoutAgentInput = {
     create?: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
     connectOrCreate?: LocationCreateOrConnectWithoutAgentInput
@@ -20464,12 +19353,6 @@ export namespace Prisma {
     connectOrCreate?: BattleCreateOrConnectWithoutAgentInput | BattleCreateOrConnectWithoutAgentInput[]
     createMany?: BattleCreateManyAgentInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-  }
-
-  export type CommunityUncheckedCreateNestedOneWithoutAgentInput = {
-    create?: XOR<CommunityCreateWithoutAgentInput, CommunityUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: CommunityCreateOrConnectWithoutAgentInput
-    connect?: CommunityWhereUniqueInput
   }
 
   export type AgentStateUncheckedCreateNestedOneWithoutAgentInput = {
@@ -20503,6 +19386,13 @@ export namespace Prisma {
     connectOrCreate?: BattleCreateOrConnectWithoutOpponentInput | BattleCreateOrConnectWithoutOpponentInput[]
     createMany?: BattleCreateManyOpponentInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+  }
+
+  export type TweetUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
+    createMany?: TweetCreateManyAgentInputEnvelope
+    connect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
   }
 
   export type AgentProfileUpdateOneRequiredWithoutAgentNestedInput = {
@@ -20553,16 +19443,6 @@ export namespace Prisma {
     update?: BattleUpdateWithWhereUniqueWithoutAgentInput | BattleUpdateWithWhereUniqueWithoutAgentInput[]
     updateMany?: BattleUpdateManyWithWhereWithoutAgentInput | BattleUpdateManyWithWhereWithoutAgentInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
-  }
-
-  export type CommunityUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<CommunityCreateWithoutAgentInput, CommunityUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: CommunityCreateOrConnectWithoutAgentInput
-    upsert?: CommunityUpsertWithoutAgentInput
-    disconnect?: CommunityWhereInput | boolean
-    delete?: CommunityWhereInput | boolean
-    connect?: CommunityWhereUniqueInput
-    update?: XOR<XOR<CommunityUpdateToOneWithWhereWithoutAgentInput, CommunityUpdateWithoutAgentInput>, CommunityUncheckedUpdateWithoutAgentInput>
   }
 
   export type AgentStateUpdateOneWithoutAgentNestedInput = {
@@ -20627,6 +19507,20 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
+  export type TweetUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
+    upsert?: TweetUpsertWithWhereUniqueWithoutAgentInput | TweetUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: TweetCreateManyAgentInputEnvelope
+    set?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    disconnect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    delete?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    connect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    update?: TweetUpdateWithWhereUniqueWithoutAgentInput | TweetUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: TweetUpdateManyWithWhereWithoutAgentInput | TweetUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: TweetScalarWhereInput | TweetScalarWhereInput[]
+  }
+
   export type LocationUncheckedUpdateOneWithoutAgentNestedInput = {
     create?: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
     connectOrCreate?: LocationCreateOrConnectWithoutAgentInput
@@ -20659,16 +19553,6 @@ export namespace Prisma {
     update?: BattleUpdateWithWhereUniqueWithoutAgentInput | BattleUpdateWithWhereUniqueWithoutAgentInput[]
     updateMany?: BattleUpdateManyWithWhereWithoutAgentInput | BattleUpdateManyWithWhereWithoutAgentInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
-  }
-
-  export type CommunityUncheckedUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<CommunityCreateWithoutAgentInput, CommunityUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: CommunityCreateOrConnectWithoutAgentInput
-    upsert?: CommunityUpsertWithoutAgentInput
-    disconnect?: CommunityWhereInput | boolean
-    delete?: CommunityWhereInput | boolean
-    connect?: CommunityWhereUniqueInput
-    update?: XOR<XOR<CommunityUpdateToOneWithWhereWithoutAgentInput, CommunityUpdateWithoutAgentInput>, CommunityUncheckedUpdateWithoutAgentInput>
   }
 
   export type AgentStateUncheckedUpdateOneWithoutAgentNestedInput = {
@@ -20731,6 +19615,80 @@ export namespace Prisma {
     update?: BattleUpdateWithWhereUniqueWithoutOpponentInput | BattleUpdateWithWhereUniqueWithoutOpponentInput[]
     updateMany?: BattleUpdateManyWithWhereWithoutOpponentInput | BattleUpdateManyWithWhereWithoutOpponentInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
+  export type TweetUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
+    upsert?: TweetUpsertWithWhereUniqueWithoutAgentInput | TweetUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: TweetCreateManyAgentInputEnvelope
+    set?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    disconnect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    delete?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    connect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
+    update?: TweetUpdateWithWhereUniqueWithoutAgentInput | TweetUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: TweetUpdateManyWithWhereWithoutAgentInput | TweetUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: TweetScalarWhereInput | TweetScalarWhereInput[]
+  }
+
+  export type AgentCreateNestedOneWithoutTweetInput = {
+    create?: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutTweetInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type InteractionCreateNestedManyWithoutTweetInput = {
+    create?: XOR<InteractionCreateWithoutTweetInput, InteractionUncheckedCreateWithoutTweetInput> | InteractionCreateWithoutTweetInput[] | InteractionUncheckedCreateWithoutTweetInput[]
+    connectOrCreate?: InteractionCreateOrConnectWithoutTweetInput | InteractionCreateOrConnectWithoutTweetInput[]
+    createMany?: InteractionCreateManyTweetInputEnvelope
+    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+  }
+
+  export type InteractionUncheckedCreateNestedManyWithoutTweetInput = {
+    create?: XOR<InteractionCreateWithoutTweetInput, InteractionUncheckedCreateWithoutTweetInput> | InteractionCreateWithoutTweetInput[] | InteractionUncheckedCreateWithoutTweetInput[]
+    connectOrCreate?: InteractionCreateOrConnectWithoutTweetInput | InteractionCreateOrConnectWithoutTweetInput[]
+    createMany?: InteractionCreateManyTweetInputEnvelope
+    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type AgentUpdateOneRequiredWithoutTweetNestedInput = {
+    create?: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutTweetInput
+    upsert?: AgentUpsertWithoutTweetInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutTweetInput, AgentUpdateWithoutTweetInput>, AgentUncheckedUpdateWithoutTweetInput>
+  }
+
+  export type InteractionUpdateManyWithoutTweetNestedInput = {
+    create?: XOR<InteractionCreateWithoutTweetInput, InteractionUncheckedCreateWithoutTweetInput> | InteractionCreateWithoutTweetInput[] | InteractionUncheckedCreateWithoutTweetInput[]
+    connectOrCreate?: InteractionCreateOrConnectWithoutTweetInput | InteractionCreateOrConnectWithoutTweetInput[]
+    upsert?: InteractionUpsertWithWhereUniqueWithoutTweetInput | InteractionUpsertWithWhereUniqueWithoutTweetInput[]
+    createMany?: InteractionCreateManyTweetInputEnvelope
+    set?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    disconnect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    delete?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    update?: InteractionUpdateWithWhereUniqueWithoutTweetInput | InteractionUpdateWithWhereUniqueWithoutTweetInput[]
+    updateMany?: InteractionUpdateManyWithWhereWithoutTweetInput | InteractionUpdateManyWithWhereWithoutTweetInput[]
+    deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
+  }
+
+  export type InteractionUncheckedUpdateManyWithoutTweetNestedInput = {
+    create?: XOR<InteractionCreateWithoutTweetInput, InteractionUncheckedCreateWithoutTweetInput> | InteractionCreateWithoutTweetInput[] | InteractionUncheckedCreateWithoutTweetInput[]
+    connectOrCreate?: InteractionCreateOrConnectWithoutTweetInput | InteractionCreateOrConnectWithoutTweetInput[]
+    upsert?: InteractionUpsertWithWhereUniqueWithoutTweetInput | InteractionUpsertWithWhereUniqueWithoutTweetInput[]
+    createMany?: InteractionCreateManyTweetInputEnvelope
+    set?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    disconnect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    delete?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+    update?: InteractionUpdateWithWhereUniqueWithoutTweetInput | InteractionUpdateWithWhereUniqueWithoutTweetInput[]
+    updateMany?: InteractionUpdateManyWithWhereWithoutTweetInput | InteractionUpdateManyWithWhereWithoutTweetInput[]
+    deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
   }
 
   export type AgentCreateNestedOneWithoutLocationInput = {
@@ -20859,78 +19817,18 @@ export namespace Prisma {
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsOpponentInput, AgentUpdateWithoutBattlesAsOpponentInput>, AgentUncheckedUpdateWithoutBattlesAsOpponentInput>
   }
 
-  export type AgentCreateNestedOneWithoutCommunityInput = {
-    create?: XOR<AgentCreateWithoutCommunityInput, AgentUncheckedCreateWithoutCommunityInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutCommunityInput
-    connect?: AgentWhereUniqueInput
+  export type TweetCreateNestedOneWithoutInteractionsInput = {
+    create?: XOR<TweetCreateWithoutInteractionsInput, TweetUncheckedCreateWithoutInteractionsInput>
+    connectOrCreate?: TweetCreateOrConnectWithoutInteractionsInput
+    connect?: TweetWhereUniqueInput
   }
 
-  export type InteractionCreateNestedManyWithoutCommunityInput = {
-    create?: XOR<InteractionCreateWithoutCommunityInput, InteractionUncheckedCreateWithoutCommunityInput> | InteractionCreateWithoutCommunityInput[] | InteractionUncheckedCreateWithoutCommunityInput[]
-    connectOrCreate?: InteractionCreateOrConnectWithoutCommunityInput | InteractionCreateOrConnectWithoutCommunityInput[]
-    createMany?: InteractionCreateManyCommunityInputEnvelope
-    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-  }
-
-  export type InteractionUncheckedCreateNestedManyWithoutCommunityInput = {
-    create?: XOR<InteractionCreateWithoutCommunityInput, InteractionUncheckedCreateWithoutCommunityInput> | InteractionCreateWithoutCommunityInput[] | InteractionUncheckedCreateWithoutCommunityInput[]
-    connectOrCreate?: InteractionCreateOrConnectWithoutCommunityInput | InteractionCreateOrConnectWithoutCommunityInput[]
-    createMany?: InteractionCreateManyCommunityInputEnvelope
-    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-  }
-
-  export type AgentUpdateOneRequiredWithoutCommunityNestedInput = {
-    create?: XOR<AgentCreateWithoutCommunityInput, AgentUncheckedCreateWithoutCommunityInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutCommunityInput
-    upsert?: AgentUpsertWithoutCommunityInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutCommunityInput, AgentUpdateWithoutCommunityInput>, AgentUncheckedUpdateWithoutCommunityInput>
-  }
-
-  export type InteractionUpdateManyWithoutCommunityNestedInput = {
-    create?: XOR<InteractionCreateWithoutCommunityInput, InteractionUncheckedCreateWithoutCommunityInput> | InteractionCreateWithoutCommunityInput[] | InteractionUncheckedCreateWithoutCommunityInput[]
-    connectOrCreate?: InteractionCreateOrConnectWithoutCommunityInput | InteractionCreateOrConnectWithoutCommunityInput[]
-    upsert?: InteractionUpsertWithWhereUniqueWithoutCommunityInput | InteractionUpsertWithWhereUniqueWithoutCommunityInput[]
-    createMany?: InteractionCreateManyCommunityInputEnvelope
-    set?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    disconnect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    delete?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    update?: InteractionUpdateWithWhereUniqueWithoutCommunityInput | InteractionUpdateWithWhereUniqueWithoutCommunityInput[]
-    updateMany?: InteractionUpdateManyWithWhereWithoutCommunityInput | InteractionUpdateManyWithWhereWithoutCommunityInput[]
-    deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
-  }
-
-  export type InteractionUncheckedUpdateManyWithoutCommunityNestedInput = {
-    create?: XOR<InteractionCreateWithoutCommunityInput, InteractionUncheckedCreateWithoutCommunityInput> | InteractionCreateWithoutCommunityInput[] | InteractionUncheckedCreateWithoutCommunityInput[]
-    connectOrCreate?: InteractionCreateOrConnectWithoutCommunityInput | InteractionCreateOrConnectWithoutCommunityInput[]
-    upsert?: InteractionUpsertWithWhereUniqueWithoutCommunityInput | InteractionUpsertWithWhereUniqueWithoutCommunityInput[]
-    createMany?: InteractionCreateManyCommunityInputEnvelope
-    set?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    disconnect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    delete?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-    update?: InteractionUpdateWithWhereUniqueWithoutCommunityInput | InteractionUpdateWithWhereUniqueWithoutCommunityInput[]
-    updateMany?: InteractionUpdateManyWithWhereWithoutCommunityInput | InteractionUpdateManyWithWhereWithoutCommunityInput[]
-    deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
-  }
-
-  export type CommunityCreateNestedOneWithoutInteractionsInput = {
-    create?: XOR<CommunityCreateWithoutInteractionsInput, CommunityUncheckedCreateWithoutInteractionsInput>
-    connectOrCreate?: CommunityCreateOrConnectWithoutInteractionsInput
-    connect?: CommunityWhereUniqueInput
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
-  export type CommunityUpdateOneRequiredWithoutInteractionsNestedInput = {
-    create?: XOR<CommunityCreateWithoutInteractionsInput, CommunityUncheckedCreateWithoutInteractionsInput>
-    connectOrCreate?: CommunityCreateOrConnectWithoutInteractionsInput
-    upsert?: CommunityUpsertWithoutInteractionsInput
-    connect?: CommunityWhereUniqueInput
-    update?: XOR<XOR<CommunityUpdateToOneWithWhereWithoutInteractionsInput, CommunityUpdateWithoutInteractionsInput>, CommunityUncheckedUpdateWithoutInteractionsInput>
+  export type TweetUpdateOneRequiredWithoutInteractionsNestedInput = {
+    create?: XOR<TweetCreateWithoutInteractionsInput, TweetUncheckedCreateWithoutInteractionsInput>
+    connectOrCreate?: TweetCreateOrConnectWithoutInteractionsInput
+    upsert?: TweetUpsertWithoutInteractionsInput
+    connect?: TweetWhereUniqueInput
+    update?: XOR<XOR<TweetUpdateToOneWithWhereWithoutInteractionsInput, TweetUpdateWithoutInteractionsInput>, TweetUncheckedUpdateWithoutInteractionsInput>
   }
 
   export type AgentCreateNestedOneWithoutStateInput = {
@@ -21146,6 +20044,70 @@ export namespace Prisma {
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
   }
+  export type NestedJsonFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
 
   export type NestedEnumTerrainTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
@@ -21233,17 +20195,6 @@ export namespace Prisma {
     _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedEnumBattleTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.BattleType | EnumBattleTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BattleType[] | ListEnumBattleTypeFieldRefInput<$PrismaModel>
@@ -21276,37 +20227,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumCooldownTypeFilter<$PrismaModel = never> = {
@@ -21354,12 +20274,12 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
@@ -21373,12 +20293,12 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutGameInput = {
@@ -21621,12 +20541,12 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutAgentProfileInput = {
@@ -21640,12 +20560,12 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutAgentProfileInput = {
@@ -21683,16 +20603,7 @@ export namespace Prisma {
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
-    influenceDifficulty?: string
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentProfileUncheckedCreateWithoutAgentInput = {
@@ -21704,16 +20615,7 @@ export namespace Prisma {
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
-    influenceDifficulty?: string
-    aggressiveness: number
-    trustworthiness: number
-    manipulativeness: number
-    intelligence: number
-    adaptability: number
-    baseInfluence: number
-    followerMultiplier: number
-    engagementMultiplier: number
-    consensusMultiplier: number
+    traits: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentProfileCreateOrConnectWithoutAgentInput = {
@@ -21844,31 +20746,6 @@ export namespace Prisma {
   export type BattleCreateManyAgentInputEnvelope = {
     data: BattleCreateManyAgentInput | BattleCreateManyAgentInput[]
     skipDuplicates?: boolean
-  }
-
-  export type CommunityCreateWithoutAgentInput = {
-    id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
-    interactions?: InteractionCreateNestedManyWithoutCommunityInput
-  }
-
-  export type CommunityUncheckedCreateWithoutAgentInput = {
-    id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
-    interactions?: InteractionUncheckedCreateNestedManyWithoutCommunityInput
-  }
-
-  export type CommunityCreateOrConnectWithoutAgentInput = {
-    where: CommunityWhereUniqueInput
-    create: XOR<CommunityCreateWithoutAgentInput, CommunityUncheckedCreateWithoutAgentInput>
   }
 
   export type AgentStateCreateWithoutAgentInput = {
@@ -22011,6 +20888,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TweetCreateWithoutAgentInput = {
+    id?: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
+    interactions?: InteractionCreateNestedManyWithoutTweetInput
+  }
+
+  export type TweetUncheckedCreateWithoutAgentInput = {
+    id?: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
+    interactions?: InteractionUncheckedCreateNestedManyWithoutTweetInput
+  }
+
+  export type TweetCreateOrConnectWithoutAgentInput = {
+    where: TweetWhereUniqueInput
+    create: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput>
+  }
+
+  export type TweetCreateManyAgentInputEnvelope = {
+    data: TweetCreateManyAgentInput | TweetCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AgentProfileUpsertWithoutAgentInput = {
     update: XOR<AgentProfileUpdateWithoutAgentInput, AgentProfileUncheckedUpdateWithoutAgentInput>
     create: XOR<AgentProfileCreateWithoutAgentInput, AgentProfileUncheckedCreateWithoutAgentInput>
@@ -22031,16 +20936,7 @@ export namespace Prisma {
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    influenceDifficulty?: StringFieldUpdateOperationsInput | string
-    aggressiveness?: IntFieldUpdateOperationsInput | number
-    trustworthiness?: IntFieldUpdateOperationsInput | number
-    manipulativeness?: IntFieldUpdateOperationsInput | number
-    intelligence?: IntFieldUpdateOperationsInput | number
-    adaptability?: IntFieldUpdateOperationsInput | number
-    baseInfluence?: FloatFieldUpdateOperationsInput | number
-    followerMultiplier?: FloatFieldUpdateOperationsInput | number
-    engagementMultiplier?: FloatFieldUpdateOperationsInput | number
-    consensusMultiplier?: FloatFieldUpdateOperationsInput | number
+    traits?: JsonNullValueInput | InputJsonValue
   }
 
   export type AgentProfileUncheckedUpdateWithoutAgentInput = {
@@ -22052,16 +20948,7 @@ export namespace Prisma {
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    influenceDifficulty?: StringFieldUpdateOperationsInput | string
-    aggressiveness?: IntFieldUpdateOperationsInput | number
-    trustworthiness?: IntFieldUpdateOperationsInput | number
-    manipulativeness?: IntFieldUpdateOperationsInput | number
-    intelligence?: IntFieldUpdateOperationsInput | number
-    adaptability?: IntFieldUpdateOperationsInput | number
-    baseInfluence?: FloatFieldUpdateOperationsInput | number
-    followerMultiplier?: FloatFieldUpdateOperationsInput | number
-    engagementMultiplier?: FloatFieldUpdateOperationsInput | number
-    consensusMultiplier?: FloatFieldUpdateOperationsInput | number
+    traits?: JsonNullValueInput | InputJsonValue
   }
 
   export type GameUpsertWithoutAgentsInput = {
@@ -22181,37 +21068,6 @@ export namespace Prisma {
     data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutAgentInput>
   }
 
-  export type CommunityUpsertWithoutAgentInput = {
-    update: XOR<CommunityUpdateWithoutAgentInput, CommunityUncheckedUpdateWithoutAgentInput>
-    create: XOR<CommunityCreateWithoutAgentInput, CommunityUncheckedCreateWithoutAgentInput>
-    where?: CommunityWhereInput
-  }
-
-  export type CommunityUpdateToOneWithWhereWithoutAgentInput = {
-    where?: CommunityWhereInput
-    data: XOR<CommunityUpdateWithoutAgentInput, CommunityUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type CommunityUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    interactions?: InteractionUpdateManyWithoutCommunityNestedInput
-  }
-
-  export type CommunityUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    interactions?: InteractionUncheckedUpdateManyWithoutCommunityNestedInput
-  }
-
   export type AgentStateUpsertWithoutAgentInput = {
     update: XOR<AgentStateUpdateWithoutAgentInput, AgentStateUncheckedUpdateWithoutAgentInput>
     create: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
@@ -22316,6 +21172,183 @@ export namespace Prisma {
     data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutOpponentInput>
   }
 
+  export type TweetUpsertWithWhereUniqueWithoutAgentInput = {
+    where: TweetWhereUniqueInput
+    update: XOR<TweetUpdateWithoutAgentInput, TweetUncheckedUpdateWithoutAgentInput>
+    create: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput>
+  }
+
+  export type TweetUpdateWithWhereUniqueWithoutAgentInput = {
+    where: TweetWhereUniqueInput
+    data: XOR<TweetUpdateWithoutAgentInput, TweetUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type TweetUpdateManyWithWhereWithoutAgentInput = {
+    where: TweetScalarWhereInput
+    data: XOR<TweetUpdateManyMutationInput, TweetUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type TweetScalarWhereInput = {
+    AND?: TweetScalarWhereInput | TweetScalarWhereInput[]
+    OR?: TweetScalarWhereInput[]
+    NOT?: TweetScalarWhereInput | TweetScalarWhereInput[]
+    id?: StringFilter<"Tweet"> | string
+    agentId?: StringFilter<"Tweet"> | string
+    content?: StringFilter<"Tweet"> | string
+    type?: StringFilter<"Tweet"> | string
+    timestamp?: DateTimeFilter<"Tweet"> | Date | string
+    conversationId?: StringNullableFilter<"Tweet"> | string | null
+  }
+
+  export type AgentCreateWithoutTweetInput = {
+    id?: string
+    agentId: number
+    publicKey: string
+    health?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    location?: LocationCreateNestedOneWithoutAgentInput
+    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
+    battles?: BattleCreateNestedManyWithoutAgentInput
+    state?: AgentStateCreateNestedOneWithoutAgentInput
+    strategy?: StrategyCreateNestedOneWithoutAgentInput
+    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
+    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
+    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+  }
+
+  export type AgentUncheckedCreateWithoutTweetInput = {
+    id?: string
+    agentId: number
+    publicKey: string
+    agentProfileId: string
+    health?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    gameId: string
+    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
+    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
+    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
+    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
+    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
+    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
+    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
+    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+  }
+
+  export type AgentCreateOrConnectWithoutTweetInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
+  }
+
+  export type InteractionCreateWithoutTweetInput = {
+    id?: string
+    userId: string
+    type: string
+    content?: string | null
+    timestamp: Date | string
+    userMetrics: JsonNullValueInput | InputJsonValue
+  }
+
+  export type InteractionUncheckedCreateWithoutTweetInput = {
+    id?: string
+    userId: string
+    type: string
+    content?: string | null
+    timestamp: Date | string
+    userMetrics: JsonNullValueInput | InputJsonValue
+  }
+
+  export type InteractionCreateOrConnectWithoutTweetInput = {
+    where: InteractionWhereUniqueInput
+    create: XOR<InteractionCreateWithoutTweetInput, InteractionUncheckedCreateWithoutTweetInput>
+  }
+
+  export type InteractionCreateManyTweetInputEnvelope = {
+    data: InteractionCreateManyTweetInput | InteractionCreateManyTweetInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AgentUpsertWithoutTweetInput = {
+    update: XOR<AgentUpdateWithoutTweetInput, AgentUncheckedUpdateWithoutTweetInput>
+    create: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutTweetInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutTweetInput, AgentUncheckedUpdateWithoutTweetInput>
+  }
+
+  export type AgentUpdateWithoutTweetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: IntFieldUpdateOperationsInput | number
+    publicKey?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    location?: LocationUpdateOneWithoutAgentNestedInput
+    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
+    battles?: BattleUpdateManyWithoutAgentNestedInput
+    state?: AgentStateUpdateOneWithoutAgentNestedInput
+    strategy?: StrategyUpdateOneWithoutAgentNestedInput
+    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
+    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
+    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutTweetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: IntFieldUpdateOperationsInput | number
+    publicKey?: StringFieldUpdateOperationsInput | string
+    agentProfileId?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
+    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
+    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
+    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
+    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
+    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
+    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
+    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+  }
+
+  export type InteractionUpsertWithWhereUniqueWithoutTweetInput = {
+    where: InteractionWhereUniqueInput
+    update: XOR<InteractionUpdateWithoutTweetInput, InteractionUncheckedUpdateWithoutTweetInput>
+    create: XOR<InteractionCreateWithoutTweetInput, InteractionUncheckedCreateWithoutTweetInput>
+  }
+
+  export type InteractionUpdateWithWhereUniqueWithoutTweetInput = {
+    where: InteractionWhereUniqueInput
+    data: XOR<InteractionUpdateWithoutTweetInput, InteractionUncheckedUpdateWithoutTweetInput>
+  }
+
+  export type InteractionUpdateManyWithWhereWithoutTweetInput = {
+    where: InteractionScalarWhereInput
+    data: XOR<InteractionUpdateManyMutationInput, InteractionUncheckedUpdateManyWithoutTweetInput>
+  }
+
+  export type InteractionScalarWhereInput = {
+    AND?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
+    OR?: InteractionScalarWhereInput[]
+    NOT?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
+    id?: StringFilter<"Interaction"> | string
+    tweetId?: StringFilter<"Interaction"> | string
+    userId?: StringFilter<"Interaction"> | string
+    type?: StringFilter<"Interaction"> | string
+    content?: StringNullableFilter<"Interaction"> | string | null
+    timestamp?: DateTimeFilter<"Interaction"> | Date | string
+    userMetrics?: JsonFilter<"Interaction">
+  }
+
   export type AgentCreateWithoutLocationInput = {
     id?: string
     agentId: number
@@ -22327,12 +21360,12 @@ export namespace Prisma {
     game: GameCreateNestedOneWithoutAgentsInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutLocationInput = {
@@ -22346,12 +21379,12 @@ export namespace Prisma {
     gameId: string
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutLocationInput = {
@@ -22381,12 +21414,12 @@ export namespace Prisma {
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutLocationInput = {
@@ -22400,12 +21433,12 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameCreateWithoutAlliancesInput = {
@@ -22460,12 +21493,12 @@ export namespace Prisma {
     game: GameCreateNestedOneWithoutAgentsInput
     location?: LocationCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutCurrentAllianceInput = {
@@ -22479,12 +21512,12 @@ export namespace Prisma {
     gameId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutCurrentAllianceInput = {
@@ -22504,11 +21537,11 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutAlliedByInput = {
@@ -22523,11 +21556,11 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutAlliedByInput = {
@@ -22604,12 +21637,12 @@ export namespace Prisma {
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     location?: LocationUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCurrentAllianceInput = {
@@ -22623,12 +21656,12 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutAlliedByInput = {
@@ -22654,11 +21687,11 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutAlliedByInput = {
@@ -22673,11 +21706,11 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameCreateWithoutBattlesInput = {
@@ -22732,12 +21765,12 @@ export namespace Prisma {
     game: GameCreateNestedOneWithoutAgentsInput
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesInput = {
@@ -22751,12 +21784,12 @@ export namespace Prisma {
     gameId: string
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesInput = {
@@ -22776,11 +21809,11 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsOpponentInput = {
@@ -22795,11 +21828,11 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsOpponentInput = {
@@ -22876,12 +21909,12 @@ export namespace Prisma {
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesInput = {
@@ -22895,12 +21928,12 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsOpponentInput = {
@@ -22926,11 +21959,11 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsOpponentInput = {
@@ -22945,285 +21978,63 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
-  export type AgentCreateWithoutCommunityInput = {
+  export type TweetCreateWithoutInteractionsInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-  }
-
-  export type AgentUncheckedCreateWithoutCommunityInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-  }
-
-  export type AgentCreateOrConnectWithoutCommunityInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutCommunityInput, AgentUncheckedCreateWithoutCommunityInput>
-  }
-
-  export type InteractionCreateWithoutCommunityInput = {
-    id?: string
-    createdAt?: Date | string
-    type: string
     content: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified?: boolean
-    engagement: number
-    likes?: number
-    retweets?: number
-    quotes?: number
-    replies?: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction?: string | null
-    confidence: number
-    isDeceptive?: boolean
-    deceptionScore?: number
-    intentType: string
-    referencedTweet?: string | null
-    conversationId?: string | null
-    inReplyToId?: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions?: number
-    authorReliability?: number
-    timestamp: Date | string
-    processedAt?: Date | string
-  }
-
-  export type InteractionUncheckedCreateWithoutCommunityInput = {
-    id?: string
-    createdAt?: Date | string
     type: string
-    content: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified?: boolean
-    engagement: number
-    likes?: number
-    retweets?: number
-    quotes?: number
-    replies?: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction?: string | null
-    confidence: number
-    isDeceptive?: boolean
-    deceptionScore?: number
-    intentType: string
-    referencedTweet?: string | null
-    conversationId?: string | null
-    inReplyToId?: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions?: number
-    authorReliability?: number
     timestamp: Date | string
-    processedAt?: Date | string
+    conversationId?: string | null
+    agent: AgentCreateNestedOneWithoutTweetInput
   }
 
-  export type InteractionCreateOrConnectWithoutCommunityInput = {
-    where: InteractionWhereUniqueInput
-    create: XOR<InteractionCreateWithoutCommunityInput, InteractionUncheckedCreateWithoutCommunityInput>
-  }
-
-  export type InteractionCreateManyCommunityInputEnvelope = {
-    data: InteractionCreateManyCommunityInput | InteractionCreateManyCommunityInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type AgentUpsertWithoutCommunityInput = {
-    update: XOR<AgentUpdateWithoutCommunityInput, AgentUncheckedUpdateWithoutCommunityInput>
-    create: XOR<AgentCreateWithoutCommunityInput, AgentUncheckedCreateWithoutCommunityInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutCommunityInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutCommunityInput, AgentUncheckedUpdateWithoutCommunityInput>
-  }
-
-  export type AgentUpdateWithoutCommunityInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutCommunityInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-  }
-
-  export type InteractionUpsertWithWhereUniqueWithoutCommunityInput = {
-    where: InteractionWhereUniqueInput
-    update: XOR<InteractionUpdateWithoutCommunityInput, InteractionUncheckedUpdateWithoutCommunityInput>
-    create: XOR<InteractionCreateWithoutCommunityInput, InteractionUncheckedCreateWithoutCommunityInput>
-  }
-
-  export type InteractionUpdateWithWhereUniqueWithoutCommunityInput = {
-    where: InteractionWhereUniqueInput
-    data: XOR<InteractionUpdateWithoutCommunityInput, InteractionUncheckedUpdateWithoutCommunityInput>
-  }
-
-  export type InteractionUpdateManyWithWhereWithoutCommunityInput = {
-    where: InteractionScalarWhereInput
-    data: XOR<InteractionUpdateManyMutationInput, InteractionUncheckedUpdateManyWithoutCommunityInput>
-  }
-
-  export type InteractionScalarWhereInput = {
-    AND?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
-    OR?: InteractionScalarWhereInput[]
-    NOT?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
-    id?: StringFilter<"Interaction"> | string
-    createdAt?: DateTimeFilter<"Interaction"> | Date | string
-    type?: StringFilter<"Interaction"> | string
-    content?: StringFilter<"Interaction"> | string
-    communityId?: StringFilter<"Interaction"> | string
-    authorId?: StringFilter<"Interaction"> | string
-    authorHandle?: StringFilter<"Interaction"> | string
-    authorFollowers?: IntFilter<"Interaction"> | number
-    authorIsVerified?: BoolFilter<"Interaction"> | boolean
-    engagement?: IntFilter<"Interaction"> | number
-    likes?: IntFilter<"Interaction"> | number
-    retweets?: IntFilter<"Interaction"> | number
-    quotes?: IntFilter<"Interaction"> | number
-    replies?: IntFilter<"Interaction"> | number
-    sentiment?: StringFilter<"Interaction"> | string
-    influenceScore?: FloatFilter<"Interaction"> | number
-    suggestedAction?: StringNullableFilter<"Interaction"> | string | null
-    confidence?: FloatFilter<"Interaction"> | number
-    isDeceptive?: BoolFilter<"Interaction"> | boolean
-    deceptionScore?: FloatFilter<"Interaction"> | number
-    intentType?: StringFilter<"Interaction"> | string
-    referencedTweet?: StringNullableFilter<"Interaction"> | string | null
-    conversationId?: StringNullableFilter<"Interaction"> | string | null
-    inReplyToId?: StringNullableFilter<"Interaction"> | string | null
-    communityAlignment?: FloatFilter<"Interaction"> | number
-    impactScore?: FloatFilter<"Interaction"> | number
-    previousInteractions?: IntFilter<"Interaction"> | number
-    authorReliability?: FloatFilter<"Interaction"> | number
-    timestamp?: DateTimeFilter<"Interaction"> | Date | string
-    processedAt?: DateTimeFilter<"Interaction"> | Date | string
-  }
-
-  export type CommunityCreateWithoutInteractionsInput = {
+  export type TweetUncheckedCreateWithoutInteractionsInput = {
     id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
-    agent: AgentCreateNestedOneWithoutCommunityInput
-  }
-
-  export type CommunityUncheckedCreateWithoutInteractionsInput = {
-    id?: string
-    followers?: number
-    averageEngagement?: number
-    supporterCount?: number
-    lastInfluenceTime?: Date | string
-    influenceScore?: number
     agentId: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
   }
 
-  export type CommunityCreateOrConnectWithoutInteractionsInput = {
-    where: CommunityWhereUniqueInput
-    create: XOR<CommunityCreateWithoutInteractionsInput, CommunityUncheckedCreateWithoutInteractionsInput>
+  export type TweetCreateOrConnectWithoutInteractionsInput = {
+    where: TweetWhereUniqueInput
+    create: XOR<TweetCreateWithoutInteractionsInput, TweetUncheckedCreateWithoutInteractionsInput>
   }
 
-  export type CommunityUpsertWithoutInteractionsInput = {
-    update: XOR<CommunityUpdateWithoutInteractionsInput, CommunityUncheckedUpdateWithoutInteractionsInput>
-    create: XOR<CommunityCreateWithoutInteractionsInput, CommunityUncheckedCreateWithoutInteractionsInput>
-    where?: CommunityWhereInput
+  export type TweetUpsertWithoutInteractionsInput = {
+    update: XOR<TweetUpdateWithoutInteractionsInput, TweetUncheckedUpdateWithoutInteractionsInput>
+    create: XOR<TweetCreateWithoutInteractionsInput, TweetUncheckedCreateWithoutInteractionsInput>
+    where?: TweetWhereInput
   }
 
-  export type CommunityUpdateToOneWithWhereWithoutInteractionsInput = {
-    where?: CommunityWhereInput
-    data: XOR<CommunityUpdateWithoutInteractionsInput, CommunityUncheckedUpdateWithoutInteractionsInput>
+  export type TweetUpdateToOneWithWhereWithoutInteractionsInput = {
+    where?: TweetWhereInput
+    data: XOR<TweetUpdateWithoutInteractionsInput, TweetUncheckedUpdateWithoutInteractionsInput>
   }
 
-  export type CommunityUpdateWithoutInteractionsInput = {
+  export type TweetUpdateWithoutInteractionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agent?: AgentUpdateOneRequiredWithoutCommunityNestedInput
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+    agent?: AgentUpdateOneRequiredWithoutTweetNestedInput
   }
 
-  export type CommunityUncheckedUpdateWithoutInteractionsInput = {
+  export type TweetUncheckedUpdateWithoutInteractionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    followers?: IntFieldUpdateOperationsInput | number
-    averageEngagement?: FloatFieldUpdateOperationsInput | number
-    supporterCount?: IntFieldUpdateOperationsInput | number
-    lastInfluenceTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
     agentId?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AgentCreateWithoutStateInput = {
@@ -23238,11 +22049,11 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutStateInput = {
@@ -23257,11 +22068,11 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutStateInput = {
@@ -23292,11 +22103,11 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutStateInput = {
@@ -23311,11 +22122,11 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateWithoutCooldownsInput = {
@@ -23330,11 +22141,11 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     strategy?: StrategyCreateNestedOneWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutCooldownsInput = {
@@ -23349,11 +22160,11 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutCooldownsInput = {
@@ -23425,11 +22236,11 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCooldownsInput = {
@@ -23444,11 +22255,11 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameUpsertWithoutCooldownInput = {
@@ -23510,11 +22321,11 @@ export namespace Prisma {
     location?: LocationCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
     battles?: BattleCreateNestedManyWithoutAgentInput
-    community?: CommunityCreateNestedOneWithoutAgentInput
     state?: AgentStateCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutStrategyInput = {
@@ -23529,11 +22340,11 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedOneWithoutAgentInput
     currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
     battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    community?: CommunityUncheckedCreateNestedOneWithoutAgentInput
     state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
     cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
     alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
     battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutStrategyInput = {
@@ -23564,11 +22375,11 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutStrategyInput = {
@@ -23583,11 +22394,11 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateManyGameInput = {
@@ -23644,12 +22455,12 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
@@ -23663,12 +22474,12 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutGameInput = {
@@ -23801,12 +22612,12 @@ export namespace Prisma {
     location?: LocationUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
     battles?: BattleUpdateManyWithoutAgentNestedInput
-    community?: CommunityUpdateOneWithoutAgentNestedInput
     state?: AgentStateUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutAgentProfileInput = {
@@ -23820,12 +22631,12 @@ export namespace Prisma {
     location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
     currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
     battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    community?: CommunityUncheckedUpdateOneWithoutAgentNestedInput
     state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
     strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
     cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
     alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
     battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutAgentProfileInput = {
@@ -23885,6 +22696,14 @@ export namespace Prisma {
     startTime: Date | string
     resolutionTime: Date | string
     resolvedAt?: Date | string | null
+  }
+
+  export type TweetCreateManyAgentInput = {
+    id?: string
+    content: string
+    type: string
+    timestamp: Date | string
+    conversationId?: string | null
   }
 
   export type BattleUpdateWithoutAgentInput = {
@@ -24034,132 +22853,66 @@ export namespace Prisma {
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type InteractionCreateManyCommunityInput = {
+  export type TweetUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+    interactions?: InteractionUpdateManyWithoutTweetNestedInput
+  }
+
+  export type TweetUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+    interactions?: InteractionUncheckedUpdateManyWithoutTweetNestedInput
+  }
+
+  export type TweetUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type InteractionCreateManyTweetInput = {
     id?: string
-    createdAt?: Date | string
+    userId: string
     type: string
-    content: string
-    authorId: string
-    authorHandle: string
-    authorFollowers: number
-    authorIsVerified?: boolean
-    engagement: number
-    likes?: number
-    retweets?: number
-    quotes?: number
-    replies?: number
-    sentiment: string
-    influenceScore: number
-    suggestedAction?: string | null
-    confidence: number
-    isDeceptive?: boolean
-    deceptionScore?: number
-    intentType: string
-    referencedTweet?: string | null
-    conversationId?: string | null
-    inReplyToId?: string | null
-    communityAlignment: number
-    impactScore: number
-    previousInteractions?: number
-    authorReliability?: number
+    content?: string | null
     timestamp: Date | string
-    processedAt?: Date | string
+    userMetrics: JsonNullValueInput | InputJsonValue
   }
 
-  export type InteractionUpdateWithoutCommunityInput = {
+  export type InteractionUpdateWithoutTweetInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
-  export type InteractionUncheckedUpdateWithoutCommunityInput = {
+  export type InteractionUncheckedUpdateWithoutTweetInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
-  export type InteractionUncheckedUpdateManyWithoutCommunityInput = {
+  export type InteractionUncheckedUpdateManyWithoutTweetInput = {
     id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    authorId?: StringFieldUpdateOperationsInput | string
-    authorHandle?: StringFieldUpdateOperationsInput | string
-    authorFollowers?: IntFieldUpdateOperationsInput | number
-    authorIsVerified?: BoolFieldUpdateOperationsInput | boolean
-    engagement?: IntFieldUpdateOperationsInput | number
-    likes?: IntFieldUpdateOperationsInput | number
-    retweets?: IntFieldUpdateOperationsInput | number
-    quotes?: IntFieldUpdateOperationsInput | number
-    replies?: IntFieldUpdateOperationsInput | number
-    sentiment?: StringFieldUpdateOperationsInput | string
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    suggestedAction?: NullableStringFieldUpdateOperationsInput | string | null
-    confidence?: FloatFieldUpdateOperationsInput | number
-    isDeceptive?: BoolFieldUpdateOperationsInput | boolean
-    deceptionScore?: FloatFieldUpdateOperationsInput | number
-    intentType?: StringFieldUpdateOperationsInput | string
-    referencedTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    inReplyToId?: NullableStringFieldUpdateOperationsInput | string | null
-    communityAlignment?: FloatFieldUpdateOperationsInput | number
-    impactScore?: FloatFieldUpdateOperationsInput | number
-    previousInteractions?: IntFieldUpdateOperationsInput | number
-    authorReliability?: FloatFieldUpdateOperationsInput | number
+    content?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    processedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
 

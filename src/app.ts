@@ -2,9 +2,23 @@ import { logger } from "@/utils/logger";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import { prisma } from "./config/prisma";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
+import { HealthMonitor } from "./agent/HealthMonitor";
+import { AgentId } from "./agent/TwitterManager";
+import { GameOrchestrator } from "./agent/GameOrchestrator";
+import { BattleResolver } from "./agent/BattleResolver";
+import EventEmitter from "events";
+import { InfluenceCalculator } from "./agent/InfluenceCalculator";
+import CacheManager from "./agent/CacheManager";
+import TwitterManager from "./agent/TwitterManager";
+import { DecisionEngine } from "./agent/DecisionEngine";
+import TwitterApi from "twitter-api-v2";
+import { createNextGame } from "./config/setup";
+import { checkDatabaseConnection } from "./utils";
+import { getProgramWithWallet } from "./utils/program";
+import { PrismaClient } from "@prisma/client";
+import { BN } from "@coral-xyz/anchor";
 
 const app = express();
 
@@ -43,7 +57,6 @@ app.use(
     maxAge: 86400, // 24 hours
   })
 );
-
 // Body parsing middleware
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
@@ -85,11 +98,79 @@ app.use(
 const PORT = process.env.PORT || 3001;
 
 export async function startServer() {
-  try {
-    // Verify database connection
-    await prisma.$connect();
-    logger.info("Database connection established");
+  await checkDatabaseConnection();
 
+  const { gameAccount, agents } = await createNextGame();
+  const program = await getProgramWithWallet();
+  const prisma = new PrismaClient();
+
+  const _twitterClients = new Map<AgentId, TwitterApi>();
+  agents.forEach((agent) => {
+    const appKey = process.env.TWITTER_API_KEY;
+    const appSecret = process.env.TWITTER_API_SECRET;
+
+    if (!appKey || !appSecret) {
+      throw new Error("Twitter AppKey and AppSecret are not set");
+    }
+
+    const agentId = new BN(agent.account.id).toString() as AgentId;
+    console.log(
+      "agentId:🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥",
+      agentId
+    );
+    const accessToken = process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
+    const accessSecret = process.env[`TWITTER_ACCESS_SECRET_${agentId}`];
+
+    if (!accessToken || !accessSecret) {
+      throw new Error(
+        `Twitter Access Token and Access Secret are not set env key: ${
+          process.env[`TWITTER_ACCESS_TOKEN_${agentId}`]
+        } ${process.env[`TWITTER_ACCESS_SECRET_${agentId}`]}`
+      );
+    }
+    _twitterClients.set(
+      agentId,
+      new TwitterApi({
+        appKey,
+        appSecret,
+        accessSecret,
+        accessToken,
+      })
+    );
+  });
+
+  const twitter = new TwitterManager(_twitterClients);
+  const cache = new CacheManager();
+  const calculator = new InfluenceCalculator();
+  const eventEmitter = new EventEmitter();
+  const engine = new DecisionEngine(prisma, eventEmitter);
+
+  const battleResolver = new BattleResolver(gameAccount.gameId, program);
+
+  const orchestrator = new GameOrchestrator(
+    gameAccount.gameId,
+    program,
+    twitter,
+    cache,
+    calculator,
+    engine,
+    prisma,
+    eventEmitter,
+    battleResolver
+  );
+
+  const healthMonitor = new HealthMonitor(orchestrator, prisma, cache);
+  try {
+    await orchestrator.start();
+    await healthMonitor.startMonitoring();
+
+    logger.info("System started successfully");
+  } catch (error) {
+    logger.error("Failed to start system", { error });
+    process.exit(1);
+  }
+
+  try {
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in development mode`);
       logger.info(`API available at /api`);

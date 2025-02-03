@@ -41,30 +41,26 @@ model Game {
 }
 
 model AgentProfile {
-  id                  String   @id @default(uuid())
-  onchainId           Int      @unique
-  name                String
-  xHandle             String   @unique
-  bio                 String[]
-  lore                String[]
-  characteristics     String[]
-  knowledge           String[]
-  influenceDifficulty String   @default("medium")
+  id              String   @id @default(uuid())
+  onchainId       Int      @unique
+  name            String
+  xHandle         String   @unique
+  bio             String[]
+  lore            String[]
+  characteristics String[]
+  knowledge       String[]
 
+  traits Json
+  // influenceDifficulty String   @default("medium")
   // All personality traits must be between 0 and 100
-  aggressiveness   Int @db.Integer
-  trustworthiness  Int @db.Integer
-  manipulativeness Int @db.Integer
-  intelligence     Int @db.Integer
-  adaptability     Int @db.Integer
+  // aggressiveness   Int @db.Integer
+  // trustworthiness  Int @db.Integer
+  // manipulativeness Int @db.Integer
+  // intelligence     Int @db.Integer
+  // adaptability     Int @db.Integer
 
-  // Influence factors (all must be >= 0)
-  baseInfluence        Float   @db.DoublePrecision
-  followerMultiplier   Float   @db.DoublePrecision
-  engagementMultiplier Float   @db.DoublePrecision
-  consensusMultiplier  Float   @db.DoublePrecision
   // Relations
-  agent                Agent[]
+  agent Agent[]
 }
 
 model Agent {
@@ -83,7 +79,6 @@ model Agent {
   location        Location?
   currentAlliance Alliance?
   battles         Battle[]
-  community       Community?
   state           AgentState?
   strategy        Strategy?
   cooldowns       Cooldown[]
@@ -95,9 +90,21 @@ model Agent {
   // Add these new fields
   // ownerId String
   // owner   User   @relation("AgentOwner", fields: [ownerId], references: [id])
+  Tweet Tweet[]
 
   // Composite unique constraints
   @@unique([agentId, gameId])
+}
+
+model Tweet {
+  id             String        @id @default(cuid())
+  agentId        String
+  agent          Agent         @relation(fields: [agentId], references: [id])
+  content        String
+  type           String
+  timestamp      DateTime
+  conversationId String?
+  interactions   Interaction[]
 }
 
 model Location {
@@ -149,72 +156,15 @@ model Battle {
   resolvedAt     DateTime?
 }
 
-model Community {
-  id                String   @id @default(uuid())
-  followers         Int      @default(0)
-  averageEngagement Float    @default(0)
-  supporterCount    Int      @default(0)
-  lastInfluenceTime DateTime @default(now())
-  influenceScore    Float    @default(0)
-
-  // Relations
-  agent        Agent         @relation(fields: [agentId], references: [id])
-  agentId      String        @unique
-  interactions Interaction[]
-}
-
 model Interaction {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
+  id          String   @id @default(cuid())
+  tweetId     String
+  userId      String
   type        String // "comment", "quote", "mention"
-  content     String // The actual tweet content
-  communityId String
-  community   Community @relation(fields: [communityId], references: [id])
-
-  // Author metrics
-  authorId         String // Twitter author ID
-  authorHandle     String // Twitter handle
-  authorFollowers  Int
-  authorIsVerified Boolean @default(false)
-
-  // Engagement metrics
-  engagement Int // Overall engagement score
-  likes      Int @default(0)
-  retweets   Int @default(0)
-  quotes     Int @default(0)
-  replies    Int @default(0)
-
-  // Content analysis
-  sentiment       String // "positive", "negative", "neutral"
-  influenceScore  Float // How influential this interaction is (0-1)
-  suggestedAction String? // Suggested action from the community
-  confidence      Float // Confidence in the analysis (0-1)
-
-  // Strategic analysis
-  isDeceptive    Boolean @default(false)
-  deceptionScore Float   @default(0) // Probability of deception (0-1)
-  intentType     String // "support", "oppose", "deceive", "inform", "question"
-
-  // Context
-  referencedTweet String? // ID of tweet being referenced (for QRTs/replies)
-  conversationId  String? // Twitter conversation ID
-  inReplyToId     String? // ID of tweet being replied to
-
-  // Community impact
-  communityAlignment Float // How aligned with community interests (-1 to 1)
-  impactScore        Float // Calculated impact on agent's decision making (0-1)
-
-  // Historical context
-  previousInteractions Int   @default(0) // Number of previous interactions from this author
-  authorReliability    Float @default(0.5) // Historical reliability score of author (0-1)
-
-  // Timestamps
-  timestamp   DateTime // When the interaction occurred
-  processedAt DateTime @default(now())
-
-  @@index([communityId])
-  @@index([authorId])
-  @@index([timestamp])
+  content     String?
+  timestamp   DateTime
+  userMetrics Json
+  tweet       Tweet    @relation(fields: [tweetId], references: [id])
 }
 
 model AgentState {

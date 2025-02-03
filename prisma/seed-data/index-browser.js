@@ -141,16 +141,7 @@ exports.Prisma.AgentProfileScalarFieldEnum = {
   lore: 'lore',
   characteristics: 'characteristics',
   knowledge: 'knowledge',
-  influenceDifficulty: 'influenceDifficulty',
-  aggressiveness: 'aggressiveness',
-  trustworthiness: 'trustworthiness',
-  manipulativeness: 'manipulativeness',
-  intelligence: 'intelligence',
-  adaptability: 'adaptability',
-  baseInfluence: 'baseInfluence',
-  followerMultiplier: 'followerMultiplier',
-  engagementMultiplier: 'engagementMultiplier',
-  consensusMultiplier: 'consensusMultiplier'
+  traits: 'traits'
 };
 
 exports.Prisma.AgentScalarFieldEnum = {
@@ -162,6 +153,15 @@ exports.Prisma.AgentScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   gameId: 'gameId'
+};
+
+exports.Prisma.TweetScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  content: 'content',
+  type: 'type',
+  timestamp: 'timestamp',
+  conversationId: 'conversationId'
 };
 
 exports.Prisma.LocationScalarFieldEnum = {
@@ -199,47 +199,14 @@ exports.Prisma.BattleScalarFieldEnum = {
   resolvedAt: 'resolvedAt'
 };
 
-exports.Prisma.CommunityScalarFieldEnum = {
-  id: 'id',
-  followers: 'followers',
-  averageEngagement: 'averageEngagement',
-  supporterCount: 'supporterCount',
-  lastInfluenceTime: 'lastInfluenceTime',
-  influenceScore: 'influenceScore',
-  agentId: 'agentId'
-};
-
 exports.Prisma.InteractionScalarFieldEnum = {
   id: 'id',
-  createdAt: 'createdAt',
+  tweetId: 'tweetId',
+  userId: 'userId',
   type: 'type',
   content: 'content',
-  communityId: 'communityId',
-  authorId: 'authorId',
-  authorHandle: 'authorHandle',
-  authorFollowers: 'authorFollowers',
-  authorIsVerified: 'authorIsVerified',
-  engagement: 'engagement',
-  likes: 'likes',
-  retweets: 'retweets',
-  quotes: 'quotes',
-  replies: 'replies',
-  sentiment: 'sentiment',
-  influenceScore: 'influenceScore',
-  suggestedAction: 'suggestedAction',
-  confidence: 'confidence',
-  isDeceptive: 'isDeceptive',
-  deceptionScore: 'deceptionScore',
-  intentType: 'intentType',
-  referencedTweet: 'referencedTweet',
-  conversationId: 'conversationId',
-  inReplyToId: 'inReplyToId',
-  communityAlignment: 'communityAlignment',
-  impactScore: 'impactScore',
-  previousInteractions: 'previousInteractions',
-  authorReliability: 'authorReliability',
   timestamp: 'timestamp',
-  processedAt: 'processedAt'
+  userMetrics: 'userMetrics'
 };
 
 exports.Prisma.AgentStateScalarFieldEnum = {
@@ -285,9 +252,19 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 
 exports.Prisma.NullsOrder = {
@@ -336,10 +313,10 @@ exports.Prisma.ModelName = {
   Game: 'Game',
   AgentProfile: 'AgentProfile',
   Agent: 'Agent',
+  Tweet: 'Tweet',
   Location: 'Location',
   Alliance: 'Alliance',
   Battle: 'Battle',
-  Community: 'Community',
   Interaction: 'Interaction',
   AgentState: 'AgentState',
   Cooldown: 'Cooldown',

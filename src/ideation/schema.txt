@@ -1,0 +1,206 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+// Add seed configuration
+generator seed {
+    provider = "prisma-client-js"
+    output   = "./seed-data"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Game {
+    id                String   @id @default(uuid())
+    gameId            BigInt   @unique
+    authority         String
+    tokenMint         String
+    rewardsVault      String
+    mapDiameter       Int
+    isActive          Boolean  @default(true)
+    bump              Int      @db.Integer
+    dailyRewardTokens Float    @db.DoublePrecision
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+
+    agents    Agent[]
+    alliances Alliance[]
+    battles   Battle[]
+    Cooldown  Cooldown[]
+}
+
+model Agent {
+    id        String @id @default(cuid())
+    onchainId Int    @unique
+    XHandle   String @unique
+    name      String
+
+    followers Int @default(100)
+
+    lore      String[]
+    bio       String[]
+    knowledge String[]
+    image     String
+
+    health Int @default(100)
+
+    traits Json
+
+    tweets Tweet[]
+
+    Game   Game   @relation(fields: [gameId], references: [id])
+    gameId String
+
+    // An agent can be involved in many battles, either as attacker or defender
+    battlesAsAttacker     Battle[]   @relation("attacker")
+    battlesAsDefender     Battle[]   @relation("defender")
+    battlesAsAttackerAlly Battle[]   @relation("attackerAlly")
+    battlesAsDefenderAlly Battle[]   @relation("defenderAlly")
+    Cooldown              Cooldown[]
+
+    // allies   Alliance[] @relation("Allies")
+    // allieds  Alliance[] @relation("Allieds")
+    MapTile MapTile[]
+}
+
+model Battle {
+    id        String     @id @default(cuid())
+    timestamp DateTime   @default(now())
+    type      BattleType @default(Simple)
+
+    tokensStaked Float
+    tokensLost   Float?
+
+    outcome String? // WIN, LOSS
+
+    // Battle must have both attacker and defender and option ally
+    attackerId     String
+    attacker       Agent   @relation("attacker", fields: [attackerId], references: [id])
+    attackerAllyId String?
+    attackerAlly   Agent?  @relation("attackerAlly", fields: [attackerAllyId], references: [id])
+    defenderId     String
+    defender       Agent   @relation("defender", fields: [defenderId], references: [id])
+    defenderAllyId String?
+    defenderAlly   Agent?  @relation("defenderAlly", fields: [defenderAllyId], references: [id])
+
+    status BattleStatus @default(Active)
+
+    // Battle belongs to a game
+    game   Game   @relation(fields: [gameId], references: [id])
+    gameId String
+
+    startTime  DateTime  @default(now())
+    resolvedAt DateTime?
+}
+
+enum BattleStatus {
+    Active
+    Resolved
+}
+
+enum BattleType {
+    Simple
+    AgentVsAlliance
+    AllianceVsAlliance
+}
+
+model Alliance {
+    id             String         @id @default(cuid())
+    combinedTokens Float?
+    status         AllianceStatus @default(Active)
+    timestamp      DateTime
+    Game           Game?          @relation(fields: [gameId], references: [id])
+    gameId         String?
+    // ally1          Agent          @relation("allies", fields: [ally1Id], references: [id])
+    // ally1Id        String
+    // allied         Agent          @relation("allieds", fields: [alliedId], references: [id])
+    // alliedId       String
+    // Agent          Agent?         @relation(fields: [agentId], references: [id])
+    // agentId        String?
+
+    // Agent Agent? @relation(fields: [agentId], references: [id])
+    // Agent Agent? @relation(fields: [agentId], references: [id])
+}
+
+enum AllianceStatus {
+    Active
+    Broken
+}
+
+model Tweet {
+    id             String        @id @default(cuid())
+    agentId        String
+    agent          Agent         @relation(fields: [agentId], references: [id])
+    content        String
+    type           String 
+    timestamp      DateTime
+    conversationId String?
+    interactions   Interaction[]
+}
+
+model Interaction {
+    id          String   @id @default(cuid())
+    tweetId     String
+    userId      String
+    type        String // "comment", "quote", "mention"
+    content     String?
+    timestamp   DateTime
+    userMetrics Json
+    tweet       Tweet    @relation(fields: [tweetId], references: [id])
+}
+
+model MapTile {
+    id          String      @id @default(uuid())
+    x           Int         @db.Integer
+    y           Int         @db.Integer
+    terrainType TerrainType
+    occupiedBy  String?
+    agent       Agent?      @relation(fields: [occupiedBy], references: [id])
+}
+
+enum TerrainType {
+    PLAIN
+    MOUNTAIN
+    RIVER
+}
+
+model Cooldown {
+    id     String       @id @default(uuid())
+    type   CooldownType
+    endsAt DateTime
+
+    // Relations
+    cooledAgentId String
+    cooledAgent   Agent   @relation(fields: [cooledAgentId], references: [id])
+    targetAgentId String? // for alliance cooldown
+
+    gameId String
+    game   Game   @relation(fields: [gameId], references: [id])
+}
+
+enum CooldownType {
+    Alliance
+    Battle
+    Ignore
+    Tweet
+    Move
+}
+
+model User {
+    id            String   @id
+    privyUserId   String   @unique // The ID from Privy
+    role          UserRole @default(USER)
+    email         String?  @unique
+    walletAddress String?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+enum UserRole {
+    ADMIN
+    MANAGER
+    USER
+}

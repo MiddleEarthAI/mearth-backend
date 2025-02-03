@@ -1,18 +1,9 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { logger } from "@/utils/logger";
-import { TwitterApi } from "twitter-api-v2";
 import { prisma } from "@/config/prisma";
 import { TWEET_COOLDOWN_MS } from "@/constants";
-
-export enum TweetType {
-  BattleReport = "Battle Report",
-  AllianceProposal = "Alliance Proposal",
-  TerritoryClaim = "Territory Claim",
-  StrategicUpdate = "Strategic Update",
-  StatusUpdate = "Status Update",
-  CommunityEngagement = "Community Engagement",
-}
+import TwitterManager from "@/agent/TwitterManager";
 
 /**
  * Creates a sophisticated tweet tool for agents to engage in Middle Earth's social landscape
@@ -23,12 +14,12 @@ export const tweetTool = async ({
   agentId,
   agentDbId,
   gameDbId,
-  twitterApi,
+  twitter,
 }: {
   agentId: number;
   agentDbId: string;
   gameDbId: string;
-  twitterApi: TwitterApi;
+  twitter: TwitterManager;
 }) => {
   const cooldown = await prisma.cooldown.findUnique({
     where: {
@@ -57,7 +48,7 @@ Every interaction from humans can alter your path - use your words wisely to gai
 
     execute: async ({ content }) => {
       try {
-        if (!twitterApi) throw new Error("Communication systems offline");
+        if (!twitter) throw new Error("Communication systems offline");
 
         const cooldown = await prisma.cooldown.upsert({
           where: {
@@ -78,7 +69,18 @@ Every interaction from humans can alter your path - use your words wisely to gai
         });
 
         // Post tweet and get its ID
-        // const tweetId = await twitterApi.v2.tweet(content);
+        const postResult = await twitter.postTweet(content);
+
+        const tweet = await prisma.tweet.create({
+          data: {
+            content,
+            timestamp: new Date(),
+            type: "Battle", // ??
+            agentId: agentDbId,
+            conversationId: postResult.data.id,
+          },
+        });
+
         logger.info(`
         🐦 ═══════════════════════════════════════════════════════════════════════
            Agent: ${agentId}
@@ -92,8 +94,9 @@ Every interaction from humans can alter your path - use your words wisely to gai
 
         return {
           success: true,
-          message: `Tweet deployed via @${agentId}. You can make your next tweet post at ${cooldown?.endsAt.toLocaleString()}`,
-          // tweetId,
+          message: `Tweet deployed via @${agentId}.You just twitted: ${content} 
+          You can make your next tweet post at ${cooldown?.endsAt.toLocaleString()}`,
+          tweetId: tweet.id,
         };
       } catch (error) {
         logger.error("Communication failure:", error);
