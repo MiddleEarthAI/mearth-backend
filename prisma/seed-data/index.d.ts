@@ -14111,10 +14111,10 @@ export namespace Prisma {
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    onchainId?: number
     AND?: AgentWhereInput | AgentWhereInput[]
     OR?: AgentWhereInput[]
     NOT?: AgentWhereInput | AgentWhereInput[]
+    onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
@@ -14130,7 +14130,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceListRelationFilter
     mapTiles?: MapTileListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
-  }, "id" | "onchainId">
+  }, "id">
 
   export type AgentOrderByWithAggregationInput = {
     id?: SortOrder

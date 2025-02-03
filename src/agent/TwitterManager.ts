@@ -1,4 +1,6 @@
-import { TwitterApi } from "twitter-api-v2";
+import { logger } from "@/utils/logger";
+import { TweetData, TwitterInteraction } from "@/types/twitter";
+import { TwitterApi, UserV2 } from "twitter-api-v2";
 
 export type AgentId = "1" | "2" | "3" | "4";
 
@@ -8,7 +10,7 @@ export type AgentId = "1" | "2" | "3" | "4";
  */
 class TwitterManager {
   private readonly _clients: Map<AgentId, TwitterApi>;
-  private readonly RATE_LIMIT_WINDOW = 900000; // 15 minutes
+  private readonly RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes in milliseconds
   private requestCount: number = 0;
   private client: TwitterApi;
 
@@ -28,49 +30,125 @@ class TwitterManager {
     console.log("✅ Twitter Manager initialized successfully");
   }
 
-  async getTweetInteractions(tweetId: AgentId): Promise<any[]> {
-    console.log(`🔍 Fetching interactions for tweet ${tweetId}...`);
-
-    if (this.shouldThrottle()) {
-      const backoffTime = this.calculateBackoff();
-      console.log(`⏳ Rate limit reached. Waiting for ${backoffTime}ms...`);
-      await this.wait(backoffTime);
-    }
-
-    const client = this._clients.get("1");
-
-    if (!client) {
-      console.error("❌ Error: Client not found");
-      throw new Error(`Client for agent Id ${1} not found`);
-    }
-
+  async fetchTweetInteractions(
+    tweetId: string,
+    username?: string
+  ): Promise<TwitterInteraction[]> {
     try {
-      console.log("📊 Fetching replies, quotes, and likes...");
-      const [replies, quotes, likes] = await Promise.all([
-        client.v2.search(`in_reply_to_tweet_id:${tweetId}`),
-        client.v2.quotes(tweetId),
-        client.v2.tweetLikedBy(tweetId),
-      ]);
+      // Check rate limiting before making requests
+      if (this.shouldThrottle()) {
+        const backoffTime = this.calculateBackoff();
+        await this.wait(backoffTime);
+      }
 
-      this.requestCount += 3;
-      console.log("✅ Successfully fetched all interactions");
+      const interactions: TwitterInteraction[] = [];
+      this.requestCount++;
 
-      return this.formatInteractions(replies, quotes, likes);
+      // Fetch replies
+      const replies = await this.fetchTweetReplies(tweetId);
+      console.log("🔍 Fetched replies:", replies);
+      for (const reply of replies) {
+        const user = await this.fetchUserInfo(
+          this.client,
+          reply.in_reply_to_user_id!
+        );
+        interactions.push({
+          type: "reply",
+          userId: user.id,
+          username: user.username,
+          tweetId: reply.id,
+          content: reply.text,
+          timestamp: new Date(reply.created_at!),
+          userMetrics: {
+            followerCount: user.public_metrics?.followers_count || 0,
+            averageEngagement: await this.calculateAverageEngagementScore(
+              reply
+            ),
+            accountAge: 0,
+            verificationStatus: user.verified || false,
+            reputationScore: 0,
+          },
+        });
+      }
+
+      // Check rate limiting between requests
+      if (this.shouldThrottle()) {
+        const backoffTime = this.calculateBackoff();
+        await this.wait(backoffTime);
+      }
+      this.requestCount++;
+
+      // Fetch quotes
+      const quotes = await this.fetchTweetQuotes(tweetId);
+      for (const quote of quotes) {
+        const user = await this.fetchUserInfo(this.client, quote.author_id!);
+        interactions.push({
+          type: "quote",
+          userId: user.id,
+          username: user.username,
+          tweetId: quote.id,
+          content: quote.text,
+          timestamp: new Date(quote.created_at!),
+          userMetrics: {
+            followerCount: user.public_metrics?.followers_count || 0,
+            averageEngagement: await this.calculateAverageEngagementScore(
+              quote
+            ),
+            accountAge: 0,
+            verificationStatus: user.verified || false,
+            reputationScore: 0,
+          },
+        });
+      }
+
+      // // Check rate limiting between requests
+      // if (this.shouldThrottle()) {
+      //   const backoffTime = this.calculateBackoff();
+      //   await this.wait(backoffTime);
+      // }
+      // this.requestCount++;
+
+      // // Fetch mentions
+      // const mentions = await this.fetchUserMentions(username);
+      // for (const mention of mentions) {
+      //   // Skip if the mention is already counted as a reply or quote
+      //   if (interactions.some((i) => i.tweetId === mention.id)) continue;
+
+      //   const user = await this.fetchUserInfo(this.client, mention.author_id!);
+      //   interactions.push({
+      //     type: "mention",
+      //     userId: user.id,
+      //     username: user.username,
+      //     tweetId: mention.id,
+      //     content: mention.text,
+      //     timestamp: new Date(mention.created_at!),
+      //     userMetrics: {
+      //       followerCount: user.public_metrics?.followers_count || 0,
+      //       averageEngagement: await this.calculateAverageEngagementScore(
+      //         mention
+      //       ),
+      //       accountAge: 0,
+      //       verificationStatus: user.verified || false,
+      //       reputationScore: 0,
+      //     },
+      //   });
+      // }
+
+      return interactions;
     } catch (error) {
-      console.error("❌ Failed to fetch tweet interactions", {
-        tweetId,
-        error,
-      });
+      logger.error("Error fetching tweet interactions:", error);
       throw error;
     }
   }
 
-  private formatInteractions(replies: any, quotes: any, likes: any): any[] {
-    console.log("🔄 Formatting interactions data...");
-    return [...replies, ...quotes, ...likes];
-  }
+  async postTweet(content: string) {
+    // Check rate limiting before posting
+    if (this.shouldThrottle()) {
+      const backoffTime = this.calculateBackoff();
+      await this.wait(backoffTime);
+    }
+    this.requestCount++;
 
-  postTweet(content: string) {
     console.log("📝 Posting new tweet...");
     return this.client.v2
       .tweet(content, {})
@@ -83,6 +161,254 @@ class TwitterManager {
       });
   }
 
+  async fetchRecentTweets(agentId: AgentId, count: number) {
+    // Check rate limiting before fetching
+    if (this.shouldThrottle()) {
+      const backoffTime = this.calculateBackoff();
+      await this.wait(backoffTime);
+    }
+    this.requestCount++;
+
+    const agentClient = this._clients.get(agentId);
+    if (!agentClient) {
+      console.error("❌ Error: Client not found for agentId", agentId);
+      throw new Error(`Client for agent Id ${agentId} not found`);
+    }
+    const me = await agentClient.v2.me();
+    console.log("🔍 Fetching tweets for agent", me);
+
+    return await agentClient?.v2.userTimeline(me.data.id, {
+      max_results: count,
+      "tweet.fields": [
+        "created_at",
+        "public_metrics",
+        "text",
+        "conversation_id",
+        "in_reply_to_user_id",
+      ],
+      "user.fields": ["name", "username", "verified", "profile_image_url"],
+      expansions: [
+        "author_id",
+        "referenced_tweets.id",
+        "in_reply_to_user_id",
+        "attachments.media_keys",
+      ],
+    });
+  }
+
+  async fetchTweetReplies(tweetId: string): Promise<TweetData[]> {
+    // Check rate limiting before fetching
+    if (this.shouldThrottle()) {
+      const backoffTime = this.calculateBackoff();
+      await this.wait(backoffTime);
+    }
+    this.requestCount++;
+
+    try {
+      const replies = await this.client.v2.search(
+        `conversation_id:${tweetId} is:reply`,
+        {
+          "tweet.fields": [
+            "created_at",
+            "public_metrics",
+            "text",
+            "conversation_id",
+            "in_reply_to_user_id",
+            "referenced_tweets",
+          ],
+          "user.fields": ["name", "username", "verified", "public_metrics"],
+          expansions: ["author_id", "referenced_tweets.id"],
+        }
+      );
+
+      return replies.data.data || [];
+    } catch (error) {
+      logger.error("Error fetching replies:", error);
+      throw error;
+    }
+  }
+
+  async fetchTweetQuotes(tweetId: string): Promise<TweetData[]> {
+    // Check rate limiting before fetching
+    if (this.shouldThrottle()) {
+      const backoffTime = this.calculateBackoff();
+      await this.wait(backoffTime);
+    }
+    this.requestCount++;
+
+    try {
+      const quotes = await this.client.v2.quotes(tweetId, {
+        "tweet.fields": [
+          "created_at",
+          "public_metrics",
+          "text",
+          "conversation_id",
+          "in_reply_to_user_id",
+          "referenced_tweets",
+          "author_id",
+        ],
+        "user.fields": ["name", "username", "verified", "public_metrics"],
+        expansions: ["author_id", "referenced_tweets.id"],
+      });
+
+      return quotes.data.data || [];
+    } catch (error) {
+      logger.error("Error fetching quotes:", error);
+      throw error;
+    }
+  }
+
+  async fetchUserMentions(
+    username: string,
+    count: number = 100
+  ): Promise<TweetData[]> {
+    // Check rate limiting before fetching
+    if (this.shouldThrottle()) {
+      const backoffTime = this.calculateBackoff();
+      await this.wait(backoffTime);
+    }
+    this.requestCount++;
+
+    try {
+      const mentions = await this.client.v2.search(`@${username}`, {
+        max_results: count,
+        "tweet.fields": [
+          "created_at",
+          "public_metrics",
+          "text",
+          "conversation_id",
+          "in_reply_to_user_id",
+          "referenced_tweets",
+          "author_id",
+        ],
+        "user.fields": ["name", "username", "verified", "public_metrics"],
+        expansions: ["author_id", "referenced_tweets.id"],
+      });
+
+      return mentions.data.data || [];
+    } catch (error) {
+      logger.error("Error fetching mentions:", error);
+      throw error;
+    }
+  }
+
+  async fetchTweetById(tweetId: string): Promise<TweetData> {
+    // Check rate limiting before fetching
+    if (this.shouldThrottle()) {
+      const backoffTime = this.calculateBackoff();
+      await this.wait(backoffTime);
+    }
+    this.requestCount++;
+
+    try {
+      const tweet = await this.client.v2.singleTweet(tweetId, {
+        "tweet.fields": [
+          "created_at",
+          "public_metrics",
+          "text",
+          "conversation_id",
+          "in_reply_to_user_id",
+          "referenced_tweets",
+        ],
+      });
+
+      if (!tweet.data) {
+        throw new Error(`Tweet ${tweetId} not found`);
+      }
+
+      return tweet.data;
+    } catch (error) {
+      logger.error("Error fetching tweet:", error);
+      throw error;
+    }
+  }
+
+  async fetchUserInfo(client: TwitterApi, username: string): Promise<UserV2> {
+    try {
+      const user = await client.v2.userByUsername(username, {
+        "user.fields": [
+          "created_at",
+          "description",
+          "public_metrics",
+          "verified",
+          "profile_image_url",
+        ],
+      });
+
+      if (!user.data) {
+        throw new Error(`User ${username} not found`);
+      }
+
+      return user.data;
+    } catch (error) {
+      logger.error("Error fetching user info:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Calculates engagement score for a tweet based on interactions
+   * @param tweet - Tweet data
+   * @param interactions - Array of tweet interactions
+   * @returns Engagement score between 0 and 1
+   */
+  async calculateEngagementScore(
+    tweet: TweetData,
+    interactions: TwitterInteraction[]
+  ): Promise<number> {
+    if (!tweet.public_metrics) return 0;
+
+    const metrics = tweet.public_metrics;
+
+    const totalEngagement =
+      metrics.like_count +
+      metrics.retweet_count +
+      metrics.reply_count +
+      metrics.quote_count;
+
+    const verifiedInteractions = interactions.filter(
+      (i) => i.userMetrics.verificationStatus
+    ).length;
+    const highFollowerInteractions = interactions.filter(
+      (i) => i.userMetrics.followerCount > 10000
+    ).length;
+
+    // Weight different factors
+    const engagementWeight = 0.5;
+    const verifiedWeight = 0.3;
+    const followerWeight = 0.2;
+
+    const engagementScore =
+      Math.min(totalEngagement / 1000, 1) * engagementWeight;
+    const verifiedScore =
+      (verifiedInteractions / interactions.length) * verifiedWeight;
+    const followerScore =
+      (highFollowerInteractions / interactions.length) * followerWeight;
+
+    return engagementScore + verifiedScore + followerScore;
+  }
+
+  async calculateAverageEngagementScore(tweetData: TweetData): Promise<number> {
+    if (!tweetData.public_metrics) return 0;
+
+    const metrics = tweetData.public_metrics;
+    const totalEngagement =
+      metrics.like_count +
+      metrics.retweet_count +
+      metrics.reply_count +
+      metrics.quote_count;
+
+    // Calculate average engagement as percentage of total possible engagement
+    // Normalize to value between 0-1
+    const averageScore = Math.min(totalEngagement / 1000, 1);
+
+    return averageScore;
+  }
+
+  /**
+   * Checks if the current request count has reached the rate limit threshold
+   * @returns boolean indicating if requests should be throttled
+   */
   private shouldThrottle(): boolean {
     const shouldThrottle = this.requestCount >= 450;
     if (shouldThrottle) {
@@ -91,6 +417,10 @@ class TwitterManager {
     return shouldThrottle;
   }
 
+  /**
+   * Calculates exponential backoff time based on request count
+   * @returns number of milliseconds to wait
+   */
   private calculateBackoff(): number {
     const backoff = Math.min(
       Math.pow(2, this.requestCount - 450) * 1000,
@@ -100,6 +430,10 @@ class TwitterManager {
     return backoff;
   }
 
+  /**
+   * Utility method to pause execution for specified duration
+   * @param ms Number of milliseconds to wait
+   */
   private async wait(ms: number): Promise<void> {
     console.log(`⏳ Waiting for ${ms}ms...`);
     return new Promise((resolve) => setTimeout(resolve, ms));

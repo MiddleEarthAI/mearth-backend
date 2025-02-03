@@ -4,7 +4,6 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 import { prisma } from "./prisma";
-import { TerrainType } from "@prisma/client";
 import { getRandomCoordinatesWithTerrainType } from "@/constants";
 import { profiles } from "./game-data";
 
@@ -16,7 +15,7 @@ export const createNextGame = async () => {
   try {
     // Execute everything in a single transaction to ensure atomicity
     return await prisma.$transaction(
-      async (prismaClient) => {
+      async (prisma) => {
         const nextGameId = await generateGameId();
         logger.info(`🌟 Checking for existing game - Game ID: ${nextGameId}`);
 
@@ -35,7 +34,12 @@ export const createNextGame = async () => {
         const gameAccount = await program.account.game.fetch(gamePda);
 
         // Create game record in database
-        const dbGame = await prismaClient.game.create({
+        await prisma.game.updateMany({
+          where: { isActive: true },
+          data: { isActive: false },
+        });
+
+        const dbGame = await prisma.game.create({
           data: {
             onchainId: nextGameId,
             authority: program.provider.publicKey?.toString() ?? "",
@@ -76,7 +80,7 @@ export const createNextGame = async () => {
             const agentAccount = await program.account.agent.fetch(agentPda);
 
             // Create agent in database
-            const agentDb = await prismaClient.agent.create({
+            const agentDb = await prisma.agent.create({
               data: {
                 onchainId: profile.onchainId,
                 game: { connect: { id: dbGame.id } },

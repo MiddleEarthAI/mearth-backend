@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
-import TwitterManager from "@/agent/TwitterManager";
+import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
 import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
@@ -13,13 +13,17 @@ import EventEmitter from "events";
 import { MearthProgram } from "@/types";
 import { BN } from "@coral-xyz/anchor";
 import { BattleResolver } from "./BattleResolver";
+import { stringToUuid } from "@/utils/uuid";
+import { TweetV2 } from "twitter-api-v2";
 
 /**
  * Service for managing AI agentData behavior and decision making
  * Handles game orchestration, agent updates, and event processing
  */
 export class GameOrchestrator {
-  private readonly updateInterval = 60 * 60 * 1000; // 1 min for testing
+  private readonly updateInterval = process.env.UPDATE_INTERVAL
+    ? parseInt(process.env.UPDATE_INTERVAL)
+    : 60 * 60 * 1000; // 1 min for testing
   private readonly cleanupInterval = 3600000; // 1 hour
 
   constructor(
@@ -91,14 +95,14 @@ export class GameOrchestrator {
       await this.updateAgentState(data.agentId, data.action);
 
       // Create and post new tweet
-      const tweet = await this.prisma.tweet.create({
-        data: {
-          agentId: data.agentId,
-          content: data.action.content,
-          type: data.action.type,
-          timestamp: new Date(),
-        },
-      });
+      // const tweet = await this.prisma.tweet.create({
+      //   data: {
+      //     agentId: data.agentId,
+      //     content: data.action.content,
+      //     type: data.action.type,
+      //     timestamp: new Date(),
+      //   },
+      // });
 
       logger.info("✅ Action successfully processed", {
         agentId: data.agentId,
@@ -129,55 +133,92 @@ export class GameOrchestrator {
     logger.info("👥 Processing all active agents");
     const agents = await prisma.agent.findMany({
       where: { game: { isActive: true }, health: { gt: 0 } },
+      take: 1,
     });
 
-    await Promise.all(agents.map((agent) => this.processAgent(agent.id)));
+    await Promise.all(
+      agents.map((agent) => this.processAgent(agent.id, agent.onchainId))
+    );
     logger.info(`✅ Processed ${agents.length} agents`);
   }
 
-  private async processAgent(agentId: string): Promise<void> {
+  private async processAgent(
+    agentId: string,
+    agentOnchainId: number
+  ): Promise<void> {
     logger.info(`🤖 Processing agent ${agentId}`);
-    const recentTweets = await this.prisma.tweet.findMany({
-      where: {
-        agentId,
-        timestamp: {
-          gte: new Date(Date.now() - 3600000), // Last hour
-        },
-      },
-      include: { interactions: true },
-    });
+    const recentTweets = await this.twitter.fetchRecentTweets(
+      agentOnchainId.toString() as AgentId,
+      5
+    );
 
-    for (const tweet of recentTweets) {
-      await this.processTweetInteractions(agentId, tweet);
+    try {
+      for (const tweet of recentTweets) {
+        await this.processTweetInteractions(agentId, tweet);
+      }
+    } catch (error) {
+      logger.error(
+        "Error processing community interactions, continue anyway...",
+        { agentId, error }
+      );
     }
+
+    this.engine.proceedWithoutInteractions(
+      new BN(agentOnchainId).toNumber().toString() as AgentId
+    );
   }
 
   private async processTweetInteractions(
     agentId: string,
-    tweet: any
+    tweet: TweetV2
   ): Promise<void> {
     logger.info(`📱 Processing tweet interactions for agent ${agentId}`);
     // Get new interactions from Twitter
-    const newInteractions = await this.twitter.getTweetInteractions(tweet.id);
-
+    const newInteractions = await this.twitter.fetchTweetInteractions(tweet.id);
     // Process each interaction
     const scores = await Promise.all(
       newInteractions.map(async (interaction) => {
+        // Generate deterministic UUID for interaction based on its content
+        const interactionId = stringToUuid(
+          `${tweet.id}-${interaction.userId}-${interaction.timestamp}`
+        );
         // Check cache first
-        const cached = await this.cache.getCachedInteraction(interaction.id);
+        const cached = await this.cache.getCachedInteraction(interactionId);
         if (cached) return cached;
+
+        // Upsert interaction in DB with generated UUID
+        // await this.prisma.interaction.upsert({
+        //   where: { id: interactionId },
+        //   update: {
+        //     userMetrics: {
+        //       toJSON: () => interaction.userMetrics,
+        //     },
+        //   },
+        //   create: {
+        //     id: interactionId,
+        //     tweetId: tweet.id,
+        //     userId: interaction.userId,
+        //     type: interaction.type,
+        //     content: interaction.content,
+        //     timestamp: new Date(interaction.timestamp),
+        //     userMetrics: interaction.userMetrics,
+        //     // engagementScore: interaction.userMetrics.engagementRate,
+        //     // lastUpdated: new Date(),
+        //     tweet: { connect: { id: tweet.id } },
+        //   },
+        // });
 
         // Calculate new score
         const score = await this.calculator.calculateScore(interaction);
+
         await this.cache.cacheInteraction({
-          id: interaction.id,
+          id: interactionId,
           score,
         });
 
         return score;
       })
     );
-
     // Process scores through decision engine
     await this.engine.processInfluenceScores(agentId, scores);
     logger.info(`✅ Processed ${scores.length} interactions`);

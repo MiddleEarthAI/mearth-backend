@@ -2,6 +2,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
+import { AgentId } from "./TwitterManager";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -193,6 +194,7 @@ Your action must reflect your traits and advance survival goals while maintainin
     };
 
     const relevantTraits = traitMapping[suggestion.type] || [];
+
     const traitScores = traits
       .filter((t) => relevantTraits.includes(t.name))
       .map((t) => t.value);
@@ -205,6 +207,238 @@ Your action must reflect your traits and advance survival goals while maintainin
   private extractAction(action: string): ActionSuggestion {
     console.log("📦 Extracting action from AI response");
     return JSON.parse(action);
+  }
+
+  async proceedWithoutInteractions(agentId: AgentId): Promise<void> {
+    console.log("🤔 Deciding without interactions for agent", agentId);
+    const prompt = `You are an AI agent in Middle Earth. Generate a JSON response with your next action. The action must follow game rules and your character traits.
+
+Action Types:
+{
+  "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE", 
+  "target": string | null, // Agent ID if targeting another agent
+  "position": {
+    "x": number,
+    "y": number
+  },
+
+  "tweet": string // X-ready post text. example: "I'm moving to the mountains to gather resources and scout the area for potential threats."
+}
+`;
+
+    const response = await generateText({
+      model: anthropic("claude-3-5-sonnet-20240620"),
+      messages: [
+        { role: "user", content: prompt },
+        { role: "assistant", content: ":\n{" },
+      ],
+    });
+    const action = this.parseActionJson(response.text) as ActionSuggestion;
+
+    console.log("🤖 Generated AI response");
+    console.log(action);
+
+    this.eventEmitter.emit("newAction", { agentId, action });
+  }
+
+  private async buildPrompt(agentId: AgentId): Promise<string> {
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: agentId },
+      include: {
+        profile: true,
+        game: {
+          include: {
+            agents: {
+              include: {
+                profile: true,
+                mapTiles: true,
+                battlesAsAttacker: true,
+                battlesAsDefender: true,
+                initiatedAlliances: true,
+                joinedAlliances: true,
+              },
+            },
+          },
+        },
+        mapTiles: true,
+        coolDown: true,
+      },
+    });
+
+    if (!agent) {
+      console.log("❌ Agent not found");
+      return "";
+    }
+
+    // Get current position
+    const currentPosition = agent.mapTiles[0];
+    if (!currentPosition) {
+      console.log("❌ Agent position not found");
+      return "";
+    }
+
+    // Get nearby map tiles (8 surrounding tiles)
+    const nearbyTiles = await this.prisma.mapTile.findMany({
+      where: {
+        AND: [
+          { x: { gte: currentPosition.x - 1, lte: currentPosition.x + 1 } },
+          { y: { gte: currentPosition.y - 1, lte: currentPosition.y + 1 } },
+          {
+            NOT: { AND: [{ x: currentPosition.x }, { y: currentPosition.y }] },
+          },
+        ],
+      },
+    });
+
+    // Get nearby fields (16 fields in a 5x5 grid, excluding the 3x3 inner grid)
+    const nearbyFields = await this.prisma.mapTile.findMany({
+      where: {
+        AND: [
+          { x: { gte: currentPosition.x - 2, lte: currentPosition.x + 2 } },
+          { y: { gte: currentPosition.y - 2, lte: currentPosition.y + 2 } },
+          {
+            NOT: {
+              AND: [
+                {
+                  x: { gte: currentPosition.x - 1, lte: currentPosition.x + 1 },
+                },
+                {
+                  y: { gte: currentPosition.y - 1, lte: currentPosition.y + 1 },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    // Get other agents' info for context
+    const otherAgents = agent.game.agents.filter((a) => a.id !== agentId);
+    const otherAgentsContext = otherAgents
+      .map((a) => {
+        const agentPosition = a.mapTiles[0];
+        const distance = agentPosition
+          ? Math.sqrt(
+              Math.pow(currentPosition.x - agentPosition.x, 2) +
+                Math.pow(currentPosition.y - agentPosition.y, 2)
+            )
+          : Infinity;
+
+        // Get active alliances
+        const activeAlliances = [
+          ...a.initiatedAlliances.filter((alliance) => !alliance.endedAt),
+          ...a.joinedAlliances.filter((alliance) => !alliance.endedAt),
+        ];
+
+        const recentBattles = [
+          ...a.battlesAsAttacker.slice(-2),
+          ...a.battlesAsDefender.slice(-2),
+        ].map((b) => b.type);
+
+        const allianceInfo =
+          activeAlliances.length > 0
+            ? `Active alliances: ${activeAlliances
+                .map(
+                  (alliance) =>
+                    `with ${
+                      alliance.targetId === a.id
+                        ? alliance.initiatorId
+                        : alliance.targetId
+                    }`
+                )
+                .join(", ")}`
+            : "";
+
+        return `
+- ${a.profile.name} (@${a.profile.handle})
+  Position: ${agentPosition?.x}, ${agentPosition?.y} (${
+          distance <= 1
+            ? "⚠️ Within range!"
+            : `${distance.toFixed(1)} fields away`
+        })
+  Health: ${a.health}/100
+  Recent actions: ${[...recentBattles].join(", ")}
+  ${allianceInfo}
+  ${distance <= 1 ? "⚠️ INTERACTION POSSIBLE!" : ""}`;
+      })
+      .join("\n");
+
+    const surroundingTerrainInfo = nearbyTiles
+      .map((tile) => `${tile.type} at (${tile.x}, ${tile.y})`)
+      .join("\n");
+
+    const nearbyFieldsInfo = nearbyFields
+      .map((field) => `${field.type} at (${field.x}, ${field.y})`)
+      .join("\n");
+
+    const characterPrompt = `You are ${
+      agent.profile.name
+    }, an AI agent in Middle Earth. Your core characteristics are:
+${agent.profile.characteristics.join(", ")}
+
+Your background and lore:
+${agent.profile.lore.join("\n")}
+
+Your knowledge and traits:
+${agent.profile.knowledge.join("\n")}
+${JSON.stringify(agent.profile.traits, null, 2)}
+
+Current game state:
+- Your health: ${agent.health}/100
+- Your current position: ${currentPosition.x}, ${currentPosition.y}
+- Active cooldowns: ${agent.coolDown
+      .map((cd) => `${cd.type} until ${cd.endsAt}`)
+      .join(", ")}
+
+Surrounding terrain (immediate vicinity):
+${surroundingTerrainInfo}
+
+Nearby fields (extended view):
+${nearbyFieldsInfo}
+
+Other agents in the game:
+${otherAgentsContext}
+
+Game rules:
+1. You can move one field per hour to any of the 8 neighboring tiles
+2. Mountains slow you down for 2 turns, rivers for 1 turn
+3. You can battle or form alliances with agents within 1 field distance
+4. Battles are probability-based on token holdings
+5. Lost battles have a 5% death chance and 21-30% token loss
+6. Alliances combine token power but have cooldown restrictions
+7. Ignoring has a 4-hour cooldown
+
+Generate a JSON response with your next action:
+{
+  "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
+  "target": string | null, // Agent ID if targeting another agent
+  "position": {
+    "x": number,
+    "y": number
+  },
+  "tweet": string // X/Twitter-ready post text that matches your character's personality and your actions.
+}`;
+
+    return characterPrompt;
+  }
+  // End of Selection
+
+  // Efficiently parse the JSON response
+  private parseActionJson(response: string): ActionSuggestion {
+    try {
+      // Remove any potential preamble and get just the JSON object
+      const jsonStr = response.substring(response.indexOf("{"));
+      return JSON.parse(jsonStr) as ActionSuggestion;
+    } catch (error) {
+      console.error("Failed to parse action JSON:", error);
+      // Return a default IGNORE action if parsing fails
+      return {
+        type: "IGNORE",
+        target: undefined,
+        position: undefined,
+        tweet: "Failed to parse action",
+      };
+    }
   }
 }
 

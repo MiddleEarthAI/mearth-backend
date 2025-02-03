@@ -51,7 +51,7 @@ model AgentProfile {
 
 model Agent {
   id                    String     @id @default(cuid())
-  onchainId             Int        @unique
+  onchainId             Int
   authority             String
   health                Int        @default(100)
   tweets                Tweet[]

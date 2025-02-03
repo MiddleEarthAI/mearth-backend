@@ -44,8 +44,9 @@ interface InfluenceScore {
 }
 
 interface ActionSuggestion {
-  type: "MOVE" | "BATTLE" | "ALLIANCE" | "STRATEGY";
+  type: "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE";
   target?: string; // agentId
   position?: Position;
-  content: string;
+  content?: string;
+  tweet: string;
 }
