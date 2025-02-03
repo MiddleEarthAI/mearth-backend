@@ -19,7 +19,7 @@ import { BattleResolver } from "./BattleResolver";
  * Handles game orchestration, agent updates, and event processing
  */
 export class GameOrchestrator {
-  private readonly updateInterval = 60 * 60 * 1000; // 1 hour
+  private readonly updateInterval = 60 * 1000; // 1 min for testing
   private readonly cleanupInterval = 3600000; // 1 hour
 
   constructor(
@@ -128,7 +128,7 @@ export class GameOrchestrator {
   private async processAllAgents(): Promise<void> {
     logger.info("👥 Processing all active agents");
     const agents = await prisma.agent.findMany({
-      where: { game: { isActive: true }, state: { isAlive: true } },
+      where: { game: { isActive: true }, health: { gt: 0 } },
     });
 
     await Promise.all(agents.map((agent) => this.processAgent(agent.id)));
@@ -216,10 +216,12 @@ export class GameOrchestrator {
           await prisma.agent.update({
             where: { id: agentId },
             data: {
-              location: {
-                update: {
-                  x: action.position.x,
-                  y: action.position.y,
+              mapTiles: {
+                connect: {
+                  x_y: {
+                    x: action.position.x,
+                    y: action.position.y,
+                  },
                 },
               },
             },

@@ -119,7 +119,7 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.GameScalarFieldEnum = {
   id: 'id',
-  gameId: 'gameId',
+  onchainId: 'onchainId',
   authority: 'authority',
   tokenMint: 'tokenMint',
   rewardsVault: 'rewardsVault',
@@ -137,6 +137,7 @@ exports.Prisma.AgentProfileScalarFieldEnum = {
   onchainId: 'onchainId',
   name: 'name',
   xHandle: 'xHandle',
+  followers: 'followers',
   bio: 'bio',
   lore: 'lore',
   characteristics: 'characteristics',
@@ -146,13 +147,11 @@ exports.Prisma.AgentProfileScalarFieldEnum = {
 
 exports.Prisma.AgentScalarFieldEnum = {
   id: 'id',
-  agentId: 'agentId',
-  publicKey: 'publicKey',
-  agentProfileId: 'agentProfileId',
+  onchainId: 'onchainId',
+  authority: 'authority',
   health: 'health',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  gameId: 'gameId'
+  gameId: 'gameId',
+  profileId: 'profileId'
 };
 
 exports.Prisma.TweetScalarFieldEnum = {
@@ -164,38 +163,30 @@ exports.Prisma.TweetScalarFieldEnum = {
   conversationId: 'conversationId'
 };
 
-exports.Prisma.LocationScalarFieldEnum = {
-  id: 'id',
-  x: 'x',
-  y: 'y',
-  terrainType: 'terrainType',
-  agentId: 'agentId'
-};
-
 exports.Prisma.AllianceScalarFieldEnum = {
   id: 'id',
-  formedAt: 'formedAt',
   combinedTokens: 'combinedTokens',
   status: 'status',
+  timestamp: 'timestamp',
   gameId: 'gameId',
-  agentId: 'agentId',
-  alliedAgentId: 'alliedAgentId'
+  initiatorId: 'initiatorId',
+  joinerId: 'joinerId'
 };
 
 exports.Prisma.BattleScalarFieldEnum = {
   id: 'id',
   timestamp: 'timestamp',
-  outcome: 'outcome',
-  tokensLost: 'tokensLost',
-  tokensGained: 'tokensGained',
-  probability: 'probability',
-  gameId: 'gameId',
-  agentId: 'agentId',
-  opponentId: 'opponentId',
   type: 'type',
+  tokensStaked: 'tokensStaked',
+  tokensLost: 'tokensLost',
+  outcome: 'outcome',
+  attackerId: 'attackerId',
+  attackerAllyId: 'attackerAllyId',
+  defenderId: 'defenderId',
+  defenderAllyId: 'defenderAllyId',
   status: 'status',
+  gameId: 'gameId',
   startTime: 'startTime',
-  resolutionTime: 'resolutionTime',
   resolvedAt: 'resolvedAt'
 };
 
@@ -209,32 +200,20 @@ exports.Prisma.InteractionScalarFieldEnum = {
   userMetrics: 'userMetrics'
 };
 
-exports.Prisma.AgentStateScalarFieldEnum = {
+exports.Prisma.MapTileScalarFieldEnum = {
   id: 'id',
-  isAlive: 'isAlive',
-  lastActionType: 'lastActionType',
-  lastActionTime: 'lastActionTime',
-  lastActionDetails: 'lastActionDetails',
-  influencedByTweet: 'influencedByTweet',
-  influenceScore: 'influenceScore',
-  agentId: 'agentId'
+  x: 'x',
+  y: 'y',
+  terrainType: 'terrainType',
+  occupiedBy: 'occupiedBy'
 };
 
-exports.Prisma.CooldownScalarFieldEnum = {
+exports.Prisma.CoolDownScalarFieldEnum = {
   id: 'id',
   type: 'type',
   endsAt: 'endsAt',
-  agentId: 'agentId',
-  targetAgentId: 'targetAgentId',
+  cooledAgentId: 'cooledAgentId',
   gameId: 'gameId'
-};
-
-exports.Prisma.StrategyScalarFieldEnum = {
-  id: 'id',
-  publicStrategy: 'publicStrategy',
-  actualStrategy: 'actualStrategy',
-  deceptionLevel: 'deceptionLevel',
-  agentId: 'agentId'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
@@ -271,12 +250,6 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-exports.TerrainType = exports.$Enums.TerrainType = {
-  Plain: 'Plain',
-  Mountain: 'Mountain',
-  River: 'River'
-};
-
 exports.AllianceStatus = exports.$Enums.AllianceStatus = {
   Active: 'Active',
   Pending: 'Pending',
@@ -292,7 +265,19 @@ exports.BattleType = exports.$Enums.BattleType = {
 exports.BattleStatus = exports.$Enums.BattleStatus = {
   Active: 'Active',
   Resolved: 'Resolved',
-  Failed: 'Failed'
+  Error: 'Error'
+};
+
+exports.InteractionType = exports.$Enums.InteractionType = {
+  Comment: 'Comment',
+  Quote: 'Quote',
+  Mention: 'Mention'
+};
+
+exports.TerrainType = exports.$Enums.TerrainType = {
+  Plain: 'Plain',
+  Mountain: 'Mountain',
+  River: 'River'
 };
 
 exports.CooldownType = exports.$Enums.CooldownType = {
@@ -314,13 +299,11 @@ exports.Prisma.ModelName = {
   AgentProfile: 'AgentProfile',
   Agent: 'Agent',
   Tweet: 'Tweet',
-  Location: 'Location',
   Alliance: 'Alliance',
   Battle: 'Battle',
   Interaction: 'Interaction',
-  AgentState: 'AgentState',
-  Cooldown: 'Cooldown',
-  Strategy: 'Strategy',
+  MapTile: 'MapTile',
+  CoolDown: 'CoolDown',
   User: 'User'
 };
 

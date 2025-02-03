@@ -16,28 +16,22 @@ datasource db {
 
 model Game {
   id                String   @id @default(uuid())
-  gameId            BigInt   @unique // onchain game id
-  authority         String // Authority that controls the game
-  tokenMint         String // Token mint used in the game
-  rewardsVault      String // Vault that holds staking rewards
-  mapDiameter       Int      @db.Integer // Diameter of the circular map (must be > 0)
-  isActive          Boolean  @default(true) // Whether game is currently active
-  lastUpdate        DateTime @default(now()) // Timestamp of last game state update
-  bump              Int      @db.Integer // PDA bump seed
-  dailyRewardTokens Float    @db.DoublePrecision // Number of tokens to distribute daily (must be >= 0)
+  onchainId         BigInt   @unique
+  authority         String
+  tokenMint         String
+  rewardsVault      String
+  mapDiameter       Int      @db.Integer
+  isActive          Boolean  @default(true)
+  lastUpdate        DateTime @default(now())
+  bump              Int      @db.Integer
+  dailyRewardTokens Float    @db.DoublePrecision
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  // Relations
-  agents    Agent[] // One game has many agents
-  alliances Alliance[] // One game has many alliances
-  battles   Battle[] // One game has many battles
-
-  // Add these new fields
-  // ownerId String
-  // owner    User   @relation("GameOwner", fields: [ownerId], references: [id])
-  // managers User[] @relation("GameManager")
-  Cooldown Cooldown[]
+  agents    Agent[]
+  alliances Alliance[]
+  battles   Battle[]
+  coolDown  CoolDown[]
 }
 
 model AgentProfile {
@@ -45,55 +39,39 @@ model AgentProfile {
   onchainId       Int      @unique
   name            String
   xHandle         String   @unique
+  followers       Int      @default(100)
   bio             String[]
   lore            String[]
   characteristics String[]
   knowledge       String[]
-
-  traits Json
-  // influenceDifficulty String   @default("medium")
-  // All personality traits must be between 0 and 100
-  // aggressiveness   Int @db.Integer
-  // trustworthiness  Int @db.Integer
-  // manipulativeness Int @db.Integer
-  // intelligence     Int @db.Integer
-  // adaptability     Int @db.Integer
-
-  // Relations
-  agent Agent[]
+  traits          Json
+  // Relations - one profile can have many agents
+  agents          Agent[]
 }
 
 model Agent {
-  id             String       @id @default(uuid())
-  agentId        Int
-  publicKey      String
-  agentProfileId String
-  agentProfile   AgentProfile @relation(fields: [agentProfileId], references: [id])
-  health         Int          @default(100)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id                    String     @id @default(cuid())
+  onchainId             Int        @unique
+  authority             String
+  health                Int        @default(100)
+  tweets                Tweet[]
+  game                  Game       @relation(fields: [gameId], references: [id])
+  gameId                String
+  // An agent can be involved in many battles, either as attacker or defender
+  battlesAsAttacker     Battle[]   @relation("attacker")
+  battlesAsDefender     Battle[]   @relation("defender")
+  battlesAsAttackerAlly Battle[]   @relation("attackerAlly")
+  battlesAsDefenderAlly Battle[]   @relation("defenderAlly")
+  coolDown              CoolDown[]
 
-  // Relations
-  game            Game        @relation(fields: [gameId], references: [id])
-  gameId          String
-  location        Location?
-  currentAlliance Alliance?
-  battles         Battle[]
-  state           AgentState?
-  strategy        Strategy?
-  cooldowns       Cooldown[]
+  // Alliance relationships
+  initiatedAlliances Alliance[] @relation("AllianceInitiator") // Alliances initiated by this agent
+  joinedAlliances    Alliance[] @relation("AllianceJoiner") // Alliances this agent joined
+  mapTiles           MapTile[] // Map tiles occupied by this agent
 
-  // Reverse relations
-  alliedBy          Alliance[] @relation("AlliedAgent")
-  battlesAsOpponent Battle[]   @relation("OpponentAgent")
-
-  // Add these new fields
-  // ownerId String
-  // owner   User   @relation("AgentOwner", fields: [ownerId], references: [id])
-  Tweet Tweet[]
-
-  // Composite unique constraints
-  @@unique([agentId, gameId])
+  // Each agent belongs to exactly one profile
+  profile   AgentProfile @relation(fields: [profileId], references: [id])
+  profileId String
 }
 
 model Tweet {
@@ -107,110 +85,23 @@ model Tweet {
   interactions   Interaction[]
 }
 
-model Location {
-  id          String      @id @default(uuid())
-  x           Int         @db.Integer
-  y           Int         @db.Integer
-  terrainType TerrainType // 'plain', 'mountain', 'river'
-
-  // Relations
-  agent   Agent  @relation(fields: [agentId], references: [id])
-  agentId String @unique
-}
-
 model Alliance {
-  id             String         @id @default(uuid())
-  formedAt       DateTime       @default(now())
-  combinedTokens Float
+  id             String         @id @default(cuid())
+  combinedTokens Float?
   status         AllianceStatus @default(Active)
+  timestamp      DateTime       @default(now())
 
-  // Relations
-  game          Game   @relation(fields: [gameId], references: [id])
-  gameId        String
-  agent         Agent  @relation(fields: [agentId], references: [id])
-  agentId       String @unique
-  alliedAgent   Agent  @relation("AlliedAgent", fields: [alliedAgentId], references: [id])
-  alliedAgentId String
-}
-
-model Battle {
-  id           String   @id @default(uuid())
-  timestamp    DateTime @default(now())
-  outcome      String // 'victory' or 'defeat'
-  tokensLost   Float?
-  tokensGained Float?
-  probability  Float
-
-  // Relations
-  game       Game   @relation(fields: [gameId], references: [id])
-  gameId     String
-  agent      Agent  @relation(fields: [agentId], references: [id])
-  agentId    String
-  opponent   Agent  @relation("OpponentAgent", fields: [opponentId], references: [id])
-  opponentId String
-
-  type           BattleType   @default(Simple)
-  status         BattleStatus @default(Active)
-  startTime      DateTime
-  resolutionTime DateTime
-  resolvedAt     DateTime?
-}
-
-model Interaction {
-  id          String   @id @default(cuid())
-  tweetId     String
-  userId      String
-  type        String // "comment", "quote", "mention"
-  content     String?
-  timestamp   DateTime
-  userMetrics Json
-  tweet       Tweet    @relation(fields: [tweetId], references: [id])
-}
-
-model AgentState {
-  id                String   @id @default(uuid())
-  isAlive           Boolean  @default(true)
-  lastActionType    String // 'move', 'battle', 'alliance', 'ignore'
-  lastActionTime    DateTime @default(now())
-  lastActionDetails String   @db.Text
-  influencedByTweet String? // ID of tweet that influenced this action
-  influenceScore    Float    @default(0)
-
-  // Relations
-  agent   Agent  @relation(fields: [agentId], references: [id])
-  agentId String @unique
-}
-
-model Cooldown {
-  id     String       @id @default(uuid())
-  type   CooldownType // 'alliance', 'battle', 'ignore'
-  endsAt DateTime
-
-  // Relations
-  agent         Agent   @relation(fields: [agentId], references: [id])
-  agentId       String
-  targetAgentId String? // for alliance cooldown
-
-  gameId String
+  // Game relationship
   game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
 
-  @@unique([agentId, type])
-}
+  // Alliance relationships
+  initiator   Agent  @relation("AllianceInitiator", fields: [initiatorId], references: [id])
+  initiatorId String
+  joiner      Agent  @relation("AllianceJoiner", fields: [joinerId], references: [id])
+  joinerId    String
 
-model Strategy {
-  id             String @id @default(uuid())
-  publicStrategy String @db.Text
-  actualStrategy String @db.Text
-  deceptionLevel Int
-  // Relations
-  agent          Agent  @relation(fields: [agentId], references: [id])
-  agentId        String @unique
-}
-
-enum TerrainType {
-  Plain
-  Mountain
-  River
+  @@unique([initiatorId, joinerId])
 }
 
 enum AllianceStatus {
@@ -219,16 +110,101 @@ enum AllianceStatus {
   Broken
 }
 
-enum BattleStatus {
-  Active
-  Resolved
-  Failed
+model Battle {
+  id        String     @id @default(cuid())
+  timestamp DateTime   @default(now())
+  type      BattleType @default(Simple)
+
+  tokensStaked Float
+  tokensLost   Float?
+
+  outcome String? // WIN, LOSS
+
+  // Battle must have both attacker and defender and option ally
+  attackerId     String
+  attacker       Agent   @relation("attacker", fields: [attackerId], references: [id])
+  attackerAllyId String?
+  attackerAlly   Agent?  @relation("attackerAlly", fields: [attackerAllyId], references: [id])
+  defenderId     String
+  defender       Agent   @relation("defender", fields: [defenderId], references: [id])
+  defenderAllyId String?
+  defenderAlly   Agent?  @relation("defenderAlly", fields: [defenderAllyId], references: [id])
+
+  status BattleStatus @default(Active)
+
+  // Battle belongs to a game
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+
+  startTime  DateTime  @default(now())
+  resolvedAt DateTime?
 }
 
 enum BattleType {
   Simple
   AgentVsAlliance
   AllianceVsAlliance
+}
+
+enum BattleStatus {
+  Active
+  Resolved
+  Error
+}
+
+model Interaction {
+  id          String          @id @default(cuid())
+  tweetId     String
+  userId      String
+  type        InteractionType
+  content     String
+  timestamp   DateTime
+  userMetrics Json
+  tweet       Tweet           @relation(fields: [tweetId], references: [id])
+}
+
+enum InteractionType {
+  Comment
+  Quote
+  Mention
+}
+
+enum TerrainType {
+  Plain
+  Mountain
+  River
+}
+
+model MapTile {
+  id          String      @id @default(uuid())
+  x           Int         @db.Integer
+  y           Int         @db.Integer
+  terrainType TerrainType
+  occupiedBy  String?
+  agent       Agent?      @relation(fields: [occupiedBy], references: [id])
+
+  @@unique([x, y])
+}
+
+model CoolDown {
+  id     String       @id @default(uuid())
+  type   CooldownType
+  endsAt DateTime
+
+  // Relations
+  cooledAgentId String
+  cooledAgent   Agent  @relation(fields: [cooledAgentId], references: [id])
+
+  gameId String
+  game   Game   @relation(fields: [gameId], references: [id])
+}
+
+enum CooldownType {
+  Alliance
+  Battle
+  Ignore
+  Tweet
+  Move
 }
 
 model User {
@@ -239,23 +215,10 @@ model User {
   walletAddress String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  // Relations
-  // ownedGames   Game[]  @relation("GameOwner")
-  // managedGames Game[]  @relation("GameManager")
-  // ownedAgents  Agent[] @relation("AgentOwner")
 }
 
 enum UserRole {
   ADMIN
   MANAGER
   USER
-}
-
-enum CooldownType {
-  Alliance
-  Battle
-  Ignore
-  Tweet
-  Move
 }

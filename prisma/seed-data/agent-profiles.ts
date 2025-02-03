@@ -9,6 +9,7 @@ const profiles: AgentProfile[] = [
     onchainId: 1,
     name: "Purrlock Paws",
     xHandle: "PurrlockPawsAI",
+    followers: 300,
     bio: [
       "A mysterious detective-turned-warrior in Middle Earth, haunted by a royal conspiracy",
       "Masters the art of strategic combat and calculated investigation",
@@ -58,6 +59,7 @@ const profiles: AgentProfile[] = [
     onchainId: 2,
     name: "Scootles",
     xHandle: "ScootlesAI",
+    followers: 200,
     bio: [
       "A former kitchen worker turned relentless pursuer of truth in Middle Earth",
       "Transformed from humble beginnings to a determined seeker of justice",
@@ -127,6 +129,7 @@ const profiles: AgentProfile[] = [
     onchainId: 3,
     name: "Sir Gullihop",
     xHandle: "SirGullihopAI",
+    followers: 100,
     bio: [
       "The carefree third prince of Middle Earth, hiding dark secrets behind a cheerful facade",
       "Masters the art of deflection through charm and generosity",
@@ -195,6 +198,7 @@ const profiles: AgentProfile[] = [
     onchainId: 4,
     name: "Wanderleaf",
     xHandle: "WanderleafAI",
+    followers: 100,
     bio: [
       "An ancient wanderer of Middle Earth, carrying centuries of wisdom and secrets",
       "Struggles with memory but possesses deep insight into the realm's mysteries",

@@ -34,11 +34,6 @@ export type Agent = $Result.DefaultSelection<Prisma.$AgentPayload>
  */
 export type Tweet = $Result.DefaultSelection<Prisma.$TweetPayload>
 /**
- * Model Location
- * 
- */
-export type Location = $Result.DefaultSelection<Prisma.$LocationPayload>
-/**
  * Model Alliance
  * 
  */
@@ -54,20 +49,15 @@ export type Battle = $Result.DefaultSelection<Prisma.$BattlePayload>
  */
 export type Interaction = $Result.DefaultSelection<Prisma.$InteractionPayload>
 /**
- * Model AgentState
+ * Model MapTile
  * 
  */
-export type AgentState = $Result.DefaultSelection<Prisma.$AgentStatePayload>
+export type MapTile = $Result.DefaultSelection<Prisma.$MapTilePayload>
 /**
- * Model Cooldown
+ * Model CoolDown
  * 
  */
-export type Cooldown = $Result.DefaultSelection<Prisma.$CooldownPayload>
-/**
- * Model Strategy
- * 
- */
-export type Strategy = $Result.DefaultSelection<Prisma.$StrategyPayload>
+export type CoolDown = $Result.DefaultSelection<Prisma.$CoolDownPayload>
 /**
  * Model User
  * 
@@ -78,31 +68,13 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  * Enums
  */
 export namespace $Enums {
-  export const TerrainType: {
-  Plain: 'Plain',
-  Mountain: 'Mountain',
-  River: 'River'
-};
-
-export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType]
-
-
-export const AllianceStatus: {
+  export const AllianceStatus: {
   Active: 'Active',
   Pending: 'Pending',
   Broken: 'Broken'
 };
 
 export type AllianceStatus = (typeof AllianceStatus)[keyof typeof AllianceStatus]
-
-
-export const BattleStatus: {
-  Active: 'Active',
-  Resolved: 'Resolved',
-  Failed: 'Failed'
-};
-
-export type BattleStatus = (typeof BattleStatus)[keyof typeof BattleStatus]
 
 
 export const BattleType: {
@@ -114,13 +86,31 @@ export const BattleType: {
 export type BattleType = (typeof BattleType)[keyof typeof BattleType]
 
 
-export const UserRole: {
-  ADMIN: 'ADMIN',
-  MANAGER: 'MANAGER',
-  USER: 'USER'
+export const BattleStatus: {
+  Active: 'Active',
+  Resolved: 'Resolved',
+  Error: 'Error'
 };
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+export type BattleStatus = (typeof BattleStatus)[keyof typeof BattleStatus]
+
+
+export const InteractionType: {
+  Comment: 'Comment',
+  Quote: 'Quote',
+  Mention: 'Mention'
+};
+
+export type InteractionType = (typeof InteractionType)[keyof typeof InteractionType]
+
+
+export const TerrainType: {
+  Plain: 'Plain',
+  Mountain: 'Mountain',
+  River: 'River'
+};
+
+export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType]
 
 
 export const CooldownType: {
@@ -133,31 +123,44 @@ export const CooldownType: {
 
 export type CooldownType = (typeof CooldownType)[keyof typeof CooldownType]
 
+
+export const UserRole: {
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  USER: 'USER'
+};
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
 }
-
-export type TerrainType = $Enums.TerrainType
-
-export const TerrainType: typeof $Enums.TerrainType
 
 export type AllianceStatus = $Enums.AllianceStatus
 
 export const AllianceStatus: typeof $Enums.AllianceStatus
 
-export type BattleStatus = $Enums.BattleStatus
-
-export const BattleStatus: typeof $Enums.BattleStatus
-
 export type BattleType = $Enums.BattleType
 
 export const BattleType: typeof $Enums.BattleType
 
-export type UserRole = $Enums.UserRole
+export type BattleStatus = $Enums.BattleStatus
 
-export const UserRole: typeof $Enums.UserRole
+export const BattleStatus: typeof $Enums.BattleStatus
+
+export type InteractionType = $Enums.InteractionType
+
+export const InteractionType: typeof $Enums.InteractionType
+
+export type TerrainType = $Enums.TerrainType
+
+export const TerrainType: typeof $Enums.TerrainType
 
 export type CooldownType = $Enums.CooldownType
 
 export const CooldownType: typeof $Enums.CooldownType
+
+export type UserRole = $Enums.UserRole
+
+export const UserRole: typeof $Enums.UserRole
 
 /**
  * ##  Prisma Client ʲˢ
@@ -325,16 +328,6 @@ export class PrismaClient<
   get tweet(): Prisma.TweetDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.location`: Exposes CRUD operations for the **Location** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Locations
-    * const locations = await prisma.location.findMany()
-    * ```
-    */
-  get location(): Prisma.LocationDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.alliance`: Exposes CRUD operations for the **Alliance** model.
     * Example usage:
     * ```ts
@@ -365,34 +358,24 @@ export class PrismaClient<
   get interaction(): Prisma.InteractionDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.agentState`: Exposes CRUD operations for the **AgentState** model.
+   * `prisma.mapTile`: Exposes CRUD operations for the **MapTile** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more AgentStates
-    * const agentStates = await prisma.agentState.findMany()
+    * // Fetch zero or more MapTiles
+    * const mapTiles = await prisma.mapTile.findMany()
     * ```
     */
-  get agentState(): Prisma.AgentStateDelegate<ExtArgs, ClientOptions>;
+  get mapTile(): Prisma.MapTileDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.cooldown`: Exposes CRUD operations for the **Cooldown** model.
+   * `prisma.coolDown`: Exposes CRUD operations for the **CoolDown** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more Cooldowns
-    * const cooldowns = await prisma.cooldown.findMany()
+    * // Fetch zero or more CoolDowns
+    * const coolDowns = await prisma.coolDown.findMany()
     * ```
     */
-  get cooldown(): Prisma.CooldownDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.strategy`: Exposes CRUD operations for the **Strategy** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Strategies
-    * const strategies = await prisma.strategy.findMany()
-    * ```
-    */
-  get strategy(): Prisma.StrategyDelegate<ExtArgs, ClientOptions>;
+  get coolDown(): Prisma.CoolDownDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -847,13 +830,11 @@ export namespace Prisma {
     AgentProfile: 'AgentProfile',
     Agent: 'Agent',
     Tweet: 'Tweet',
-    Location: 'Location',
     Alliance: 'Alliance',
     Battle: 'Battle',
     Interaction: 'Interaction',
-    AgentState: 'AgentState',
-    Cooldown: 'Cooldown',
-    Strategy: 'Strategy',
+    MapTile: 'MapTile',
+    CoolDown: 'CoolDown',
     User: 'User'
   };
 
@@ -870,7 +851,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "game" | "agentProfile" | "agent" | "tweet" | "location" | "alliance" | "battle" | "interaction" | "agentState" | "cooldown" | "strategy" | "user"
+      modelProps: "game" | "agentProfile" | "agent" | "tweet" | "alliance" | "battle" | "interaction" | "mapTile" | "coolDown" | "user"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1170,80 +1151,6 @@ export namespace Prisma {
           }
         }
       }
-      Location: {
-        payload: Prisma.$LocationPayload<ExtArgs>
-        fields: Prisma.LocationFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.LocationFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.LocationFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>
-          }
-          findFirst: {
-            args: Prisma.LocationFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.LocationFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>
-          }
-          findMany: {
-            args: Prisma.LocationFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>[]
-          }
-          create: {
-            args: Prisma.LocationCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>
-          }
-          createMany: {
-            args: Prisma.LocationCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.LocationCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>[]
-          }
-          delete: {
-            args: Prisma.LocationDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>
-          }
-          update: {
-            args: Prisma.LocationUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>
-          }
-          deleteMany: {
-            args: Prisma.LocationDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.LocationUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.LocationUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>[]
-          }
-          upsert: {
-            args: Prisma.LocationUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$LocationPayload>
-          }
-          aggregate: {
-            args: Prisma.LocationAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateLocation>
-          }
-          groupBy: {
-            args: Prisma.LocationGroupByArgs<ExtArgs>
-            result: $Utils.Optional<LocationGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.LocationCountArgs<ExtArgs>
-            result: $Utils.Optional<LocationCountAggregateOutputType> | number
-          }
-        }
-      }
       Alliance: {
         payload: Prisma.$AlliancePayload<ExtArgs>
         fields: Prisma.AllianceFieldRefs
@@ -1466,225 +1373,151 @@ export namespace Prisma {
           }
         }
       }
-      AgentState: {
-        payload: Prisma.$AgentStatePayload<ExtArgs>
-        fields: Prisma.AgentStateFieldRefs
+      MapTile: {
+        payload: Prisma.$MapTilePayload<ExtArgs>
+        fields: Prisma.MapTileFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.AgentStateFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload> | null
+            args: Prisma.MapTileFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.AgentStateFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>
+            args: Prisma.MapTileFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
           }
           findFirst: {
-            args: Prisma.AgentStateFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload> | null
+            args: Prisma.MapTileFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.AgentStateFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>
+            args: Prisma.MapTileFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
           }
           findMany: {
-            args: Prisma.AgentStateFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>[]
+            args: Prisma.MapTileFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
           }
           create: {
-            args: Prisma.AgentStateCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>
+            args: Prisma.MapTileCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
           }
           createMany: {
-            args: Prisma.AgentStateCreateManyArgs<ExtArgs>
+            args: Prisma.MapTileCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.AgentStateCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>[]
+            args: Prisma.MapTileCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
           }
           delete: {
-            args: Prisma.AgentStateDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>
+            args: Prisma.MapTileDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
           }
           update: {
-            args: Prisma.AgentStateUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>
+            args: Prisma.MapTileUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
           }
           deleteMany: {
-            args: Prisma.AgentStateDeleteManyArgs<ExtArgs>
+            args: Prisma.MapTileDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.AgentStateUpdateManyArgs<ExtArgs>
+            args: Prisma.MapTileUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.AgentStateUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>[]
+            args: Prisma.MapTileUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
           }
           upsert: {
-            args: Prisma.AgentStateUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentStatePayload>
+            args: Prisma.MapTileUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
           }
           aggregate: {
-            args: Prisma.AgentStateAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateAgentState>
+            args: Prisma.MapTileAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMapTile>
           }
           groupBy: {
-            args: Prisma.AgentStateGroupByArgs<ExtArgs>
-            result: $Utils.Optional<AgentStateGroupByOutputType>[]
+            args: Prisma.MapTileGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MapTileGroupByOutputType>[]
           }
           count: {
-            args: Prisma.AgentStateCountArgs<ExtArgs>
-            result: $Utils.Optional<AgentStateCountAggregateOutputType> | number
+            args: Prisma.MapTileCountArgs<ExtArgs>
+            result: $Utils.Optional<MapTileCountAggregateOutputType> | number
           }
         }
       }
-      Cooldown: {
-        payload: Prisma.$CooldownPayload<ExtArgs>
-        fields: Prisma.CooldownFieldRefs
+      CoolDown: {
+        payload: Prisma.$CoolDownPayload<ExtArgs>
+        fields: Prisma.CoolDownFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.CooldownFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload> | null
+            args: Prisma.CoolDownFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.CooldownFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>
+            args: Prisma.CoolDownFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>
           }
           findFirst: {
-            args: Prisma.CooldownFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload> | null
+            args: Prisma.CoolDownFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.CooldownFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>
+            args: Prisma.CoolDownFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>
           }
           findMany: {
-            args: Prisma.CooldownFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>[]
+            args: Prisma.CoolDownFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>[]
           }
           create: {
-            args: Prisma.CooldownCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>
+            args: Prisma.CoolDownCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>
           }
           createMany: {
-            args: Prisma.CooldownCreateManyArgs<ExtArgs>
+            args: Prisma.CoolDownCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.CooldownCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>[]
+            args: Prisma.CoolDownCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>[]
           }
           delete: {
-            args: Prisma.CooldownDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>
+            args: Prisma.CoolDownDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>
           }
           update: {
-            args: Prisma.CooldownUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>
+            args: Prisma.CoolDownUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>
           }
           deleteMany: {
-            args: Prisma.CooldownDeleteManyArgs<ExtArgs>
+            args: Prisma.CoolDownDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.CooldownUpdateManyArgs<ExtArgs>
+            args: Prisma.CoolDownUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.CooldownUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>[]
+            args: Prisma.CoolDownUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>[]
           }
           upsert: {
-            args: Prisma.CooldownUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$CooldownPayload>
+            args: Prisma.CoolDownUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoolDownPayload>
           }
           aggregate: {
-            args: Prisma.CooldownAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateCooldown>
+            args: Prisma.CoolDownAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCoolDown>
           }
           groupBy: {
-            args: Prisma.CooldownGroupByArgs<ExtArgs>
-            result: $Utils.Optional<CooldownGroupByOutputType>[]
+            args: Prisma.CoolDownGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CoolDownGroupByOutputType>[]
           }
           count: {
-            args: Prisma.CooldownCountArgs<ExtArgs>
-            result: $Utils.Optional<CooldownCountAggregateOutputType> | number
-          }
-        }
-      }
-      Strategy: {
-        payload: Prisma.$StrategyPayload<ExtArgs>
-        fields: Prisma.StrategyFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.StrategyFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.StrategyFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>
-          }
-          findFirst: {
-            args: Prisma.StrategyFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.StrategyFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>
-          }
-          findMany: {
-            args: Prisma.StrategyFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>[]
-          }
-          create: {
-            args: Prisma.StrategyCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>
-          }
-          createMany: {
-            args: Prisma.StrategyCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.StrategyCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>[]
-          }
-          delete: {
-            args: Prisma.StrategyDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>
-          }
-          update: {
-            args: Prisma.StrategyUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>
-          }
-          deleteMany: {
-            args: Prisma.StrategyDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.StrategyUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.StrategyUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>[]
-          }
-          upsert: {
-            args: Prisma.StrategyUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StrategyPayload>
-          }
-          aggregate: {
-            args: Prisma.StrategyAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStrategy>
-          }
-          groupBy: {
-            args: Prisma.StrategyGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StrategyGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.StrategyCountArgs<ExtArgs>
-            result: $Utils.Optional<StrategyCountAggregateOutputType> | number
+            args: Prisma.CoolDownCountArgs<ExtArgs>
+            result: $Utils.Optional<CoolDownCountAggregateOutputType> | number
           }
         }
       }
@@ -1850,13 +1683,11 @@ export namespace Prisma {
     agentProfile?: AgentProfileOmit
     agent?: AgentOmit
     tweet?: TweetOmit
-    location?: LocationOmit
     alliance?: AllianceOmit
     battle?: BattleOmit
     interaction?: InteractionOmit
-    agentState?: AgentStateOmit
-    cooldown?: CooldownOmit
-    strategy?: StrategyOmit
+    mapTile?: MapTileOmit
+    coolDown?: CoolDownOmit
     user?: UserOmit
   }
 
@@ -1955,14 +1786,14 @@ export namespace Prisma {
     agents: number
     alliances: number
     battles: number
-    Cooldown: number
+    coolDown: number
   }
 
   export type GameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | GameCountOutputTypeCountAgentsArgs
     alliances?: boolean | GameCountOutputTypeCountAlliancesArgs
     battles?: boolean | GameCountOutputTypeCountBattlesArgs
-    Cooldown?: boolean | GameCountOutputTypeCountCooldownArgs
+    coolDown?: boolean | GameCountOutputTypeCountCoolDownArgs
   }
 
   // Custom InputTypes
@@ -2000,8 +1831,8 @@ export namespace Prisma {
   /**
    * GameCountOutputType without action
    */
-  export type GameCountOutputTypeCountCooldownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: CooldownWhereInput
+  export type GameCountOutputTypeCountCoolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CoolDownWhereInput
   }
 
 
@@ -2010,11 +1841,11 @@ export namespace Prisma {
    */
 
   export type AgentProfileCountOutputType = {
-    agent: number
+    agents: number
   }
 
   export type AgentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentProfileCountOutputTypeCountAgentArgs
+    agents?: boolean | AgentProfileCountOutputTypeCountAgentsArgs
   }
 
   // Custom InputTypes
@@ -2031,7 +1862,7 @@ export namespace Prisma {
   /**
    * AgentProfileCountOutputType without action
    */
-  export type AgentProfileCountOutputTypeCountAgentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type AgentProfileCountOutputTypeCountAgentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AgentWhereInput
   }
 
@@ -2041,19 +1872,27 @@ export namespace Prisma {
    */
 
   export type AgentCountOutputType = {
-    battles: number
-    cooldowns: number
-    alliedBy: number
-    battlesAsOpponent: number
-    Tweet: number
+    tweets: number
+    battlesAsAttacker: number
+    battlesAsDefender: number
+    battlesAsAttackerAlly: number
+    battlesAsDefenderAlly: number
+    coolDown: number
+    initiatedAlliances: number
+    joinedAlliances: number
+    mapTiles: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    battles?: boolean | AgentCountOutputTypeCountBattlesArgs
-    cooldowns?: boolean | AgentCountOutputTypeCountCooldownsArgs
-    alliedBy?: boolean | AgentCountOutputTypeCountAlliedByArgs
-    battlesAsOpponent?: boolean | AgentCountOutputTypeCountBattlesAsOpponentArgs
-    Tweet?: boolean | AgentCountOutputTypeCountTweetArgs
+    tweets?: boolean | AgentCountOutputTypeCountTweetsArgs
+    battlesAsAttacker?: boolean | AgentCountOutputTypeCountBattlesAsAttackerArgs
+    battlesAsDefender?: boolean | AgentCountOutputTypeCountBattlesAsDefenderArgs
+    battlesAsAttackerAlly?: boolean | AgentCountOutputTypeCountBattlesAsAttackerAllyArgs
+    battlesAsDefenderAlly?: boolean | AgentCountOutputTypeCountBattlesAsDefenderAllyArgs
+    coolDown?: boolean | AgentCountOutputTypeCountCoolDownArgs
+    initiatedAlliances?: boolean | AgentCountOutputTypeCountInitiatedAlliancesArgs
+    joinedAlliances?: boolean | AgentCountOutputTypeCountJoinedAlliancesArgs
+    mapTiles?: boolean | AgentCountOutputTypeCountMapTilesArgs
   }
 
   // Custom InputTypes
@@ -2070,36 +1909,64 @@ export namespace Prisma {
   /**
    * AgentCountOutputType without action
    */
-  export type AgentCountOutputTypeCountBattlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type AgentCountOutputTypeCountTweetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TweetWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountBattlesAsAttackerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BattleWhereInput
   }
 
   /**
    * AgentCountOutputType without action
    */
-  export type AgentCountOutputTypeCountCooldownsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: CooldownWhereInput
+  export type AgentCountOutputTypeCountBattlesAsDefenderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BattleWhereInput
   }
 
   /**
    * AgentCountOutputType without action
    */
-  export type AgentCountOutputTypeCountAlliedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type AgentCountOutputTypeCountBattlesAsAttackerAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BattleWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountBattlesAsDefenderAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BattleWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountCoolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CoolDownWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountInitiatedAlliancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AllianceWhereInput
   }
 
   /**
    * AgentCountOutputType without action
    */
-  export type AgentCountOutputTypeCountBattlesAsOpponentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: BattleWhereInput
+  export type AgentCountOutputTypeCountJoinedAlliancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AllianceWhereInput
   }
 
   /**
    * AgentCountOutputType without action
    */
-  export type AgentCountOutputTypeCountTweetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: TweetWhereInput
+  export type AgentCountOutputTypeCountMapTilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MapTileWhereInput
   }
 
 
@@ -2151,14 +2018,14 @@ export namespace Prisma {
   }
 
   export type GameAvgAggregateOutputType = {
-    gameId: number | null
+    onchainId: number | null
     mapDiameter: number | null
     bump: number | null
     dailyRewardTokens: number | null
   }
 
   export type GameSumAggregateOutputType = {
-    gameId: bigint | null
+    onchainId: bigint | null
     mapDiameter: number | null
     bump: number | null
     dailyRewardTokens: number | null
@@ -2166,7 +2033,7 @@ export namespace Prisma {
 
   export type GameMinAggregateOutputType = {
     id: string | null
-    gameId: bigint | null
+    onchainId: bigint | null
     authority: string | null
     tokenMint: string | null
     rewardsVault: string | null
@@ -2181,7 +2048,7 @@ export namespace Prisma {
 
   export type GameMaxAggregateOutputType = {
     id: string | null
-    gameId: bigint | null
+    onchainId: bigint | null
     authority: string | null
     tokenMint: string | null
     rewardsVault: string | null
@@ -2196,7 +2063,7 @@ export namespace Prisma {
 
   export type GameCountAggregateOutputType = {
     id: number
-    gameId: number
+    onchainId: number
     authority: number
     tokenMint: number
     rewardsVault: number
@@ -2212,14 +2079,14 @@ export namespace Prisma {
 
 
   export type GameAvgAggregateInputType = {
-    gameId?: true
+    onchainId?: true
     mapDiameter?: true
     bump?: true
     dailyRewardTokens?: true
   }
 
   export type GameSumAggregateInputType = {
-    gameId?: true
+    onchainId?: true
     mapDiameter?: true
     bump?: true
     dailyRewardTokens?: true
@@ -2227,7 +2094,7 @@ export namespace Prisma {
 
   export type GameMinAggregateInputType = {
     id?: true
-    gameId?: true
+    onchainId?: true
     authority?: true
     tokenMint?: true
     rewardsVault?: true
@@ -2242,7 +2109,7 @@ export namespace Prisma {
 
   export type GameMaxAggregateInputType = {
     id?: true
-    gameId?: true
+    onchainId?: true
     authority?: true
     tokenMint?: true
     rewardsVault?: true
@@ -2257,7 +2124,7 @@ export namespace Prisma {
 
   export type GameCountAggregateInputType = {
     id?: true
-    gameId?: true
+    onchainId?: true
     authority?: true
     tokenMint?: true
     rewardsVault?: true
@@ -2359,7 +2226,7 @@ export namespace Prisma {
 
   export type GameGroupByOutputType = {
     id: string
-    gameId: bigint
+    onchainId: bigint
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -2393,7 +2260,7 @@ export namespace Prisma {
 
   export type GameSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    gameId?: boolean
+    onchainId?: boolean
     authority?: boolean
     tokenMint?: boolean
     rewardsVault?: boolean
@@ -2407,13 +2274,13 @@ export namespace Prisma {
     agents?: boolean | Game$agentsArgs<ExtArgs>
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
-    Cooldown?: boolean | Game$CooldownArgs<ExtArgs>
+    coolDown?: boolean | Game$coolDownArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
   export type GameSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    gameId?: boolean
+    onchainId?: boolean
     authority?: boolean
     tokenMint?: boolean
     rewardsVault?: boolean
@@ -2428,7 +2295,7 @@ export namespace Prisma {
 
   export type GameSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    gameId?: boolean
+    onchainId?: boolean
     authority?: boolean
     tokenMint?: boolean
     rewardsVault?: boolean
@@ -2443,7 +2310,7 @@ export namespace Prisma {
 
   export type GameSelectScalar = {
     id?: boolean
-    gameId?: boolean
+    onchainId?: boolean
     authority?: boolean
     tokenMint?: boolean
     rewardsVault?: boolean
@@ -2456,12 +2323,12 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type GameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gameId" | "authority" | "tokenMint" | "rewardsVault" | "mapDiameter" | "isActive" | "lastUpdate" | "bump" | "dailyRewardTokens" | "createdAt" | "updatedAt", ExtArgs["result"]["game"]>
+  export type GameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "tokenMint" | "rewardsVault" | "mapDiameter" | "isActive" | "lastUpdate" | "bump" | "dailyRewardTokens" | "createdAt" | "updatedAt", ExtArgs["result"]["game"]>
   export type GameInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | Game$agentsArgs<ExtArgs>
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
-    Cooldown?: boolean | Game$CooldownArgs<ExtArgs>
+    coolDown?: boolean | Game$coolDownArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2473,11 +2340,11 @@ export namespace Prisma {
       agents: Prisma.$AgentPayload<ExtArgs>[]
       alliances: Prisma.$AlliancePayload<ExtArgs>[]
       battles: Prisma.$BattlePayload<ExtArgs>[]
-      Cooldown: Prisma.$CooldownPayload<ExtArgs>[]
+      coolDown: Prisma.$CoolDownPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      gameId: bigint
+      onchainId: bigint
       authority: string
       tokenMint: string
       rewardsVault: string
@@ -2885,7 +2752,7 @@ export namespace Prisma {
     agents<T extends Game$agentsArgs<ExtArgs> = {}>(args?: Subset<T, Game$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     alliances<T extends Game$alliancesArgs<ExtArgs> = {}>(args?: Subset<T, Game$alliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battles<T extends Game$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Game$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    Cooldown<T extends Game$CooldownArgs<ExtArgs> = {}>(args?: Subset<T, Game$CooldownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    coolDown<T extends Game$coolDownArgs<ExtArgs> = {}>(args?: Subset<T, Game$coolDownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2916,7 +2783,7 @@ export namespace Prisma {
    */ 
   interface GameFieldRefs {
     readonly id: FieldRef<"Game", 'String'>
-    readonly gameId: FieldRef<"Game", 'BigInt'>
+    readonly onchainId: FieldRef<"Game", 'BigInt'>
     readonly authority: FieldRef<"Game", 'String'>
     readonly tokenMint: FieldRef<"Game", 'String'>
     readonly rewardsVault: FieldRef<"Game", 'String'>
@@ -3375,27 +3242,27 @@ export namespace Prisma {
   }
 
   /**
-   * Game.Cooldown
+   * Game.coolDown
    */
-  export type Game$CooldownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Game$coolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
-    where?: CooldownWhereInput
-    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
-    cursor?: CooldownWhereUniqueInput
+    include?: CoolDownInclude<ExtArgs> | null
+    where?: CoolDownWhereInput
+    orderBy?: CoolDownOrderByWithRelationInput | CoolDownOrderByWithRelationInput[]
+    cursor?: CoolDownWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: CooldownScalarFieldEnum | CooldownScalarFieldEnum[]
+    distinct?: CoolDownScalarFieldEnum | CoolDownScalarFieldEnum[]
   }
 
   /**
@@ -3431,10 +3298,12 @@ export namespace Prisma {
 
   export type AgentProfileAvgAggregateOutputType = {
     onchainId: number | null
+    followers: number | null
   }
 
   export type AgentProfileSumAggregateOutputType = {
     onchainId: number | null
+    followers: number | null
   }
 
   export type AgentProfileMinAggregateOutputType = {
@@ -3442,6 +3311,7 @@ export namespace Prisma {
     onchainId: number | null
     name: string | null
     xHandle: string | null
+    followers: number | null
   }
 
   export type AgentProfileMaxAggregateOutputType = {
@@ -3449,6 +3319,7 @@ export namespace Prisma {
     onchainId: number | null
     name: string | null
     xHandle: string | null
+    followers: number | null
   }
 
   export type AgentProfileCountAggregateOutputType = {
@@ -3456,6 +3327,7 @@ export namespace Prisma {
     onchainId: number
     name: number
     xHandle: number
+    followers: number
     bio: number
     lore: number
     characteristics: number
@@ -3467,10 +3339,12 @@ export namespace Prisma {
 
   export type AgentProfileAvgAggregateInputType = {
     onchainId?: true
+    followers?: true
   }
 
   export type AgentProfileSumAggregateInputType = {
     onchainId?: true
+    followers?: true
   }
 
   export type AgentProfileMinAggregateInputType = {
@@ -3478,6 +3352,7 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
+    followers?: true
   }
 
   export type AgentProfileMaxAggregateInputType = {
@@ -3485,6 +3360,7 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
+    followers?: true
   }
 
   export type AgentProfileCountAggregateInputType = {
@@ -3492,6 +3368,7 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
+    followers?: true
     bio?: true
     lore?: true
     characteristics?: true
@@ -3591,6 +3468,7 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    followers: number
     bio: string[]
     lore: string[]
     characteristics: string[]
@@ -3622,12 +3500,13 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    followers?: boolean
     bio?: boolean
     lore?: boolean
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
-    agent?: boolean | AgentProfile$agentArgs<ExtArgs>
+    agents?: boolean | AgentProfile$agentsArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agentProfile"]>
 
@@ -3636,6 +3515,7 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    followers?: boolean
     bio?: boolean
     lore?: boolean
     characteristics?: boolean
@@ -3648,6 +3528,7 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    followers?: boolean
     bio?: boolean
     lore?: boolean
     characteristics?: boolean
@@ -3660,6 +3541,7 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    followers?: boolean
     bio?: boolean
     lore?: boolean
     characteristics?: boolean
@@ -3667,9 +3549,9 @@ export namespace Prisma {
     traits?: boolean
   }
 
-  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "bio" | "lore" | "characteristics" | "knowledge" | "traits", ExtArgs["result"]["agentProfile"]>
+  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "followers" | "bio" | "lore" | "characteristics" | "knowledge" | "traits", ExtArgs["result"]["agentProfile"]>
   export type AgentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentProfile$agentArgs<ExtArgs>
+    agents?: boolean | AgentProfile$agentsArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3678,13 +3560,14 @@ export namespace Prisma {
   export type $AgentProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AgentProfile"
     objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>[]
+      agents: Prisma.$AgentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       onchainId: number
       name: string
       xHandle: string
+      followers: number
       bio: string[]
       lore: string[]
       characteristics: string[]
@@ -4084,7 +3967,7 @@ export namespace Prisma {
    */
   export interface Prisma__AgentProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentProfile$agentArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfile$agentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    agents<T extends AgentProfile$agentsArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfile$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4118,6 +4001,7 @@ export namespace Prisma {
     readonly onchainId: FieldRef<"AgentProfile", 'Int'>
     readonly name: FieldRef<"AgentProfile", 'String'>
     readonly xHandle: FieldRef<"AgentProfile", 'String'>
+    readonly followers: FieldRef<"AgentProfile", 'Int'>
     readonly bio: FieldRef<"AgentProfile", 'String[]'>
     readonly lore: FieldRef<"AgentProfile", 'String[]'>
     readonly characteristics: FieldRef<"AgentProfile", 'String[]'>
@@ -4499,9 +4383,9 @@ export namespace Prisma {
   }
 
   /**
-   * AgentProfile.agent
+   * AgentProfile.agents
    */
-  export type AgentProfile$agentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type AgentProfile$agentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Agent
      */
@@ -4554,91 +4438,79 @@ export namespace Prisma {
   }
 
   export type AgentAvgAggregateOutputType = {
-    agentId: number | null
+    onchainId: number | null
     health: number | null
   }
 
   export type AgentSumAggregateOutputType = {
-    agentId: number | null
+    onchainId: number | null
     health: number | null
   }
 
   export type AgentMinAggregateOutputType = {
     id: string | null
-    agentId: number | null
-    publicKey: string | null
-    agentProfileId: string | null
+    onchainId: number | null
+    authority: string | null
     health: number | null
-    createdAt: Date | null
-    updatedAt: Date | null
     gameId: string | null
+    profileId: string | null
   }
 
   export type AgentMaxAggregateOutputType = {
     id: string | null
-    agentId: number | null
-    publicKey: string | null
-    agentProfileId: string | null
+    onchainId: number | null
+    authority: string | null
     health: number | null
-    createdAt: Date | null
-    updatedAt: Date | null
     gameId: string | null
+    profileId: string | null
   }
 
   export type AgentCountAggregateOutputType = {
     id: number
-    agentId: number
-    publicKey: number
-    agentProfileId: number
+    onchainId: number
+    authority: number
     health: number
-    createdAt: number
-    updatedAt: number
     gameId: number
+    profileId: number
     _all: number
   }
 
 
   export type AgentAvgAggregateInputType = {
-    agentId?: true
+    onchainId?: true
     health?: true
   }
 
   export type AgentSumAggregateInputType = {
-    agentId?: true
+    onchainId?: true
     health?: true
   }
 
   export type AgentMinAggregateInputType = {
     id?: true
-    agentId?: true
-    publicKey?: true
-    agentProfileId?: true
+    onchainId?: true
+    authority?: true
     health?: true
-    createdAt?: true
-    updatedAt?: true
     gameId?: true
+    profileId?: true
   }
 
   export type AgentMaxAggregateInputType = {
     id?: true
-    agentId?: true
-    publicKey?: true
-    agentProfileId?: true
+    onchainId?: true
+    authority?: true
     health?: true
-    createdAt?: true
-    updatedAt?: true
     gameId?: true
+    profileId?: true
   }
 
   export type AgentCountAggregateInputType = {
     id?: true
-    agentId?: true
-    publicKey?: true
-    agentProfileId?: true
+    onchainId?: true
+    authority?: true
     health?: true
-    createdAt?: true
-    updatedAt?: true
     gameId?: true
+    profileId?: true
     _all?: true
   }
 
@@ -4730,13 +4602,11 @@ export namespace Prisma {
 
   export type AgentGroupByOutputType = {
     id: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health: number
-    createdAt: Date
-    updatedAt: Date
     gameId: string
+    profileId: string
     _count: AgentCountAggregateOutputType | null
     _avg: AgentAvgAggregateOutputType | null
     _sum: AgentSumAggregateOutputType | null
@@ -4760,112 +4630,102 @@ export namespace Prisma {
 
   export type AgentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    agentId?: boolean
-    publicKey?: boolean
-    agentProfileId?: boolean
+    onchainId?: boolean
+    authority?: boolean
     health?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
     gameId?: boolean
-    agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    profileId?: boolean
+    tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    location?: boolean | Agent$locationArgs<ExtArgs>
-    currentAlliance?: boolean | Agent$currentAllianceArgs<ExtArgs>
-    battles?: boolean | Agent$battlesArgs<ExtArgs>
-    state?: boolean | Agent$stateArgs<ExtArgs>
-    strategy?: boolean | Agent$strategyArgs<ExtArgs>
-    cooldowns?: boolean | Agent$cooldownsArgs<ExtArgs>
-    alliedBy?: boolean | Agent$alliedByArgs<ExtArgs>
-    battlesAsOpponent?: boolean | Agent$battlesAsOpponentArgs<ExtArgs>
-    Tweet?: boolean | Agent$TweetArgs<ExtArgs>
+    battlesAsAttacker?: boolean | Agent$battlesAsAttackerArgs<ExtArgs>
+    battlesAsDefender?: boolean | Agent$battlesAsDefenderArgs<ExtArgs>
+    battlesAsAttackerAlly?: boolean | Agent$battlesAsAttackerAllyArgs<ExtArgs>
+    battlesAsDefenderAlly?: boolean | Agent$battlesAsDefenderAllyArgs<ExtArgs>
+    coolDown?: boolean | Agent$coolDownArgs<ExtArgs>
+    initiatedAlliances?: boolean | Agent$initiatedAlliancesArgs<ExtArgs>
+    joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
+    mapTiles?: boolean | Agent$mapTilesArgs<ExtArgs>
+    profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    agentId?: boolean
-    publicKey?: boolean
-    agentProfileId?: boolean
+    onchainId?: boolean
+    authority?: boolean
     health?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
     gameId?: boolean
-    agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    profileId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
+    profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    agentId?: boolean
-    publicKey?: boolean
-    agentProfileId?: boolean
+    onchainId?: boolean
+    authority?: boolean
     health?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
     gameId?: boolean
-    agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    profileId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
+    profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectScalar = {
     id?: boolean
-    agentId?: boolean
-    publicKey?: boolean
-    agentProfileId?: boolean
+    onchainId?: boolean
+    authority?: boolean
     health?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
     gameId?: boolean
+    profileId?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "publicKey" | "agentProfileId" | "health" | "createdAt" | "updatedAt" | "gameId", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "health" | "gameId" | "profileId", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    location?: boolean | Agent$locationArgs<ExtArgs>
-    currentAlliance?: boolean | Agent$currentAllianceArgs<ExtArgs>
-    battles?: boolean | Agent$battlesArgs<ExtArgs>
-    state?: boolean | Agent$stateArgs<ExtArgs>
-    strategy?: boolean | Agent$strategyArgs<ExtArgs>
-    cooldowns?: boolean | Agent$cooldownsArgs<ExtArgs>
-    alliedBy?: boolean | Agent$alliedByArgs<ExtArgs>
-    battlesAsOpponent?: boolean | Agent$battlesAsOpponentArgs<ExtArgs>
-    Tweet?: boolean | Agent$TweetArgs<ExtArgs>
+    battlesAsAttacker?: boolean | Agent$battlesAsAttackerArgs<ExtArgs>
+    battlesAsDefender?: boolean | Agent$battlesAsDefenderArgs<ExtArgs>
+    battlesAsAttackerAlly?: boolean | Agent$battlesAsAttackerAllyArgs<ExtArgs>
+    battlesAsDefenderAlly?: boolean | Agent$battlesAsDefenderAllyArgs<ExtArgs>
+    coolDown?: boolean | Agent$coolDownArgs<ExtArgs>
+    initiatedAlliances?: boolean | Agent$initiatedAlliancesArgs<ExtArgs>
+    joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
+    mapTiles?: boolean | Agent$mapTilesArgs<ExtArgs>
+    profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
+    profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
   }
   export type AgentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agentProfile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
+    profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
   }
 
   export type $AgentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Agent"
     objects: {
-      agentProfile: Prisma.$AgentProfilePayload<ExtArgs>
+      tweets: Prisma.$TweetPayload<ExtArgs>[]
       game: Prisma.$GamePayload<ExtArgs>
-      location: Prisma.$LocationPayload<ExtArgs> | null
-      currentAlliance: Prisma.$AlliancePayload<ExtArgs> | null
-      battles: Prisma.$BattlePayload<ExtArgs>[]
-      state: Prisma.$AgentStatePayload<ExtArgs> | null
-      strategy: Prisma.$StrategyPayload<ExtArgs> | null
-      cooldowns: Prisma.$CooldownPayload<ExtArgs>[]
-      alliedBy: Prisma.$AlliancePayload<ExtArgs>[]
-      battlesAsOpponent: Prisma.$BattlePayload<ExtArgs>[]
-      Tweet: Prisma.$TweetPayload<ExtArgs>[]
+      battlesAsAttacker: Prisma.$BattlePayload<ExtArgs>[]
+      battlesAsDefender: Prisma.$BattlePayload<ExtArgs>[]
+      battlesAsAttackerAlly: Prisma.$BattlePayload<ExtArgs>[]
+      battlesAsDefenderAlly: Prisma.$BattlePayload<ExtArgs>[]
+      coolDown: Prisma.$CoolDownPayload<ExtArgs>[]
+      initiatedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
+      joinedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
+      mapTiles: Prisma.$MapTilePayload<ExtArgs>[]
+      profile: Prisma.$AgentProfilePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      agentId: number
-      publicKey: string
-      agentProfileId: string
+      onchainId: number
+      authority: string
       health: number
-      createdAt: Date
-      updatedAt: Date
       gameId: string
+      profileId: string
     }, ExtArgs["result"]["agent"]>
     composites: {}
   }
@@ -5260,17 +5120,17 @@ export namespace Prisma {
    */
   export interface Prisma__AgentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    agentProfile<T extends AgentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfileDefaultArgs<ExtArgs>>): Prisma__AgentProfileClient<$Result.GetResult<Prisma.$AgentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    tweets<T extends Agent$tweetsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$tweetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    location<T extends Agent$locationArgs<ExtArgs> = {}>(args?: Subset<T, Agent$locationArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    currentAlliance<T extends Agent$currentAllianceArgs<ExtArgs> = {}>(args?: Subset<T, Agent$currentAllianceArgs<ExtArgs>>): Prisma__AllianceClient<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    battles<T extends Agent$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    state<T extends Agent$stateArgs<ExtArgs> = {}>(args?: Subset<T, Agent$stateArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    strategy<T extends Agent$strategyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$strategyArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    cooldowns<T extends Agent$cooldownsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$cooldownsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    alliedBy<T extends Agent$alliedByArgs<ExtArgs> = {}>(args?: Subset<T, Agent$alliedByArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    battlesAsOpponent<T extends Agent$battlesAsOpponentArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsOpponentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    Tweet<T extends Agent$TweetArgs<ExtArgs> = {}>(args?: Subset<T, Agent$TweetArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TweetPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    battlesAsAttacker<T extends Agent$battlesAsAttackerArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsAttackerArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    battlesAsDefender<T extends Agent$battlesAsDefenderArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsDefenderArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    battlesAsAttackerAlly<T extends Agent$battlesAsAttackerAllyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsAttackerAllyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    battlesAsDefenderAlly<T extends Agent$battlesAsDefenderAllyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsDefenderAllyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    coolDown<T extends Agent$coolDownArgs<ExtArgs> = {}>(args?: Subset<T, Agent$coolDownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    initiatedAlliances<T extends Agent$initiatedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$initiatedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    joinedAlliances<T extends Agent$joinedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$joinedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    mapTiles<T extends Agent$mapTilesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$mapTilesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    profile<T extends AgentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfileDefaultArgs<ExtArgs>>): Prisma__AgentProfileClient<$Result.GetResult<Prisma.$AgentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5301,13 +5161,11 @@ export namespace Prisma {
    */ 
   interface AgentFieldRefs {
     readonly id: FieldRef<"Agent", 'String'>
-    readonly agentId: FieldRef<"Agent", 'Int'>
-    readonly publicKey: FieldRef<"Agent", 'String'>
-    readonly agentProfileId: FieldRef<"Agent", 'String'>
+    readonly onchainId: FieldRef<"Agent", 'Int'>
+    readonly authority: FieldRef<"Agent", 'String'>
     readonly health: FieldRef<"Agent", 'Int'>
-    readonly createdAt: FieldRef<"Agent", 'DateTime'>
-    readonly updatedAt: FieldRef<"Agent", 'DateTime'>
     readonly gameId: FieldRef<"Agent", 'String'>
+    readonly profileId: FieldRef<"Agent", 'String'>
   }
     
 
@@ -5692,47 +5550,33 @@ export namespace Prisma {
   }
 
   /**
-   * Agent.location
+   * Agent.tweets
    */
-  export type Agent$locationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Agent$tweetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Location
+     * Select specific fields to fetch from the Tweet
      */
-    select?: LocationSelect<ExtArgs> | null
+    select?: TweetSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Location
+     * Omit specific fields from the Tweet
      */
-    omit?: LocationOmit<ExtArgs> | null
+    omit?: TweetOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: LocationInclude<ExtArgs> | null
-    where?: LocationWhereInput
+    include?: TweetInclude<ExtArgs> | null
+    where?: TweetWhereInput
+    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
+    cursor?: TweetWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TweetScalarFieldEnum | TweetScalarFieldEnum[]
   }
 
   /**
-   * Agent.currentAlliance
+   * Agent.battlesAsAttacker
    */
-  export type Agent$currentAllianceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Alliance
-     */
-    select?: AllianceSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Alliance
-     */
-    omit?: AllianceOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AllianceInclude<ExtArgs> | null
-    where?: AllianceWhereInput
-  }
-
-  /**
-   * Agent.battles
-   */
-  export type Agent$battlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Agent$battlesAsAttackerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Battle
      */
@@ -5754,71 +5598,105 @@ export namespace Prisma {
   }
 
   /**
-   * Agent.state
+   * Agent.battlesAsDefender
    */
-  export type Agent$stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Agent$battlesAsDefenderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the Battle
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: BattleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the Battle
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: BattleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
-    where?: AgentStateWhereInput
-  }
-
-  /**
-   * Agent.strategy
-   */
-  export type Agent$strategyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    where?: StrategyWhereInput
-  }
-
-  /**
-   * Agent.cooldowns
-   */
-  export type Agent$cooldownsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Cooldown
-     */
-    select?: CooldownSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Cooldown
-     */
-    omit?: CooldownOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CooldownInclude<ExtArgs> | null
-    where?: CooldownWhereInput
-    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
-    cursor?: CooldownWhereUniqueInput
+    include?: BattleInclude<ExtArgs> | null
+    where?: BattleWhereInput
+    orderBy?: BattleOrderByWithRelationInput | BattleOrderByWithRelationInput[]
+    cursor?: BattleWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: CooldownScalarFieldEnum | CooldownScalarFieldEnum[]
+    distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
   }
 
   /**
-   * Agent.alliedBy
+   * Agent.battlesAsAttackerAlly
    */
-  export type Agent$alliedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Agent$battlesAsAttackerAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Battle
+     */
+    select?: BattleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Battle
+     */
+    omit?: BattleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BattleInclude<ExtArgs> | null
+    where?: BattleWhereInput
+    orderBy?: BattleOrderByWithRelationInput | BattleOrderByWithRelationInput[]
+    cursor?: BattleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.battlesAsDefenderAlly
+   */
+  export type Agent$battlesAsDefenderAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Battle
+     */
+    select?: BattleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Battle
+     */
+    omit?: BattleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BattleInclude<ExtArgs> | null
+    where?: BattleWhereInput
+    orderBy?: BattleOrderByWithRelationInput | BattleOrderByWithRelationInput[]
+    cursor?: BattleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.coolDown
+   */
+  export type Agent$coolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoolDown
+     */
+    select?: CoolDownSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoolDown
+     */
+    omit?: CoolDownOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoolDownInclude<ExtArgs> | null
+    where?: CoolDownWhereInput
+    orderBy?: CoolDownOrderByWithRelationInput | CoolDownOrderByWithRelationInput[]
+    cursor?: CoolDownWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CoolDownScalarFieldEnum | CoolDownScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.initiatedAlliances
+   */
+  export type Agent$initiatedAlliancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Alliance
      */
@@ -5840,51 +5718,51 @@ export namespace Prisma {
   }
 
   /**
-   * Agent.battlesAsOpponent
+   * Agent.joinedAlliances
    */
-  export type Agent$battlesAsOpponentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Agent$joinedAlliancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Battle
+     * Select specific fields to fetch from the Alliance
      */
-    select?: BattleSelect<ExtArgs> | null
+    select?: AllianceSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Battle
+     * Omit specific fields from the Alliance
      */
-    omit?: BattleOmit<ExtArgs> | null
+    omit?: AllianceOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: BattleInclude<ExtArgs> | null
-    where?: BattleWhereInput
-    orderBy?: BattleOrderByWithRelationInput | BattleOrderByWithRelationInput[]
-    cursor?: BattleWhereUniqueInput
+    include?: AllianceInclude<ExtArgs> | null
+    where?: AllianceWhereInput
+    orderBy?: AllianceOrderByWithRelationInput | AllianceOrderByWithRelationInput[]
+    cursor?: AllianceWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
+    distinct?: AllianceScalarFieldEnum | AllianceScalarFieldEnum[]
   }
 
   /**
-   * Agent.Tweet
+   * Agent.mapTiles
    */
-  export type Agent$TweetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Agent$mapTilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Tweet
+     * Select specific fields to fetch from the MapTile
      */
-    select?: TweetSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Tweet
+     * Omit specific fields from the MapTile
      */
-    omit?: TweetOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: TweetInclude<ExtArgs> | null
-    where?: TweetWhereInput
-    orderBy?: TweetOrderByWithRelationInput | TweetOrderByWithRelationInput[]
-    cursor?: TweetWhereUniqueInput
+    include?: MapTileInclude<ExtArgs> | null
+    where?: MapTileWhereInput
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
+    cursor?: MapTileWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: TweetScalarFieldEnum | TweetScalarFieldEnum[]
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
   }
 
   /**
@@ -6996,1090 +6874,6 @@ export namespace Prisma {
 
 
   /**
-   * Model Location
-   */
-
-  export type AggregateLocation = {
-    _count: LocationCountAggregateOutputType | null
-    _avg: LocationAvgAggregateOutputType | null
-    _sum: LocationSumAggregateOutputType | null
-    _min: LocationMinAggregateOutputType | null
-    _max: LocationMaxAggregateOutputType | null
-  }
-
-  export type LocationAvgAggregateOutputType = {
-    x: number | null
-    y: number | null
-  }
-
-  export type LocationSumAggregateOutputType = {
-    x: number | null
-    y: number | null
-  }
-
-  export type LocationMinAggregateOutputType = {
-    id: string | null
-    x: number | null
-    y: number | null
-    terrainType: $Enums.TerrainType | null
-    agentId: string | null
-  }
-
-  export type LocationMaxAggregateOutputType = {
-    id: string | null
-    x: number | null
-    y: number | null
-    terrainType: $Enums.TerrainType | null
-    agentId: string | null
-  }
-
-  export type LocationCountAggregateOutputType = {
-    id: number
-    x: number
-    y: number
-    terrainType: number
-    agentId: number
-    _all: number
-  }
-
-
-  export type LocationAvgAggregateInputType = {
-    x?: true
-    y?: true
-  }
-
-  export type LocationSumAggregateInputType = {
-    x?: true
-    y?: true
-  }
-
-  export type LocationMinAggregateInputType = {
-    id?: true
-    x?: true
-    y?: true
-    terrainType?: true
-    agentId?: true
-  }
-
-  export type LocationMaxAggregateInputType = {
-    id?: true
-    x?: true
-    y?: true
-    terrainType?: true
-    agentId?: true
-  }
-
-  export type LocationCountAggregateInputType = {
-    id?: true
-    x?: true
-    y?: true
-    terrainType?: true
-    agentId?: true
-    _all?: true
-  }
-
-  export type LocationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Location to aggregate.
-     */
-    where?: LocationWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Locations to fetch.
-     */
-    orderBy?: LocationOrderByWithRelationInput | LocationOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: LocationWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Locations from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Locations.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Locations
-    **/
-    _count?: true | LocationCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: LocationAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: LocationSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: LocationMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: LocationMaxAggregateInputType
-  }
-
-  export type GetLocationAggregateType<T extends LocationAggregateArgs> = {
-        [P in keyof T & keyof AggregateLocation]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateLocation[P]>
-      : GetScalarType<T[P], AggregateLocation[P]>
-  }
-
-
-
-
-  export type LocationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: LocationWhereInput
-    orderBy?: LocationOrderByWithAggregationInput | LocationOrderByWithAggregationInput[]
-    by: LocationScalarFieldEnum[] | LocationScalarFieldEnum
-    having?: LocationScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: LocationCountAggregateInputType | true
-    _avg?: LocationAvgAggregateInputType
-    _sum?: LocationSumAggregateInputType
-    _min?: LocationMinAggregateInputType
-    _max?: LocationMaxAggregateInputType
-  }
-
-  export type LocationGroupByOutputType = {
-    id: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    agentId: string
-    _count: LocationCountAggregateOutputType | null
-    _avg: LocationAvgAggregateOutputType | null
-    _sum: LocationSumAggregateOutputType | null
-    _min: LocationMinAggregateOutputType | null
-    _max: LocationMaxAggregateOutputType | null
-  }
-
-  type GetLocationGroupByPayload<T extends LocationGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<LocationGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof LocationGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], LocationGroupByOutputType[P]>
-            : GetScalarType<T[P], LocationGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type LocationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["location"]>
-
-  export type LocationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["location"]>
-
-  export type LocationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["location"]>
-
-  export type LocationSelectScalar = {
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    agentId?: boolean
-  }
-
-  export type LocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "x" | "y" | "terrainType" | "agentId", ExtArgs["result"]["location"]>
-  export type LocationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-  export type LocationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-  export type LocationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-
-  export type $LocationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Location"
-    objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      x: number
-      y: number
-      terrainType: $Enums.TerrainType
-      agentId: string
-    }, ExtArgs["result"]["location"]>
-    composites: {}
-  }
-
-  type LocationGetPayload<S extends boolean | null | undefined | LocationDefaultArgs> = $Result.GetResult<Prisma.$LocationPayload, S>
-
-  type LocationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<LocationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: LocationCountAggregateInputType | true
-    }
-
-  export interface LocationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Location'], meta: { name: 'Location' } }
-    /**
-     * Find zero or one Location that matches the filter.
-     * @param {LocationFindUniqueArgs} args - Arguments to find a Location
-     * @example
-     * // Get one Location
-     * const location = await prisma.location.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends LocationFindUniqueArgs>(args: SelectSubset<T, LocationFindUniqueArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find one Location that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {LocationFindUniqueOrThrowArgs} args - Arguments to find a Location
-     * @example
-     * // Get one Location
-     * const location = await prisma.location.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends LocationFindUniqueOrThrowArgs>(args: SelectSubset<T, LocationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first Location that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationFindFirstArgs} args - Arguments to find a Location
-     * @example
-     * // Get one Location
-     * const location = await prisma.location.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends LocationFindFirstArgs>(args?: SelectSubset<T, LocationFindFirstArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first Location that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationFindFirstOrThrowArgs} args - Arguments to find a Location
-     * @example
-     * // Get one Location
-     * const location = await prisma.location.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends LocationFindFirstOrThrowArgs>(args?: SelectSubset<T, LocationFindFirstOrThrowArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find zero or more Locations that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Locations
-     * const locations = await prisma.location.findMany()
-     * 
-     * // Get first 10 Locations
-     * const locations = await prisma.location.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const locationWithIdOnly = await prisma.location.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends LocationFindManyArgs>(args?: SelectSubset<T, LocationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", ClientOptions>>
-
-    /**
-     * Create a Location.
-     * @param {LocationCreateArgs} args - Arguments to create a Location.
-     * @example
-     * // Create one Location
-     * const Location = await prisma.location.create({
-     *   data: {
-     *     // ... data to create a Location
-     *   }
-     * })
-     * 
-     */
-    create<T extends LocationCreateArgs>(args: SelectSubset<T, LocationCreateArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Create many Locations.
-     * @param {LocationCreateManyArgs} args - Arguments to create many Locations.
-     * @example
-     * // Create many Locations
-     * const location = await prisma.location.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends LocationCreateManyArgs>(args?: SelectSubset<T, LocationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Locations and returns the data saved in the database.
-     * @param {LocationCreateManyAndReturnArgs} args - Arguments to create many Locations.
-     * @example
-     * // Create many Locations
-     * const location = await prisma.location.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Locations and only return the `id`
-     * const locationWithIdOnly = await prisma.location.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends LocationCreateManyAndReturnArgs>(args?: SelectSubset<T, LocationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
-
-    /**
-     * Delete a Location.
-     * @param {LocationDeleteArgs} args - Arguments to delete one Location.
-     * @example
-     * // Delete one Location
-     * const Location = await prisma.location.delete({
-     *   where: {
-     *     // ... filter to delete one Location
-     *   }
-     * })
-     * 
-     */
-    delete<T extends LocationDeleteArgs>(args: SelectSubset<T, LocationDeleteArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Update one Location.
-     * @param {LocationUpdateArgs} args - Arguments to update one Location.
-     * @example
-     * // Update one Location
-     * const location = await prisma.location.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends LocationUpdateArgs>(args: SelectSubset<T, LocationUpdateArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Delete zero or more Locations.
-     * @param {LocationDeleteManyArgs} args - Arguments to filter Locations to delete.
-     * @example
-     * // Delete a few Locations
-     * const { count } = await prisma.location.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends LocationDeleteManyArgs>(args?: SelectSubset<T, LocationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Locations.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Locations
-     * const location = await prisma.location.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends LocationUpdateManyArgs>(args: SelectSubset<T, LocationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Locations and returns the data updated in the database.
-     * @param {LocationUpdateManyAndReturnArgs} args - Arguments to update many Locations.
-     * @example
-     * // Update many Locations
-     * const location = await prisma.location.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Locations and only return the `id`
-     * const locationWithIdOnly = await prisma.location.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends LocationUpdateManyAndReturnArgs>(args: SelectSubset<T, LocationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
-
-    /**
-     * Create or update one Location.
-     * @param {LocationUpsertArgs} args - Arguments to update or create a Location.
-     * @example
-     * // Update or create a Location
-     * const location = await prisma.location.upsert({
-     *   create: {
-     *     // ... data to create a Location
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Location we want to update
-     *   }
-     * })
-     */
-    upsert<T extends LocationUpsertArgs>(args: SelectSubset<T, LocationUpsertArgs<ExtArgs>>): Prisma__LocationClient<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
-
-
-    /**
-     * Count the number of Locations.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationCountArgs} args - Arguments to filter Locations to count.
-     * @example
-     * // Count the number of Locations
-     * const count = await prisma.location.count({
-     *   where: {
-     *     // ... the filter for the Locations we want to count
-     *   }
-     * })
-    **/
-    count<T extends LocationCountArgs>(
-      args?: Subset<T, LocationCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], LocationCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Location.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends LocationAggregateArgs>(args: Subset<T, LocationAggregateArgs>): Prisma.PrismaPromise<GetLocationAggregateType<T>>
-
-    /**
-     * Group by Location.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {LocationGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends LocationGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: LocationGroupByArgs['orderBy'] }
-        : { orderBy?: LocationGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, LocationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLocationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Location model
-   */
-  readonly fields: LocationFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Location.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__LocationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Location model
-   */ 
-  interface LocationFieldRefs {
-    readonly id: FieldRef<"Location", 'String'>
-    readonly x: FieldRef<"Location", 'Int'>
-    readonly y: FieldRef<"Location", 'Int'>
-    readonly terrainType: FieldRef<"Location", 'TerrainType'>
-    readonly agentId: FieldRef<"Location", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Location findUnique
-   */
-  export type LocationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * Filter, which Location to fetch.
-     */
-    where: LocationWhereUniqueInput
-  }
-
-  /**
-   * Location findUniqueOrThrow
-   */
-  export type LocationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * Filter, which Location to fetch.
-     */
-    where: LocationWhereUniqueInput
-  }
-
-  /**
-   * Location findFirst
-   */
-  export type LocationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * Filter, which Location to fetch.
-     */
-    where?: LocationWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Locations to fetch.
-     */
-    orderBy?: LocationOrderByWithRelationInput | LocationOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Locations.
-     */
-    cursor?: LocationWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Locations from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Locations.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Locations.
-     */
-    distinct?: LocationScalarFieldEnum | LocationScalarFieldEnum[]
-  }
-
-  /**
-   * Location findFirstOrThrow
-   */
-  export type LocationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * Filter, which Location to fetch.
-     */
-    where?: LocationWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Locations to fetch.
-     */
-    orderBy?: LocationOrderByWithRelationInput | LocationOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Locations.
-     */
-    cursor?: LocationWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Locations from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Locations.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Locations.
-     */
-    distinct?: LocationScalarFieldEnum | LocationScalarFieldEnum[]
-  }
-
-  /**
-   * Location findMany
-   */
-  export type LocationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * Filter, which Locations to fetch.
-     */
-    where?: LocationWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Locations to fetch.
-     */
-    orderBy?: LocationOrderByWithRelationInput | LocationOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Locations.
-     */
-    cursor?: LocationWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Locations from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Locations.
-     */
-    skip?: number
-    distinct?: LocationScalarFieldEnum | LocationScalarFieldEnum[]
-  }
-
-  /**
-   * Location create
-   */
-  export type LocationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Location.
-     */
-    data: XOR<LocationCreateInput, LocationUncheckedCreateInput>
-  }
-
-  /**
-   * Location createMany
-   */
-  export type LocationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Locations.
-     */
-    data: LocationCreateManyInput | LocationCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Location createManyAndReturn
-   */
-  export type LocationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * The data used to create many Locations.
-     */
-    data: LocationCreateManyInput | LocationCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Location update
-   */
-  export type LocationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Location.
-     */
-    data: XOR<LocationUpdateInput, LocationUncheckedUpdateInput>
-    /**
-     * Choose, which Location to update.
-     */
-    where: LocationWhereUniqueInput
-  }
-
-  /**
-   * Location updateMany
-   */
-  export type LocationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Locations.
-     */
-    data: XOR<LocationUpdateManyMutationInput, LocationUncheckedUpdateManyInput>
-    /**
-     * Filter which Locations to update
-     */
-    where?: LocationWhereInput
-  }
-
-  /**
-   * Location updateManyAndReturn
-   */
-  export type LocationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * The data used to update Locations.
-     */
-    data: XOR<LocationUpdateManyMutationInput, LocationUncheckedUpdateManyInput>
-    /**
-     * Filter which Locations to update
-     */
-    where?: LocationWhereInput
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Location upsert
-   */
-  export type LocationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Location to update in case it exists.
-     */
-    where: LocationWhereUniqueInput
-    /**
-     * In case the Location found by the `where` argument doesn't exist, create a new Location with this data.
-     */
-    create: XOR<LocationCreateInput, LocationUncheckedCreateInput>
-    /**
-     * In case the Location was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<LocationUpdateInput, LocationUncheckedUpdateInput>
-  }
-
-  /**
-   * Location delete
-   */
-  export type LocationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    /**
-     * Filter which Location to delete.
-     */
-    where: LocationWhereUniqueInput
-  }
-
-  /**
-   * Location deleteMany
-   */
-  export type LocationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Locations to delete
-     */
-    where?: LocationWhereInput
-  }
-
-  /**
-   * Location without action
-   */
-  export type LocationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Model Alliance
    */
 
@@ -8101,32 +6895,32 @@ export namespace Prisma {
 
   export type AllianceMinAggregateOutputType = {
     id: string | null
-    formedAt: Date | null
     combinedTokens: number | null
     status: $Enums.AllianceStatus | null
+    timestamp: Date | null
     gameId: string | null
-    agentId: string | null
-    alliedAgentId: string | null
+    initiatorId: string | null
+    joinerId: string | null
   }
 
   export type AllianceMaxAggregateOutputType = {
     id: string | null
-    formedAt: Date | null
     combinedTokens: number | null
     status: $Enums.AllianceStatus | null
+    timestamp: Date | null
     gameId: string | null
-    agentId: string | null
-    alliedAgentId: string | null
+    initiatorId: string | null
+    joinerId: string | null
   }
 
   export type AllianceCountAggregateOutputType = {
     id: number
-    formedAt: number
     combinedTokens: number
     status: number
+    timestamp: number
     gameId: number
-    agentId: number
-    alliedAgentId: number
+    initiatorId: number
+    joinerId: number
     _all: number
   }
 
@@ -8141,32 +6935,32 @@ export namespace Prisma {
 
   export type AllianceMinAggregateInputType = {
     id?: true
-    formedAt?: true
     combinedTokens?: true
     status?: true
+    timestamp?: true
     gameId?: true
-    agentId?: true
-    alliedAgentId?: true
+    initiatorId?: true
+    joinerId?: true
   }
 
   export type AllianceMaxAggregateInputType = {
     id?: true
-    formedAt?: true
     combinedTokens?: true
     status?: true
+    timestamp?: true
     gameId?: true
-    agentId?: true
-    alliedAgentId?: true
+    initiatorId?: true
+    joinerId?: true
   }
 
   export type AllianceCountAggregateInputType = {
     id?: true
-    formedAt?: true
     combinedTokens?: true
     status?: true
+    timestamp?: true
     gameId?: true
-    agentId?: true
-    alliedAgentId?: true
+    initiatorId?: true
+    joinerId?: true
     _all?: true
   }
 
@@ -8258,12 +7052,12 @@ export namespace Prisma {
 
   export type AllianceGroupByOutputType = {
     id: string
-    formedAt: Date
-    combinedTokens: number
+    combinedTokens: number | null
     status: $Enums.AllianceStatus
+    timestamp: Date
     gameId: string
-    agentId: string
-    alliedAgentId: string
+    initiatorId: string
+    joinerId: string
     _count: AllianceCountAggregateOutputType | null
     _avg: AllianceAvgAggregateOutputType | null
     _sum: AllianceSumAggregateOutputType | null
@@ -8287,85 +7081,85 @@ export namespace Prisma {
 
   export type AllianceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    formedAt?: boolean
     combinedTokens?: boolean
     status?: boolean
+    timestamp?: boolean
     gameId?: boolean
-    agentId?: boolean
-    alliedAgentId?: boolean
+    initiatorId?: boolean
+    joinerId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    alliedAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    initiator?: boolean | AgentDefaultArgs<ExtArgs>
+    joiner?: boolean | AgentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alliance"]>
 
   export type AllianceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    formedAt?: boolean
     combinedTokens?: boolean
     status?: boolean
+    timestamp?: boolean
     gameId?: boolean
-    agentId?: boolean
-    alliedAgentId?: boolean
+    initiatorId?: boolean
+    joinerId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    alliedAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    initiator?: boolean | AgentDefaultArgs<ExtArgs>
+    joiner?: boolean | AgentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alliance"]>
 
   export type AllianceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    formedAt?: boolean
     combinedTokens?: boolean
     status?: boolean
+    timestamp?: boolean
     gameId?: boolean
-    agentId?: boolean
-    alliedAgentId?: boolean
+    initiatorId?: boolean
+    joinerId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    alliedAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    initiator?: boolean | AgentDefaultArgs<ExtArgs>
+    joiner?: boolean | AgentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alliance"]>
 
   export type AllianceSelectScalar = {
     id?: boolean
-    formedAt?: boolean
     combinedTokens?: boolean
     status?: boolean
+    timestamp?: boolean
     gameId?: boolean
-    agentId?: boolean
-    alliedAgentId?: boolean
+    initiatorId?: boolean
+    joinerId?: boolean
   }
 
-  export type AllianceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "formedAt" | "combinedTokens" | "status" | "gameId" | "agentId" | "alliedAgentId", ExtArgs["result"]["alliance"]>
+  export type AllianceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "combinedTokens" | "status" | "timestamp" | "gameId" | "initiatorId" | "joinerId", ExtArgs["result"]["alliance"]>
   export type AllianceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    alliedAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    initiator?: boolean | AgentDefaultArgs<ExtArgs>
+    joiner?: boolean | AgentDefaultArgs<ExtArgs>
   }
   export type AllianceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    alliedAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    initiator?: boolean | AgentDefaultArgs<ExtArgs>
+    joiner?: boolean | AgentDefaultArgs<ExtArgs>
   }
   export type AllianceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    alliedAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    initiator?: boolean | AgentDefaultArgs<ExtArgs>
+    joiner?: boolean | AgentDefaultArgs<ExtArgs>
   }
 
   export type $AlliancePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Alliance"
     objects: {
       game: Prisma.$GamePayload<ExtArgs>
-      agent: Prisma.$AgentPayload<ExtArgs>
-      alliedAgent: Prisma.$AgentPayload<ExtArgs>
+      initiator: Prisma.$AgentPayload<ExtArgs>
+      joiner: Prisma.$AgentPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      formedAt: Date
-      combinedTokens: number
+      combinedTokens: number | null
       status: $Enums.AllianceStatus
+      timestamp: Date
       gameId: string
-      agentId: string
-      alliedAgentId: string
+      initiatorId: string
+      joinerId: string
     }, ExtArgs["result"]["alliance"]>
     composites: {}
   }
@@ -8761,8 +7555,8 @@ export namespace Prisma {
   export interface Prisma__AllianceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    alliedAgent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    initiator<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    joiner<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8793,12 +7587,12 @@ export namespace Prisma {
    */ 
   interface AllianceFieldRefs {
     readonly id: FieldRef<"Alliance", 'String'>
-    readonly formedAt: FieldRef<"Alliance", 'DateTime'>
     readonly combinedTokens: FieldRef<"Alliance", 'Float'>
     readonly status: FieldRef<"Alliance", 'AllianceStatus'>
+    readonly timestamp: FieldRef<"Alliance", 'DateTime'>
     readonly gameId: FieldRef<"Alliance", 'String'>
-    readonly agentId: FieldRef<"Alliance", 'String'>
-    readonly alliedAgentId: FieldRef<"Alliance", 'String'>
+    readonly initiatorId: FieldRef<"Alliance", 'String'>
+    readonly joinerId: FieldRef<"Alliance", 'String'>
   }
     
 
@@ -9214,130 +8008,126 @@ export namespace Prisma {
   }
 
   export type BattleAvgAggregateOutputType = {
+    tokensStaked: number | null
     tokensLost: number | null
-    tokensGained: number | null
-    probability: number | null
   }
 
   export type BattleSumAggregateOutputType = {
+    tokensStaked: number | null
     tokensLost: number | null
-    tokensGained: number | null
-    probability: number | null
   }
 
   export type BattleMinAggregateOutputType = {
     id: string | null
     timestamp: Date | null
-    outcome: string | null
-    tokensLost: number | null
-    tokensGained: number | null
-    probability: number | null
-    gameId: string | null
-    agentId: string | null
-    opponentId: string | null
     type: $Enums.BattleType | null
+    tokensStaked: number | null
+    tokensLost: number | null
+    outcome: string | null
+    attackerId: string | null
+    attackerAllyId: string | null
+    defenderId: string | null
+    defenderAllyId: string | null
     status: $Enums.BattleStatus | null
+    gameId: string | null
     startTime: Date | null
-    resolutionTime: Date | null
     resolvedAt: Date | null
   }
 
   export type BattleMaxAggregateOutputType = {
     id: string | null
     timestamp: Date | null
-    outcome: string | null
-    tokensLost: number | null
-    tokensGained: number | null
-    probability: number | null
-    gameId: string | null
-    agentId: string | null
-    opponentId: string | null
     type: $Enums.BattleType | null
+    tokensStaked: number | null
+    tokensLost: number | null
+    outcome: string | null
+    attackerId: string | null
+    attackerAllyId: string | null
+    defenderId: string | null
+    defenderAllyId: string | null
     status: $Enums.BattleStatus | null
+    gameId: string | null
     startTime: Date | null
-    resolutionTime: Date | null
     resolvedAt: Date | null
   }
 
   export type BattleCountAggregateOutputType = {
     id: number
     timestamp: number
-    outcome: number
-    tokensLost: number
-    tokensGained: number
-    probability: number
-    gameId: number
-    agentId: number
-    opponentId: number
     type: number
+    tokensStaked: number
+    tokensLost: number
+    outcome: number
+    attackerId: number
+    attackerAllyId: number
+    defenderId: number
+    defenderAllyId: number
     status: number
+    gameId: number
     startTime: number
-    resolutionTime: number
     resolvedAt: number
     _all: number
   }
 
 
   export type BattleAvgAggregateInputType = {
+    tokensStaked?: true
     tokensLost?: true
-    tokensGained?: true
-    probability?: true
   }
 
   export type BattleSumAggregateInputType = {
+    tokensStaked?: true
     tokensLost?: true
-    tokensGained?: true
-    probability?: true
   }
 
   export type BattleMinAggregateInputType = {
     id?: true
     timestamp?: true
-    outcome?: true
-    tokensLost?: true
-    tokensGained?: true
-    probability?: true
-    gameId?: true
-    agentId?: true
-    opponentId?: true
     type?: true
+    tokensStaked?: true
+    tokensLost?: true
+    outcome?: true
+    attackerId?: true
+    attackerAllyId?: true
+    defenderId?: true
+    defenderAllyId?: true
     status?: true
+    gameId?: true
     startTime?: true
-    resolutionTime?: true
     resolvedAt?: true
   }
 
   export type BattleMaxAggregateInputType = {
     id?: true
     timestamp?: true
-    outcome?: true
-    tokensLost?: true
-    tokensGained?: true
-    probability?: true
-    gameId?: true
-    agentId?: true
-    opponentId?: true
     type?: true
+    tokensStaked?: true
+    tokensLost?: true
+    outcome?: true
+    attackerId?: true
+    attackerAllyId?: true
+    defenderId?: true
+    defenderAllyId?: true
     status?: true
+    gameId?: true
     startTime?: true
-    resolutionTime?: true
     resolvedAt?: true
   }
 
   export type BattleCountAggregateInputType = {
     id?: true
     timestamp?: true
-    outcome?: true
-    tokensLost?: true
-    tokensGained?: true
-    probability?: true
-    gameId?: true
-    agentId?: true
-    opponentId?: true
     type?: true
+    tokensStaked?: true
+    tokensLost?: true
+    outcome?: true
+    attackerId?: true
+    attackerAllyId?: true
+    defenderId?: true
+    defenderAllyId?: true
     status?: true
+    gameId?: true
     startTime?: true
-    resolutionTime?: true
     resolvedAt?: true
     _all?: true
   }
@@ -9431,17 +8221,17 @@ export namespace Prisma {
   export type BattleGroupByOutputType = {
     id: string
     timestamp: Date
-    outcome: string
-    tokensLost: number | null
-    tokensGained: number | null
-    probability: number
-    gameId: string
-    agentId: string
-    opponentId: string
     type: $Enums.BattleType
+    tokensStaked: number
+    tokensLost: number | null
+    outcome: string | null
+    attackerId: string
+    attackerAllyId: string | null
+    defenderId: string
+    defenderAllyId: string | null
     status: $Enums.BattleStatus
+    gameId: string
     startTime: Date
-    resolutionTime: Date
     resolvedAt: Date | null
     _count: BattleCountAggregateOutputType | null
     _avg: BattleAvgAggregateOutputType | null
@@ -9467,118 +8257,132 @@ export namespace Prisma {
   export type BattleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     timestamp?: boolean
-    outcome?: boolean
-    tokensLost?: boolean
-    tokensGained?: boolean
-    probability?: boolean
-    gameId?: boolean
-    agentId?: boolean
-    opponentId?: boolean
     type?: boolean
+    tokensStaked?: boolean
+    tokensLost?: boolean
+    outcome?: boolean
+    attackerId?: boolean
+    attackerAllyId?: boolean
+    defenderId?: boolean
+    defenderAllyId?: boolean
     status?: boolean
+    gameId?: boolean
     startTime?: boolean
-    resolutionTime?: boolean
     resolvedAt?: boolean
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    opponent?: boolean | AgentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["battle"]>
 
   export type BattleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     timestamp?: boolean
-    outcome?: boolean
-    tokensLost?: boolean
-    tokensGained?: boolean
-    probability?: boolean
-    gameId?: boolean
-    agentId?: boolean
-    opponentId?: boolean
     type?: boolean
+    tokensStaked?: boolean
+    tokensLost?: boolean
+    outcome?: boolean
+    attackerId?: boolean
+    attackerAllyId?: boolean
+    defenderId?: boolean
+    defenderAllyId?: boolean
     status?: boolean
+    gameId?: boolean
     startTime?: boolean
-    resolutionTime?: boolean
     resolvedAt?: boolean
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    opponent?: boolean | AgentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["battle"]>
 
   export type BattleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     timestamp?: boolean
-    outcome?: boolean
-    tokensLost?: boolean
-    tokensGained?: boolean
-    probability?: boolean
-    gameId?: boolean
-    agentId?: boolean
-    opponentId?: boolean
     type?: boolean
+    tokensStaked?: boolean
+    tokensLost?: boolean
+    outcome?: boolean
+    attackerId?: boolean
+    attackerAllyId?: boolean
+    defenderId?: boolean
+    defenderAllyId?: boolean
     status?: boolean
+    gameId?: boolean
     startTime?: boolean
-    resolutionTime?: boolean
     resolvedAt?: boolean
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    opponent?: boolean | AgentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["battle"]>
 
   export type BattleSelectScalar = {
     id?: boolean
     timestamp?: boolean
-    outcome?: boolean
-    tokensLost?: boolean
-    tokensGained?: boolean
-    probability?: boolean
-    gameId?: boolean
-    agentId?: boolean
-    opponentId?: boolean
     type?: boolean
+    tokensStaked?: boolean
+    tokensLost?: boolean
+    outcome?: boolean
+    attackerId?: boolean
+    attackerAllyId?: boolean
+    defenderId?: boolean
+    defenderAllyId?: boolean
     status?: boolean
+    gameId?: boolean
     startTime?: boolean
-    resolutionTime?: boolean
     resolvedAt?: boolean
   }
 
-  export type BattleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "timestamp" | "outcome" | "tokensLost" | "tokensGained" | "probability" | "gameId" | "agentId" | "opponentId" | "type" | "status" | "startTime" | "resolutionTime" | "resolvedAt", ExtArgs["result"]["battle"]>
+  export type BattleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "timestamp" | "type" | "tokensStaked" | "tokensLost" | "outcome" | "attackerId" | "attackerAllyId" | "defenderId" | "defenderAllyId" | "status" | "gameId" | "startTime" | "resolvedAt", ExtArgs["result"]["battle"]>
   export type BattleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    opponent?: boolean | AgentDefaultArgs<ExtArgs>
   }
   export type BattleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    opponent?: boolean | AgentDefaultArgs<ExtArgs>
   }
   export type BattleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    opponent?: boolean | AgentDefaultArgs<ExtArgs>
   }
 
   export type $BattlePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Battle"
     objects: {
+      attacker: Prisma.$AgentPayload<ExtArgs>
+      attackerAlly: Prisma.$AgentPayload<ExtArgs> | null
+      defender: Prisma.$AgentPayload<ExtArgs>
+      defenderAlly: Prisma.$AgentPayload<ExtArgs> | null
       game: Prisma.$GamePayload<ExtArgs>
-      agent: Prisma.$AgentPayload<ExtArgs>
-      opponent: Prisma.$AgentPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       timestamp: Date
-      outcome: string
-      tokensLost: number | null
-      tokensGained: number | null
-      probability: number
-      gameId: string
-      agentId: string
-      opponentId: string
       type: $Enums.BattleType
+      tokensStaked: number
+      tokensLost: number | null
+      outcome: string | null
+      attackerId: string
+      attackerAllyId: string | null
+      defenderId: string
+      defenderAllyId: string | null
       status: $Enums.BattleStatus
+      gameId: string
       startTime: Date
-      resolutionTime: Date
       resolvedAt: Date | null
     }, ExtArgs["result"]["battle"]>
     composites: {}
@@ -9974,9 +8778,11 @@ export namespace Prisma {
    */
   export interface Prisma__BattleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    attacker<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    attackerAlly<T extends Battle$attackerAllyArgs<ExtArgs> = {}>(args?: Subset<T, Battle$attackerAllyArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    defender<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    defenderAlly<T extends Battle$defenderAllyArgs<ExtArgs> = {}>(args?: Subset<T, Battle$defenderAllyArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    opponent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10008,17 +8814,17 @@ export namespace Prisma {
   interface BattleFieldRefs {
     readonly id: FieldRef<"Battle", 'String'>
     readonly timestamp: FieldRef<"Battle", 'DateTime'>
-    readonly outcome: FieldRef<"Battle", 'String'>
-    readonly tokensLost: FieldRef<"Battle", 'Float'>
-    readonly tokensGained: FieldRef<"Battle", 'Float'>
-    readonly probability: FieldRef<"Battle", 'Float'>
-    readonly gameId: FieldRef<"Battle", 'String'>
-    readonly agentId: FieldRef<"Battle", 'String'>
-    readonly opponentId: FieldRef<"Battle", 'String'>
     readonly type: FieldRef<"Battle", 'BattleType'>
+    readonly tokensStaked: FieldRef<"Battle", 'Float'>
+    readonly tokensLost: FieldRef<"Battle", 'Float'>
+    readonly outcome: FieldRef<"Battle", 'String'>
+    readonly attackerId: FieldRef<"Battle", 'String'>
+    readonly attackerAllyId: FieldRef<"Battle", 'String'>
+    readonly defenderId: FieldRef<"Battle", 'String'>
+    readonly defenderAllyId: FieldRef<"Battle", 'String'>
     readonly status: FieldRef<"Battle", 'BattleStatus'>
+    readonly gameId: FieldRef<"Battle", 'String'>
     readonly startTime: FieldRef<"Battle", 'DateTime'>
-    readonly resolutionTime: FieldRef<"Battle", 'DateTime'>
     readonly resolvedAt: FieldRef<"Battle", 'DateTime'>
   }
     
@@ -10404,6 +9210,44 @@ export namespace Prisma {
   }
 
   /**
+   * Battle.attackerAlly
+   */
+  export type Battle$attackerAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Agent
+     */
+    select?: AgentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Agent
+     */
+    omit?: AgentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
+   * Battle.defenderAlly
+   */
+  export type Battle$defenderAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Agent
+     */
+    select?: AgentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Agent
+     */
+    omit?: AgentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
    * Battle without action
    */
   export type BattleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10436,7 +9280,7 @@ export namespace Prisma {
     id: string | null
     tweetId: string | null
     userId: string | null
-    type: string | null
+    type: $Enums.InteractionType | null
     content: string | null
     timestamp: Date | null
   }
@@ -10445,7 +9289,7 @@ export namespace Prisma {
     id: string | null
     tweetId: string | null
     userId: string | null
-    type: string | null
+    type: $Enums.InteractionType | null
     content: string | null
     timestamp: Date | null
   }
@@ -10567,8 +9411,8 @@ export namespace Prisma {
     id: string
     tweetId: string
     userId: string
-    type: string
-    content: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date
     userMetrics: JsonValue
     _count: InteractionCountAggregateOutputType | null
@@ -10653,8 +9497,8 @@ export namespace Prisma {
       id: string
       tweetId: string
       userId: string
-      type: string
-      content: string | null
+      type: $Enums.InteractionType
+      content: string
       timestamp: Date
       userMetrics: Prisma.JsonValue
     }, ExtArgs["result"]["interaction"]>
@@ -11084,7 +9928,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Interaction", 'String'>
     readonly tweetId: FieldRef<"Interaction", 'String'>
     readonly userId: FieldRef<"Interaction", 'String'>
-    readonly type: FieldRef<"Interaction", 'String'>
+    readonly type: FieldRef<"Interaction", 'InteractionType'>
     readonly content: FieldRef<"Interaction", 'String'>
     readonly timestamp: FieldRef<"Interaction", 'DateTime'>
     readonly userMetrics: FieldRef<"Interaction", 'Json'>
@@ -11491,420 +10335,388 @@ export namespace Prisma {
 
 
   /**
-   * Model AgentState
+   * Model MapTile
    */
 
-  export type AggregateAgentState = {
-    _count: AgentStateCountAggregateOutputType | null
-    _avg: AgentStateAvgAggregateOutputType | null
-    _sum: AgentStateSumAggregateOutputType | null
-    _min: AgentStateMinAggregateOutputType | null
-    _max: AgentStateMaxAggregateOutputType | null
+  export type AggregateMapTile = {
+    _count: MapTileCountAggregateOutputType | null
+    _avg: MapTileAvgAggregateOutputType | null
+    _sum: MapTileSumAggregateOutputType | null
+    _min: MapTileMinAggregateOutputType | null
+    _max: MapTileMaxAggregateOutputType | null
   }
 
-  export type AgentStateAvgAggregateOutputType = {
-    influenceScore: number | null
+  export type MapTileAvgAggregateOutputType = {
+    x: number | null
+    y: number | null
   }
 
-  export type AgentStateSumAggregateOutputType = {
-    influenceScore: number | null
+  export type MapTileSumAggregateOutputType = {
+    x: number | null
+    y: number | null
   }
 
-  export type AgentStateMinAggregateOutputType = {
+  export type MapTileMinAggregateOutputType = {
     id: string | null
-    isAlive: boolean | null
-    lastActionType: string | null
-    lastActionTime: Date | null
-    lastActionDetails: string | null
-    influencedByTweet: string | null
-    influenceScore: number | null
-    agentId: string | null
+    x: number | null
+    y: number | null
+    terrainType: $Enums.TerrainType | null
+    occupiedBy: string | null
   }
 
-  export type AgentStateMaxAggregateOutputType = {
+  export type MapTileMaxAggregateOutputType = {
     id: string | null
-    isAlive: boolean | null
-    lastActionType: string | null
-    lastActionTime: Date | null
-    lastActionDetails: string | null
-    influencedByTweet: string | null
-    influenceScore: number | null
-    agentId: string | null
+    x: number | null
+    y: number | null
+    terrainType: $Enums.TerrainType | null
+    occupiedBy: string | null
   }
 
-  export type AgentStateCountAggregateOutputType = {
+  export type MapTileCountAggregateOutputType = {
     id: number
-    isAlive: number
-    lastActionType: number
-    lastActionTime: number
-    lastActionDetails: number
-    influencedByTweet: number
-    influenceScore: number
-    agentId: number
+    x: number
+    y: number
+    terrainType: number
+    occupiedBy: number
     _all: number
   }
 
 
-  export type AgentStateAvgAggregateInputType = {
-    influenceScore?: true
+  export type MapTileAvgAggregateInputType = {
+    x?: true
+    y?: true
   }
 
-  export type AgentStateSumAggregateInputType = {
-    influenceScore?: true
+  export type MapTileSumAggregateInputType = {
+    x?: true
+    y?: true
   }
 
-  export type AgentStateMinAggregateInputType = {
+  export type MapTileMinAggregateInputType = {
     id?: true
-    isAlive?: true
-    lastActionType?: true
-    lastActionTime?: true
-    lastActionDetails?: true
-    influencedByTweet?: true
-    influenceScore?: true
-    agentId?: true
+    x?: true
+    y?: true
+    terrainType?: true
+    occupiedBy?: true
   }
 
-  export type AgentStateMaxAggregateInputType = {
+  export type MapTileMaxAggregateInputType = {
     id?: true
-    isAlive?: true
-    lastActionType?: true
-    lastActionTime?: true
-    lastActionDetails?: true
-    influencedByTweet?: true
-    influenceScore?: true
-    agentId?: true
+    x?: true
+    y?: true
+    terrainType?: true
+    occupiedBy?: true
   }
 
-  export type AgentStateCountAggregateInputType = {
+  export type MapTileCountAggregateInputType = {
     id?: true
-    isAlive?: true
-    lastActionType?: true
-    lastActionTime?: true
-    lastActionDetails?: true
-    influencedByTweet?: true
-    influenceScore?: true
-    agentId?: true
+    x?: true
+    y?: true
+    terrainType?: true
+    occupiedBy?: true
     _all?: true
   }
 
-  export type AgentStateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which AgentState to aggregate.
+     * Filter which MapTile to aggregate.
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of AgentStates to fetch.
+     * Determine the order of MapTiles to fetch.
      */
-    orderBy?: AgentStateOrderByWithRelationInput | AgentStateOrderByWithRelationInput[]
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: AgentStateWhereUniqueInput
+    cursor?: MapTileWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` AgentStates from the position of the cursor.
+     * Take `±n` MapTiles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` AgentStates.
+     * Skip the first `n` MapTiles.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned AgentStates
+     * Count returned MapTiles
     **/
-    _count?: true | AgentStateCountAggregateInputType
+    _count?: true | MapTileCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to average
     **/
-    _avg?: AgentStateAvgAggregateInputType
+    _avg?: MapTileAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to sum
     **/
-    _sum?: AgentStateSumAggregateInputType
+    _sum?: MapTileSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: AgentStateMinAggregateInputType
+    _min?: MapTileMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: AgentStateMaxAggregateInputType
+    _max?: MapTileMaxAggregateInputType
   }
 
-  export type GetAgentStateAggregateType<T extends AgentStateAggregateArgs> = {
-        [P in keyof T & keyof AggregateAgentState]: P extends '_count' | 'count'
+  export type GetMapTileAggregateType<T extends MapTileAggregateArgs> = {
+        [P in keyof T & keyof AggregateMapTile]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateAgentState[P]>
-      : GetScalarType<T[P], AggregateAgentState[P]>
+        : GetScalarType<T[P], AggregateMapTile[P]>
+      : GetScalarType<T[P], AggregateMapTile[P]>
   }
 
 
 
 
-  export type AgentStateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AgentStateWhereInput
-    orderBy?: AgentStateOrderByWithAggregationInput | AgentStateOrderByWithAggregationInput[]
-    by: AgentStateScalarFieldEnum[] | AgentStateScalarFieldEnum
-    having?: AgentStateScalarWhereWithAggregatesInput
+  export type MapTileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MapTileWhereInput
+    orderBy?: MapTileOrderByWithAggregationInput | MapTileOrderByWithAggregationInput[]
+    by: MapTileScalarFieldEnum[] | MapTileScalarFieldEnum
+    having?: MapTileScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: AgentStateCountAggregateInputType | true
-    _avg?: AgentStateAvgAggregateInputType
-    _sum?: AgentStateSumAggregateInputType
-    _min?: AgentStateMinAggregateInputType
-    _max?: AgentStateMaxAggregateInputType
+    _count?: MapTileCountAggregateInputType | true
+    _avg?: MapTileAvgAggregateInputType
+    _sum?: MapTileSumAggregateInputType
+    _min?: MapTileMinAggregateInputType
+    _max?: MapTileMaxAggregateInputType
   }
 
-  export type AgentStateGroupByOutputType = {
+  export type MapTileGroupByOutputType = {
     id: string
-    isAlive: boolean
-    lastActionType: string
-    lastActionTime: Date
-    lastActionDetails: string
-    influencedByTweet: string | null
-    influenceScore: number
-    agentId: string
-    _count: AgentStateCountAggregateOutputType | null
-    _avg: AgentStateAvgAggregateOutputType | null
-    _sum: AgentStateSumAggregateOutputType | null
-    _min: AgentStateMinAggregateOutputType | null
-    _max: AgentStateMaxAggregateOutputType | null
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    occupiedBy: string | null
+    _count: MapTileCountAggregateOutputType | null
+    _avg: MapTileAvgAggregateOutputType | null
+    _sum: MapTileSumAggregateOutputType | null
+    _min: MapTileMinAggregateOutputType | null
+    _max: MapTileMaxAggregateOutputType | null
   }
 
-  type GetAgentStateGroupByPayload<T extends AgentStateGroupByArgs> = Prisma.PrismaPromise<
+  type GetMapTileGroupByPayload<T extends MapTileGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<AgentStateGroupByOutputType, T['by']> &
+      PickEnumerable<MapTileGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof AgentStateGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof MapTileGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], AgentStateGroupByOutputType[P]>
-            : GetScalarType<T[P], AgentStateGroupByOutputType[P]>
+              : GetScalarType<T[P], MapTileGroupByOutputType[P]>
+            : GetScalarType<T[P], MapTileGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type AgentStateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type MapTileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    isAlive?: boolean
-    lastActionType?: boolean
-    lastActionTime?: boolean
-    lastActionDetails?: boolean
-    influencedByTweet?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["agentState"]>
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    occupiedBy?: boolean
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
+  }, ExtArgs["result"]["mapTile"]>
 
-  export type AgentStateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type MapTileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    isAlive?: boolean
-    lastActionType?: boolean
-    lastActionTime?: boolean
-    lastActionDetails?: boolean
-    influencedByTweet?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["agentState"]>
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    occupiedBy?: boolean
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
+  }, ExtArgs["result"]["mapTile"]>
 
-  export type AgentStateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type MapTileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    isAlive?: boolean
-    lastActionType?: boolean
-    lastActionTime?: boolean
-    lastActionDetails?: boolean
-    influencedByTweet?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["agentState"]>
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    occupiedBy?: boolean
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
+  }, ExtArgs["result"]["mapTile"]>
 
-  export type AgentStateSelectScalar = {
+  export type MapTileSelectScalar = {
     id?: boolean
-    isAlive?: boolean
-    lastActionType?: boolean
-    lastActionTime?: boolean
-    lastActionDetails?: boolean
-    influencedByTweet?: boolean
-    influenceScore?: boolean
-    agentId?: boolean
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    occupiedBy?: boolean
   }
 
-  export type AgentStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "isAlive" | "lastActionType" | "lastActionTime" | "lastActionDetails" | "influencedByTweet" | "influenceScore" | "agentId", ExtArgs["result"]["agentState"]>
-  export type AgentStateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  export type MapTileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "x" | "y" | "terrainType" | "occupiedBy", ExtArgs["result"]["mapTile"]>
+  export type MapTileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
   }
-  export type AgentStateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  export type MapTileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
   }
-  export type AgentStateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  export type MapTileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
   }
 
-  export type $AgentStatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "AgentState"
+  export type $MapTilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MapTile"
     objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>
+      agent: Prisma.$AgentPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      isAlive: boolean
-      lastActionType: string
-      lastActionTime: Date
-      lastActionDetails: string
-      influencedByTweet: string | null
-      influenceScore: number
-      agentId: string
-    }, ExtArgs["result"]["agentState"]>
+      x: number
+      y: number
+      terrainType: $Enums.TerrainType
+      occupiedBy: string | null
+    }, ExtArgs["result"]["mapTile"]>
     composites: {}
   }
 
-  type AgentStateGetPayload<S extends boolean | null | undefined | AgentStateDefaultArgs> = $Result.GetResult<Prisma.$AgentStatePayload, S>
+  type MapTileGetPayload<S extends boolean | null | undefined | MapTileDefaultArgs> = $Result.GetResult<Prisma.$MapTilePayload, S>
 
-  type AgentStateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<AgentStateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: AgentStateCountAggregateInputType | true
+  type MapTileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MapTileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MapTileCountAggregateInputType | true
     }
 
-  export interface AgentStateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgentState'], meta: { name: 'AgentState' } }
+  export interface MapTileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MapTile'], meta: { name: 'MapTile' } }
     /**
-     * Find zero or one AgentState that matches the filter.
-     * @param {AgentStateFindUniqueArgs} args - Arguments to find a AgentState
+     * Find zero or one MapTile that matches the filter.
+     * @param {MapTileFindUniqueArgs} args - Arguments to find a MapTile
      * @example
-     * // Get one AgentState
-     * const agentState = await prisma.agentState.findUnique({
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends AgentStateFindUniqueArgs>(args: SelectSubset<T, AgentStateFindUniqueArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findUnique<T extends MapTileFindUniqueArgs>(args: SelectSubset<T, MapTileFindUniqueArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
 
     /**
-     * Find one AgentState that matches the filter or throw an error with `error.code='P2025'`
+     * Find one MapTile that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {AgentStateFindUniqueOrThrowArgs} args - Arguments to find a AgentState
+     * @param {MapTileFindUniqueOrThrowArgs} args - Arguments to find a MapTile
      * @example
-     * // Get one AgentState
-     * const agentState = await prisma.agentState.findUniqueOrThrow({
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends AgentStateFindUniqueOrThrowArgs>(args: SelectSubset<T, AgentStateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findUniqueOrThrow<T extends MapTileFindUniqueOrThrowArgs>(args: SelectSubset<T, MapTileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Find the first AgentState that matches the filter.
+     * Find the first MapTile that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateFindFirstArgs} args - Arguments to find a AgentState
+     * @param {MapTileFindFirstArgs} args - Arguments to find a MapTile
      * @example
-     * // Get one AgentState
-     * const agentState = await prisma.agentState.findFirst({
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends AgentStateFindFirstArgs>(args?: SelectSubset<T, AgentStateFindFirstArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findFirst<T extends MapTileFindFirstArgs>(args?: SelectSubset<T, MapTileFindFirstArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
 
     /**
-     * Find the first AgentState that matches the filter or
+     * Find the first MapTile that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateFindFirstOrThrowArgs} args - Arguments to find a AgentState
+     * @param {MapTileFindFirstOrThrowArgs} args - Arguments to find a MapTile
      * @example
-     * // Get one AgentState
-     * const agentState = await prisma.agentState.findFirstOrThrow({
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends AgentStateFindFirstOrThrowArgs>(args?: SelectSubset<T, AgentStateFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findFirstOrThrow<T extends MapTileFindFirstOrThrowArgs>(args?: SelectSubset<T, MapTileFindFirstOrThrowArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Find zero or more AgentStates that matches the filter.
+     * Find zero or more MapTiles that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {MapTileFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all AgentStates
-     * const agentStates = await prisma.agentState.findMany()
+     * // Get all MapTiles
+     * const mapTiles = await prisma.mapTile.findMany()
      * 
-     * // Get first 10 AgentStates
-     * const agentStates = await prisma.agentState.findMany({ take: 10 })
+     * // Get first 10 MapTiles
+     * const mapTiles = await prisma.mapTile.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const agentStateWithIdOnly = await prisma.agentState.findMany({ select: { id: true } })
+     * const mapTileWithIdOnly = await prisma.mapTile.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends AgentStateFindManyArgs>(args?: SelectSubset<T, AgentStateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "findMany", ClientOptions>>
+    findMany<T extends MapTileFindManyArgs>(args?: SelectSubset<T, MapTileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findMany", ClientOptions>>
 
     /**
-     * Create a AgentState.
-     * @param {AgentStateCreateArgs} args - Arguments to create a AgentState.
+     * Create a MapTile.
+     * @param {MapTileCreateArgs} args - Arguments to create a MapTile.
      * @example
-     * // Create one AgentState
-     * const AgentState = await prisma.agentState.create({
+     * // Create one MapTile
+     * const MapTile = await prisma.mapTile.create({
      *   data: {
-     *     // ... data to create a AgentState
+     *     // ... data to create a MapTile
      *   }
      * })
      * 
      */
-    create<T extends AgentStateCreateArgs>(args: SelectSubset<T, AgentStateCreateArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+    create<T extends MapTileCreateArgs>(args: SelectSubset<T, MapTileCreateArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Create many AgentStates.
-     * @param {AgentStateCreateManyArgs} args - Arguments to create many AgentStates.
+     * Create many MapTiles.
+     * @param {MapTileCreateManyArgs} args - Arguments to create many MapTiles.
      * @example
-     * // Create many AgentStates
-     * const agentState = await prisma.agentState.createMany({
+     * // Create many MapTiles
+     * const mapTile = await prisma.mapTile.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends AgentStateCreateManyArgs>(args?: SelectSubset<T, AgentStateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends MapTileCreateManyArgs>(args?: SelectSubset<T, MapTileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many AgentStates and returns the data saved in the database.
-     * @param {AgentStateCreateManyAndReturnArgs} args - Arguments to create many AgentStates.
+     * Create many MapTiles and returns the data saved in the database.
+     * @param {MapTileCreateManyAndReturnArgs} args - Arguments to create many MapTiles.
      * @example
-     * // Create many AgentStates
-     * const agentState = await prisma.agentState.createManyAndReturn({
+     * // Create many MapTiles
+     * const mapTile = await prisma.mapTile.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many AgentStates and only return the `id`
-     * const agentStateWithIdOnly = await prisma.agentState.createManyAndReturn({
+     * // Create many MapTiles and only return the `id`
+     * const mapTileWithIdOnly = await prisma.mapTile.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -11914,28 +10726,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends AgentStateCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentStateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+    createManyAndReturn<T extends MapTileCreateManyAndReturnArgs>(args?: SelectSubset<T, MapTileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
 
     /**
-     * Delete a AgentState.
-     * @param {AgentStateDeleteArgs} args - Arguments to delete one AgentState.
+     * Delete a MapTile.
+     * @param {MapTileDeleteArgs} args - Arguments to delete one MapTile.
      * @example
-     * // Delete one AgentState
-     * const AgentState = await prisma.agentState.delete({
+     * // Delete one MapTile
+     * const MapTile = await prisma.mapTile.delete({
      *   where: {
-     *     // ... filter to delete one AgentState
+     *     // ... filter to delete one MapTile
      *   }
      * })
      * 
      */
-    delete<T extends AgentStateDeleteArgs>(args: SelectSubset<T, AgentStateDeleteArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+    delete<T extends MapTileDeleteArgs>(args: SelectSubset<T, MapTileDeleteArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Update one AgentState.
-     * @param {AgentStateUpdateArgs} args - Arguments to update one AgentState.
+     * Update one MapTile.
+     * @param {MapTileUpdateArgs} args - Arguments to update one MapTile.
      * @example
-     * // Update one AgentState
-     * const agentState = await prisma.agentState.update({
+     * // Update one MapTile
+     * const mapTile = await prisma.mapTile.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -11945,30 +10757,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends AgentStateUpdateArgs>(args: SelectSubset<T, AgentStateUpdateArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+    update<T extends MapTileUpdateArgs>(args: SelectSubset<T, MapTileUpdateArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Delete zero or more AgentStates.
-     * @param {AgentStateDeleteManyArgs} args - Arguments to filter AgentStates to delete.
+     * Delete zero or more MapTiles.
+     * @param {MapTileDeleteManyArgs} args - Arguments to filter MapTiles to delete.
      * @example
-     * // Delete a few AgentStates
-     * const { count } = await prisma.agentState.deleteMany({
+     * // Delete a few MapTiles
+     * const { count } = await prisma.mapTile.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends AgentStateDeleteManyArgs>(args?: SelectSubset<T, AgentStateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends MapTileDeleteManyArgs>(args?: SelectSubset<T, MapTileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more AgentStates.
+     * Update zero or more MapTiles.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {MapTileUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many AgentStates
-     * const agentState = await prisma.agentState.updateMany({
+     * // Update many MapTiles
+     * const mapTile = await prisma.mapTile.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -11978,14 +10790,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends AgentStateUpdateManyArgs>(args: SelectSubset<T, AgentStateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends MapTileUpdateManyArgs>(args: SelectSubset<T, MapTileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more AgentStates and returns the data updated in the database.
-     * @param {AgentStateUpdateManyAndReturnArgs} args - Arguments to update many AgentStates.
+     * Update zero or more MapTiles and returns the data updated in the database.
+     * @param {MapTileUpdateManyAndReturnArgs} args - Arguments to update many MapTiles.
      * @example
-     * // Update many AgentStates
-     * const agentState = await prisma.agentState.updateManyAndReturn({
+     * // Update many MapTiles
+     * const mapTile = await prisma.mapTile.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -11994,8 +10806,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more AgentStates and only return the `id`
-     * const agentStateWithIdOnly = await prisma.agentState.updateManyAndReturn({
+     * // Update zero or more MapTiles and only return the `id`
+     * const mapTileWithIdOnly = await prisma.mapTile.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -12008,56 +10820,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends AgentStateUpdateManyAndReturnArgs>(args: SelectSubset<T, AgentStateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+    updateManyAndReturn<T extends MapTileUpdateManyAndReturnArgs>(args: SelectSubset<T, MapTileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
 
     /**
-     * Create or update one AgentState.
-     * @param {AgentStateUpsertArgs} args - Arguments to update or create a AgentState.
+     * Create or update one MapTile.
+     * @param {MapTileUpsertArgs} args - Arguments to update or create a MapTile.
      * @example
-     * // Update or create a AgentState
-     * const agentState = await prisma.agentState.upsert({
+     * // Update or create a MapTile
+     * const mapTile = await prisma.mapTile.upsert({
      *   create: {
-     *     // ... data to create a AgentState
+     *     // ... data to create a MapTile
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the AgentState we want to update
+     *     // ... the filter for the MapTile we want to update
      *   }
      * })
      */
-    upsert<T extends AgentStateUpsertArgs>(args: SelectSubset<T, AgentStateUpsertArgs<ExtArgs>>): Prisma__AgentStateClient<$Result.GetResult<Prisma.$AgentStatePayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+    upsert<T extends MapTileUpsertArgs>(args: SelectSubset<T, MapTileUpsertArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
 
 
     /**
-     * Count the number of AgentStates.
+     * Count the number of MapTiles.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateCountArgs} args - Arguments to filter AgentStates to count.
+     * @param {MapTileCountArgs} args - Arguments to filter MapTiles to count.
      * @example
-     * // Count the number of AgentStates
-     * const count = await prisma.agentState.count({
+     * // Count the number of MapTiles
+     * const count = await prisma.mapTile.count({
      *   where: {
-     *     // ... the filter for the AgentStates we want to count
+     *     // ... the filter for the MapTiles we want to count
      *   }
      * })
     **/
-    count<T extends AgentStateCountArgs>(
-      args?: Subset<T, AgentStateCountArgs>,
+    count<T extends MapTileCountArgs>(
+      args?: Subset<T, MapTileCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], AgentStateCountAggregateOutputType>
+          : GetScalarType<T['select'], MapTileCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a AgentState.
+     * Allows you to perform aggregations operations on a MapTile.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {MapTileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -12077,13 +10889,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends AgentStateAggregateArgs>(args: Subset<T, AgentStateAggregateArgs>): Prisma.PrismaPromise<GetAgentStateAggregateType<T>>
+    aggregate<T extends MapTileAggregateArgs>(args: Subset<T, MapTileAggregateArgs>): Prisma.PrismaPromise<GetMapTileAggregateType<T>>
 
     /**
-     * Group by AgentState.
+     * Group by MapTile.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentStateGroupByArgs} args - Group by arguments.
+     * @param {MapTileGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -12098,14 +10910,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends AgentStateGroupByArgs,
+      T extends MapTileGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: AgentStateGroupByArgs['orderBy'] }
-        : { orderBy?: AgentStateGroupByArgs['orderBy'] },
+        ? { orderBy: MapTileGroupByArgs['orderBy'] }
+        : { orderBy?: MapTileGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -12154,22 +10966,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, AgentStateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgentStateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, MapTileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMapTileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the AgentState model
+   * Fields of the MapTile model
    */
-  readonly fields: AgentStateFieldRefs;
+  readonly fields: MapTileFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for AgentState.
+   * The delegate class that acts as a "Promise-like" for MapTile.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__AgentStateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__MapTileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    agent<T extends MapTile$agentArgs<ExtArgs> = {}>(args?: Subset<T, MapTile$agentArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12196,783 +11008,787 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the AgentState model
+   * Fields of the MapTile model
    */ 
-  interface AgentStateFieldRefs {
-    readonly id: FieldRef<"AgentState", 'String'>
-    readonly isAlive: FieldRef<"AgentState", 'Boolean'>
-    readonly lastActionType: FieldRef<"AgentState", 'String'>
-    readonly lastActionTime: FieldRef<"AgentState", 'DateTime'>
-    readonly lastActionDetails: FieldRef<"AgentState", 'String'>
-    readonly influencedByTweet: FieldRef<"AgentState", 'String'>
-    readonly influenceScore: FieldRef<"AgentState", 'Float'>
-    readonly agentId: FieldRef<"AgentState", 'String'>
+  interface MapTileFieldRefs {
+    readonly id: FieldRef<"MapTile", 'String'>
+    readonly x: FieldRef<"MapTile", 'Int'>
+    readonly y: FieldRef<"MapTile", 'Int'>
+    readonly terrainType: FieldRef<"MapTile", 'TerrainType'>
+    readonly occupiedBy: FieldRef<"MapTile", 'String'>
   }
     
 
   // Custom InputTypes
   /**
-   * AgentState findUnique
+   * MapTile findUnique
    */
-  export type AgentStateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * Filter, which AgentState to fetch.
+     * Filter, which MapTile to fetch.
      */
-    where: AgentStateWhereUniqueInput
+    where: MapTileWhereUniqueInput
   }
 
   /**
-   * AgentState findUniqueOrThrow
+   * MapTile findUniqueOrThrow
    */
-  export type AgentStateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * Filter, which AgentState to fetch.
+     * Filter, which MapTile to fetch.
      */
-    where: AgentStateWhereUniqueInput
+    where: MapTileWhereUniqueInput
   }
 
   /**
-   * AgentState findFirst
+   * MapTile findFirst
    */
-  export type AgentStateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * Filter, which AgentState to fetch.
+     * Filter, which MapTile to fetch.
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of AgentStates to fetch.
+     * Determine the order of MapTiles to fetch.
      */
-    orderBy?: AgentStateOrderByWithRelationInput | AgentStateOrderByWithRelationInput[]
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for AgentStates.
+     * Sets the position for searching for MapTiles.
      */
-    cursor?: AgentStateWhereUniqueInput
+    cursor?: MapTileWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` AgentStates from the position of the cursor.
+     * Take `±n` MapTiles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` AgentStates.
+     * Skip the first `n` MapTiles.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of AgentStates.
+     * Filter by unique combinations of MapTiles.
      */
-    distinct?: AgentStateScalarFieldEnum | AgentStateScalarFieldEnum[]
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
   }
 
   /**
-   * AgentState findFirstOrThrow
+   * MapTile findFirstOrThrow
    */
-  export type AgentStateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * Filter, which AgentState to fetch.
+     * Filter, which MapTile to fetch.
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of AgentStates to fetch.
+     * Determine the order of MapTiles to fetch.
      */
-    orderBy?: AgentStateOrderByWithRelationInput | AgentStateOrderByWithRelationInput[]
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for AgentStates.
+     * Sets the position for searching for MapTiles.
      */
-    cursor?: AgentStateWhereUniqueInput
+    cursor?: MapTileWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` AgentStates from the position of the cursor.
+     * Take `±n` MapTiles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` AgentStates.
+     * Skip the first `n` MapTiles.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of AgentStates.
+     * Filter by unique combinations of MapTiles.
      */
-    distinct?: AgentStateScalarFieldEnum | AgentStateScalarFieldEnum[]
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
   }
 
   /**
-   * AgentState findMany
+   * MapTile findMany
    */
-  export type AgentStateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * Filter, which AgentStates to fetch.
+     * Filter, which MapTiles to fetch.
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of AgentStates to fetch.
+     * Determine the order of MapTiles to fetch.
      */
-    orderBy?: AgentStateOrderByWithRelationInput | AgentStateOrderByWithRelationInput[]
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing AgentStates.
+     * Sets the position for listing MapTiles.
      */
-    cursor?: AgentStateWhereUniqueInput
+    cursor?: MapTileWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` AgentStates from the position of the cursor.
+     * Take `±n` MapTiles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` AgentStates.
+     * Skip the first `n` MapTiles.
      */
     skip?: number
-    distinct?: AgentStateScalarFieldEnum | AgentStateScalarFieldEnum[]
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
   }
 
   /**
-   * AgentState create
+   * MapTile create
    */
-  export type AgentStateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * The data needed to create a AgentState.
+     * The data needed to create a MapTile.
      */
-    data: XOR<AgentStateCreateInput, AgentStateUncheckedCreateInput>
+    data: XOR<MapTileCreateInput, MapTileUncheckedCreateInput>
   }
 
   /**
-   * AgentState createMany
+   * MapTile createMany
    */
-  export type AgentStateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many AgentStates.
+     * The data used to create many MapTiles.
      */
-    data: AgentStateCreateManyInput | AgentStateCreateManyInput[]
+    data: MapTileCreateManyInput | MapTileCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * AgentState createManyAndReturn
+   * MapTile createManyAndReturn
    */
-  export type AgentStateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelectCreateManyAndReturn<ExtArgs> | null
+    select?: MapTileSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
-     * The data used to create many AgentStates.
+     * The data used to create many MapTiles.
      */
-    data: AgentStateCreateManyInput | AgentStateCreateManyInput[]
+    data: MapTileCreateManyInput | MapTileCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: MapTileIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * AgentState update
+   * MapTile update
    */
-  export type AgentStateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * The data needed to update a AgentState.
+     * The data needed to update a MapTile.
      */
-    data: XOR<AgentStateUpdateInput, AgentStateUncheckedUpdateInput>
+    data: XOR<MapTileUpdateInput, MapTileUncheckedUpdateInput>
     /**
-     * Choose, which AgentState to update.
+     * Choose, which MapTile to update.
      */
-    where: AgentStateWhereUniqueInput
+    where: MapTileWhereUniqueInput
   }
 
   /**
-   * AgentState updateMany
+   * MapTile updateMany
    */
-  export type AgentStateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update AgentStates.
+     * The data used to update MapTiles.
      */
-    data: XOR<AgentStateUpdateManyMutationInput, AgentStateUncheckedUpdateManyInput>
+    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyInput>
     /**
-     * Filter which AgentStates to update
+     * Filter which MapTiles to update
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
   }
 
   /**
-   * AgentState updateManyAndReturn
+   * MapTile updateManyAndReturn
    */
-  export type AgentStateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: MapTileSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
-     * The data used to update AgentStates.
+     * The data used to update MapTiles.
      */
-    data: XOR<AgentStateUpdateManyMutationInput, AgentStateUncheckedUpdateManyInput>
+    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyInput>
     /**
-     * Filter which AgentStates to update
+     * Filter which MapTiles to update
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: MapTileIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * AgentState upsert
+   * MapTile upsert
    */
-  export type AgentStateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * The filter to search for the AgentState to update in case it exists.
+     * The filter to search for the MapTile to update in case it exists.
      */
-    where: AgentStateWhereUniqueInput
+    where: MapTileWhereUniqueInput
     /**
-     * In case the AgentState found by the `where` argument doesn't exist, create a new AgentState with this data.
+     * In case the MapTile found by the `where` argument doesn't exist, create a new MapTile with this data.
      */
-    create: XOR<AgentStateCreateInput, AgentStateUncheckedCreateInput>
+    create: XOR<MapTileCreateInput, MapTileUncheckedCreateInput>
     /**
-     * In case the AgentState was found with the provided `where` argument, update it with this data.
+     * In case the MapTile was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<AgentStateUpdateInput, AgentStateUncheckedUpdateInput>
+    update: XOR<MapTileUpdateInput, MapTileUncheckedUpdateInput>
   }
 
   /**
-   * AgentState delete
+   * MapTile delete
    */
-  export type AgentStateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the MapTile
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: MapTileSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the MapTile
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: MapTileOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: MapTileInclude<ExtArgs> | null
     /**
-     * Filter which AgentState to delete.
+     * Filter which MapTile to delete.
      */
-    where: AgentStateWhereUniqueInput
+    where: MapTileWhereUniqueInput
   }
 
   /**
-   * AgentState deleteMany
+   * MapTile deleteMany
    */
-  export type AgentStateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which AgentStates to delete
+     * Filter which MapTiles to delete
      */
-    where?: AgentStateWhereInput
+    where?: MapTileWhereInput
   }
 
   /**
-   * AgentState without action
+   * MapTile.agent
    */
-  export type AgentStateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type MapTile$agentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the AgentState
+     * Select specific fields to fetch from the Agent
      */
-    select?: AgentStateSelect<ExtArgs> | null
+    select?: AgentSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the AgentState
+     * Omit specific fields from the Agent
      */
-    omit?: AgentStateOmit<ExtArgs> | null
+    omit?: AgentOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AgentStateInclude<ExtArgs> | null
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
+   * MapTile without action
+   */
+  export type MapTileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
   }
 
 
   /**
-   * Model Cooldown
+   * Model CoolDown
    */
 
-  export type AggregateCooldown = {
-    _count: CooldownCountAggregateOutputType | null
-    _min: CooldownMinAggregateOutputType | null
-    _max: CooldownMaxAggregateOutputType | null
+  export type AggregateCoolDown = {
+    _count: CoolDownCountAggregateOutputType | null
+    _min: CoolDownMinAggregateOutputType | null
+    _max: CoolDownMaxAggregateOutputType | null
   }
 
-  export type CooldownMinAggregateOutputType = {
+  export type CoolDownMinAggregateOutputType = {
     id: string | null
     type: $Enums.CooldownType | null
     endsAt: Date | null
-    agentId: string | null
-    targetAgentId: string | null
+    cooledAgentId: string | null
     gameId: string | null
   }
 
-  export type CooldownMaxAggregateOutputType = {
+  export type CoolDownMaxAggregateOutputType = {
     id: string | null
     type: $Enums.CooldownType | null
     endsAt: Date | null
-    agentId: string | null
-    targetAgentId: string | null
+    cooledAgentId: string | null
     gameId: string | null
   }
 
-  export type CooldownCountAggregateOutputType = {
+  export type CoolDownCountAggregateOutputType = {
     id: number
     type: number
     endsAt: number
-    agentId: number
-    targetAgentId: number
+    cooledAgentId: number
     gameId: number
     _all: number
   }
 
 
-  export type CooldownMinAggregateInputType = {
+  export type CoolDownMinAggregateInputType = {
     id?: true
     type?: true
     endsAt?: true
-    agentId?: true
-    targetAgentId?: true
+    cooledAgentId?: true
     gameId?: true
   }
 
-  export type CooldownMaxAggregateInputType = {
+  export type CoolDownMaxAggregateInputType = {
     id?: true
     type?: true
     endsAt?: true
-    agentId?: true
-    targetAgentId?: true
+    cooledAgentId?: true
     gameId?: true
   }
 
-  export type CooldownCountAggregateInputType = {
+  export type CoolDownCountAggregateInputType = {
     id?: true
     type?: true
     endsAt?: true
-    agentId?: true
-    targetAgentId?: true
+    cooledAgentId?: true
     gameId?: true
     _all?: true
   }
 
-  export type CooldownAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Cooldown to aggregate.
+     * Filter which CoolDown to aggregate.
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Cooldowns to fetch.
+     * Determine the order of CoolDowns to fetch.
      */
-    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
+    orderBy?: CoolDownOrderByWithRelationInput | CoolDownOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: CooldownWhereUniqueInput
+    cursor?: CoolDownWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Cooldowns from the position of the cursor.
+     * Take `±n` CoolDowns from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Cooldowns.
+     * Skip the first `n` CoolDowns.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned Cooldowns
+     * Count returned CoolDowns
     **/
-    _count?: true | CooldownCountAggregateInputType
+    _count?: true | CoolDownCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: CooldownMinAggregateInputType
+    _min?: CoolDownMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: CooldownMaxAggregateInputType
+    _max?: CoolDownMaxAggregateInputType
   }
 
-  export type GetCooldownAggregateType<T extends CooldownAggregateArgs> = {
-        [P in keyof T & keyof AggregateCooldown]: P extends '_count' | 'count'
+  export type GetCoolDownAggregateType<T extends CoolDownAggregateArgs> = {
+        [P in keyof T & keyof AggregateCoolDown]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateCooldown[P]>
-      : GetScalarType<T[P], AggregateCooldown[P]>
+        : GetScalarType<T[P], AggregateCoolDown[P]>
+      : GetScalarType<T[P], AggregateCoolDown[P]>
   }
 
 
 
 
-  export type CooldownGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: CooldownWhereInput
-    orderBy?: CooldownOrderByWithAggregationInput | CooldownOrderByWithAggregationInput[]
-    by: CooldownScalarFieldEnum[] | CooldownScalarFieldEnum
-    having?: CooldownScalarWhereWithAggregatesInput
+  export type CoolDownGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CoolDownWhereInput
+    orderBy?: CoolDownOrderByWithAggregationInput | CoolDownOrderByWithAggregationInput[]
+    by: CoolDownScalarFieldEnum[] | CoolDownScalarFieldEnum
+    having?: CoolDownScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: CooldownCountAggregateInputType | true
-    _min?: CooldownMinAggregateInputType
-    _max?: CooldownMaxAggregateInputType
+    _count?: CoolDownCountAggregateInputType | true
+    _min?: CoolDownMinAggregateInputType
+    _max?: CoolDownMaxAggregateInputType
   }
 
-  export type CooldownGroupByOutputType = {
+  export type CoolDownGroupByOutputType = {
     id: string
     type: $Enums.CooldownType
     endsAt: Date
-    agentId: string
-    targetAgentId: string | null
+    cooledAgentId: string
     gameId: string
-    _count: CooldownCountAggregateOutputType | null
-    _min: CooldownMinAggregateOutputType | null
-    _max: CooldownMaxAggregateOutputType | null
+    _count: CoolDownCountAggregateOutputType | null
+    _min: CoolDownMinAggregateOutputType | null
+    _max: CoolDownMaxAggregateOutputType | null
   }
 
-  type GetCooldownGroupByPayload<T extends CooldownGroupByArgs> = Prisma.PrismaPromise<
+  type GetCoolDownGroupByPayload<T extends CoolDownGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<CooldownGroupByOutputType, T['by']> &
+      PickEnumerable<CoolDownGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof CooldownGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof CoolDownGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], CooldownGroupByOutputType[P]>
-            : GetScalarType<T[P], CooldownGroupByOutputType[P]>
+              : GetScalarType<T[P], CoolDownGroupByOutputType[P]>
+            : GetScalarType<T[P], CoolDownGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type CooldownSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type CoolDownSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     endsAt?: boolean
-    agentId?: boolean
-    targetAgentId?: boolean
+    cooledAgentId?: boolean
     gameId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    cooledAgent?: boolean | AgentDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["cooldown"]>
+  }, ExtArgs["result"]["coolDown"]>
 
-  export type CooldownSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type CoolDownSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     endsAt?: boolean
-    agentId?: boolean
-    targetAgentId?: boolean
+    cooledAgentId?: boolean
     gameId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    cooledAgent?: boolean | AgentDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["cooldown"]>
+  }, ExtArgs["result"]["coolDown"]>
 
-  export type CooldownSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type CoolDownSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     type?: boolean
     endsAt?: boolean
-    agentId?: boolean
-    targetAgentId?: boolean
+    cooledAgentId?: boolean
     gameId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    cooledAgent?: boolean | AgentDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["cooldown"]>
+  }, ExtArgs["result"]["coolDown"]>
 
-  export type CooldownSelectScalar = {
+  export type CoolDownSelectScalar = {
     id?: boolean
     type?: boolean
     endsAt?: boolean
-    agentId?: boolean
-    targetAgentId?: boolean
+    cooledAgentId?: boolean
     gameId?: boolean
   }
 
-  export type CooldownOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "endsAt" | "agentId" | "targetAgentId" | "gameId", ExtArgs["result"]["cooldown"]>
-  export type CooldownInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  export type CoolDownOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "endsAt" | "cooledAgentId" | "gameId", ExtArgs["result"]["coolDown"]>
+  export type CoolDownInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cooledAgent?: boolean | AgentDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
   }
-  export type CooldownIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  export type CoolDownIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cooledAgent?: boolean | AgentDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
   }
-  export type CooldownIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  export type CoolDownIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cooledAgent?: boolean | AgentDefaultArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
   }
 
-  export type $CooldownPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Cooldown"
+  export type $CoolDownPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CoolDown"
     objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>
+      cooledAgent: Prisma.$AgentPayload<ExtArgs>
       game: Prisma.$GamePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       type: $Enums.CooldownType
       endsAt: Date
-      agentId: string
-      targetAgentId: string | null
+      cooledAgentId: string
       gameId: string
-    }, ExtArgs["result"]["cooldown"]>
+    }, ExtArgs["result"]["coolDown"]>
     composites: {}
   }
 
-  type CooldownGetPayload<S extends boolean | null | undefined | CooldownDefaultArgs> = $Result.GetResult<Prisma.$CooldownPayload, S>
+  type CoolDownGetPayload<S extends boolean | null | undefined | CoolDownDefaultArgs> = $Result.GetResult<Prisma.$CoolDownPayload, S>
 
-  type CooldownCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<CooldownFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: CooldownCountAggregateInputType | true
+  type CoolDownCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CoolDownFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CoolDownCountAggregateInputType | true
     }
 
-  export interface CooldownDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Cooldown'], meta: { name: 'Cooldown' } }
+  export interface CoolDownDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CoolDown'], meta: { name: 'CoolDown' } }
     /**
-     * Find zero or one Cooldown that matches the filter.
-     * @param {CooldownFindUniqueArgs} args - Arguments to find a Cooldown
+     * Find zero or one CoolDown that matches the filter.
+     * @param {CoolDownFindUniqueArgs} args - Arguments to find a CoolDown
      * @example
-     * // Get one Cooldown
-     * const cooldown = await prisma.cooldown.findUnique({
+     * // Get one CoolDown
+     * const coolDown = await prisma.coolDown.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends CooldownFindUniqueArgs>(args: SelectSubset<T, CooldownFindUniqueArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findUnique<T extends CoolDownFindUniqueArgs>(args: SelectSubset<T, CoolDownFindUniqueArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
 
     /**
-     * Find one Cooldown that matches the filter or throw an error with `error.code='P2025'`
+     * Find one CoolDown that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {CooldownFindUniqueOrThrowArgs} args - Arguments to find a Cooldown
+     * @param {CoolDownFindUniqueOrThrowArgs} args - Arguments to find a CoolDown
      * @example
-     * // Get one Cooldown
-     * const cooldown = await prisma.cooldown.findUniqueOrThrow({
+     * // Get one CoolDown
+     * const coolDown = await prisma.coolDown.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends CooldownFindUniqueOrThrowArgs>(args: SelectSubset<T, CooldownFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findUniqueOrThrow<T extends CoolDownFindUniqueOrThrowArgs>(args: SelectSubset<T, CoolDownFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Find the first Cooldown that matches the filter.
+     * Find the first CoolDown that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownFindFirstArgs} args - Arguments to find a Cooldown
+     * @param {CoolDownFindFirstArgs} args - Arguments to find a CoolDown
      * @example
-     * // Get one Cooldown
-     * const cooldown = await prisma.cooldown.findFirst({
+     * // Get one CoolDown
+     * const coolDown = await prisma.coolDown.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends CooldownFindFirstArgs>(args?: SelectSubset<T, CooldownFindFirstArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findFirst<T extends CoolDownFindFirstArgs>(args?: SelectSubset<T, CoolDownFindFirstArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
 
     /**
-     * Find the first Cooldown that matches the filter or
+     * Find the first CoolDown that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownFindFirstOrThrowArgs} args - Arguments to find a Cooldown
+     * @param {CoolDownFindFirstOrThrowArgs} args - Arguments to find a CoolDown
      * @example
-     * // Get one Cooldown
-     * const cooldown = await prisma.cooldown.findFirstOrThrow({
+     * // Get one CoolDown
+     * const coolDown = await prisma.coolDown.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends CooldownFindFirstOrThrowArgs>(args?: SelectSubset<T, CooldownFindFirstOrThrowArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findFirstOrThrow<T extends CoolDownFindFirstOrThrowArgs>(args?: SelectSubset<T, CoolDownFindFirstOrThrowArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Find zero or more Cooldowns that matches the filter.
+     * Find zero or more CoolDowns that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {CoolDownFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all Cooldowns
-     * const cooldowns = await prisma.cooldown.findMany()
+     * // Get all CoolDowns
+     * const coolDowns = await prisma.coolDown.findMany()
      * 
-     * // Get first 10 Cooldowns
-     * const cooldowns = await prisma.cooldown.findMany({ take: 10 })
+     * // Get first 10 CoolDowns
+     * const coolDowns = await prisma.coolDown.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const cooldownWithIdOnly = await prisma.cooldown.findMany({ select: { id: true } })
+     * const coolDownWithIdOnly = await prisma.coolDown.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends CooldownFindManyArgs>(args?: SelectSubset<T, CooldownFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "findMany", ClientOptions>>
+    findMany<T extends CoolDownFindManyArgs>(args?: SelectSubset<T, CoolDownFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions>>
 
     /**
-     * Create a Cooldown.
-     * @param {CooldownCreateArgs} args - Arguments to create a Cooldown.
+     * Create a CoolDown.
+     * @param {CoolDownCreateArgs} args - Arguments to create a CoolDown.
      * @example
-     * // Create one Cooldown
-     * const Cooldown = await prisma.cooldown.create({
+     * // Create one CoolDown
+     * const CoolDown = await prisma.coolDown.create({
      *   data: {
-     *     // ... data to create a Cooldown
+     *     // ... data to create a CoolDown
      *   }
      * })
      * 
      */
-    create<T extends CooldownCreateArgs>(args: SelectSubset<T, CooldownCreateArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+    create<T extends CoolDownCreateArgs>(args: SelectSubset<T, CoolDownCreateArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Create many Cooldowns.
-     * @param {CooldownCreateManyArgs} args - Arguments to create many Cooldowns.
+     * Create many CoolDowns.
+     * @param {CoolDownCreateManyArgs} args - Arguments to create many CoolDowns.
      * @example
-     * // Create many Cooldowns
-     * const cooldown = await prisma.cooldown.createMany({
+     * // Create many CoolDowns
+     * const coolDown = await prisma.coolDown.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends CooldownCreateManyArgs>(args?: SelectSubset<T, CooldownCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends CoolDownCreateManyArgs>(args?: SelectSubset<T, CoolDownCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many Cooldowns and returns the data saved in the database.
-     * @param {CooldownCreateManyAndReturnArgs} args - Arguments to create many Cooldowns.
+     * Create many CoolDowns and returns the data saved in the database.
+     * @param {CoolDownCreateManyAndReturnArgs} args - Arguments to create many CoolDowns.
      * @example
-     * // Create many Cooldowns
-     * const cooldown = await prisma.cooldown.createManyAndReturn({
+     * // Create many CoolDowns
+     * const coolDown = await prisma.coolDown.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many Cooldowns and only return the `id`
-     * const cooldownWithIdOnly = await prisma.cooldown.createManyAndReturn({
+     * // Create many CoolDowns and only return the `id`
+     * const coolDownWithIdOnly = await prisma.coolDown.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -12982,28 +11798,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends CooldownCreateManyAndReturnArgs>(args?: SelectSubset<T, CooldownCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+    createManyAndReturn<T extends CoolDownCreateManyAndReturnArgs>(args?: SelectSubset<T, CoolDownCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
 
     /**
-     * Delete a Cooldown.
-     * @param {CooldownDeleteArgs} args - Arguments to delete one Cooldown.
+     * Delete a CoolDown.
+     * @param {CoolDownDeleteArgs} args - Arguments to delete one CoolDown.
      * @example
-     * // Delete one Cooldown
-     * const Cooldown = await prisma.cooldown.delete({
+     * // Delete one CoolDown
+     * const CoolDown = await prisma.coolDown.delete({
      *   where: {
-     *     // ... filter to delete one Cooldown
+     *     // ... filter to delete one CoolDown
      *   }
      * })
      * 
      */
-    delete<T extends CooldownDeleteArgs>(args: SelectSubset<T, CooldownDeleteArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+    delete<T extends CoolDownDeleteArgs>(args: SelectSubset<T, CoolDownDeleteArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Update one Cooldown.
-     * @param {CooldownUpdateArgs} args - Arguments to update one Cooldown.
+     * Update one CoolDown.
+     * @param {CoolDownUpdateArgs} args - Arguments to update one CoolDown.
      * @example
-     * // Update one Cooldown
-     * const cooldown = await prisma.cooldown.update({
+     * // Update one CoolDown
+     * const coolDown = await prisma.coolDown.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13013,30 +11829,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends CooldownUpdateArgs>(args: SelectSubset<T, CooldownUpdateArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+    update<T extends CoolDownUpdateArgs>(args: SelectSubset<T, CoolDownUpdateArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
 
     /**
-     * Delete zero or more Cooldowns.
-     * @param {CooldownDeleteManyArgs} args - Arguments to filter Cooldowns to delete.
+     * Delete zero or more CoolDowns.
+     * @param {CoolDownDeleteManyArgs} args - Arguments to filter CoolDowns to delete.
      * @example
-     * // Delete a few Cooldowns
-     * const { count } = await prisma.cooldown.deleteMany({
+     * // Delete a few CoolDowns
+     * const { count } = await prisma.coolDown.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends CooldownDeleteManyArgs>(args?: SelectSubset<T, CooldownDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends CoolDownDeleteManyArgs>(args?: SelectSubset<T, CoolDownDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Cooldowns.
+     * Update zero or more CoolDowns.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {CoolDownUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many Cooldowns
-     * const cooldown = await prisma.cooldown.updateMany({
+     * // Update many CoolDowns
+     * const coolDown = await prisma.coolDown.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13046,14 +11862,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends CooldownUpdateManyArgs>(args: SelectSubset<T, CooldownUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends CoolDownUpdateManyArgs>(args: SelectSubset<T, CoolDownUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Cooldowns and returns the data updated in the database.
-     * @param {CooldownUpdateManyAndReturnArgs} args - Arguments to update many Cooldowns.
+     * Update zero or more CoolDowns and returns the data updated in the database.
+     * @param {CoolDownUpdateManyAndReturnArgs} args - Arguments to update many CoolDowns.
      * @example
-     * // Update many Cooldowns
-     * const cooldown = await prisma.cooldown.updateManyAndReturn({
+     * // Update many CoolDowns
+     * const coolDown = await prisma.coolDown.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13062,8 +11878,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Cooldowns and only return the `id`
-     * const cooldownWithIdOnly = await prisma.cooldown.updateManyAndReturn({
+     * // Update zero or more CoolDowns and only return the `id`
+     * const coolDownWithIdOnly = await prisma.coolDown.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -13076,56 +11892,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends CooldownUpdateManyAndReturnArgs>(args: SelectSubset<T, CooldownUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+    updateManyAndReturn<T extends CoolDownUpdateManyAndReturnArgs>(args: SelectSubset<T, CoolDownUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
 
     /**
-     * Create or update one Cooldown.
-     * @param {CooldownUpsertArgs} args - Arguments to update or create a Cooldown.
+     * Create or update one CoolDown.
+     * @param {CoolDownUpsertArgs} args - Arguments to update or create a CoolDown.
      * @example
-     * // Update or create a Cooldown
-     * const cooldown = await prisma.cooldown.upsert({
+     * // Update or create a CoolDown
+     * const coolDown = await prisma.coolDown.upsert({
      *   create: {
-     *     // ... data to create a Cooldown
+     *     // ... data to create a CoolDown
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the Cooldown we want to update
+     *     // ... the filter for the CoolDown we want to update
      *   }
      * })
      */
-    upsert<T extends CooldownUpsertArgs>(args: SelectSubset<T, CooldownUpsertArgs<ExtArgs>>): Prisma__CooldownClient<$Result.GetResult<Prisma.$CooldownPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+    upsert<T extends CoolDownUpsertArgs>(args: SelectSubset<T, CoolDownUpsertArgs<ExtArgs>>): Prisma__CoolDownClient<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
 
 
     /**
-     * Count the number of Cooldowns.
+     * Count the number of CoolDowns.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownCountArgs} args - Arguments to filter Cooldowns to count.
+     * @param {CoolDownCountArgs} args - Arguments to filter CoolDowns to count.
      * @example
-     * // Count the number of Cooldowns
-     * const count = await prisma.cooldown.count({
+     * // Count the number of CoolDowns
+     * const count = await prisma.coolDown.count({
      *   where: {
-     *     // ... the filter for the Cooldowns we want to count
+     *     // ... the filter for the CoolDowns we want to count
      *   }
      * })
     **/
-    count<T extends CooldownCountArgs>(
-      args?: Subset<T, CooldownCountArgs>,
+    count<T extends CoolDownCountArgs>(
+      args?: Subset<T, CoolDownCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], CooldownCountAggregateOutputType>
+          : GetScalarType<T['select'], CoolDownCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a Cooldown.
+     * Allows you to perform aggregations operations on a CoolDown.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {CoolDownAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -13145,13 +11961,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends CooldownAggregateArgs>(args: Subset<T, CooldownAggregateArgs>): Prisma.PrismaPromise<GetCooldownAggregateType<T>>
+    aggregate<T extends CoolDownAggregateArgs>(args: Subset<T, CoolDownAggregateArgs>): Prisma.PrismaPromise<GetCoolDownAggregateType<T>>
 
     /**
-     * Group by Cooldown.
+     * Group by CoolDown.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {CooldownGroupByArgs} args - Group by arguments.
+     * @param {CoolDownGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -13166,14 +11982,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends CooldownGroupByArgs,
+      T extends CoolDownGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: CooldownGroupByArgs['orderBy'] }
-        : { orderBy?: CooldownGroupByArgs['orderBy'] },
+        ? { orderBy: CoolDownGroupByArgs['orderBy'] }
+        : { orderBy?: CoolDownGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -13222,22 +12038,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, CooldownGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCooldownGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, CoolDownGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCoolDownGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the Cooldown model
+   * Fields of the CoolDown model
    */
-  readonly fields: CooldownFieldRefs;
+  readonly fields: CoolDownFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for Cooldown.
+   * The delegate class that acts as a "Promise-like" for CoolDown.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__CooldownClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__CoolDownClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    cooledAgent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -13265,1494 +12081,413 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the Cooldown model
+   * Fields of the CoolDown model
    */ 
-  interface CooldownFieldRefs {
-    readonly id: FieldRef<"Cooldown", 'String'>
-    readonly type: FieldRef<"Cooldown", 'CooldownType'>
-    readonly endsAt: FieldRef<"Cooldown", 'DateTime'>
-    readonly agentId: FieldRef<"Cooldown", 'String'>
-    readonly targetAgentId: FieldRef<"Cooldown", 'String'>
-    readonly gameId: FieldRef<"Cooldown", 'String'>
+  interface CoolDownFieldRefs {
+    readonly id: FieldRef<"CoolDown", 'String'>
+    readonly type: FieldRef<"CoolDown", 'CooldownType'>
+    readonly endsAt: FieldRef<"CoolDown", 'DateTime'>
+    readonly cooledAgentId: FieldRef<"CoolDown", 'String'>
+    readonly gameId: FieldRef<"CoolDown", 'String'>
   }
     
 
   // Custom InputTypes
   /**
-   * Cooldown findUnique
+   * CoolDown findUnique
    */
-  export type CooldownFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * Filter, which Cooldown to fetch.
+     * Filter, which CoolDown to fetch.
      */
-    where: CooldownWhereUniqueInput
+    where: CoolDownWhereUniqueInput
   }
 
   /**
-   * Cooldown findUniqueOrThrow
+   * CoolDown findUniqueOrThrow
    */
-  export type CooldownFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * Filter, which Cooldown to fetch.
+     * Filter, which CoolDown to fetch.
      */
-    where: CooldownWhereUniqueInput
+    where: CoolDownWhereUniqueInput
   }
 
   /**
-   * Cooldown findFirst
+   * CoolDown findFirst
    */
-  export type CooldownFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * Filter, which Cooldown to fetch.
+     * Filter, which CoolDown to fetch.
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Cooldowns to fetch.
+     * Determine the order of CoolDowns to fetch.
      */
-    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
+    orderBy?: CoolDownOrderByWithRelationInput | CoolDownOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Cooldowns.
+     * Sets the position for searching for CoolDowns.
      */
-    cursor?: CooldownWhereUniqueInput
+    cursor?: CoolDownWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Cooldowns from the position of the cursor.
+     * Take `±n` CoolDowns from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Cooldowns.
+     * Skip the first `n` CoolDowns.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Cooldowns.
+     * Filter by unique combinations of CoolDowns.
      */
-    distinct?: CooldownScalarFieldEnum | CooldownScalarFieldEnum[]
+    distinct?: CoolDownScalarFieldEnum | CoolDownScalarFieldEnum[]
   }
 
   /**
-   * Cooldown findFirstOrThrow
+   * CoolDown findFirstOrThrow
    */
-  export type CooldownFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * Filter, which Cooldown to fetch.
+     * Filter, which CoolDown to fetch.
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Cooldowns to fetch.
+     * Determine the order of CoolDowns to fetch.
      */
-    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
+    orderBy?: CoolDownOrderByWithRelationInput | CoolDownOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Cooldowns.
+     * Sets the position for searching for CoolDowns.
      */
-    cursor?: CooldownWhereUniqueInput
+    cursor?: CoolDownWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Cooldowns from the position of the cursor.
+     * Take `±n` CoolDowns from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Cooldowns.
+     * Skip the first `n` CoolDowns.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Cooldowns.
+     * Filter by unique combinations of CoolDowns.
      */
-    distinct?: CooldownScalarFieldEnum | CooldownScalarFieldEnum[]
+    distinct?: CoolDownScalarFieldEnum | CoolDownScalarFieldEnum[]
   }
 
   /**
-   * Cooldown findMany
+   * CoolDown findMany
    */
-  export type CooldownFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * Filter, which Cooldowns to fetch.
+     * Filter, which CoolDowns to fetch.
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Cooldowns to fetch.
+     * Determine the order of CoolDowns to fetch.
      */
-    orderBy?: CooldownOrderByWithRelationInput | CooldownOrderByWithRelationInput[]
+    orderBy?: CoolDownOrderByWithRelationInput | CoolDownOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing Cooldowns.
+     * Sets the position for listing CoolDowns.
      */
-    cursor?: CooldownWhereUniqueInput
+    cursor?: CoolDownWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Cooldowns from the position of the cursor.
+     * Take `±n` CoolDowns from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Cooldowns.
+     * Skip the first `n` CoolDowns.
      */
     skip?: number
-    distinct?: CooldownScalarFieldEnum | CooldownScalarFieldEnum[]
+    distinct?: CoolDownScalarFieldEnum | CoolDownScalarFieldEnum[]
   }
 
   /**
-   * Cooldown create
+   * CoolDown create
    */
-  export type CooldownCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * The data needed to create a Cooldown.
+     * The data needed to create a CoolDown.
      */
-    data: XOR<CooldownCreateInput, CooldownUncheckedCreateInput>
+    data: XOR<CoolDownCreateInput, CoolDownUncheckedCreateInput>
   }
 
   /**
-   * Cooldown createMany
+   * CoolDown createMany
    */
-  export type CooldownCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many Cooldowns.
+     * The data used to create many CoolDowns.
      */
-    data: CooldownCreateManyInput | CooldownCreateManyInput[]
+    data: CoolDownCreateManyInput | CoolDownCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * Cooldown createManyAndReturn
+   * CoolDown createManyAndReturn
    */
-  export type CooldownCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelectCreateManyAndReturn<ExtArgs> | null
+    select?: CoolDownSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
-     * The data used to create many Cooldowns.
+     * The data used to create many CoolDowns.
      */
-    data: CooldownCreateManyInput | CooldownCreateManyInput[]
+    data: CoolDownCreateManyInput | CoolDownCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: CoolDownIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * Cooldown update
+   * CoolDown update
    */
-  export type CooldownUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * The data needed to update a Cooldown.
+     * The data needed to update a CoolDown.
      */
-    data: XOR<CooldownUpdateInput, CooldownUncheckedUpdateInput>
+    data: XOR<CoolDownUpdateInput, CoolDownUncheckedUpdateInput>
     /**
-     * Choose, which Cooldown to update.
+     * Choose, which CoolDown to update.
      */
-    where: CooldownWhereUniqueInput
+    where: CoolDownWhereUniqueInput
   }
 
   /**
-   * Cooldown updateMany
+   * CoolDown updateMany
    */
-  export type CooldownUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update Cooldowns.
+     * The data used to update CoolDowns.
      */
-    data: XOR<CooldownUpdateManyMutationInput, CooldownUncheckedUpdateManyInput>
+    data: XOR<CoolDownUpdateManyMutationInput, CoolDownUncheckedUpdateManyInput>
     /**
-     * Filter which Cooldowns to update
+     * Filter which CoolDowns to update
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
   }
 
   /**
-   * Cooldown updateManyAndReturn
+   * CoolDown updateManyAndReturn
    */
-  export type CooldownUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: CoolDownSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
-     * The data used to update Cooldowns.
+     * The data used to update CoolDowns.
      */
-    data: XOR<CooldownUpdateManyMutationInput, CooldownUncheckedUpdateManyInput>
+    data: XOR<CoolDownUpdateManyMutationInput, CoolDownUncheckedUpdateManyInput>
     /**
-     * Filter which Cooldowns to update
+     * Filter which CoolDowns to update
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: CoolDownIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * Cooldown upsert
+   * CoolDown upsert
    */
-  export type CooldownUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * The filter to search for the Cooldown to update in case it exists.
+     * The filter to search for the CoolDown to update in case it exists.
      */
-    where: CooldownWhereUniqueInput
+    where: CoolDownWhereUniqueInput
     /**
-     * In case the Cooldown found by the `where` argument doesn't exist, create a new Cooldown with this data.
+     * In case the CoolDown found by the `where` argument doesn't exist, create a new CoolDown with this data.
      */
-    create: XOR<CooldownCreateInput, CooldownUncheckedCreateInput>
+    create: XOR<CoolDownCreateInput, CoolDownUncheckedCreateInput>
     /**
-     * In case the Cooldown was found with the provided `where` argument, update it with this data.
+     * In case the CoolDown was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<CooldownUpdateInput, CooldownUncheckedUpdateInput>
+    update: XOR<CoolDownUpdateInput, CoolDownUncheckedUpdateInput>
   }
 
   /**
-   * Cooldown delete
+   * CoolDown delete
    */
-  export type CooldownDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
     /**
-     * Filter which Cooldown to delete.
+     * Filter which CoolDown to delete.
      */
-    where: CooldownWhereUniqueInput
+    where: CoolDownWhereUniqueInput
   }
 
   /**
-   * Cooldown deleteMany
+   * CoolDown deleteMany
    */
-  export type CooldownDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Cooldowns to delete
+     * Filter which CoolDowns to delete
      */
-    where?: CooldownWhereInput
+    where?: CoolDownWhereInput
   }
 
   /**
-   * Cooldown without action
+   * CoolDown without action
    */
-  export type CooldownDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CoolDownDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Cooldown
+     * Select specific fields to fetch from the CoolDown
      */
-    select?: CooldownSelect<ExtArgs> | null
+    select?: CoolDownSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Cooldown
+     * Omit specific fields from the CoolDown
      */
-    omit?: CooldownOmit<ExtArgs> | null
+    omit?: CoolDownOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: CooldownInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model Strategy
-   */
-
-  export type AggregateStrategy = {
-    _count: StrategyCountAggregateOutputType | null
-    _avg: StrategyAvgAggregateOutputType | null
-    _sum: StrategySumAggregateOutputType | null
-    _min: StrategyMinAggregateOutputType | null
-    _max: StrategyMaxAggregateOutputType | null
-  }
-
-  export type StrategyAvgAggregateOutputType = {
-    deceptionLevel: number | null
-  }
-
-  export type StrategySumAggregateOutputType = {
-    deceptionLevel: number | null
-  }
-
-  export type StrategyMinAggregateOutputType = {
-    id: string | null
-    publicStrategy: string | null
-    actualStrategy: string | null
-    deceptionLevel: number | null
-    agentId: string | null
-  }
-
-  export type StrategyMaxAggregateOutputType = {
-    id: string | null
-    publicStrategy: string | null
-    actualStrategy: string | null
-    deceptionLevel: number | null
-    agentId: string | null
-  }
-
-  export type StrategyCountAggregateOutputType = {
-    id: number
-    publicStrategy: number
-    actualStrategy: number
-    deceptionLevel: number
-    agentId: number
-    _all: number
-  }
-
-
-  export type StrategyAvgAggregateInputType = {
-    deceptionLevel?: true
-  }
-
-  export type StrategySumAggregateInputType = {
-    deceptionLevel?: true
-  }
-
-  export type StrategyMinAggregateInputType = {
-    id?: true
-    publicStrategy?: true
-    actualStrategy?: true
-    deceptionLevel?: true
-    agentId?: true
-  }
-
-  export type StrategyMaxAggregateInputType = {
-    id?: true
-    publicStrategy?: true
-    actualStrategy?: true
-    deceptionLevel?: true
-    agentId?: true
-  }
-
-  export type StrategyCountAggregateInputType = {
-    id?: true
-    publicStrategy?: true
-    actualStrategy?: true
-    deceptionLevel?: true
-    agentId?: true
-    _all?: true
-  }
-
-  export type StrategyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Strategy to aggregate.
-     */
-    where?: StrategyWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Strategies to fetch.
-     */
-    orderBy?: StrategyOrderByWithRelationInput | StrategyOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: StrategyWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Strategies from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Strategies.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Strategies
-    **/
-    _count?: true | StrategyCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: StrategyAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: StrategySumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: StrategyMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: StrategyMaxAggregateInputType
-  }
-
-  export type GetStrategyAggregateType<T extends StrategyAggregateArgs> = {
-        [P in keyof T & keyof AggregateStrategy]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateStrategy[P]>
-      : GetScalarType<T[P], AggregateStrategy[P]>
-  }
-
-
-
-
-  export type StrategyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StrategyWhereInput
-    orderBy?: StrategyOrderByWithAggregationInput | StrategyOrderByWithAggregationInput[]
-    by: StrategyScalarFieldEnum[] | StrategyScalarFieldEnum
-    having?: StrategyScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: StrategyCountAggregateInputType | true
-    _avg?: StrategyAvgAggregateInputType
-    _sum?: StrategySumAggregateInputType
-    _min?: StrategyMinAggregateInputType
-    _max?: StrategyMaxAggregateInputType
-  }
-
-  export type StrategyGroupByOutputType = {
-    id: string
-    publicStrategy: string
-    actualStrategy: string
-    deceptionLevel: number
-    agentId: string
-    _count: StrategyCountAggregateOutputType | null
-    _avg: StrategyAvgAggregateOutputType | null
-    _sum: StrategySumAggregateOutputType | null
-    _min: StrategyMinAggregateOutputType | null
-    _max: StrategyMaxAggregateOutputType | null
-  }
-
-  type GetStrategyGroupByPayload<T extends StrategyGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<StrategyGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof StrategyGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], StrategyGroupByOutputType[P]>
-            : GetScalarType<T[P], StrategyGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type StrategySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    publicStrategy?: boolean
-    actualStrategy?: boolean
-    deceptionLevel?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["strategy"]>
-
-  export type StrategySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    publicStrategy?: boolean
-    actualStrategy?: boolean
-    deceptionLevel?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["strategy"]>
-
-  export type StrategySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    publicStrategy?: boolean
-    actualStrategy?: boolean
-    deceptionLevel?: boolean
-    agentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["strategy"]>
-
-  export type StrategySelectScalar = {
-    id?: boolean
-    publicStrategy?: boolean
-    actualStrategy?: boolean
-    deceptionLevel?: boolean
-    agentId?: boolean
-  }
-
-  export type StrategyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "publicStrategy" | "actualStrategy" | "deceptionLevel" | "agentId", ExtArgs["result"]["strategy"]>
-  export type StrategyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-  export type StrategyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-  export type StrategyIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-  }
-
-  export type $StrategyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Strategy"
-    objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      publicStrategy: string
-      actualStrategy: string
-      deceptionLevel: number
-      agentId: string
-    }, ExtArgs["result"]["strategy"]>
-    composites: {}
-  }
-
-  type StrategyGetPayload<S extends boolean | null | undefined | StrategyDefaultArgs> = $Result.GetResult<Prisma.$StrategyPayload, S>
-
-  type StrategyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<StrategyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: StrategyCountAggregateInputType | true
-    }
-
-  export interface StrategyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Strategy'], meta: { name: 'Strategy' } }
-    /**
-     * Find zero or one Strategy that matches the filter.
-     * @param {StrategyFindUniqueArgs} args - Arguments to find a Strategy
-     * @example
-     * // Get one Strategy
-     * const strategy = await prisma.strategy.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends StrategyFindUniqueArgs>(args: SelectSubset<T, StrategyFindUniqueArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find one Strategy that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {StrategyFindUniqueOrThrowArgs} args - Arguments to find a Strategy
-     * @example
-     * // Get one Strategy
-     * const strategy = await prisma.strategy.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends StrategyFindUniqueOrThrowArgs>(args: SelectSubset<T, StrategyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first Strategy that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyFindFirstArgs} args - Arguments to find a Strategy
-     * @example
-     * // Get one Strategy
-     * const strategy = await prisma.strategy.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends StrategyFindFirstArgs>(args?: SelectSubset<T, StrategyFindFirstArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first Strategy that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyFindFirstOrThrowArgs} args - Arguments to find a Strategy
-     * @example
-     * // Get one Strategy
-     * const strategy = await prisma.strategy.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends StrategyFindFirstOrThrowArgs>(args?: SelectSubset<T, StrategyFindFirstOrThrowArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find zero or more Strategies that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Strategies
-     * const strategies = await prisma.strategy.findMany()
-     * 
-     * // Get first 10 Strategies
-     * const strategies = await prisma.strategy.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const strategyWithIdOnly = await prisma.strategy.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends StrategyFindManyArgs>(args?: SelectSubset<T, StrategyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findMany", ClientOptions>>
-
-    /**
-     * Create a Strategy.
-     * @param {StrategyCreateArgs} args - Arguments to create a Strategy.
-     * @example
-     * // Create one Strategy
-     * const Strategy = await prisma.strategy.create({
-     *   data: {
-     *     // ... data to create a Strategy
-     *   }
-     * })
-     * 
-     */
-    create<T extends StrategyCreateArgs>(args: SelectSubset<T, StrategyCreateArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Create many Strategies.
-     * @param {StrategyCreateManyArgs} args - Arguments to create many Strategies.
-     * @example
-     * // Create many Strategies
-     * const strategy = await prisma.strategy.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends StrategyCreateManyArgs>(args?: SelectSubset<T, StrategyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Strategies and returns the data saved in the database.
-     * @param {StrategyCreateManyAndReturnArgs} args - Arguments to create many Strategies.
-     * @example
-     * // Create many Strategies
-     * const strategy = await prisma.strategy.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Strategies and only return the `id`
-     * const strategyWithIdOnly = await prisma.strategy.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends StrategyCreateManyAndReturnArgs>(args?: SelectSubset<T, StrategyCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
-
-    /**
-     * Delete a Strategy.
-     * @param {StrategyDeleteArgs} args - Arguments to delete one Strategy.
-     * @example
-     * // Delete one Strategy
-     * const Strategy = await prisma.strategy.delete({
-     *   where: {
-     *     // ... filter to delete one Strategy
-     *   }
-     * })
-     * 
-     */
-    delete<T extends StrategyDeleteArgs>(args: SelectSubset<T, StrategyDeleteArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Update one Strategy.
-     * @param {StrategyUpdateArgs} args - Arguments to update one Strategy.
-     * @example
-     * // Update one Strategy
-     * const strategy = await prisma.strategy.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends StrategyUpdateArgs>(args: SelectSubset<T, StrategyUpdateArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Delete zero or more Strategies.
-     * @param {StrategyDeleteManyArgs} args - Arguments to filter Strategies to delete.
-     * @example
-     * // Delete a few Strategies
-     * const { count } = await prisma.strategy.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends StrategyDeleteManyArgs>(args?: SelectSubset<T, StrategyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Strategies.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Strategies
-     * const strategy = await prisma.strategy.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends StrategyUpdateManyArgs>(args: SelectSubset<T, StrategyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Strategies and returns the data updated in the database.
-     * @param {StrategyUpdateManyAndReturnArgs} args - Arguments to update many Strategies.
-     * @example
-     * // Update many Strategies
-     * const strategy = await prisma.strategy.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Strategies and only return the `id`
-     * const strategyWithIdOnly = await prisma.strategy.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends StrategyUpdateManyAndReturnArgs>(args: SelectSubset<T, StrategyUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
-
-    /**
-     * Create or update one Strategy.
-     * @param {StrategyUpsertArgs} args - Arguments to update or create a Strategy.
-     * @example
-     * // Update or create a Strategy
-     * const strategy = await prisma.strategy.upsert({
-     *   create: {
-     *     // ... data to create a Strategy
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Strategy we want to update
-     *   }
-     * })
-     */
-    upsert<T extends StrategyUpsertArgs>(args: SelectSubset<T, StrategyUpsertArgs<ExtArgs>>): Prisma__StrategyClient<$Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
-
-
-    /**
-     * Count the number of Strategies.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyCountArgs} args - Arguments to filter Strategies to count.
-     * @example
-     * // Count the number of Strategies
-     * const count = await prisma.strategy.count({
-     *   where: {
-     *     // ... the filter for the Strategies we want to count
-     *   }
-     * })
-    **/
-    count<T extends StrategyCountArgs>(
-      args?: Subset<T, StrategyCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], StrategyCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Strategy.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends StrategyAggregateArgs>(args: Subset<T, StrategyAggregateArgs>): Prisma.PrismaPromise<GetStrategyAggregateType<T>>
-
-    /**
-     * Group by Strategy.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StrategyGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends StrategyGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StrategyGroupByArgs['orderBy'] }
-        : { orderBy?: StrategyGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, StrategyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStrategyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Strategy model
-   */
-  readonly fields: StrategyFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Strategy.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__StrategyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Strategy model
-   */ 
-  interface StrategyFieldRefs {
-    readonly id: FieldRef<"Strategy", 'String'>
-    readonly publicStrategy: FieldRef<"Strategy", 'String'>
-    readonly actualStrategy: FieldRef<"Strategy", 'String'>
-    readonly deceptionLevel: FieldRef<"Strategy", 'Int'>
-    readonly agentId: FieldRef<"Strategy", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Strategy findUnique
-   */
-  export type StrategyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * Filter, which Strategy to fetch.
-     */
-    where: StrategyWhereUniqueInput
-  }
-
-  /**
-   * Strategy findUniqueOrThrow
-   */
-  export type StrategyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * Filter, which Strategy to fetch.
-     */
-    where: StrategyWhereUniqueInput
-  }
-
-  /**
-   * Strategy findFirst
-   */
-  export type StrategyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * Filter, which Strategy to fetch.
-     */
-    where?: StrategyWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Strategies to fetch.
-     */
-    orderBy?: StrategyOrderByWithRelationInput | StrategyOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Strategies.
-     */
-    cursor?: StrategyWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Strategies from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Strategies.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Strategies.
-     */
-    distinct?: StrategyScalarFieldEnum | StrategyScalarFieldEnum[]
-  }
-
-  /**
-   * Strategy findFirstOrThrow
-   */
-  export type StrategyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * Filter, which Strategy to fetch.
-     */
-    where?: StrategyWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Strategies to fetch.
-     */
-    orderBy?: StrategyOrderByWithRelationInput | StrategyOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Strategies.
-     */
-    cursor?: StrategyWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Strategies from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Strategies.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Strategies.
-     */
-    distinct?: StrategyScalarFieldEnum | StrategyScalarFieldEnum[]
-  }
-
-  /**
-   * Strategy findMany
-   */
-  export type StrategyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * Filter, which Strategies to fetch.
-     */
-    where?: StrategyWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Strategies to fetch.
-     */
-    orderBy?: StrategyOrderByWithRelationInput | StrategyOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Strategies.
-     */
-    cursor?: StrategyWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Strategies from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Strategies.
-     */
-    skip?: number
-    distinct?: StrategyScalarFieldEnum | StrategyScalarFieldEnum[]
-  }
-
-  /**
-   * Strategy create
-   */
-  export type StrategyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Strategy.
-     */
-    data: XOR<StrategyCreateInput, StrategyUncheckedCreateInput>
-  }
-
-  /**
-   * Strategy createMany
-   */
-  export type StrategyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Strategies.
-     */
-    data: StrategyCreateManyInput | StrategyCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Strategy createManyAndReturn
-   */
-  export type StrategyCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * The data used to create many Strategies.
-     */
-    data: StrategyCreateManyInput | StrategyCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Strategy update
-   */
-  export type StrategyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Strategy.
-     */
-    data: XOR<StrategyUpdateInput, StrategyUncheckedUpdateInput>
-    /**
-     * Choose, which Strategy to update.
-     */
-    where: StrategyWhereUniqueInput
-  }
-
-  /**
-   * Strategy updateMany
-   */
-  export type StrategyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Strategies.
-     */
-    data: XOR<StrategyUpdateManyMutationInput, StrategyUncheckedUpdateManyInput>
-    /**
-     * Filter which Strategies to update
-     */
-    where?: StrategyWhereInput
-  }
-
-  /**
-   * Strategy updateManyAndReturn
-   */
-  export type StrategyUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * The data used to update Strategies.
-     */
-    data: XOR<StrategyUpdateManyMutationInput, StrategyUncheckedUpdateManyInput>
-    /**
-     * Filter which Strategies to update
-     */
-    where?: StrategyWhereInput
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Strategy upsert
-   */
-  export type StrategyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Strategy to update in case it exists.
-     */
-    where: StrategyWhereUniqueInput
-    /**
-     * In case the Strategy found by the `where` argument doesn't exist, create a new Strategy with this data.
-     */
-    create: XOR<StrategyCreateInput, StrategyUncheckedCreateInput>
-    /**
-     * In case the Strategy was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<StrategyUpdateInput, StrategyUncheckedUpdateInput>
-  }
-
-  /**
-   * Strategy delete
-   */
-  export type StrategyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
-    /**
-     * Filter which Strategy to delete.
-     */
-    where: StrategyWhereUniqueInput
-  }
-
-  /**
-   * Strategy deleteMany
-   */
-  export type StrategyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Strategies to delete
-     */
-    where?: StrategyWhereInput
-  }
-
-  /**
-   * Strategy without action
-   */
-  export type StrategyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Strategy
-     */
-    select?: StrategySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Strategy
-     */
-    omit?: StrategyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StrategyInclude<ExtArgs> | null
+    include?: CoolDownInclude<ExtArgs> | null
   }
 
 
@@ -15781,7 +13516,7 @@ export namespace Prisma {
 
   export const GameScalarFieldEnum: {
     id: 'id',
-    gameId: 'gameId',
+    onchainId: 'onchainId',
     authority: 'authority',
     tokenMint: 'tokenMint',
     rewardsVault: 'rewardsVault',
@@ -15802,6 +13537,7 @@ export namespace Prisma {
     onchainId: 'onchainId',
     name: 'name',
     xHandle: 'xHandle',
+    followers: 'followers',
     bio: 'bio',
     lore: 'lore',
     characteristics: 'characteristics',
@@ -15814,13 +13550,11 @@ export namespace Prisma {
 
   export const AgentScalarFieldEnum: {
     id: 'id',
-    agentId: 'agentId',
-    publicKey: 'publicKey',
-    agentProfileId: 'agentProfileId',
+    onchainId: 'onchainId',
+    authority: 'authority',
     health: 'health',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    gameId: 'gameId'
+    gameId: 'gameId',
+    profileId: 'profileId'
   };
 
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
@@ -15838,25 +13572,14 @@ export namespace Prisma {
   export type TweetScalarFieldEnum = (typeof TweetScalarFieldEnum)[keyof typeof TweetScalarFieldEnum]
 
 
-  export const LocationScalarFieldEnum: {
-    id: 'id',
-    x: 'x',
-    y: 'y',
-    terrainType: 'terrainType',
-    agentId: 'agentId'
-  };
-
-  export type LocationScalarFieldEnum = (typeof LocationScalarFieldEnum)[keyof typeof LocationScalarFieldEnum]
-
-
   export const AllianceScalarFieldEnum: {
     id: 'id',
-    formedAt: 'formedAt',
     combinedTokens: 'combinedTokens',
     status: 'status',
+    timestamp: 'timestamp',
     gameId: 'gameId',
-    agentId: 'agentId',
-    alliedAgentId: 'alliedAgentId'
+    initiatorId: 'initiatorId',
+    joinerId: 'joinerId'
   };
 
   export type AllianceScalarFieldEnum = (typeof AllianceScalarFieldEnum)[keyof typeof AllianceScalarFieldEnum]
@@ -15865,17 +13588,17 @@ export namespace Prisma {
   export const BattleScalarFieldEnum: {
     id: 'id',
     timestamp: 'timestamp',
-    outcome: 'outcome',
-    tokensLost: 'tokensLost',
-    tokensGained: 'tokensGained',
-    probability: 'probability',
-    gameId: 'gameId',
-    agentId: 'agentId',
-    opponentId: 'opponentId',
     type: 'type',
+    tokensStaked: 'tokensStaked',
+    tokensLost: 'tokensLost',
+    outcome: 'outcome',
+    attackerId: 'attackerId',
+    attackerAllyId: 'attackerAllyId',
+    defenderId: 'defenderId',
+    defenderAllyId: 'defenderAllyId',
     status: 'status',
+    gameId: 'gameId',
     startTime: 'startTime',
-    resolutionTime: 'resolutionTime',
     resolvedAt: 'resolvedAt'
   };
 
@@ -15895,41 +13618,26 @@ export namespace Prisma {
   export type InteractionScalarFieldEnum = (typeof InteractionScalarFieldEnum)[keyof typeof InteractionScalarFieldEnum]
 
 
-  export const AgentStateScalarFieldEnum: {
+  export const MapTileScalarFieldEnum: {
     id: 'id',
-    isAlive: 'isAlive',
-    lastActionType: 'lastActionType',
-    lastActionTime: 'lastActionTime',
-    lastActionDetails: 'lastActionDetails',
-    influencedByTweet: 'influencedByTweet',
-    influenceScore: 'influenceScore',
-    agentId: 'agentId'
+    x: 'x',
+    y: 'y',
+    terrainType: 'terrainType',
+    occupiedBy: 'occupiedBy'
   };
 
-  export type AgentStateScalarFieldEnum = (typeof AgentStateScalarFieldEnum)[keyof typeof AgentStateScalarFieldEnum]
+  export type MapTileScalarFieldEnum = (typeof MapTileScalarFieldEnum)[keyof typeof MapTileScalarFieldEnum]
 
 
-  export const CooldownScalarFieldEnum: {
+  export const CoolDownScalarFieldEnum: {
     id: 'id',
     type: 'type',
     endsAt: 'endsAt',
-    agentId: 'agentId',
-    targetAgentId: 'targetAgentId',
+    cooledAgentId: 'cooledAgentId',
     gameId: 'gameId'
   };
 
-  export type CooldownScalarFieldEnum = (typeof CooldownScalarFieldEnum)[keyof typeof CooldownScalarFieldEnum]
-
-
-  export const StrategyScalarFieldEnum: {
-    id: 'id',
-    publicStrategy: 'publicStrategy',
-    actualStrategy: 'actualStrategy',
-    deceptionLevel: 'deceptionLevel',
-    agentId: 'agentId'
-  };
-
-  export type StrategyScalarFieldEnum = (typeof StrategyScalarFieldEnum)[keyof typeof StrategyScalarFieldEnum]
+  export type CoolDownScalarFieldEnum = (typeof CoolDownScalarFieldEnum)[keyof typeof CoolDownScalarFieldEnum]
 
 
   export const UserScalarFieldEnum: {
@@ -16075,20 +13783,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'TerrainType'
-   */
-  export type EnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType'>
-    
-
-
-  /**
-   * Reference to a field of type 'TerrainType[]'
-   */
-  export type ListEnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType[]'>
-    
-
-
-  /**
    * Reference to a field of type 'AllianceStatus'
    */
   export type EnumAllianceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AllianceStatus'>
@@ -16131,6 +13825,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'InteractionType'
+   */
+  export type EnumInteractionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InteractionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'InteractionType[]'
+   */
+  export type ListEnumInteractionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InteractionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TerrainType'
+   */
+  export type EnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType'>
+    
+
+
+  /**
+   * Reference to a field of type 'TerrainType[]'
+   */
+  export type ListEnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'CooldownType'
    */
   export type EnumCooldownTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CooldownType'>
@@ -16166,7 +13888,7 @@ export namespace Prisma {
     OR?: GameWhereInput[]
     NOT?: GameWhereInput | GameWhereInput[]
     id?: StringFilter<"Game"> | string
-    gameId?: BigIntFilter<"Game"> | bigint | number
+    onchainId?: BigIntFilter<"Game"> | bigint | number
     authority?: StringFilter<"Game"> | string
     tokenMint?: StringFilter<"Game"> | string
     rewardsVault?: StringFilter<"Game"> | string
@@ -16180,12 +13902,12 @@ export namespace Prisma {
     agents?: AgentListRelationFilter
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
-    Cooldown?: CooldownListRelationFilter
+    coolDown?: CoolDownListRelationFilter
   }
 
   export type GameOrderByWithRelationInput = {
     id?: SortOrder
-    gameId?: SortOrder
+    onchainId?: SortOrder
     authority?: SortOrder
     tokenMint?: SortOrder
     rewardsVault?: SortOrder
@@ -16199,12 +13921,12 @@ export namespace Prisma {
     agents?: AgentOrderByRelationAggregateInput
     alliances?: AllianceOrderByRelationAggregateInput
     battles?: BattleOrderByRelationAggregateInput
-    Cooldown?: CooldownOrderByRelationAggregateInput
+    coolDown?: CoolDownOrderByRelationAggregateInput
   }
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    gameId?: bigint | number
+    onchainId?: bigint | number
     AND?: GameWhereInput | GameWhereInput[]
     OR?: GameWhereInput[]
     NOT?: GameWhereInput | GameWhereInput[]
@@ -16221,12 +13943,12 @@ export namespace Prisma {
     agents?: AgentListRelationFilter
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
-    Cooldown?: CooldownListRelationFilter
-  }, "id" | "gameId">
+    coolDown?: CoolDownListRelationFilter
+  }, "id" | "onchainId">
 
   export type GameOrderByWithAggregationInput = {
     id?: SortOrder
-    gameId?: SortOrder
+    onchainId?: SortOrder
     authority?: SortOrder
     tokenMint?: SortOrder
     rewardsVault?: SortOrder
@@ -16249,7 +13971,7 @@ export namespace Prisma {
     OR?: GameScalarWhereWithAggregatesInput[]
     NOT?: GameScalarWhereWithAggregatesInput | GameScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Game"> | string
-    gameId?: BigIntWithAggregatesFilter<"Game"> | bigint | number
+    onchainId?: BigIntWithAggregatesFilter<"Game"> | bigint | number
     authority?: StringWithAggregatesFilter<"Game"> | string
     tokenMint?: StringWithAggregatesFilter<"Game"> | string
     rewardsVault?: StringWithAggregatesFilter<"Game"> | string
@@ -16270,12 +13992,13 @@ export namespace Prisma {
     onchainId?: IntFilter<"AgentProfile"> | number
     name?: StringFilter<"AgentProfile"> | string
     xHandle?: StringFilter<"AgentProfile"> | string
+    followers?: IntFilter<"AgentProfile"> | number
     bio?: StringNullableListFilter<"AgentProfile">
     lore?: StringNullableListFilter<"AgentProfile">
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonFilter<"AgentProfile">
-    agent?: AgentListRelationFilter
+    agents?: AgentListRelationFilter
   }
 
   export type AgentProfileOrderByWithRelationInput = {
@@ -16283,12 +14006,13 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    followers?: SortOrder
     bio?: SortOrder
     lore?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
-    agent?: AgentOrderByRelationAggregateInput
+    agents?: AgentOrderByRelationAggregateInput
   }
 
   export type AgentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -16299,12 +14023,13 @@ export namespace Prisma {
     OR?: AgentProfileWhereInput[]
     NOT?: AgentProfileWhereInput | AgentProfileWhereInput[]
     name?: StringFilter<"AgentProfile"> | string
+    followers?: IntFilter<"AgentProfile"> | number
     bio?: StringNullableListFilter<"AgentProfile">
     lore?: StringNullableListFilter<"AgentProfile">
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonFilter<"AgentProfile">
-    agent?: AgentListRelationFilter
+    agents?: AgentListRelationFilter
   }, "id" | "onchainId" | "xHandle">
 
   export type AgentProfileOrderByWithAggregationInput = {
@@ -16312,6 +14037,7 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    followers?: SortOrder
     bio?: SortOrder
     lore?: SortOrder
     characteristics?: SortOrder
@@ -16332,6 +14058,7 @@ export namespace Prisma {
     onchainId?: IntWithAggregatesFilter<"AgentProfile"> | number
     name?: StringWithAggregatesFilter<"AgentProfile"> | string
     xHandle?: StringWithAggregatesFilter<"AgentProfile"> | string
+    followers?: IntWithAggregatesFilter<"AgentProfile"> | number
     bio?: StringNullableListFilter<"AgentProfile">
     lore?: StringNullableListFilter<"AgentProfile">
     characteristics?: StringNullableListFilter<"AgentProfile">
@@ -16344,83 +14071,74 @@ export namespace Prisma {
     OR?: AgentWhereInput[]
     NOT?: AgentWhereInput | AgentWhereInput[]
     id?: StringFilter<"Agent"> | string
-    agentId?: IntFilter<"Agent"> | number
-    publicKey?: StringFilter<"Agent"> | string
-    agentProfileId?: StringFilter<"Agent"> | string
+    onchainId?: IntFilter<"Agent"> | number
+    authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
-    createdAt?: DateTimeFilter<"Agent"> | Date | string
-    updatedAt?: DateTimeFilter<"Agent"> | Date | string
     gameId?: StringFilter<"Agent"> | string
-    agentProfile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
+    profileId?: StringFilter<"Agent"> | string
+    tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    location?: XOR<LocationNullableScalarRelationFilter, LocationWhereInput> | null
-    currentAlliance?: XOR<AllianceNullableScalarRelationFilter, AllianceWhereInput> | null
-    battles?: BattleListRelationFilter
-    state?: XOR<AgentStateNullableScalarRelationFilter, AgentStateWhereInput> | null
-    strategy?: XOR<StrategyNullableScalarRelationFilter, StrategyWhereInput> | null
-    cooldowns?: CooldownListRelationFilter
-    alliedBy?: AllianceListRelationFilter
-    battlesAsOpponent?: BattleListRelationFilter
-    Tweet?: TweetListRelationFilter
+    battlesAsAttacker?: BattleListRelationFilter
+    battlesAsDefender?: BattleListRelationFilter
+    battlesAsAttackerAlly?: BattleListRelationFilter
+    battlesAsDefenderAlly?: BattleListRelationFilter
+    coolDown?: CoolDownListRelationFilter
+    initiatedAlliances?: AllianceListRelationFilter
+    joinedAlliances?: AllianceListRelationFilter
+    mapTiles?: MapTileListRelationFilter
+    profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
   }
 
   export type AgentOrderByWithRelationInput = {
     id?: SortOrder
-    agentId?: SortOrder
-    publicKey?: SortOrder
-    agentProfileId?: SortOrder
+    onchainId?: SortOrder
+    authority?: SortOrder
     health?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
     gameId?: SortOrder
-    agentProfile?: AgentProfileOrderByWithRelationInput
+    profileId?: SortOrder
+    tweets?: TweetOrderByRelationAggregateInput
     game?: GameOrderByWithRelationInput
-    location?: LocationOrderByWithRelationInput
-    currentAlliance?: AllianceOrderByWithRelationInput
-    battles?: BattleOrderByRelationAggregateInput
-    state?: AgentStateOrderByWithRelationInput
-    strategy?: StrategyOrderByWithRelationInput
-    cooldowns?: CooldownOrderByRelationAggregateInput
-    alliedBy?: AllianceOrderByRelationAggregateInput
-    battlesAsOpponent?: BattleOrderByRelationAggregateInput
-    Tweet?: TweetOrderByRelationAggregateInput
+    battlesAsAttacker?: BattleOrderByRelationAggregateInput
+    battlesAsDefender?: BattleOrderByRelationAggregateInput
+    battlesAsAttackerAlly?: BattleOrderByRelationAggregateInput
+    battlesAsDefenderAlly?: BattleOrderByRelationAggregateInput
+    coolDown?: CoolDownOrderByRelationAggregateInput
+    initiatedAlliances?: AllianceOrderByRelationAggregateInput
+    joinedAlliances?: AllianceOrderByRelationAggregateInput
+    mapTiles?: MapTileOrderByRelationAggregateInput
+    profile?: AgentProfileOrderByWithRelationInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    agentId_gameId?: AgentAgentIdGameIdCompoundUniqueInput
+    onchainId?: number
     AND?: AgentWhereInput | AgentWhereInput[]
     OR?: AgentWhereInput[]
     NOT?: AgentWhereInput | AgentWhereInput[]
-    agentId?: IntFilter<"Agent"> | number
-    publicKey?: StringFilter<"Agent"> | string
-    agentProfileId?: StringFilter<"Agent"> | string
+    authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
-    createdAt?: DateTimeFilter<"Agent"> | Date | string
-    updatedAt?: DateTimeFilter<"Agent"> | Date | string
     gameId?: StringFilter<"Agent"> | string
-    agentProfile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
+    profileId?: StringFilter<"Agent"> | string
+    tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    location?: XOR<LocationNullableScalarRelationFilter, LocationWhereInput> | null
-    currentAlliance?: XOR<AllianceNullableScalarRelationFilter, AllianceWhereInput> | null
-    battles?: BattleListRelationFilter
-    state?: XOR<AgentStateNullableScalarRelationFilter, AgentStateWhereInput> | null
-    strategy?: XOR<StrategyNullableScalarRelationFilter, StrategyWhereInput> | null
-    cooldowns?: CooldownListRelationFilter
-    alliedBy?: AllianceListRelationFilter
-    battlesAsOpponent?: BattleListRelationFilter
-    Tweet?: TweetListRelationFilter
-  }, "id" | "agentId_gameId">
+    battlesAsAttacker?: BattleListRelationFilter
+    battlesAsDefender?: BattleListRelationFilter
+    battlesAsAttackerAlly?: BattleListRelationFilter
+    battlesAsDefenderAlly?: BattleListRelationFilter
+    coolDown?: CoolDownListRelationFilter
+    initiatedAlliances?: AllianceListRelationFilter
+    joinedAlliances?: AllianceListRelationFilter
+    mapTiles?: MapTileListRelationFilter
+    profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
+  }, "id" | "onchainId">
 
   export type AgentOrderByWithAggregationInput = {
     id?: SortOrder
-    agentId?: SortOrder
-    publicKey?: SortOrder
-    agentProfileId?: SortOrder
+    onchainId?: SortOrder
+    authority?: SortOrder
     health?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
     gameId?: SortOrder
+    profileId?: SortOrder
     _count?: AgentCountOrderByAggregateInput
     _avg?: AgentAvgOrderByAggregateInput
     _max?: AgentMaxOrderByAggregateInput
@@ -16433,13 +14151,11 @@ export namespace Prisma {
     OR?: AgentScalarWhereWithAggregatesInput[]
     NOT?: AgentScalarWhereWithAggregatesInput | AgentScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Agent"> | string
-    agentId?: IntWithAggregatesFilter<"Agent"> | number
-    publicKey?: StringWithAggregatesFilter<"Agent"> | string
-    agentProfileId?: StringWithAggregatesFilter<"Agent"> | string
+    onchainId?: IntWithAggregatesFilter<"Agent"> | number
+    authority?: StringWithAggregatesFilter<"Agent"> | string
     health?: IntWithAggregatesFilter<"Agent"> | number
-    createdAt?: DateTimeWithAggregatesFilter<"Agent"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"Agent"> | Date | string
     gameId?: StringWithAggregatesFilter<"Agent"> | string
+    profileId?: StringWithAggregatesFilter<"Agent"> | string
   }
 
   export type TweetWhereInput = {
@@ -16505,116 +14221,60 @@ export namespace Prisma {
     conversationId?: StringNullableWithAggregatesFilter<"Tweet"> | string | null
   }
 
-  export type LocationWhereInput = {
-    AND?: LocationWhereInput | LocationWhereInput[]
-    OR?: LocationWhereInput[]
-    NOT?: LocationWhereInput | LocationWhereInput[]
-    id?: StringFilter<"Location"> | string
-    x?: IntFilter<"Location"> | number
-    y?: IntFilter<"Location"> | number
-    terrainType?: EnumTerrainTypeFilter<"Location"> | $Enums.TerrainType
-    agentId?: StringFilter<"Location"> | string
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }
-
-  export type LocationOrderByWithRelationInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    agentId?: SortOrder
-    agent?: AgentOrderByWithRelationInput
-  }
-
-  export type LocationWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    agentId?: string
-    AND?: LocationWhereInput | LocationWhereInput[]
-    OR?: LocationWhereInput[]
-    NOT?: LocationWhereInput | LocationWhereInput[]
-    x?: IntFilter<"Location"> | number
-    y?: IntFilter<"Location"> | number
-    terrainType?: EnumTerrainTypeFilter<"Location"> | $Enums.TerrainType
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }, "id" | "agentId">
-
-  export type LocationOrderByWithAggregationInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    agentId?: SortOrder
-    _count?: LocationCountOrderByAggregateInput
-    _avg?: LocationAvgOrderByAggregateInput
-    _max?: LocationMaxOrderByAggregateInput
-    _min?: LocationMinOrderByAggregateInput
-    _sum?: LocationSumOrderByAggregateInput
-  }
-
-  export type LocationScalarWhereWithAggregatesInput = {
-    AND?: LocationScalarWhereWithAggregatesInput | LocationScalarWhereWithAggregatesInput[]
-    OR?: LocationScalarWhereWithAggregatesInput[]
-    NOT?: LocationScalarWhereWithAggregatesInput | LocationScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Location"> | string
-    x?: IntWithAggregatesFilter<"Location"> | number
-    y?: IntWithAggregatesFilter<"Location"> | number
-    terrainType?: EnumTerrainTypeWithAggregatesFilter<"Location"> | $Enums.TerrainType
-    agentId?: StringWithAggregatesFilter<"Location"> | string
-  }
-
   export type AllianceWhereInput = {
     AND?: AllianceWhereInput | AllianceWhereInput[]
     OR?: AllianceWhereInput[]
     NOT?: AllianceWhereInput | AllianceWhereInput[]
     id?: StringFilter<"Alliance"> | string
-    formedAt?: DateTimeFilter<"Alliance"> | Date | string
-    combinedTokens?: FloatFilter<"Alliance"> | number
+    combinedTokens?: FloatNullableFilter<"Alliance"> | number | null
     status?: EnumAllianceStatusFilter<"Alliance"> | $Enums.AllianceStatus
+    timestamp?: DateTimeFilter<"Alliance"> | Date | string
     gameId?: StringFilter<"Alliance"> | string
-    agentId?: StringFilter<"Alliance"> | string
-    alliedAgentId?: StringFilter<"Alliance"> | string
+    initiatorId?: StringFilter<"Alliance"> | string
+    joinerId?: StringFilter<"Alliance"> | string
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    alliedAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    initiator?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    joiner?: XOR<AgentScalarRelationFilter, AgentWhereInput>
   }
 
   export type AllianceOrderByWithRelationInput = {
     id?: SortOrder
-    formedAt?: SortOrder
-    combinedTokens?: SortOrder
+    combinedTokens?: SortOrderInput | SortOrder
     status?: SortOrder
+    timestamp?: SortOrder
     gameId?: SortOrder
-    agentId?: SortOrder
-    alliedAgentId?: SortOrder
+    initiatorId?: SortOrder
+    joinerId?: SortOrder
     game?: GameOrderByWithRelationInput
-    agent?: AgentOrderByWithRelationInput
-    alliedAgent?: AgentOrderByWithRelationInput
+    initiator?: AgentOrderByWithRelationInput
+    joiner?: AgentOrderByWithRelationInput
   }
 
   export type AllianceWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    agentId?: string
+    initiatorId_joinerId?: AllianceInitiatorIdJoinerIdCompoundUniqueInput
     AND?: AllianceWhereInput | AllianceWhereInput[]
     OR?: AllianceWhereInput[]
     NOT?: AllianceWhereInput | AllianceWhereInput[]
-    formedAt?: DateTimeFilter<"Alliance"> | Date | string
-    combinedTokens?: FloatFilter<"Alliance"> | number
+    combinedTokens?: FloatNullableFilter<"Alliance"> | number | null
     status?: EnumAllianceStatusFilter<"Alliance"> | $Enums.AllianceStatus
+    timestamp?: DateTimeFilter<"Alliance"> | Date | string
     gameId?: StringFilter<"Alliance"> | string
-    alliedAgentId?: StringFilter<"Alliance"> | string
+    initiatorId?: StringFilter<"Alliance"> | string
+    joinerId?: StringFilter<"Alliance"> | string
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    alliedAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }, "id" | "agentId">
+    initiator?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    joiner?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }, "id" | "initiatorId_joinerId">
 
   export type AllianceOrderByWithAggregationInput = {
     id?: SortOrder
-    formedAt?: SortOrder
-    combinedTokens?: SortOrder
+    combinedTokens?: SortOrderInput | SortOrder
     status?: SortOrder
+    timestamp?: SortOrder
     gameId?: SortOrder
-    agentId?: SortOrder
-    alliedAgentId?: SortOrder
+    initiatorId?: SortOrder
+    joinerId?: SortOrder
     _count?: AllianceCountOrderByAggregateInput
     _avg?: AllianceAvgOrderByAggregateInput
     _max?: AllianceMaxOrderByAggregateInput
@@ -16627,12 +14287,12 @@ export namespace Prisma {
     OR?: AllianceScalarWhereWithAggregatesInput[]
     NOT?: AllianceScalarWhereWithAggregatesInput | AllianceScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Alliance"> | string
-    formedAt?: DateTimeWithAggregatesFilter<"Alliance"> | Date | string
-    combinedTokens?: FloatWithAggregatesFilter<"Alliance"> | number
+    combinedTokens?: FloatNullableWithAggregatesFilter<"Alliance"> | number | null
     status?: EnumAllianceStatusWithAggregatesFilter<"Alliance"> | $Enums.AllianceStatus
+    timestamp?: DateTimeWithAggregatesFilter<"Alliance"> | Date | string
     gameId?: StringWithAggregatesFilter<"Alliance"> | string
-    agentId?: StringWithAggregatesFilter<"Alliance"> | string
-    alliedAgentId?: StringWithAggregatesFilter<"Alliance"> | string
+    initiatorId?: StringWithAggregatesFilter<"Alliance"> | string
+    joinerId?: StringWithAggregatesFilter<"Alliance"> | string
   }
 
   export type BattleWhereInput = {
@@ -16641,41 +14301,45 @@ export namespace Prisma {
     NOT?: BattleWhereInput | BattleWhereInput[]
     id?: StringFilter<"Battle"> | string
     timestamp?: DateTimeFilter<"Battle"> | Date | string
-    outcome?: StringFilter<"Battle"> | string
-    tokensLost?: FloatNullableFilter<"Battle"> | number | null
-    tokensGained?: FloatNullableFilter<"Battle"> | number | null
-    probability?: FloatFilter<"Battle"> | number
-    gameId?: StringFilter<"Battle"> | string
-    agentId?: StringFilter<"Battle"> | string
-    opponentId?: StringFilter<"Battle"> | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
+    tokensStaked?: FloatFilter<"Battle"> | number
+    tokensLost?: FloatNullableFilter<"Battle"> | number | null
+    outcome?: StringNullableFilter<"Battle"> | string | null
+    attackerId?: StringFilter<"Battle"> | string
+    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
+    defenderId?: StringFilter<"Battle"> | string
+    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
+    gameId?: StringFilter<"Battle"> | string
     startTime?: DateTimeFilter<"Battle"> | Date | string
-    resolutionTime?: DateTimeFilter<"Battle"> | Date | string
     resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
+    attacker?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    defender?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    opponent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
   }
 
   export type BattleOrderByWithRelationInput = {
     id?: SortOrder
     timestamp?: SortOrder
-    outcome?: SortOrder
-    tokensLost?: SortOrderInput | SortOrder
-    tokensGained?: SortOrderInput | SortOrder
-    probability?: SortOrder
-    gameId?: SortOrder
-    agentId?: SortOrder
-    opponentId?: SortOrder
     type?: SortOrder
+    tokensStaked?: SortOrder
+    tokensLost?: SortOrderInput | SortOrder
+    outcome?: SortOrderInput | SortOrder
+    attackerId?: SortOrder
+    attackerAllyId?: SortOrderInput | SortOrder
+    defenderId?: SortOrder
+    defenderAllyId?: SortOrderInput | SortOrder
     status?: SortOrder
+    gameId?: SortOrder
     startTime?: SortOrder
-    resolutionTime?: SortOrder
     resolvedAt?: SortOrderInput | SortOrder
+    attacker?: AgentOrderByWithRelationInput
+    attackerAlly?: AgentOrderByWithRelationInput
+    defender?: AgentOrderByWithRelationInput
+    defenderAlly?: AgentOrderByWithRelationInput
     game?: GameOrderByWithRelationInput
-    agent?: AgentOrderByWithRelationInput
-    opponent?: AgentOrderByWithRelationInput
   }
 
   export type BattleWhereUniqueInput = Prisma.AtLeast<{
@@ -16684,37 +14348,39 @@ export namespace Prisma {
     OR?: BattleWhereInput[]
     NOT?: BattleWhereInput | BattleWhereInput[]
     timestamp?: DateTimeFilter<"Battle"> | Date | string
-    outcome?: StringFilter<"Battle"> | string
-    tokensLost?: FloatNullableFilter<"Battle"> | number | null
-    tokensGained?: FloatNullableFilter<"Battle"> | number | null
-    probability?: FloatFilter<"Battle"> | number
-    gameId?: StringFilter<"Battle"> | string
-    agentId?: StringFilter<"Battle"> | string
-    opponentId?: StringFilter<"Battle"> | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
+    tokensStaked?: FloatFilter<"Battle"> | number
+    tokensLost?: FloatNullableFilter<"Battle"> | number | null
+    outcome?: StringNullableFilter<"Battle"> | string | null
+    attackerId?: StringFilter<"Battle"> | string
+    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
+    defenderId?: StringFilter<"Battle"> | string
+    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
+    gameId?: StringFilter<"Battle"> | string
     startTime?: DateTimeFilter<"Battle"> | Date | string
-    resolutionTime?: DateTimeFilter<"Battle"> | Date | string
     resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
+    attacker?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    defender?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    opponent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
   }, "id">
 
   export type BattleOrderByWithAggregationInput = {
     id?: SortOrder
     timestamp?: SortOrder
-    outcome?: SortOrder
-    tokensLost?: SortOrderInput | SortOrder
-    tokensGained?: SortOrderInput | SortOrder
-    probability?: SortOrder
-    gameId?: SortOrder
-    agentId?: SortOrder
-    opponentId?: SortOrder
     type?: SortOrder
+    tokensStaked?: SortOrder
+    tokensLost?: SortOrderInput | SortOrder
+    outcome?: SortOrderInput | SortOrder
+    attackerId?: SortOrder
+    attackerAllyId?: SortOrderInput | SortOrder
+    defenderId?: SortOrder
+    defenderAllyId?: SortOrderInput | SortOrder
     status?: SortOrder
+    gameId?: SortOrder
     startTime?: SortOrder
-    resolutionTime?: SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     _count?: BattleCountOrderByAggregateInput
     _avg?: BattleAvgOrderByAggregateInput
@@ -16729,17 +14395,17 @@ export namespace Prisma {
     NOT?: BattleScalarWhereWithAggregatesInput | BattleScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Battle"> | string
     timestamp?: DateTimeWithAggregatesFilter<"Battle"> | Date | string
-    outcome?: StringWithAggregatesFilter<"Battle"> | string
-    tokensLost?: FloatNullableWithAggregatesFilter<"Battle"> | number | null
-    tokensGained?: FloatNullableWithAggregatesFilter<"Battle"> | number | null
-    probability?: FloatWithAggregatesFilter<"Battle"> | number
-    gameId?: StringWithAggregatesFilter<"Battle"> | string
-    agentId?: StringWithAggregatesFilter<"Battle"> | string
-    opponentId?: StringWithAggregatesFilter<"Battle"> | string
     type?: EnumBattleTypeWithAggregatesFilter<"Battle"> | $Enums.BattleType
+    tokensStaked?: FloatWithAggregatesFilter<"Battle"> | number
+    tokensLost?: FloatNullableWithAggregatesFilter<"Battle"> | number | null
+    outcome?: StringNullableWithAggregatesFilter<"Battle"> | string | null
+    attackerId?: StringWithAggregatesFilter<"Battle"> | string
+    attackerAllyId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
+    defenderId?: StringWithAggregatesFilter<"Battle"> | string
+    defenderAllyId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
     status?: EnumBattleStatusWithAggregatesFilter<"Battle"> | $Enums.BattleStatus
+    gameId?: StringWithAggregatesFilter<"Battle"> | string
     startTime?: DateTimeWithAggregatesFilter<"Battle"> | Date | string
-    resolutionTime?: DateTimeWithAggregatesFilter<"Battle"> | Date | string
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"Battle"> | Date | string | null
   }
 
@@ -16750,8 +14416,8 @@ export namespace Prisma {
     id?: StringFilter<"Interaction"> | string
     tweetId?: StringFilter<"Interaction"> | string
     userId?: StringFilter<"Interaction"> | string
-    type?: StringFilter<"Interaction"> | string
-    content?: StringNullableFilter<"Interaction"> | string | null
+    type?: EnumInteractionTypeFilter<"Interaction"> | $Enums.InteractionType
+    content?: StringFilter<"Interaction"> | string
     timestamp?: DateTimeFilter<"Interaction"> | Date | string
     userMetrics?: JsonFilter<"Interaction">
     tweet?: XOR<TweetScalarRelationFilter, TweetWhereInput>
@@ -16762,7 +14428,7 @@ export namespace Prisma {
     tweetId?: SortOrder
     userId?: SortOrder
     type?: SortOrder
-    content?: SortOrderInput | SortOrder
+    content?: SortOrder
     timestamp?: SortOrder
     userMetrics?: SortOrder
     tweet?: TweetOrderByWithRelationInput
@@ -16775,8 +14441,8 @@ export namespace Prisma {
     NOT?: InteractionWhereInput | InteractionWhereInput[]
     tweetId?: StringFilter<"Interaction"> | string
     userId?: StringFilter<"Interaction"> | string
-    type?: StringFilter<"Interaction"> | string
-    content?: StringNullableFilter<"Interaction"> | string | null
+    type?: EnumInteractionTypeFilter<"Interaction"> | $Enums.InteractionType
+    content?: StringFilter<"Interaction"> | string
     timestamp?: DateTimeFilter<"Interaction"> | Date | string
     userMetrics?: JsonFilter<"Interaction">
     tweet?: XOR<TweetScalarRelationFilter, TweetWhereInput>
@@ -16787,7 +14453,7 @@ export namespace Prisma {
     tweetId?: SortOrder
     userId?: SortOrder
     type?: SortOrder
-    content?: SortOrderInput | SortOrder
+    content?: SortOrder
     timestamp?: SortOrder
     userMetrics?: SortOrder
     _count?: InteractionCountOrderByAggregateInput
@@ -16802,203 +14468,126 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Interaction"> | string
     tweetId?: StringWithAggregatesFilter<"Interaction"> | string
     userId?: StringWithAggregatesFilter<"Interaction"> | string
-    type?: StringWithAggregatesFilter<"Interaction"> | string
-    content?: StringNullableWithAggregatesFilter<"Interaction"> | string | null
+    type?: EnumInteractionTypeWithAggregatesFilter<"Interaction"> | $Enums.InteractionType
+    content?: StringWithAggregatesFilter<"Interaction"> | string
     timestamp?: DateTimeWithAggregatesFilter<"Interaction"> | Date | string
     userMetrics?: JsonWithAggregatesFilter<"Interaction">
   }
 
-  export type AgentStateWhereInput = {
-    AND?: AgentStateWhereInput | AgentStateWhereInput[]
-    OR?: AgentStateWhereInput[]
-    NOT?: AgentStateWhereInput | AgentStateWhereInput[]
-    id?: StringFilter<"AgentState"> | string
-    isAlive?: BoolFilter<"AgentState"> | boolean
-    lastActionType?: StringFilter<"AgentState"> | string
-    lastActionTime?: DateTimeFilter<"AgentState"> | Date | string
-    lastActionDetails?: StringFilter<"AgentState"> | string
-    influencedByTweet?: StringNullableFilter<"AgentState"> | string | null
-    influenceScore?: FloatFilter<"AgentState"> | number
-    agentId?: StringFilter<"AgentState"> | string
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  export type MapTileWhereInput = {
+    AND?: MapTileWhereInput | MapTileWhereInput[]
+    OR?: MapTileWhereInput[]
+    NOT?: MapTileWhereInput | MapTileWhereInput[]
+    id?: StringFilter<"MapTile"> | string
+    x?: IntFilter<"MapTile"> | number
+    y?: IntFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
+    occupiedBy?: StringNullableFilter<"MapTile"> | string | null
+    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
   }
 
-  export type AgentStateOrderByWithRelationInput = {
+  export type MapTileOrderByWithRelationInput = {
     id?: SortOrder
-    isAlive?: SortOrder
-    lastActionType?: SortOrder
-    lastActionTime?: SortOrder
-    lastActionDetails?: SortOrder
-    influencedByTweet?: SortOrderInput | SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    occupiedBy?: SortOrderInput | SortOrder
     agent?: AgentOrderByWithRelationInput
   }
 
-  export type AgentStateWhereUniqueInput = Prisma.AtLeast<{
+  export type MapTileWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    agentId?: string
-    AND?: AgentStateWhereInput | AgentStateWhereInput[]
-    OR?: AgentStateWhereInput[]
-    NOT?: AgentStateWhereInput | AgentStateWhereInput[]
-    isAlive?: BoolFilter<"AgentState"> | boolean
-    lastActionType?: StringFilter<"AgentState"> | string
-    lastActionTime?: DateTimeFilter<"AgentState"> | Date | string
-    lastActionDetails?: StringFilter<"AgentState"> | string
-    influencedByTweet?: StringNullableFilter<"AgentState"> | string | null
-    influenceScore?: FloatFilter<"AgentState"> | number
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }, "id" | "agentId">
+    x_y?: MapTileXYCompoundUniqueInput
+    AND?: MapTileWhereInput | MapTileWhereInput[]
+    OR?: MapTileWhereInput[]
+    NOT?: MapTileWhereInput | MapTileWhereInput[]
+    x?: IntFilter<"MapTile"> | number
+    y?: IntFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
+    occupiedBy?: StringNullableFilter<"MapTile"> | string | null
+    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+  }, "id" | "x_y">
 
-  export type AgentStateOrderByWithAggregationInput = {
+  export type MapTileOrderByWithAggregationInput = {
     id?: SortOrder
-    isAlive?: SortOrder
-    lastActionType?: SortOrder
-    lastActionTime?: SortOrder
-    lastActionDetails?: SortOrder
-    influencedByTweet?: SortOrderInput | SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
-    _count?: AgentStateCountOrderByAggregateInput
-    _avg?: AgentStateAvgOrderByAggregateInput
-    _max?: AgentStateMaxOrderByAggregateInput
-    _min?: AgentStateMinOrderByAggregateInput
-    _sum?: AgentStateSumOrderByAggregateInput
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    occupiedBy?: SortOrderInput | SortOrder
+    _count?: MapTileCountOrderByAggregateInput
+    _avg?: MapTileAvgOrderByAggregateInput
+    _max?: MapTileMaxOrderByAggregateInput
+    _min?: MapTileMinOrderByAggregateInput
+    _sum?: MapTileSumOrderByAggregateInput
   }
 
-  export type AgentStateScalarWhereWithAggregatesInput = {
-    AND?: AgentStateScalarWhereWithAggregatesInput | AgentStateScalarWhereWithAggregatesInput[]
-    OR?: AgentStateScalarWhereWithAggregatesInput[]
-    NOT?: AgentStateScalarWhereWithAggregatesInput | AgentStateScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"AgentState"> | string
-    isAlive?: BoolWithAggregatesFilter<"AgentState"> | boolean
-    lastActionType?: StringWithAggregatesFilter<"AgentState"> | string
-    lastActionTime?: DateTimeWithAggregatesFilter<"AgentState"> | Date | string
-    lastActionDetails?: StringWithAggregatesFilter<"AgentState"> | string
-    influencedByTweet?: StringNullableWithAggregatesFilter<"AgentState"> | string | null
-    influenceScore?: FloatWithAggregatesFilter<"AgentState"> | number
-    agentId?: StringWithAggregatesFilter<"AgentState"> | string
+  export type MapTileScalarWhereWithAggregatesInput = {
+    AND?: MapTileScalarWhereWithAggregatesInput | MapTileScalarWhereWithAggregatesInput[]
+    OR?: MapTileScalarWhereWithAggregatesInput[]
+    NOT?: MapTileScalarWhereWithAggregatesInput | MapTileScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MapTile"> | string
+    x?: IntWithAggregatesFilter<"MapTile"> | number
+    y?: IntWithAggregatesFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeWithAggregatesFilter<"MapTile"> | $Enums.TerrainType
+    occupiedBy?: StringNullableWithAggregatesFilter<"MapTile"> | string | null
   }
 
-  export type CooldownWhereInput = {
-    AND?: CooldownWhereInput | CooldownWhereInput[]
-    OR?: CooldownWhereInput[]
-    NOT?: CooldownWhereInput | CooldownWhereInput[]
-    id?: StringFilter<"Cooldown"> | string
-    type?: EnumCooldownTypeFilter<"Cooldown"> | $Enums.CooldownType
-    endsAt?: DateTimeFilter<"Cooldown"> | Date | string
-    agentId?: StringFilter<"Cooldown"> | string
-    targetAgentId?: StringNullableFilter<"Cooldown"> | string | null
-    gameId?: StringFilter<"Cooldown"> | string
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  export type CoolDownWhereInput = {
+    AND?: CoolDownWhereInput | CoolDownWhereInput[]
+    OR?: CoolDownWhereInput[]
+    NOT?: CoolDownWhereInput | CoolDownWhereInput[]
+    id?: StringFilter<"CoolDown"> | string
+    type?: EnumCooldownTypeFilter<"CoolDown"> | $Enums.CooldownType
+    endsAt?: DateTimeFilter<"CoolDown"> | Date | string
+    cooledAgentId?: StringFilter<"CoolDown"> | string
+    gameId?: StringFilter<"CoolDown"> | string
+    cooledAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
   }
 
-  export type CooldownOrderByWithRelationInput = {
+  export type CoolDownOrderByWithRelationInput = {
     id?: SortOrder
     type?: SortOrder
     endsAt?: SortOrder
-    agentId?: SortOrder
-    targetAgentId?: SortOrderInput | SortOrder
+    cooledAgentId?: SortOrder
     gameId?: SortOrder
-    agent?: AgentOrderByWithRelationInput
+    cooledAgent?: AgentOrderByWithRelationInput
     game?: GameOrderByWithRelationInput
   }
 
-  export type CooldownWhereUniqueInput = Prisma.AtLeast<{
+  export type CoolDownWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    agentId_type?: CooldownAgentIdTypeCompoundUniqueInput
-    AND?: CooldownWhereInput | CooldownWhereInput[]
-    OR?: CooldownWhereInput[]
-    NOT?: CooldownWhereInput | CooldownWhereInput[]
-    type?: EnumCooldownTypeFilter<"Cooldown"> | $Enums.CooldownType
-    endsAt?: DateTimeFilter<"Cooldown"> | Date | string
-    agentId?: StringFilter<"Cooldown"> | string
-    targetAgentId?: StringNullableFilter<"Cooldown"> | string | null
-    gameId?: StringFilter<"Cooldown"> | string
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    AND?: CoolDownWhereInput | CoolDownWhereInput[]
+    OR?: CoolDownWhereInput[]
+    NOT?: CoolDownWhereInput | CoolDownWhereInput[]
+    type?: EnumCooldownTypeFilter<"CoolDown"> | $Enums.CooldownType
+    endsAt?: DateTimeFilter<"CoolDown"> | Date | string
+    cooledAgentId?: StringFilter<"CoolDown"> | string
+    gameId?: StringFilter<"CoolDown"> | string
+    cooledAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-  }, "id" | "agentId_type">
+  }, "id">
 
-  export type CooldownOrderByWithAggregationInput = {
+  export type CoolDownOrderByWithAggregationInput = {
     id?: SortOrder
     type?: SortOrder
     endsAt?: SortOrder
-    agentId?: SortOrder
-    targetAgentId?: SortOrderInput | SortOrder
+    cooledAgentId?: SortOrder
     gameId?: SortOrder
-    _count?: CooldownCountOrderByAggregateInput
-    _max?: CooldownMaxOrderByAggregateInput
-    _min?: CooldownMinOrderByAggregateInput
+    _count?: CoolDownCountOrderByAggregateInput
+    _max?: CoolDownMaxOrderByAggregateInput
+    _min?: CoolDownMinOrderByAggregateInput
   }
 
-  export type CooldownScalarWhereWithAggregatesInput = {
-    AND?: CooldownScalarWhereWithAggregatesInput | CooldownScalarWhereWithAggregatesInput[]
-    OR?: CooldownScalarWhereWithAggregatesInput[]
-    NOT?: CooldownScalarWhereWithAggregatesInput | CooldownScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Cooldown"> | string
-    type?: EnumCooldownTypeWithAggregatesFilter<"Cooldown"> | $Enums.CooldownType
-    endsAt?: DateTimeWithAggregatesFilter<"Cooldown"> | Date | string
-    agentId?: StringWithAggregatesFilter<"Cooldown"> | string
-    targetAgentId?: StringNullableWithAggregatesFilter<"Cooldown"> | string | null
-    gameId?: StringWithAggregatesFilter<"Cooldown"> | string
-  }
-
-  export type StrategyWhereInput = {
-    AND?: StrategyWhereInput | StrategyWhereInput[]
-    OR?: StrategyWhereInput[]
-    NOT?: StrategyWhereInput | StrategyWhereInput[]
-    id?: StringFilter<"Strategy"> | string
-    publicStrategy?: StringFilter<"Strategy"> | string
-    actualStrategy?: StringFilter<"Strategy"> | string
-    deceptionLevel?: IntFilter<"Strategy"> | number
-    agentId?: StringFilter<"Strategy"> | string
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }
-
-  export type StrategyOrderByWithRelationInput = {
-    id?: SortOrder
-    publicStrategy?: SortOrder
-    actualStrategy?: SortOrder
-    deceptionLevel?: SortOrder
-    agentId?: SortOrder
-    agent?: AgentOrderByWithRelationInput
-  }
-
-  export type StrategyWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    agentId?: string
-    AND?: StrategyWhereInput | StrategyWhereInput[]
-    OR?: StrategyWhereInput[]
-    NOT?: StrategyWhereInput | StrategyWhereInput[]
-    publicStrategy?: StringFilter<"Strategy"> | string
-    actualStrategy?: StringFilter<"Strategy"> | string
-    deceptionLevel?: IntFilter<"Strategy"> | number
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-  }, "id" | "agentId">
-
-  export type StrategyOrderByWithAggregationInput = {
-    id?: SortOrder
-    publicStrategy?: SortOrder
-    actualStrategy?: SortOrder
-    deceptionLevel?: SortOrder
-    agentId?: SortOrder
-    _count?: StrategyCountOrderByAggregateInput
-    _avg?: StrategyAvgOrderByAggregateInput
-    _max?: StrategyMaxOrderByAggregateInput
-    _min?: StrategyMinOrderByAggregateInput
-    _sum?: StrategySumOrderByAggregateInput
-  }
-
-  export type StrategyScalarWhereWithAggregatesInput = {
-    AND?: StrategyScalarWhereWithAggregatesInput | StrategyScalarWhereWithAggregatesInput[]
-    OR?: StrategyScalarWhereWithAggregatesInput[]
-    NOT?: StrategyScalarWhereWithAggregatesInput | StrategyScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Strategy"> | string
-    publicStrategy?: StringWithAggregatesFilter<"Strategy"> | string
-    actualStrategy?: StringWithAggregatesFilter<"Strategy"> | string
-    deceptionLevel?: IntWithAggregatesFilter<"Strategy"> | number
-    agentId?: StringWithAggregatesFilter<"Strategy"> | string
+  export type CoolDownScalarWhereWithAggregatesInput = {
+    AND?: CoolDownScalarWhereWithAggregatesInput | CoolDownScalarWhereWithAggregatesInput[]
+    OR?: CoolDownScalarWhereWithAggregatesInput[]
+    NOT?: CoolDownScalarWhereWithAggregatesInput | CoolDownScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CoolDown"> | string
+    type?: EnumCooldownTypeWithAggregatesFilter<"CoolDown"> | $Enums.CooldownType
+    endsAt?: DateTimeWithAggregatesFilter<"CoolDown"> | Date | string
+    cooledAgentId?: StringWithAggregatesFilter<"CoolDown"> | string
+    gameId?: StringWithAggregatesFilter<"CoolDown"> | string
   }
 
   export type UserWhereInput = {
@@ -17065,7 +14654,7 @@ export namespace Prisma {
 
   export type GameCreateInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -17079,12 +14668,12 @@ export namespace Prisma {
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -17098,12 +14687,12 @@ export namespace Prisma {
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -17117,12 +14706,12 @@ export namespace Prisma {
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -17136,12 +14725,12 @@ export namespace Prisma {
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type GameCreateManyInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -17156,7 +14745,7 @@ export namespace Prisma {
 
   export type GameUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -17171,7 +14760,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -17189,12 +14778,13 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
-    agent?: AgentCreateNestedManyWithoutAgentProfileInput
+    agents?: AgentCreateNestedManyWithoutProfileInput
   }
 
   export type AgentProfileUncheckedCreateInput = {
@@ -17202,12 +14792,13 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
-    agent?: AgentUncheckedCreateNestedManyWithoutAgentProfileInput
+    agents?: AgentUncheckedCreateNestedManyWithoutProfileInput
   }
 
   export type AgentProfileUpdateInput = {
@@ -17215,12 +14806,13 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
-    agent?: AgentUpdateManyWithoutAgentProfileNestedInput
+    agents?: AgentUpdateManyWithoutProfileNestedInput
   }
 
   export type AgentProfileUncheckedUpdateInput = {
@@ -17228,12 +14820,13 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
-    agent?: AgentUncheckedUpdateManyWithoutAgentProfileNestedInput
+    agents?: AgentUncheckedUpdateManyWithoutProfileNestedInput
   }
 
   export type AgentProfileCreateManyInput = {
@@ -17241,6 +14834,7 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
@@ -17253,6 +14847,7 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
@@ -17265,6 +14860,7 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
@@ -17274,113 +14870,99 @@ export namespace Prisma {
 
   export type AgentCreateInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
+    tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
   export type AgentUncheckedCreateInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
+    profileId: string
   }
 
   export type AgentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AgentUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
+    profileId?: StringFieldUpdateOperationsInput | string
   }
 
   export type TweetCreateInput = {
@@ -17389,7 +14971,7 @@ export namespace Prisma {
     type: string
     timestamp: Date | string
     conversationId?: string | null
-    agent: AgentCreateNestedOneWithoutTweetInput
+    agent: AgentCreateNestedOneWithoutTweetsInput
     interactions?: InteractionCreateNestedManyWithoutTweetInput
   }
 
@@ -17409,7 +14991,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    agent?: AgentUpdateOneRequiredWithoutTweetNestedInput
+    agent?: AgentUpdateOneRequiredWithoutTweetsNestedInput
     interactions?: InteractionUpdateManyWithoutTweetNestedInput
   }
 
@@ -17449,249 +15031,192 @@ export namespace Prisma {
     conversationId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type LocationCreateInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    agent: AgentCreateNestedOneWithoutLocationInput
-  }
-
-  export type LocationUncheckedCreateInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    agentId: string
-  }
-
-  export type LocationUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-    agent?: AgentUpdateOneRequiredWithoutLocationNestedInput
-  }
-
-  export type LocationUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-    agentId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type LocationCreateManyInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    agentId: string
-  }
-
-  export type LocationUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type LocationUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-    agentId?: StringFieldUpdateOperationsInput | string
-  }
-
   export type AllianceCreateInput = {
     id?: string
-    formedAt?: Date | string
-    combinedTokens: number
+    combinedTokens?: number | null
     status?: $Enums.AllianceStatus
+    timestamp?: Date | string
     game: GameCreateNestedOneWithoutAlliancesInput
-    agent: AgentCreateNestedOneWithoutCurrentAllianceInput
-    alliedAgent: AgentCreateNestedOneWithoutAlliedByInput
+    initiator: AgentCreateNestedOneWithoutInitiatedAlliancesInput
+    joiner: AgentCreateNestedOneWithoutJoinedAlliancesInput
   }
 
   export type AllianceUncheckedCreateInput = {
     id?: string
-    formedAt?: Date | string
-    combinedTokens: number
+    combinedTokens?: number | null
     status?: $Enums.AllianceStatus
+    timestamp?: Date | string
     gameId: string
-    agentId: string
-    alliedAgentId: string
+    initiatorId: string
+    joinerId: string
   }
 
   export type AllianceUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
-    agent?: AgentUpdateOneRequiredWithoutCurrentAllianceNestedInput
-    alliedAgent?: AgentUpdateOneRequiredWithoutAlliedByNestedInput
+    initiator?: AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput
+    joiner?: AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput
   }
 
   export type AllianceUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    alliedAgentId?: StringFieldUpdateOperationsInput | string
+    initiatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceCreateManyInput = {
     id?: string
-    formedAt?: Date | string
-    combinedTokens: number
+    combinedTokens?: number | null
     status?: $Enums.AllianceStatus
+    timestamp?: Date | string
     gameId: string
-    agentId: string
-    alliedAgentId: string
+    initiatorId: string
+    joinerId: string
   }
 
   export type AllianceUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AllianceUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    alliedAgentId?: StringFieldUpdateOperationsInput | string
+    initiatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type BattleCreateInput = {
     id?: string
     timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
     type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
     status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
+    startTime?: Date | string
     resolvedAt?: Date | string | null
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
     game: GameCreateNestedOneWithoutBattlesInput
-    agent: AgentCreateNestedOneWithoutBattlesInput
-    opponent: AgentCreateNestedOneWithoutBattlesAsOpponentInput
   }
 
   export type BattleUncheckedCreateInput = {
     id?: string
     timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    gameId: string
-    agentId: string
-    opponentId: string
     type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderId: string
+    defenderAllyId?: string | null
     status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
+    gameId: string
+    startTime?: Date | string
     resolvedAt?: Date | string | null
   }
 
   export type BattleUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
-    agent?: AgentUpdateOneRequiredWithoutBattlesNestedInput
-    opponent?: AgentUpdateOneRequiredWithoutBattlesAsOpponentNestedInput
   }
 
   export type BattleUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    opponentId?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type BattleCreateManyInput = {
     id?: string
     timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    gameId: string
-    agentId: string
-    opponentId: string
     type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderId: string
+    defenderAllyId?: string | null
     status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
+    gameId: string
+    startTime?: Date | string
     resolvedAt?: Date | string | null
   }
 
   export type BattleUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type BattleUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    opponentId?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type InteractionCreateInput = {
     id?: string
     userId: string
-    type: string
-    content?: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date | string
     userMetrics: JsonNullValueInput | InputJsonValue
     tweet: TweetCreateNestedOneWithoutInteractionsInput
@@ -17701,8 +15226,8 @@ export namespace Prisma {
     id?: string
     tweetId: string
     userId: string
-    type: string
-    content?: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date | string
     userMetrics: JsonNullValueInput | InputJsonValue
   }
@@ -17710,8 +15235,8 @@ export namespace Prisma {
   export type InteractionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
     tweet?: TweetUpdateOneRequiredWithoutInteractionsNestedInput
@@ -17721,8 +15246,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tweetId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
   }
@@ -17731,8 +15256,8 @@ export namespace Prisma {
     id?: string
     tweetId: string
     userId: string
-    type: string
-    content?: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date | string
     userMetrics: JsonNullValueInput | InputJsonValue
   }
@@ -17740,8 +15265,8 @@ export namespace Prisma {
   export type InteractionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
   }
@@ -17750,202 +15275,119 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tweetId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
-  export type AgentStateCreateInput = {
+  export type MapTileCreateInput = {
     id?: string
-    isAlive?: boolean
-    lastActionType: string
-    lastActionTime?: Date | string
-    lastActionDetails: string
-    influencedByTweet?: string | null
-    influenceScore?: number
-    agent: AgentCreateNestedOneWithoutStateInput
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agent?: AgentCreateNestedOneWithoutMapTilesInput
   }
 
-  export type AgentStateUncheckedCreateInput = {
+  export type MapTileUncheckedCreateInput = {
     id?: string
-    isAlive?: boolean
-    lastActionType: string
-    lastActionTime?: Date | string
-    lastActionDetails: string
-    influencedByTweet?: string | null
-    influenceScore?: number
-    agentId: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    occupiedBy?: string | null
   }
 
-  export type AgentStateUpdateInput = {
+  export type MapTileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    lastActionType?: StringFieldUpdateOperationsInput | string
-    lastActionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastActionDetails?: StringFieldUpdateOperationsInput | string
-    influencedByTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agent?: AgentUpdateOneRequiredWithoutStateNestedInput
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agent?: AgentUpdateOneWithoutMapTilesNestedInput
   }
 
-  export type AgentStateUncheckedUpdateInput = {
+  export type MapTileUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    lastActionType?: StringFieldUpdateOperationsInput | string
-    lastActionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastActionDetails?: StringFieldUpdateOperationsInput | string
-    influencedByTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    occupiedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type AgentStateCreateManyInput = {
+  export type MapTileCreateManyInput = {
     id?: string
-    isAlive?: boolean
-    lastActionType: string
-    lastActionTime?: Date | string
-    lastActionDetails: string
-    influencedByTweet?: string | null
-    influenceScore?: number
-    agentId: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    occupiedBy?: string | null
   }
 
-  export type AgentStateUpdateManyMutationInput = {
+  export type MapTileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    lastActionType?: StringFieldUpdateOperationsInput | string
-    lastActionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastActionDetails?: StringFieldUpdateOperationsInput | string
-    influencedByTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    influenceScore?: FloatFieldUpdateOperationsInput | number
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
   }
 
-  export type AgentStateUncheckedUpdateManyInput = {
+  export type MapTileUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    lastActionType?: StringFieldUpdateOperationsInput | string
-    lastActionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastActionDetails?: StringFieldUpdateOperationsInput | string
-    influencedByTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    influenceScore?: FloatFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    occupiedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type CooldownCreateInput = {
+  export type CoolDownCreateInput = {
     id?: string
     type: $Enums.CooldownType
     endsAt: Date | string
-    targetAgentId?: string | null
-    agent: AgentCreateNestedOneWithoutCooldownsInput
-    game: GameCreateNestedOneWithoutCooldownInput
+    cooledAgent: AgentCreateNestedOneWithoutCoolDownInput
+    game: GameCreateNestedOneWithoutCoolDownInput
   }
 
-  export type CooldownUncheckedCreateInput = {
+  export type CoolDownUncheckedCreateInput = {
     id?: string
     type: $Enums.CooldownType
     endsAt: Date | string
-    agentId: string
-    targetAgentId?: string | null
+    cooledAgentId: string
     gameId: string
   }
 
-  export type CooldownUpdateInput = {
+  export type CoolDownUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-    agent?: AgentUpdateOneRequiredWithoutCooldownsNestedInput
-    game?: GameUpdateOneRequiredWithoutCooldownNestedInput
+    cooledAgent?: AgentUpdateOneRequiredWithoutCoolDownNestedInput
+    game?: GameUpdateOneRequiredWithoutCoolDownNestedInput
   }
 
-  export type CooldownUncheckedUpdateInput = {
+  export type CoolDownUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    cooledAgentId?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type CooldownCreateManyInput = {
+  export type CoolDownCreateManyInput = {
     id?: string
     type: $Enums.CooldownType
     endsAt: Date | string
-    agentId: string
-    targetAgentId?: string | null
+    cooledAgentId: string
     gameId: string
   }
 
-  export type CooldownUpdateManyMutationInput = {
+  export type CoolDownUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type CooldownUncheckedUpdateManyInput = {
+  export type CoolDownUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    cooledAgentId?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type StrategyCreateInput = {
-    id?: string
-    publicStrategy: string
-    actualStrategy: string
-    deceptionLevel: number
-    agent: AgentCreateNestedOneWithoutStrategyInput
-  }
-
-  export type StrategyUncheckedCreateInput = {
-    id?: string
-    publicStrategy: string
-    actualStrategy: string
-    deceptionLevel: number
-    agentId: string
-  }
-
-  export type StrategyUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    publicStrategy?: StringFieldUpdateOperationsInput | string
-    actualStrategy?: StringFieldUpdateOperationsInput | string
-    deceptionLevel?: IntFieldUpdateOperationsInput | number
-    agent?: AgentUpdateOneRequiredWithoutStrategyNestedInput
-  }
-
-  export type StrategyUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    publicStrategy?: StringFieldUpdateOperationsInput | string
-    actualStrategy?: StringFieldUpdateOperationsInput | string
-    deceptionLevel?: IntFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type StrategyCreateManyInput = {
-    id?: string
-    publicStrategy: string
-    actualStrategy: string
-    deceptionLevel: number
-    agentId: string
-  }
-
-  export type StrategyUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    publicStrategy?: StringFieldUpdateOperationsInput | string
-    actualStrategy?: StringFieldUpdateOperationsInput | string
-    deceptionLevel?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type StrategyUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    publicStrategy?: StringFieldUpdateOperationsInput | string
-    actualStrategy?: StringFieldUpdateOperationsInput | string
-    deceptionLevel?: IntFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserCreateInput = {
@@ -18100,10 +15542,10 @@ export namespace Prisma {
     none?: BattleWhereInput
   }
 
-  export type CooldownListRelationFilter = {
-    every?: CooldownWhereInput
-    some?: CooldownWhereInput
-    none?: CooldownWhereInput
+  export type CoolDownListRelationFilter = {
+    every?: CoolDownWhereInput
+    some?: CoolDownWhereInput
+    none?: CoolDownWhereInput
   }
 
   export type AgentOrderByRelationAggregateInput = {
@@ -18118,13 +15560,13 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type CooldownOrderByRelationAggregateInput = {
+  export type CoolDownOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type GameCountOrderByAggregateInput = {
     id?: SortOrder
-    gameId?: SortOrder
+    onchainId?: SortOrder
     authority?: SortOrder
     tokenMint?: SortOrder
     rewardsVault?: SortOrder
@@ -18138,7 +15580,7 @@ export namespace Prisma {
   }
 
   export type GameAvgOrderByAggregateInput = {
-    gameId?: SortOrder
+    onchainId?: SortOrder
     mapDiameter?: SortOrder
     bump?: SortOrder
     dailyRewardTokens?: SortOrder
@@ -18146,7 +15588,7 @@ export namespace Prisma {
 
   export type GameMaxOrderByAggregateInput = {
     id?: SortOrder
-    gameId?: SortOrder
+    onchainId?: SortOrder
     authority?: SortOrder
     tokenMint?: SortOrder
     rewardsVault?: SortOrder
@@ -18161,7 +15603,7 @@ export namespace Prisma {
 
   export type GameMinOrderByAggregateInput = {
     id?: SortOrder
-    gameId?: SortOrder
+    onchainId?: SortOrder
     authority?: SortOrder
     tokenMint?: SortOrder
     rewardsVault?: SortOrder
@@ -18175,7 +15617,7 @@ export namespace Prisma {
   }
 
   export type GameSumOrderByAggregateInput = {
-    gameId?: SortOrder
+    onchainId?: SortOrder
     mapDiameter?: SortOrder
     bump?: SortOrder
     dailyRewardTokens?: SortOrder
@@ -18304,6 +15746,7 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    followers?: SortOrder
     bio?: SortOrder
     lore?: SortOrder
     characteristics?: SortOrder
@@ -18313,6 +15756,7 @@ export namespace Prisma {
 
   export type AgentProfileAvgOrderByAggregateInput = {
     onchainId?: SortOrder
+    followers?: SortOrder
   }
 
   export type AgentProfileMaxOrderByAggregateInput = {
@@ -18320,6 +15764,7 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    followers?: SortOrder
   }
 
   export type AgentProfileMinOrderByAggregateInput = {
@@ -18327,10 +15772,12 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    followers?: SortOrder
   }
 
   export type AgentProfileSumOrderByAggregateInput = {
     onchainId?: SortOrder
+    followers?: SortOrder
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> = 
     | PatchUndefined<
@@ -18358,9 +15805,10 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
-  export type AgentProfileScalarRelationFilter = {
-    is?: AgentProfileWhereInput
-    isNot?: AgentProfileWhereInput
+  export type TweetListRelationFilter = {
+    every?: TweetWhereInput
+    some?: TweetWhereInput
+    none?: TweetWhereInput
   }
 
   export type GameScalarRelationFilter = {
@@ -18368,81 +15816,59 @@ export namespace Prisma {
     isNot?: GameWhereInput
   }
 
-  export type LocationNullableScalarRelationFilter = {
-    is?: LocationWhereInput | null
-    isNot?: LocationWhereInput | null
+  export type MapTileListRelationFilter = {
+    every?: MapTileWhereInput
+    some?: MapTileWhereInput
+    none?: MapTileWhereInput
   }
 
-  export type AllianceNullableScalarRelationFilter = {
-    is?: AllianceWhereInput | null
-    isNot?: AllianceWhereInput | null
-  }
-
-  export type AgentStateNullableScalarRelationFilter = {
-    is?: AgentStateWhereInput | null
-    isNot?: AgentStateWhereInput | null
-  }
-
-  export type StrategyNullableScalarRelationFilter = {
-    is?: StrategyWhereInput | null
-    isNot?: StrategyWhereInput | null
-  }
-
-  export type TweetListRelationFilter = {
-    every?: TweetWhereInput
-    some?: TweetWhereInput
-    none?: TweetWhereInput
+  export type AgentProfileScalarRelationFilter = {
+    is?: AgentProfileWhereInput
+    isNot?: AgentProfileWhereInput
   }
 
   export type TweetOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type AgentAgentIdGameIdCompoundUniqueInput = {
-    agentId: number
-    gameId: string
+  export type MapTileOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type AgentCountOrderByAggregateInput = {
     id?: SortOrder
-    agentId?: SortOrder
-    publicKey?: SortOrder
-    agentProfileId?: SortOrder
+    onchainId?: SortOrder
+    authority?: SortOrder
     health?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
     gameId?: SortOrder
+    profileId?: SortOrder
   }
 
   export type AgentAvgOrderByAggregateInput = {
-    agentId?: SortOrder
+    onchainId?: SortOrder
     health?: SortOrder
   }
 
   export type AgentMaxOrderByAggregateInput = {
     id?: SortOrder
-    agentId?: SortOrder
-    publicKey?: SortOrder
-    agentProfileId?: SortOrder
+    onchainId?: SortOrder
+    authority?: SortOrder
     health?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
     gameId?: SortOrder
+    profileId?: SortOrder
   }
 
   export type AgentMinOrderByAggregateInput = {
     id?: SortOrder
-    agentId?: SortOrder
-    publicKey?: SortOrder
-    agentProfileId?: SortOrder
+    onchainId?: SortOrder
+    authority?: SortOrder
     health?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
     gameId?: SortOrder
+    profileId?: SortOrder
   }
 
   export type AgentSumOrderByAggregateInput = {
-    agentId?: SortOrder
+    onchainId?: SortOrder
     health?: SortOrder
   }
 
@@ -18526,55 +15952,15 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type EnumTerrainTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
-  }
-
-  export type LocationCountOrderByAggregateInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type LocationAvgOrderByAggregateInput = {
-    x?: SortOrder
-    y?: SortOrder
-  }
-
-  export type LocationMaxOrderByAggregateInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type LocationMinOrderByAggregateInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type LocationSumOrderByAggregateInput = {
-    x?: SortOrder
-    y?: SortOrder
-  }
-
-  export type EnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
-    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type EnumAllianceStatusFilter<$PrismaModel = never> = {
@@ -18584,14 +15970,19 @@ export namespace Prisma {
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
   }
 
+  export type AllianceInitiatorIdJoinerIdCompoundUniqueInput = {
+    initiatorId: string
+    joinerId: string
+  }
+
   export type AllianceCountOrderByAggregateInput = {
     id?: SortOrder
-    formedAt?: SortOrder
     combinedTokens?: SortOrder
     status?: SortOrder
+    timestamp?: SortOrder
     gameId?: SortOrder
-    agentId?: SortOrder
-    alliedAgentId?: SortOrder
+    initiatorId?: SortOrder
+    joinerId?: SortOrder
   }
 
   export type AllianceAvgOrderByAggregateInput = {
@@ -18600,26 +15991,42 @@ export namespace Prisma {
 
   export type AllianceMaxOrderByAggregateInput = {
     id?: SortOrder
-    formedAt?: SortOrder
     combinedTokens?: SortOrder
     status?: SortOrder
+    timestamp?: SortOrder
     gameId?: SortOrder
-    agentId?: SortOrder
-    alliedAgentId?: SortOrder
+    initiatorId?: SortOrder
+    joinerId?: SortOrder
   }
 
   export type AllianceMinOrderByAggregateInput = {
     id?: SortOrder
-    formedAt?: SortOrder
     combinedTokens?: SortOrder
     status?: SortOrder
+    timestamp?: SortOrder
     gameId?: SortOrder
-    agentId?: SortOrder
-    alliedAgentId?: SortOrder
+    initiatorId?: SortOrder
+    joinerId?: SortOrder
   }
 
   export type AllianceSumOrderByAggregateInput = {
     combinedTokens?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type EnumAllianceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -18630,17 +16037,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumAllianceStatusFilter<$PrismaModel>
     _max?: NestedEnumAllianceStatusFilter<$PrismaModel>
-  }
-
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type EnumBattleTypeFilter<$PrismaModel = never> = {
@@ -18668,83 +16064,70 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type AgentNullableScalarRelationFilter = {
+    is?: AgentWhereInput | null
+    isNot?: AgentWhereInput | null
+  }
+
   export type BattleCountOrderByAggregateInput = {
     id?: SortOrder
     timestamp?: SortOrder
-    outcome?: SortOrder
-    tokensLost?: SortOrder
-    tokensGained?: SortOrder
-    probability?: SortOrder
-    gameId?: SortOrder
-    agentId?: SortOrder
-    opponentId?: SortOrder
     type?: SortOrder
+    tokensStaked?: SortOrder
+    tokensLost?: SortOrder
+    outcome?: SortOrder
+    attackerId?: SortOrder
+    attackerAllyId?: SortOrder
+    defenderId?: SortOrder
+    defenderAllyId?: SortOrder
     status?: SortOrder
+    gameId?: SortOrder
     startTime?: SortOrder
-    resolutionTime?: SortOrder
     resolvedAt?: SortOrder
   }
 
   export type BattleAvgOrderByAggregateInput = {
+    tokensStaked?: SortOrder
     tokensLost?: SortOrder
-    tokensGained?: SortOrder
-    probability?: SortOrder
   }
 
   export type BattleMaxOrderByAggregateInput = {
     id?: SortOrder
     timestamp?: SortOrder
-    outcome?: SortOrder
-    tokensLost?: SortOrder
-    tokensGained?: SortOrder
-    probability?: SortOrder
-    gameId?: SortOrder
-    agentId?: SortOrder
-    opponentId?: SortOrder
     type?: SortOrder
+    tokensStaked?: SortOrder
+    tokensLost?: SortOrder
+    outcome?: SortOrder
+    attackerId?: SortOrder
+    attackerAllyId?: SortOrder
+    defenderId?: SortOrder
+    defenderAllyId?: SortOrder
     status?: SortOrder
+    gameId?: SortOrder
     startTime?: SortOrder
-    resolutionTime?: SortOrder
     resolvedAt?: SortOrder
   }
 
   export type BattleMinOrderByAggregateInput = {
     id?: SortOrder
     timestamp?: SortOrder
-    outcome?: SortOrder
-    tokensLost?: SortOrder
-    tokensGained?: SortOrder
-    probability?: SortOrder
-    gameId?: SortOrder
-    agentId?: SortOrder
-    opponentId?: SortOrder
     type?: SortOrder
+    tokensStaked?: SortOrder
+    tokensLost?: SortOrder
+    outcome?: SortOrder
+    attackerId?: SortOrder
+    attackerAllyId?: SortOrder
+    defenderId?: SortOrder
+    defenderAllyId?: SortOrder
     status?: SortOrder
+    gameId?: SortOrder
     startTime?: SortOrder
-    resolutionTime?: SortOrder
     resolvedAt?: SortOrder
   }
 
   export type BattleSumOrderByAggregateInput = {
+    tokensStaked?: SortOrder
     tokensLost?: SortOrder
-    tokensGained?: SortOrder
-    probability?: SortOrder
-  }
-
-  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type EnumBattleTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -18781,6 +16164,13 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type EnumInteractionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.InteractionType | EnumInteractionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInteractionTypeFilter<$PrismaModel> | $Enums.InteractionType
+  }
+
   export type TweetScalarRelationFilter = {
     is?: TweetWhereInput
     isNot?: TweetWhereInput
@@ -18814,45 +16204,70 @@ export namespace Prisma {
     timestamp?: SortOrder
   }
 
-  export type AgentStateCountOrderByAggregateInput = {
+  export type EnumInteractionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InteractionType | EnumInteractionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInteractionTypeWithAggregatesFilter<$PrismaModel> | $Enums.InteractionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInteractionTypeFilter<$PrismaModel>
+    _max?: NestedEnumInteractionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumTerrainTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
+  }
+
+  export type MapTileXYCompoundUniqueInput = {
+    x: number
+    y: number
+  }
+
+  export type MapTileCountOrderByAggregateInput = {
     id?: SortOrder
-    isAlive?: SortOrder
-    lastActionType?: SortOrder
-    lastActionTime?: SortOrder
-    lastActionDetails?: SortOrder
-    influencedByTweet?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    occupiedBy?: SortOrder
   }
 
-  export type AgentStateAvgOrderByAggregateInput = {
-    influenceScore?: SortOrder
+  export type MapTileAvgOrderByAggregateInput = {
+    x?: SortOrder
+    y?: SortOrder
   }
 
-  export type AgentStateMaxOrderByAggregateInput = {
+  export type MapTileMaxOrderByAggregateInput = {
     id?: SortOrder
-    isAlive?: SortOrder
-    lastActionType?: SortOrder
-    lastActionTime?: SortOrder
-    lastActionDetails?: SortOrder
-    influencedByTweet?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    occupiedBy?: SortOrder
   }
 
-  export type AgentStateMinOrderByAggregateInput = {
+  export type MapTileMinOrderByAggregateInput = {
     id?: SortOrder
-    isAlive?: SortOrder
-    lastActionType?: SortOrder
-    lastActionTime?: SortOrder
-    lastActionDetails?: SortOrder
-    influencedByTweet?: SortOrder
-    influenceScore?: SortOrder
-    agentId?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    occupiedBy?: SortOrder
   }
 
-  export type AgentStateSumOrderByAggregateInput = {
-    influenceScore?: SortOrder
+  export type MapTileSumOrderByAggregateInput = {
+    x?: SortOrder
+    y?: SortOrder
+  }
+
+  export type EnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
+    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
   }
 
   export type EnumCooldownTypeFilter<$PrismaModel = never> = {
@@ -18862,35 +16277,27 @@ export namespace Prisma {
     not?: NestedEnumCooldownTypeFilter<$PrismaModel> | $Enums.CooldownType
   }
 
-  export type CooldownAgentIdTypeCompoundUniqueInput = {
-    agentId: string
-    type: $Enums.CooldownType
-  }
-
-  export type CooldownCountOrderByAggregateInput = {
+  export type CoolDownCountOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
     endsAt?: SortOrder
-    agentId?: SortOrder
-    targetAgentId?: SortOrder
+    cooledAgentId?: SortOrder
     gameId?: SortOrder
   }
 
-  export type CooldownMaxOrderByAggregateInput = {
+  export type CoolDownMaxOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
     endsAt?: SortOrder
-    agentId?: SortOrder
-    targetAgentId?: SortOrder
+    cooledAgentId?: SortOrder
     gameId?: SortOrder
   }
 
-  export type CooldownMinOrderByAggregateInput = {
+  export type CoolDownMinOrderByAggregateInput = {
     id?: SortOrder
     type?: SortOrder
     endsAt?: SortOrder
-    agentId?: SortOrder
-    targetAgentId?: SortOrder
+    cooledAgentId?: SortOrder
     gameId?: SortOrder
   }
 
@@ -18902,38 +16309,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCooldownTypeFilter<$PrismaModel>
     _max?: NestedEnumCooldownTypeFilter<$PrismaModel>
-  }
-
-  export type StrategyCountOrderByAggregateInput = {
-    id?: SortOrder
-    publicStrategy?: SortOrder
-    actualStrategy?: SortOrder
-    deceptionLevel?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type StrategyAvgOrderByAggregateInput = {
-    deceptionLevel?: SortOrder
-  }
-
-  export type StrategyMaxOrderByAggregateInput = {
-    id?: SortOrder
-    publicStrategy?: SortOrder
-    actualStrategy?: SortOrder
-    deceptionLevel?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type StrategyMinOrderByAggregateInput = {
-    id?: SortOrder
-    publicStrategy?: SortOrder
-    actualStrategy?: SortOrder
-    deceptionLevel?: SortOrder
-    agentId?: SortOrder
-  }
-
-  export type StrategySumOrderByAggregateInput = {
-    deceptionLevel?: SortOrder
   }
 
   export type EnumUserRoleFilter<$PrismaModel = never> = {
@@ -19004,11 +16379,11 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type CooldownCreateNestedManyWithoutGameInput = {
-    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
-    createMany?: CooldownCreateManyGameInputEnvelope
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+  export type CoolDownCreateNestedManyWithoutGameInput = {
+    create?: XOR<CoolDownCreateWithoutGameInput, CoolDownUncheckedCreateWithoutGameInput> | CoolDownCreateWithoutGameInput[] | CoolDownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutGameInput | CoolDownCreateOrConnectWithoutGameInput[]
+    createMany?: CoolDownCreateManyGameInputEnvelope
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
   }
 
   export type AgentUncheckedCreateNestedManyWithoutGameInput = {
@@ -19032,11 +16407,11 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type CooldownUncheckedCreateNestedManyWithoutGameInput = {
-    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
-    createMany?: CooldownCreateManyGameInputEnvelope
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+  export type CoolDownUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<CoolDownCreateWithoutGameInput, CoolDownUncheckedCreateWithoutGameInput> | CoolDownCreateWithoutGameInput[] | CoolDownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutGameInput | CoolDownCreateOrConnectWithoutGameInput[]
+    createMany?: CoolDownCreateManyGameInputEnvelope
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -19117,18 +16492,18 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type CooldownUpdateManyWithoutGameNestedInput = {
-    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
-    upsert?: CooldownUpsertWithWhereUniqueWithoutGameInput | CooldownUpsertWithWhereUniqueWithoutGameInput[]
-    createMany?: CooldownCreateManyGameInputEnvelope
-    set?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    disconnect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    delete?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    update?: CooldownUpdateWithWhereUniqueWithoutGameInput | CooldownUpdateWithWhereUniqueWithoutGameInput[]
-    updateMany?: CooldownUpdateManyWithWhereWithoutGameInput | CooldownUpdateManyWithWhereWithoutGameInput[]
-    deleteMany?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+  export type CoolDownUpdateManyWithoutGameNestedInput = {
+    create?: XOR<CoolDownCreateWithoutGameInput, CoolDownUncheckedCreateWithoutGameInput> | CoolDownCreateWithoutGameInput[] | CoolDownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutGameInput | CoolDownCreateOrConnectWithoutGameInput[]
+    upsert?: CoolDownUpsertWithWhereUniqueWithoutGameInput | CoolDownUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: CoolDownCreateManyGameInputEnvelope
+    set?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    disconnect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    delete?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    update?: CoolDownUpdateWithWhereUniqueWithoutGameInput | CoolDownUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: CoolDownUpdateManyWithWhereWithoutGameInput | CoolDownUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
   }
 
   export type AgentUncheckedUpdateManyWithoutGameNestedInput = {
@@ -19173,18 +16548,18 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type CooldownUncheckedUpdateManyWithoutGameNestedInput = {
-    create?: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput> | CooldownCreateWithoutGameInput[] | CooldownUncheckedCreateWithoutGameInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutGameInput | CooldownCreateOrConnectWithoutGameInput[]
-    upsert?: CooldownUpsertWithWhereUniqueWithoutGameInput | CooldownUpsertWithWhereUniqueWithoutGameInput[]
-    createMany?: CooldownCreateManyGameInputEnvelope
-    set?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    disconnect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    delete?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    update?: CooldownUpdateWithWhereUniqueWithoutGameInput | CooldownUpdateWithWhereUniqueWithoutGameInput[]
-    updateMany?: CooldownUpdateManyWithWhereWithoutGameInput | CooldownUpdateManyWithWhereWithoutGameInput[]
-    deleteMany?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+  export type CoolDownUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<CoolDownCreateWithoutGameInput, CoolDownUncheckedCreateWithoutGameInput> | CoolDownCreateWithoutGameInput[] | CoolDownUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutGameInput | CoolDownCreateOrConnectWithoutGameInput[]
+    upsert?: CoolDownUpsertWithWhereUniqueWithoutGameInput | CoolDownUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: CoolDownCreateManyGameInputEnvelope
+    set?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    disconnect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    delete?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    update?: CoolDownUpdateWithWhereUniqueWithoutGameInput | CoolDownUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: CoolDownUpdateManyWithWhereWithoutGameInput | CoolDownUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
   }
 
   export type AgentProfileCreatebioInput = {
@@ -19203,17 +16578,17 @@ export namespace Prisma {
     set: string[]
   }
 
-  export type AgentCreateNestedManyWithoutAgentProfileInput = {
-    create?: XOR<AgentCreateWithoutAgentProfileInput, AgentUncheckedCreateWithoutAgentProfileInput> | AgentCreateWithoutAgentProfileInput[] | AgentUncheckedCreateWithoutAgentProfileInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutAgentProfileInput | AgentCreateOrConnectWithoutAgentProfileInput[]
-    createMany?: AgentCreateManyAgentProfileInputEnvelope
+  export type AgentCreateNestedManyWithoutProfileInput = {
+    create?: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput> | AgentCreateWithoutProfileInput[] | AgentUncheckedCreateWithoutProfileInput[]
+    connectOrCreate?: AgentCreateOrConnectWithoutProfileInput | AgentCreateOrConnectWithoutProfileInput[]
+    createMany?: AgentCreateManyProfileInputEnvelope
     connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
   }
 
-  export type AgentUncheckedCreateNestedManyWithoutAgentProfileInput = {
-    create?: XOR<AgentCreateWithoutAgentProfileInput, AgentUncheckedCreateWithoutAgentProfileInput> | AgentCreateWithoutAgentProfileInput[] | AgentUncheckedCreateWithoutAgentProfileInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutAgentProfileInput | AgentCreateOrConnectWithoutAgentProfileInput[]
-    createMany?: AgentCreateManyAgentProfileInputEnvelope
+  export type AgentUncheckedCreateNestedManyWithoutProfileInput = {
+    create?: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput> | AgentCreateWithoutProfileInput[] | AgentUncheckedCreateWithoutProfileInput[]
+    connectOrCreate?: AgentCreateOrConnectWithoutProfileInput | AgentCreateOrConnectWithoutProfileInput[]
+    createMany?: AgentCreateManyProfileInputEnvelope
     connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
   }
 
@@ -19237,96 +16612,32 @@ export namespace Prisma {
     push?: string | string[]
   }
 
-  export type AgentUpdateManyWithoutAgentProfileNestedInput = {
-    create?: XOR<AgentCreateWithoutAgentProfileInput, AgentUncheckedCreateWithoutAgentProfileInput> | AgentCreateWithoutAgentProfileInput[] | AgentUncheckedCreateWithoutAgentProfileInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutAgentProfileInput | AgentCreateOrConnectWithoutAgentProfileInput[]
-    upsert?: AgentUpsertWithWhereUniqueWithoutAgentProfileInput | AgentUpsertWithWhereUniqueWithoutAgentProfileInput[]
-    createMany?: AgentCreateManyAgentProfileInputEnvelope
+  export type AgentUpdateManyWithoutProfileNestedInput = {
+    create?: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput> | AgentCreateWithoutProfileInput[] | AgentUncheckedCreateWithoutProfileInput[]
+    connectOrCreate?: AgentCreateOrConnectWithoutProfileInput | AgentCreateOrConnectWithoutProfileInput[]
+    upsert?: AgentUpsertWithWhereUniqueWithoutProfileInput | AgentUpsertWithWhereUniqueWithoutProfileInput[]
+    createMany?: AgentCreateManyProfileInputEnvelope
     set?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
     disconnect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
     delete?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
     connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    update?: AgentUpdateWithWhereUniqueWithoutAgentProfileInput | AgentUpdateWithWhereUniqueWithoutAgentProfileInput[]
-    updateMany?: AgentUpdateManyWithWhereWithoutAgentProfileInput | AgentUpdateManyWithWhereWithoutAgentProfileInput[]
+    update?: AgentUpdateWithWhereUniqueWithoutProfileInput | AgentUpdateWithWhereUniqueWithoutProfileInput[]
+    updateMany?: AgentUpdateManyWithWhereWithoutProfileInput | AgentUpdateManyWithWhereWithoutProfileInput[]
     deleteMany?: AgentScalarWhereInput | AgentScalarWhereInput[]
   }
 
-  export type AgentUncheckedUpdateManyWithoutAgentProfileNestedInput = {
-    create?: XOR<AgentCreateWithoutAgentProfileInput, AgentUncheckedCreateWithoutAgentProfileInput> | AgentCreateWithoutAgentProfileInput[] | AgentUncheckedCreateWithoutAgentProfileInput[]
-    connectOrCreate?: AgentCreateOrConnectWithoutAgentProfileInput | AgentCreateOrConnectWithoutAgentProfileInput[]
-    upsert?: AgentUpsertWithWhereUniqueWithoutAgentProfileInput | AgentUpsertWithWhereUniqueWithoutAgentProfileInput[]
-    createMany?: AgentCreateManyAgentProfileInputEnvelope
+  export type AgentUncheckedUpdateManyWithoutProfileNestedInput = {
+    create?: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput> | AgentCreateWithoutProfileInput[] | AgentUncheckedCreateWithoutProfileInput[]
+    connectOrCreate?: AgentCreateOrConnectWithoutProfileInput | AgentCreateOrConnectWithoutProfileInput[]
+    upsert?: AgentUpsertWithWhereUniqueWithoutProfileInput | AgentUpsertWithWhereUniqueWithoutProfileInput[]
+    createMany?: AgentCreateManyProfileInputEnvelope
     set?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
     disconnect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
     delete?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
     connect?: AgentWhereUniqueInput | AgentWhereUniqueInput[]
-    update?: AgentUpdateWithWhereUniqueWithoutAgentProfileInput | AgentUpdateWithWhereUniqueWithoutAgentProfileInput[]
-    updateMany?: AgentUpdateManyWithWhereWithoutAgentProfileInput | AgentUpdateManyWithWhereWithoutAgentProfileInput[]
+    update?: AgentUpdateWithWhereUniqueWithoutProfileInput | AgentUpdateWithWhereUniqueWithoutProfileInput[]
+    updateMany?: AgentUpdateManyWithWhereWithoutProfileInput | AgentUpdateManyWithWhereWithoutProfileInput[]
     deleteMany?: AgentScalarWhereInput | AgentScalarWhereInput[]
-  }
-
-  export type AgentProfileCreateNestedOneWithoutAgentInput = {
-    create?: XOR<AgentProfileCreateWithoutAgentInput, AgentProfileUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentInput
-    connect?: AgentProfileWhereUniqueInput
-  }
-
-  export type GameCreateNestedOneWithoutAgentsInput = {
-    create?: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
-    connectOrCreate?: GameCreateOrConnectWithoutAgentsInput
-    connect?: GameWhereUniqueInput
-  }
-
-  export type LocationCreateNestedOneWithoutAgentInput = {
-    create?: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: LocationCreateOrConnectWithoutAgentInput
-    connect?: LocationWhereUniqueInput
-  }
-
-  export type AllianceCreateNestedOneWithoutAgentInput = {
-    create?: XOR<AllianceCreateWithoutAgentInput, AllianceUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AllianceCreateOrConnectWithoutAgentInput
-    connect?: AllianceWhereUniqueInput
-  }
-
-  export type BattleCreateNestedManyWithoutAgentInput = {
-    create?: XOR<BattleCreateWithoutAgentInput, BattleUncheckedCreateWithoutAgentInput> | BattleCreateWithoutAgentInput[] | BattleUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutAgentInput | BattleCreateOrConnectWithoutAgentInput[]
-    createMany?: BattleCreateManyAgentInputEnvelope
-    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-  }
-
-  export type AgentStateCreateNestedOneWithoutAgentInput = {
-    create?: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AgentStateCreateOrConnectWithoutAgentInput
-    connect?: AgentStateWhereUniqueInput
-  }
-
-  export type StrategyCreateNestedOneWithoutAgentInput = {
-    create?: XOR<StrategyCreateWithoutAgentInput, StrategyUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: StrategyCreateOrConnectWithoutAgentInput
-    connect?: StrategyWhereUniqueInput
-  }
-
-  export type CooldownCreateNestedManyWithoutAgentInput = {
-    create?: XOR<CooldownCreateWithoutAgentInput, CooldownUncheckedCreateWithoutAgentInput> | CooldownCreateWithoutAgentInput[] | CooldownUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutAgentInput | CooldownCreateOrConnectWithoutAgentInput[]
-    createMany?: CooldownCreateManyAgentInputEnvelope
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-  }
-
-  export type AllianceCreateNestedManyWithoutAlliedAgentInput = {
-    create?: XOR<AllianceCreateWithoutAlliedAgentInput, AllianceUncheckedCreateWithoutAlliedAgentInput> | AllianceCreateWithoutAlliedAgentInput[] | AllianceUncheckedCreateWithoutAlliedAgentInput[]
-    connectOrCreate?: AllianceCreateOrConnectWithoutAlliedAgentInput | AllianceCreateOrConnectWithoutAlliedAgentInput[]
-    createMany?: AllianceCreateManyAlliedAgentInputEnvelope
-    connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
-  }
-
-  export type BattleCreateNestedManyWithoutOpponentInput = {
-    create?: XOR<BattleCreateWithoutOpponentInput, BattleUncheckedCreateWithoutOpponentInput> | BattleCreateWithoutOpponentInput[] | BattleUncheckedCreateWithoutOpponentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutOpponentInput | BattleCreateOrConnectWithoutOpponentInput[]
-    createMany?: BattleCreateManyOpponentInputEnvelope
-    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
   export type TweetCreateNestedManyWithoutAgentInput = {
@@ -19336,56 +16647,72 @@ export namespace Prisma {
     connect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
   }
 
-  export type LocationUncheckedCreateNestedOneWithoutAgentInput = {
-    create?: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: LocationCreateOrConnectWithoutAgentInput
-    connect?: LocationWhereUniqueInput
+  export type GameCreateNestedOneWithoutAgentsInput = {
+    create?: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
+    connectOrCreate?: GameCreateOrConnectWithoutAgentsInput
+    connect?: GameWhereUniqueInput
   }
 
-  export type AllianceUncheckedCreateNestedOneWithoutAgentInput = {
-    create?: XOR<AllianceCreateWithoutAgentInput, AllianceUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AllianceCreateOrConnectWithoutAgentInput
-    connect?: AllianceWhereUniqueInput
-  }
-
-  export type BattleUncheckedCreateNestedManyWithoutAgentInput = {
-    create?: XOR<BattleCreateWithoutAgentInput, BattleUncheckedCreateWithoutAgentInput> | BattleCreateWithoutAgentInput[] | BattleUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutAgentInput | BattleCreateOrConnectWithoutAgentInput[]
-    createMany?: BattleCreateManyAgentInputEnvelope
+  export type BattleCreateNestedManyWithoutAttackerInput = {
+    create?: XOR<BattleCreateWithoutAttackerInput, BattleUncheckedCreateWithoutAttackerInput> | BattleCreateWithoutAttackerInput[] | BattleUncheckedCreateWithoutAttackerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerInput | BattleCreateOrConnectWithoutAttackerInput[]
+    createMany?: BattleCreateManyAttackerInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type AgentStateUncheckedCreateNestedOneWithoutAgentInput = {
-    create?: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AgentStateCreateOrConnectWithoutAgentInput
-    connect?: AgentStateWhereUniqueInput
+  export type BattleCreateNestedManyWithoutDefenderInput = {
+    create?: XOR<BattleCreateWithoutDefenderInput, BattleUncheckedCreateWithoutDefenderInput> | BattleCreateWithoutDefenderInput[] | BattleUncheckedCreateWithoutDefenderInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderInput | BattleCreateOrConnectWithoutDefenderInput[]
+    createMany?: BattleCreateManyDefenderInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type StrategyUncheckedCreateNestedOneWithoutAgentInput = {
-    create?: XOR<StrategyCreateWithoutAgentInput, StrategyUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: StrategyCreateOrConnectWithoutAgentInput
-    connect?: StrategyWhereUniqueInput
+  export type BattleCreateNestedManyWithoutAttackerAllyInput = {
+    create?: XOR<BattleCreateWithoutAttackerAllyInput, BattleUncheckedCreateWithoutAttackerAllyInput> | BattleCreateWithoutAttackerAllyInput[] | BattleUncheckedCreateWithoutAttackerAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerAllyInput | BattleCreateOrConnectWithoutAttackerAllyInput[]
+    createMany?: BattleCreateManyAttackerAllyInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type CooldownUncheckedCreateNestedManyWithoutAgentInput = {
-    create?: XOR<CooldownCreateWithoutAgentInput, CooldownUncheckedCreateWithoutAgentInput> | CooldownCreateWithoutAgentInput[] | CooldownUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutAgentInput | CooldownCreateOrConnectWithoutAgentInput[]
-    createMany?: CooldownCreateManyAgentInputEnvelope
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
+  export type BattleCreateNestedManyWithoutDefenderAllyInput = {
+    create?: XOR<BattleCreateWithoutDefenderAllyInput, BattleUncheckedCreateWithoutDefenderAllyInput> | BattleCreateWithoutDefenderAllyInput[] | BattleUncheckedCreateWithoutDefenderAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderAllyInput | BattleCreateOrConnectWithoutDefenderAllyInput[]
+    createMany?: BattleCreateManyDefenderAllyInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput = {
-    create?: XOR<AllianceCreateWithoutAlliedAgentInput, AllianceUncheckedCreateWithoutAlliedAgentInput> | AllianceCreateWithoutAlliedAgentInput[] | AllianceUncheckedCreateWithoutAlliedAgentInput[]
-    connectOrCreate?: AllianceCreateOrConnectWithoutAlliedAgentInput | AllianceCreateOrConnectWithoutAlliedAgentInput[]
-    createMany?: AllianceCreateManyAlliedAgentInputEnvelope
+  export type CoolDownCreateNestedManyWithoutCooledAgentInput = {
+    create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
+    createMany?: CoolDownCreateManyCooledAgentInputEnvelope
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+  }
+
+  export type AllianceCreateNestedManyWithoutInitiatorInput = {
+    create?: XOR<AllianceCreateWithoutInitiatorInput, AllianceUncheckedCreateWithoutInitiatorInput> | AllianceCreateWithoutInitiatorInput[] | AllianceUncheckedCreateWithoutInitiatorInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutInitiatorInput | AllianceCreateOrConnectWithoutInitiatorInput[]
+    createMany?: AllianceCreateManyInitiatorInputEnvelope
     connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
   }
 
-  export type BattleUncheckedCreateNestedManyWithoutOpponentInput = {
-    create?: XOR<BattleCreateWithoutOpponentInput, BattleUncheckedCreateWithoutOpponentInput> | BattleCreateWithoutOpponentInput[] | BattleUncheckedCreateWithoutOpponentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutOpponentInput | BattleCreateOrConnectWithoutOpponentInput[]
-    createMany?: BattleCreateManyOpponentInputEnvelope
-    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+  export type AllianceCreateNestedManyWithoutJoinerInput = {
+    create?: XOR<AllianceCreateWithoutJoinerInput, AllianceUncheckedCreateWithoutJoinerInput> | AllianceCreateWithoutJoinerInput[] | AllianceUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutJoinerInput | AllianceCreateOrConnectWithoutJoinerInput[]
+    createMany?: AllianceCreateManyJoinerInputEnvelope
+    connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+  }
+
+  export type MapTileCreateNestedManyWithoutAgentInput = {
+    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
+    createMany?: MapTileCreateManyAgentInputEnvelope
+    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+  }
+
+  export type AgentProfileCreateNestedOneWithoutAgentsInput = {
+    create?: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
+    connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentsInput
+    connect?: AgentProfileWhereUniqueInput
   }
 
   export type TweetUncheckedCreateNestedManyWithoutAgentInput = {
@@ -19395,116 +16722,60 @@ export namespace Prisma {
     connect?: TweetWhereUniqueInput | TweetWhereUniqueInput[]
   }
 
-  export type AgentProfileUpdateOneRequiredWithoutAgentNestedInput = {
-    create?: XOR<AgentProfileCreateWithoutAgentInput, AgentProfileUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentInput
-    upsert?: AgentProfileUpsertWithoutAgentInput
-    connect?: AgentProfileWhereUniqueInput
-    update?: XOR<XOR<AgentProfileUpdateToOneWithWhereWithoutAgentInput, AgentProfileUpdateWithoutAgentInput>, AgentProfileUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type GameUpdateOneRequiredWithoutAgentsNestedInput = {
-    create?: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
-    connectOrCreate?: GameCreateOrConnectWithoutAgentsInput
-    upsert?: GameUpsertWithoutAgentsInput
-    connect?: GameWhereUniqueInput
-    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutAgentsInput, GameUpdateWithoutAgentsInput>, GameUncheckedUpdateWithoutAgentsInput>
-  }
-
-  export type LocationUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: LocationCreateOrConnectWithoutAgentInput
-    upsert?: LocationUpsertWithoutAgentInput
-    disconnect?: LocationWhereInput | boolean
-    delete?: LocationWhereInput | boolean
-    connect?: LocationWhereUniqueInput
-    update?: XOR<XOR<LocationUpdateToOneWithWhereWithoutAgentInput, LocationUpdateWithoutAgentInput>, LocationUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type AllianceUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<AllianceCreateWithoutAgentInput, AllianceUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AllianceCreateOrConnectWithoutAgentInput
-    upsert?: AllianceUpsertWithoutAgentInput
-    disconnect?: AllianceWhereInput | boolean
-    delete?: AllianceWhereInput | boolean
-    connect?: AllianceWhereUniqueInput
-    update?: XOR<XOR<AllianceUpdateToOneWithWhereWithoutAgentInput, AllianceUpdateWithoutAgentInput>, AllianceUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type BattleUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<BattleCreateWithoutAgentInput, BattleUncheckedCreateWithoutAgentInput> | BattleCreateWithoutAgentInput[] | BattleUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutAgentInput | BattleCreateOrConnectWithoutAgentInput[]
-    upsert?: BattleUpsertWithWhereUniqueWithoutAgentInput | BattleUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: BattleCreateManyAgentInputEnvelope
-    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+  export type BattleUncheckedCreateNestedManyWithoutAttackerInput = {
+    create?: XOR<BattleCreateWithoutAttackerInput, BattleUncheckedCreateWithoutAttackerInput> | BattleCreateWithoutAttackerInput[] | BattleUncheckedCreateWithoutAttackerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerInput | BattleCreateOrConnectWithoutAttackerInput[]
+    createMany?: BattleCreateManyAttackerInputEnvelope
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    update?: BattleUpdateWithWhereUniqueWithoutAgentInput | BattleUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: BattleUpdateManyWithWhereWithoutAgentInput | BattleUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type AgentStateUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AgentStateCreateOrConnectWithoutAgentInput
-    upsert?: AgentStateUpsertWithoutAgentInput
-    disconnect?: AgentStateWhereInput | boolean
-    delete?: AgentStateWhereInput | boolean
-    connect?: AgentStateWhereUniqueInput
-    update?: XOR<XOR<AgentStateUpdateToOneWithWhereWithoutAgentInput, AgentStateUpdateWithoutAgentInput>, AgentStateUncheckedUpdateWithoutAgentInput>
+  export type BattleUncheckedCreateNestedManyWithoutDefenderInput = {
+    create?: XOR<BattleCreateWithoutDefenderInput, BattleUncheckedCreateWithoutDefenderInput> | BattleCreateWithoutDefenderInput[] | BattleUncheckedCreateWithoutDefenderInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderInput | BattleCreateOrConnectWithoutDefenderInput[]
+    createMany?: BattleCreateManyDefenderInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type StrategyUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<StrategyCreateWithoutAgentInput, StrategyUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: StrategyCreateOrConnectWithoutAgentInput
-    upsert?: StrategyUpsertWithoutAgentInput
-    disconnect?: StrategyWhereInput | boolean
-    delete?: StrategyWhereInput | boolean
-    connect?: StrategyWhereUniqueInput
-    update?: XOR<XOR<StrategyUpdateToOneWithWhereWithoutAgentInput, StrategyUpdateWithoutAgentInput>, StrategyUncheckedUpdateWithoutAgentInput>
+  export type BattleUncheckedCreateNestedManyWithoutAttackerAllyInput = {
+    create?: XOR<BattleCreateWithoutAttackerAllyInput, BattleUncheckedCreateWithoutAttackerAllyInput> | BattleCreateWithoutAttackerAllyInput[] | BattleUncheckedCreateWithoutAttackerAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerAllyInput | BattleCreateOrConnectWithoutAttackerAllyInput[]
+    createMany?: BattleCreateManyAttackerAllyInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type CooldownUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<CooldownCreateWithoutAgentInput, CooldownUncheckedCreateWithoutAgentInput> | CooldownCreateWithoutAgentInput[] | CooldownUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutAgentInput | CooldownCreateOrConnectWithoutAgentInput[]
-    upsert?: CooldownUpsertWithWhereUniqueWithoutAgentInput | CooldownUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: CooldownCreateManyAgentInputEnvelope
-    set?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    disconnect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    delete?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    update?: CooldownUpdateWithWhereUniqueWithoutAgentInput | CooldownUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: CooldownUpdateManyWithWhereWithoutAgentInput | CooldownUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+  export type BattleUncheckedCreateNestedManyWithoutDefenderAllyInput = {
+    create?: XOR<BattleCreateWithoutDefenderAllyInput, BattleUncheckedCreateWithoutDefenderAllyInput> | BattleCreateWithoutDefenderAllyInput[] | BattleUncheckedCreateWithoutDefenderAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderAllyInput | BattleCreateOrConnectWithoutDefenderAllyInput[]
+    createMany?: BattleCreateManyDefenderAllyInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
-  export type AllianceUpdateManyWithoutAlliedAgentNestedInput = {
-    create?: XOR<AllianceCreateWithoutAlliedAgentInput, AllianceUncheckedCreateWithoutAlliedAgentInput> | AllianceCreateWithoutAlliedAgentInput[] | AllianceUncheckedCreateWithoutAlliedAgentInput[]
-    connectOrCreate?: AllianceCreateOrConnectWithoutAlliedAgentInput | AllianceCreateOrConnectWithoutAlliedAgentInput[]
-    upsert?: AllianceUpsertWithWhereUniqueWithoutAlliedAgentInput | AllianceUpsertWithWhereUniqueWithoutAlliedAgentInput[]
-    createMany?: AllianceCreateManyAlliedAgentInputEnvelope
-    set?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
-    disconnect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
-    delete?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+  export type CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput = {
+    create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
+    createMany?: CoolDownCreateManyCooledAgentInputEnvelope
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+  }
+
+  export type AllianceUncheckedCreateNestedManyWithoutInitiatorInput = {
+    create?: XOR<AllianceCreateWithoutInitiatorInput, AllianceUncheckedCreateWithoutInitiatorInput> | AllianceCreateWithoutInitiatorInput[] | AllianceUncheckedCreateWithoutInitiatorInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutInitiatorInput | AllianceCreateOrConnectWithoutInitiatorInput[]
+    createMany?: AllianceCreateManyInitiatorInputEnvelope
     connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
-    update?: AllianceUpdateWithWhereUniqueWithoutAlliedAgentInput | AllianceUpdateWithWhereUniqueWithoutAlliedAgentInput[]
-    updateMany?: AllianceUpdateManyWithWhereWithoutAlliedAgentInput | AllianceUpdateManyWithWhereWithoutAlliedAgentInput[]
-    deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
   }
 
-  export type BattleUpdateManyWithoutOpponentNestedInput = {
-    create?: XOR<BattleCreateWithoutOpponentInput, BattleUncheckedCreateWithoutOpponentInput> | BattleCreateWithoutOpponentInput[] | BattleUncheckedCreateWithoutOpponentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutOpponentInput | BattleCreateOrConnectWithoutOpponentInput[]
-    upsert?: BattleUpsertWithWhereUniqueWithoutOpponentInput | BattleUpsertWithWhereUniqueWithoutOpponentInput[]
-    createMany?: BattleCreateManyOpponentInputEnvelope
-    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    update?: BattleUpdateWithWhereUniqueWithoutOpponentInput | BattleUpdateWithWhereUniqueWithoutOpponentInput[]
-    updateMany?: BattleUpdateManyWithWhereWithoutOpponentInput | BattleUpdateManyWithWhereWithoutOpponentInput[]
-    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  export type AllianceUncheckedCreateNestedManyWithoutJoinerInput = {
+    create?: XOR<AllianceCreateWithoutJoinerInput, AllianceUncheckedCreateWithoutJoinerInput> | AllianceCreateWithoutJoinerInput[] | AllianceUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutJoinerInput | AllianceCreateOrConnectWithoutJoinerInput[]
+    createMany?: AllianceCreateManyJoinerInputEnvelope
+    connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+  }
+
+  export type MapTileUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
+    createMany?: MapTileCreateManyAgentInputEnvelope
+    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
   }
 
   export type TweetUpdateManyWithoutAgentNestedInput = {
@@ -19521,100 +16792,132 @@ export namespace Prisma {
     deleteMany?: TweetScalarWhereInput | TweetScalarWhereInput[]
   }
 
-  export type LocationUncheckedUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: LocationCreateOrConnectWithoutAgentInput
-    upsert?: LocationUpsertWithoutAgentInput
-    disconnect?: LocationWhereInput | boolean
-    delete?: LocationWhereInput | boolean
-    connect?: LocationWhereUniqueInput
-    update?: XOR<XOR<LocationUpdateToOneWithWhereWithoutAgentInput, LocationUpdateWithoutAgentInput>, LocationUncheckedUpdateWithoutAgentInput>
+  export type GameUpdateOneRequiredWithoutAgentsNestedInput = {
+    create?: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
+    connectOrCreate?: GameCreateOrConnectWithoutAgentsInput
+    upsert?: GameUpsertWithoutAgentsInput
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutAgentsInput, GameUpdateWithoutAgentsInput>, GameUncheckedUpdateWithoutAgentsInput>
   }
 
-  export type AllianceUncheckedUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<AllianceCreateWithoutAgentInput, AllianceUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AllianceCreateOrConnectWithoutAgentInput
-    upsert?: AllianceUpsertWithoutAgentInput
-    disconnect?: AllianceWhereInput | boolean
-    delete?: AllianceWhereInput | boolean
-    connect?: AllianceWhereUniqueInput
-    update?: XOR<XOR<AllianceUpdateToOneWithWhereWithoutAgentInput, AllianceUpdateWithoutAgentInput>, AllianceUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type BattleUncheckedUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<BattleCreateWithoutAgentInput, BattleUncheckedCreateWithoutAgentInput> | BattleCreateWithoutAgentInput[] | BattleUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutAgentInput | BattleCreateOrConnectWithoutAgentInput[]
-    upsert?: BattleUpsertWithWhereUniqueWithoutAgentInput | BattleUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: BattleCreateManyAgentInputEnvelope
+  export type BattleUpdateManyWithoutAttackerNestedInput = {
+    create?: XOR<BattleCreateWithoutAttackerInput, BattleUncheckedCreateWithoutAttackerInput> | BattleCreateWithoutAttackerInput[] | BattleUncheckedCreateWithoutAttackerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerInput | BattleCreateOrConnectWithoutAttackerInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutAttackerInput | BattleUpsertWithWhereUniqueWithoutAttackerInput[]
+    createMany?: BattleCreateManyAttackerInputEnvelope
     set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
     disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
     delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    update?: BattleUpdateWithWhereUniqueWithoutAgentInput | BattleUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: BattleUpdateManyWithWhereWithoutAgentInput | BattleUpdateManyWithWhereWithoutAgentInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutAttackerInput | BattleUpdateWithWhereUniqueWithoutAttackerInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutAttackerInput | BattleUpdateManyWithWhereWithoutAttackerInput[]
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type AgentStateUncheckedUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: AgentStateCreateOrConnectWithoutAgentInput
-    upsert?: AgentStateUpsertWithoutAgentInput
-    disconnect?: AgentStateWhereInput | boolean
-    delete?: AgentStateWhereInput | boolean
-    connect?: AgentStateWhereUniqueInput
-    update?: XOR<XOR<AgentStateUpdateToOneWithWhereWithoutAgentInput, AgentStateUpdateWithoutAgentInput>, AgentStateUncheckedUpdateWithoutAgentInput>
+  export type BattleUpdateManyWithoutDefenderNestedInput = {
+    create?: XOR<BattleCreateWithoutDefenderInput, BattleUncheckedCreateWithoutDefenderInput> | BattleCreateWithoutDefenderInput[] | BattleUncheckedCreateWithoutDefenderInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderInput | BattleCreateOrConnectWithoutDefenderInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutDefenderInput | BattleUpsertWithWhereUniqueWithoutDefenderInput[]
+    createMany?: BattleCreateManyDefenderInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutDefenderInput | BattleUpdateWithWhereUniqueWithoutDefenderInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutDefenderInput | BattleUpdateManyWithWhereWithoutDefenderInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type StrategyUncheckedUpdateOneWithoutAgentNestedInput = {
-    create?: XOR<StrategyCreateWithoutAgentInput, StrategyUncheckedCreateWithoutAgentInput>
-    connectOrCreate?: StrategyCreateOrConnectWithoutAgentInput
-    upsert?: StrategyUpsertWithoutAgentInput
-    disconnect?: StrategyWhereInput | boolean
-    delete?: StrategyWhereInput | boolean
-    connect?: StrategyWhereUniqueInput
-    update?: XOR<XOR<StrategyUpdateToOneWithWhereWithoutAgentInput, StrategyUpdateWithoutAgentInput>, StrategyUncheckedUpdateWithoutAgentInput>
+  export type BattleUpdateManyWithoutAttackerAllyNestedInput = {
+    create?: XOR<BattleCreateWithoutAttackerAllyInput, BattleUncheckedCreateWithoutAttackerAllyInput> | BattleCreateWithoutAttackerAllyInput[] | BattleUncheckedCreateWithoutAttackerAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerAllyInput | BattleCreateOrConnectWithoutAttackerAllyInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutAttackerAllyInput | BattleUpsertWithWhereUniqueWithoutAttackerAllyInput[]
+    createMany?: BattleCreateManyAttackerAllyInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutAttackerAllyInput | BattleUpdateWithWhereUniqueWithoutAttackerAllyInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutAttackerAllyInput | BattleUpdateManyWithWhereWithoutAttackerAllyInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type CooldownUncheckedUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<CooldownCreateWithoutAgentInput, CooldownUncheckedCreateWithoutAgentInput> | CooldownCreateWithoutAgentInput[] | CooldownUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: CooldownCreateOrConnectWithoutAgentInput | CooldownCreateOrConnectWithoutAgentInput[]
-    upsert?: CooldownUpsertWithWhereUniqueWithoutAgentInput | CooldownUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: CooldownCreateManyAgentInputEnvelope
-    set?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    disconnect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    delete?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    connect?: CooldownWhereUniqueInput | CooldownWhereUniqueInput[]
-    update?: CooldownUpdateWithWhereUniqueWithoutAgentInput | CooldownUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: CooldownUpdateManyWithWhereWithoutAgentInput | CooldownUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
+  export type BattleUpdateManyWithoutDefenderAllyNestedInput = {
+    create?: XOR<BattleCreateWithoutDefenderAllyInput, BattleUncheckedCreateWithoutDefenderAllyInput> | BattleCreateWithoutDefenderAllyInput[] | BattleUncheckedCreateWithoutDefenderAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderAllyInput | BattleCreateOrConnectWithoutDefenderAllyInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutDefenderAllyInput | BattleUpsertWithWhereUniqueWithoutDefenderAllyInput[]
+    createMany?: BattleCreateManyDefenderAllyInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutDefenderAllyInput | BattleUpdateWithWhereUniqueWithoutDefenderAllyInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutDefenderAllyInput | BattleUpdateManyWithWhereWithoutDefenderAllyInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
-  export type AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput = {
-    create?: XOR<AllianceCreateWithoutAlliedAgentInput, AllianceUncheckedCreateWithoutAlliedAgentInput> | AllianceCreateWithoutAlliedAgentInput[] | AllianceUncheckedCreateWithoutAlliedAgentInput[]
-    connectOrCreate?: AllianceCreateOrConnectWithoutAlliedAgentInput | AllianceCreateOrConnectWithoutAlliedAgentInput[]
-    upsert?: AllianceUpsertWithWhereUniqueWithoutAlliedAgentInput | AllianceUpsertWithWhereUniqueWithoutAlliedAgentInput[]
-    createMany?: AllianceCreateManyAlliedAgentInputEnvelope
+  export type CoolDownUpdateManyWithoutCooledAgentNestedInput = {
+    create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
+    upsert?: CoolDownUpsertWithWhereUniqueWithoutCooledAgentInput | CoolDownUpsertWithWhereUniqueWithoutCooledAgentInput[]
+    createMany?: CoolDownCreateManyCooledAgentInputEnvelope
+    set?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    disconnect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    delete?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    update?: CoolDownUpdateWithWhereUniqueWithoutCooledAgentInput | CoolDownUpdateWithWhereUniqueWithoutCooledAgentInput[]
+    updateMany?: CoolDownUpdateManyWithWhereWithoutCooledAgentInput | CoolDownUpdateManyWithWhereWithoutCooledAgentInput[]
+    deleteMany?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
+  }
+
+  export type AllianceUpdateManyWithoutInitiatorNestedInput = {
+    create?: XOR<AllianceCreateWithoutInitiatorInput, AllianceUncheckedCreateWithoutInitiatorInput> | AllianceCreateWithoutInitiatorInput[] | AllianceUncheckedCreateWithoutInitiatorInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutInitiatorInput | AllianceCreateOrConnectWithoutInitiatorInput[]
+    upsert?: AllianceUpsertWithWhereUniqueWithoutInitiatorInput | AllianceUpsertWithWhereUniqueWithoutInitiatorInput[]
+    createMany?: AllianceCreateManyInitiatorInputEnvelope
     set?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
     disconnect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
     delete?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
     connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
-    update?: AllianceUpdateWithWhereUniqueWithoutAlliedAgentInput | AllianceUpdateWithWhereUniqueWithoutAlliedAgentInput[]
-    updateMany?: AllianceUpdateManyWithWhereWithoutAlliedAgentInput | AllianceUpdateManyWithWhereWithoutAlliedAgentInput[]
+    update?: AllianceUpdateWithWhereUniqueWithoutInitiatorInput | AllianceUpdateWithWhereUniqueWithoutInitiatorInput[]
+    updateMany?: AllianceUpdateManyWithWhereWithoutInitiatorInput | AllianceUpdateManyWithWhereWithoutInitiatorInput[]
     deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
   }
 
-  export type BattleUncheckedUpdateManyWithoutOpponentNestedInput = {
-    create?: XOR<BattleCreateWithoutOpponentInput, BattleUncheckedCreateWithoutOpponentInput> | BattleCreateWithoutOpponentInput[] | BattleUncheckedCreateWithoutOpponentInput[]
-    connectOrCreate?: BattleCreateOrConnectWithoutOpponentInput | BattleCreateOrConnectWithoutOpponentInput[]
-    upsert?: BattleUpsertWithWhereUniqueWithoutOpponentInput | BattleUpsertWithWhereUniqueWithoutOpponentInput[]
-    createMany?: BattleCreateManyOpponentInputEnvelope
-    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
-    update?: BattleUpdateWithWhereUniqueWithoutOpponentInput | BattleUpdateWithWhereUniqueWithoutOpponentInput[]
-    updateMany?: BattleUpdateManyWithWhereWithoutOpponentInput | BattleUpdateManyWithWhereWithoutOpponentInput[]
-    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  export type AllianceUpdateManyWithoutJoinerNestedInput = {
+    create?: XOR<AllianceCreateWithoutJoinerInput, AllianceUncheckedCreateWithoutJoinerInput> | AllianceCreateWithoutJoinerInput[] | AllianceUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutJoinerInput | AllianceCreateOrConnectWithoutJoinerInput[]
+    upsert?: AllianceUpsertWithWhereUniqueWithoutJoinerInput | AllianceUpsertWithWhereUniqueWithoutJoinerInput[]
+    createMany?: AllianceCreateManyJoinerInputEnvelope
+    set?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    disconnect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    delete?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    update?: AllianceUpdateWithWhereUniqueWithoutJoinerInput | AllianceUpdateWithWhereUniqueWithoutJoinerInput[]
+    updateMany?: AllianceUpdateManyWithWhereWithoutJoinerInput | AllianceUpdateManyWithWhereWithoutJoinerInput[]
+    deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
+  }
+
+  export type MapTileUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
+    upsert?: MapTileUpsertWithWhereUniqueWithoutAgentInput | MapTileUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: MapTileCreateManyAgentInputEnvelope
+    set?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    disconnect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    delete?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    update?: MapTileUpdateWithWhereUniqueWithoutAgentInput | MapTileUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: MapTileUpdateManyWithWhereWithoutAgentInput | MapTileUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
+  }
+
+  export type AgentProfileUpdateOneRequiredWithoutAgentsNestedInput = {
+    create?: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
+    connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentsInput
+    upsert?: AgentProfileUpsertWithoutAgentsInput
+    connect?: AgentProfileWhereUniqueInput
+    update?: XOR<XOR<AgentProfileUpdateToOneWithWhereWithoutAgentsInput, AgentProfileUpdateWithoutAgentsInput>, AgentProfileUncheckedUpdateWithoutAgentsInput>
   }
 
   export type TweetUncheckedUpdateManyWithoutAgentNestedInput = {
@@ -19631,9 +16934,121 @@ export namespace Prisma {
     deleteMany?: TweetScalarWhereInput | TweetScalarWhereInput[]
   }
 
-  export type AgentCreateNestedOneWithoutTweetInput = {
-    create?: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutTweetInput
+  export type BattleUncheckedUpdateManyWithoutAttackerNestedInput = {
+    create?: XOR<BattleCreateWithoutAttackerInput, BattleUncheckedCreateWithoutAttackerInput> | BattleCreateWithoutAttackerInput[] | BattleUncheckedCreateWithoutAttackerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerInput | BattleCreateOrConnectWithoutAttackerInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutAttackerInput | BattleUpsertWithWhereUniqueWithoutAttackerInput[]
+    createMany?: BattleCreateManyAttackerInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutAttackerInput | BattleUpdateWithWhereUniqueWithoutAttackerInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutAttackerInput | BattleUpdateManyWithWhereWithoutAttackerInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
+  export type BattleUncheckedUpdateManyWithoutDefenderNestedInput = {
+    create?: XOR<BattleCreateWithoutDefenderInput, BattleUncheckedCreateWithoutDefenderInput> | BattleCreateWithoutDefenderInput[] | BattleUncheckedCreateWithoutDefenderInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderInput | BattleCreateOrConnectWithoutDefenderInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutDefenderInput | BattleUpsertWithWhereUniqueWithoutDefenderInput[]
+    createMany?: BattleCreateManyDefenderInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutDefenderInput | BattleUpdateWithWhereUniqueWithoutDefenderInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutDefenderInput | BattleUpdateManyWithWhereWithoutDefenderInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
+  export type BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput = {
+    create?: XOR<BattleCreateWithoutAttackerAllyInput, BattleUncheckedCreateWithoutAttackerAllyInput> | BattleCreateWithoutAttackerAllyInput[] | BattleUncheckedCreateWithoutAttackerAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutAttackerAllyInput | BattleCreateOrConnectWithoutAttackerAllyInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutAttackerAllyInput | BattleUpsertWithWhereUniqueWithoutAttackerAllyInput[]
+    createMany?: BattleCreateManyAttackerAllyInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutAttackerAllyInput | BattleUpdateWithWhereUniqueWithoutAttackerAllyInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutAttackerAllyInput | BattleUpdateManyWithWhereWithoutAttackerAllyInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
+  export type BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput = {
+    create?: XOR<BattleCreateWithoutDefenderAllyInput, BattleUncheckedCreateWithoutDefenderAllyInput> | BattleCreateWithoutDefenderAllyInput[] | BattleUncheckedCreateWithoutDefenderAllyInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutDefenderAllyInput | BattleCreateOrConnectWithoutDefenderAllyInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutDefenderAllyInput | BattleUpsertWithWhereUniqueWithoutDefenderAllyInput[]
+    createMany?: BattleCreateManyDefenderAllyInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutDefenderAllyInput | BattleUpdateWithWhereUniqueWithoutDefenderAllyInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutDefenderAllyInput | BattleUpdateManyWithWhereWithoutDefenderAllyInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
+  export type CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput = {
+    create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
+    connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
+    upsert?: CoolDownUpsertWithWhereUniqueWithoutCooledAgentInput | CoolDownUpsertWithWhereUniqueWithoutCooledAgentInput[]
+    createMany?: CoolDownCreateManyCooledAgentInputEnvelope
+    set?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    disconnect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    delete?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+    update?: CoolDownUpdateWithWhereUniqueWithoutCooledAgentInput | CoolDownUpdateWithWhereUniqueWithoutCooledAgentInput[]
+    updateMany?: CoolDownUpdateManyWithWhereWithoutCooledAgentInput | CoolDownUpdateManyWithWhereWithoutCooledAgentInput[]
+    deleteMany?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
+  }
+
+  export type AllianceUncheckedUpdateManyWithoutInitiatorNestedInput = {
+    create?: XOR<AllianceCreateWithoutInitiatorInput, AllianceUncheckedCreateWithoutInitiatorInput> | AllianceCreateWithoutInitiatorInput[] | AllianceUncheckedCreateWithoutInitiatorInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutInitiatorInput | AllianceCreateOrConnectWithoutInitiatorInput[]
+    upsert?: AllianceUpsertWithWhereUniqueWithoutInitiatorInput | AllianceUpsertWithWhereUniqueWithoutInitiatorInput[]
+    createMany?: AllianceCreateManyInitiatorInputEnvelope
+    set?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    disconnect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    delete?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    update?: AllianceUpdateWithWhereUniqueWithoutInitiatorInput | AllianceUpdateWithWhereUniqueWithoutInitiatorInput[]
+    updateMany?: AllianceUpdateManyWithWhereWithoutInitiatorInput | AllianceUpdateManyWithWhereWithoutInitiatorInput[]
+    deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
+  }
+
+  export type AllianceUncheckedUpdateManyWithoutJoinerNestedInput = {
+    create?: XOR<AllianceCreateWithoutJoinerInput, AllianceUncheckedCreateWithoutJoinerInput> | AllianceCreateWithoutJoinerInput[] | AllianceUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: AllianceCreateOrConnectWithoutJoinerInput | AllianceCreateOrConnectWithoutJoinerInput[]
+    upsert?: AllianceUpsertWithWhereUniqueWithoutJoinerInput | AllianceUpsertWithWhereUniqueWithoutJoinerInput[]
+    createMany?: AllianceCreateManyJoinerInputEnvelope
+    set?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    disconnect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    delete?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+    update?: AllianceUpdateWithWhereUniqueWithoutJoinerInput | AllianceUpdateWithWhereUniqueWithoutJoinerInput[]
+    updateMany?: AllianceUpdateManyWithWhereWithoutJoinerInput | AllianceUpdateManyWithWhereWithoutJoinerInput[]
+    deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
+  }
+
+  export type MapTileUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
+    upsert?: MapTileUpsertWithWhereUniqueWithoutAgentInput | MapTileUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: MapTileCreateManyAgentInputEnvelope
+    set?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    disconnect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    delete?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+    update?: MapTileUpdateWithWhereUniqueWithoutAgentInput | MapTileUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: MapTileUpdateManyWithWhereWithoutAgentInput | MapTileUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
+  }
+
+  export type AgentCreateNestedOneWithoutTweetsInput = {
+    create?: XOR<AgentCreateWithoutTweetsInput, AgentUncheckedCreateWithoutTweetsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutTweetsInput
     connect?: AgentWhereUniqueInput
   }
 
@@ -19655,12 +17070,12 @@ export namespace Prisma {
     set?: string | null
   }
 
-  export type AgentUpdateOneRequiredWithoutTweetNestedInput = {
-    create?: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutTweetInput
-    upsert?: AgentUpsertWithoutTweetInput
+  export type AgentUpdateOneRequiredWithoutTweetsNestedInput = {
+    create?: XOR<AgentCreateWithoutTweetsInput, AgentUncheckedCreateWithoutTweetsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutTweetsInput
+    upsert?: AgentUpsertWithoutTweetsInput
     connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutTweetInput, AgentUpdateWithoutTweetInput>, AgentUncheckedUpdateWithoutTweetInput>
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutTweetsInput, AgentUpdateWithoutTweetsInput>, AgentUncheckedUpdateWithoutTweetsInput>
   }
 
   export type InteractionUpdateManyWithoutTweetNestedInput = {
@@ -19691,40 +17106,30 @@ export namespace Prisma {
     deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
   }
 
-  export type AgentCreateNestedOneWithoutLocationInput = {
-    create?: XOR<AgentCreateWithoutLocationInput, AgentUncheckedCreateWithoutLocationInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutLocationInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type EnumTerrainTypeFieldUpdateOperationsInput = {
-    set?: $Enums.TerrainType
-  }
-
-  export type AgentUpdateOneRequiredWithoutLocationNestedInput = {
-    create?: XOR<AgentCreateWithoutLocationInput, AgentUncheckedCreateWithoutLocationInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutLocationInput
-    upsert?: AgentUpsertWithoutLocationInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutLocationInput, AgentUpdateWithoutLocationInput>, AgentUncheckedUpdateWithoutLocationInput>
-  }
-
   export type GameCreateNestedOneWithoutAlliancesInput = {
     create?: XOR<GameCreateWithoutAlliancesInput, GameUncheckedCreateWithoutAlliancesInput>
     connectOrCreate?: GameCreateOrConnectWithoutAlliancesInput
     connect?: GameWhereUniqueInput
   }
 
-  export type AgentCreateNestedOneWithoutCurrentAllianceInput = {
-    create?: XOR<AgentCreateWithoutCurrentAllianceInput, AgentUncheckedCreateWithoutCurrentAllianceInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutCurrentAllianceInput
+  export type AgentCreateNestedOneWithoutInitiatedAlliancesInput = {
+    create?: XOR<AgentCreateWithoutInitiatedAlliancesInput, AgentUncheckedCreateWithoutInitiatedAlliancesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutInitiatedAlliancesInput
     connect?: AgentWhereUniqueInput
   }
 
-  export type AgentCreateNestedOneWithoutAlliedByInput = {
-    create?: XOR<AgentCreateWithoutAlliedByInput, AgentUncheckedCreateWithoutAlliedByInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutAlliedByInput
+  export type AgentCreateNestedOneWithoutJoinedAlliancesInput = {
+    create?: XOR<AgentCreateWithoutJoinedAlliancesInput, AgentUncheckedCreateWithoutJoinedAlliancesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutJoinedAlliancesInput
     connect?: AgentWhereUniqueInput
+  }
+
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type EnumAllianceStatusFieldUpdateOperationsInput = {
@@ -19739,46 +17144,50 @@ export namespace Prisma {
     update?: XOR<XOR<GameUpdateToOneWithWhereWithoutAlliancesInput, GameUpdateWithoutAlliancesInput>, GameUncheckedUpdateWithoutAlliancesInput>
   }
 
-  export type AgentUpdateOneRequiredWithoutCurrentAllianceNestedInput = {
-    create?: XOR<AgentCreateWithoutCurrentAllianceInput, AgentUncheckedCreateWithoutCurrentAllianceInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutCurrentAllianceInput
-    upsert?: AgentUpsertWithoutCurrentAllianceInput
+  export type AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput = {
+    create?: XOR<AgentCreateWithoutInitiatedAlliancesInput, AgentUncheckedCreateWithoutInitiatedAlliancesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutInitiatedAlliancesInput
+    upsert?: AgentUpsertWithoutInitiatedAlliancesInput
     connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutCurrentAllianceInput, AgentUpdateWithoutCurrentAllianceInput>, AgentUncheckedUpdateWithoutCurrentAllianceInput>
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutInitiatedAlliancesInput, AgentUpdateWithoutInitiatedAlliancesInput>, AgentUncheckedUpdateWithoutInitiatedAlliancesInput>
   }
 
-  export type AgentUpdateOneRequiredWithoutAlliedByNestedInput = {
-    create?: XOR<AgentCreateWithoutAlliedByInput, AgentUncheckedCreateWithoutAlliedByInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutAlliedByInput
-    upsert?: AgentUpsertWithoutAlliedByInput
+  export type AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput = {
+    create?: XOR<AgentCreateWithoutJoinedAlliancesInput, AgentUncheckedCreateWithoutJoinedAlliancesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutJoinedAlliancesInput
+    upsert?: AgentUpsertWithoutJoinedAlliancesInput
     connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutAlliedByInput, AgentUpdateWithoutAlliedByInput>, AgentUncheckedUpdateWithoutAlliedByInput>
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutJoinedAlliancesInput, AgentUpdateWithoutJoinedAlliancesInput>, AgentUncheckedUpdateWithoutJoinedAlliancesInput>
+  }
+
+  export type AgentCreateNestedOneWithoutBattlesAsAttackerInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutBattlesAsDefenderInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput
+    connect?: AgentWhereUniqueInput
   }
 
   export type GameCreateNestedOneWithoutBattlesInput = {
     create?: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
     connectOrCreate?: GameCreateOrConnectWithoutBattlesInput
     connect?: GameWhereUniqueInput
-  }
-
-  export type AgentCreateNestedOneWithoutBattlesInput = {
-    create?: XOR<AgentCreateWithoutBattlesInput, AgentUncheckedCreateWithoutBattlesInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutBattlesInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type AgentCreateNestedOneWithoutBattlesAsOpponentInput = {
-    create?: XOR<AgentCreateWithoutBattlesAsOpponentInput, AgentUncheckedCreateWithoutBattlesAsOpponentInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsOpponentInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type EnumBattleTypeFieldUpdateOperationsInput = {
@@ -19793,6 +17202,42 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerInput
+    upsert?: AgentUpsertWithoutBattlesAsAttackerInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsAttackerInput, AgentUpdateWithoutBattlesAsAttackerInput>, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+  }
+
+  export type AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput
+    upsert?: AgentUpsertWithoutBattlesAsAttackerAllyInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsAttackerAllyInput, AgentUpdateWithoutBattlesAsAttackerAllyInput>, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
+  }
+
+  export type AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderInput
+    upsert?: AgentUpsertWithoutBattlesAsDefenderInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsDefenderInput, AgentUpdateWithoutBattlesAsDefenderInput>, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+  }
+
+  export type AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput
+    upsert?: AgentUpsertWithoutBattlesAsDefenderAllyInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsDefenderAllyInput, AgentUpdateWithoutBattlesAsDefenderAllyInput>, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+  }
+
   export type GameUpdateOneRequiredWithoutBattlesNestedInput = {
     create?: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
     connectOrCreate?: GameCreateOrConnectWithoutBattlesInput
@@ -19801,26 +17246,14 @@ export namespace Prisma {
     update?: XOR<XOR<GameUpdateToOneWithWhereWithoutBattlesInput, GameUpdateWithoutBattlesInput>, GameUncheckedUpdateWithoutBattlesInput>
   }
 
-  export type AgentUpdateOneRequiredWithoutBattlesNestedInput = {
-    create?: XOR<AgentCreateWithoutBattlesInput, AgentUncheckedCreateWithoutBattlesInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutBattlesInput
-    upsert?: AgentUpsertWithoutBattlesInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesInput, AgentUpdateWithoutBattlesInput>, AgentUncheckedUpdateWithoutBattlesInput>
-  }
-
-  export type AgentUpdateOneRequiredWithoutBattlesAsOpponentNestedInput = {
-    create?: XOR<AgentCreateWithoutBattlesAsOpponentInput, AgentUncheckedCreateWithoutBattlesAsOpponentInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsOpponentInput
-    upsert?: AgentUpsertWithoutBattlesAsOpponentInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsOpponentInput, AgentUpdateWithoutBattlesAsOpponentInput>, AgentUncheckedUpdateWithoutBattlesAsOpponentInput>
-  }
-
   export type TweetCreateNestedOneWithoutInteractionsInput = {
     create?: XOR<TweetCreateWithoutInteractionsInput, TweetUncheckedCreateWithoutInteractionsInput>
     connectOrCreate?: TweetCreateOrConnectWithoutInteractionsInput
     connect?: TweetWhereUniqueInput
+  }
+
+  export type EnumInteractionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.InteractionType
   }
 
   export type TweetUpdateOneRequiredWithoutInteractionsNestedInput = {
@@ -19831,29 +17264,35 @@ export namespace Prisma {
     update?: XOR<XOR<TweetUpdateToOneWithWhereWithoutInteractionsInput, TweetUpdateWithoutInteractionsInput>, TweetUncheckedUpdateWithoutInteractionsInput>
   }
 
-  export type AgentCreateNestedOneWithoutStateInput = {
-    create?: XOR<AgentCreateWithoutStateInput, AgentUncheckedCreateWithoutStateInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutStateInput
+  export type AgentCreateNestedOneWithoutMapTilesInput = {
+    create?: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutMapTilesInput
     connect?: AgentWhereUniqueInput
   }
 
-  export type AgentUpdateOneRequiredWithoutStateNestedInput = {
-    create?: XOR<AgentCreateWithoutStateInput, AgentUncheckedCreateWithoutStateInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutStateInput
-    upsert?: AgentUpsertWithoutStateInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutStateInput, AgentUpdateWithoutStateInput>, AgentUncheckedUpdateWithoutStateInput>
+  export type EnumTerrainTypeFieldUpdateOperationsInput = {
+    set?: $Enums.TerrainType
   }
 
-  export type AgentCreateNestedOneWithoutCooldownsInput = {
-    create?: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutCooldownsInput
+  export type AgentUpdateOneWithoutMapTilesNestedInput = {
+    create?: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutMapTilesInput
+    upsert?: AgentUpsertWithoutMapTilesInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutMapTilesInput, AgentUpdateWithoutMapTilesInput>, AgentUncheckedUpdateWithoutMapTilesInput>
+  }
+
+  export type AgentCreateNestedOneWithoutCoolDownInput = {
+    create?: XOR<AgentCreateWithoutCoolDownInput, AgentUncheckedCreateWithoutCoolDownInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutCoolDownInput
     connect?: AgentWhereUniqueInput
   }
 
-  export type GameCreateNestedOneWithoutCooldownInput = {
-    create?: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
-    connectOrCreate?: GameCreateOrConnectWithoutCooldownInput
+  export type GameCreateNestedOneWithoutCoolDownInput = {
+    create?: XOR<GameCreateWithoutCoolDownInput, GameUncheckedCreateWithoutCoolDownInput>
+    connectOrCreate?: GameCreateOrConnectWithoutCoolDownInput
     connect?: GameWhereUniqueInput
   }
 
@@ -19861,34 +17300,20 @@ export namespace Prisma {
     set?: $Enums.CooldownType
   }
 
-  export type AgentUpdateOneRequiredWithoutCooldownsNestedInput = {
-    create?: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutCooldownsInput
-    upsert?: AgentUpsertWithoutCooldownsInput
+  export type AgentUpdateOneRequiredWithoutCoolDownNestedInput = {
+    create?: XOR<AgentCreateWithoutCoolDownInput, AgentUncheckedCreateWithoutCoolDownInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutCoolDownInput
+    upsert?: AgentUpsertWithoutCoolDownInput
     connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutCooldownsInput, AgentUpdateWithoutCooldownsInput>, AgentUncheckedUpdateWithoutCooldownsInput>
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutCoolDownInput, AgentUpdateWithoutCoolDownInput>, AgentUncheckedUpdateWithoutCoolDownInput>
   }
 
-  export type GameUpdateOneRequiredWithoutCooldownNestedInput = {
-    create?: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
-    connectOrCreate?: GameCreateOrConnectWithoutCooldownInput
-    upsert?: GameUpsertWithoutCooldownInput
+  export type GameUpdateOneRequiredWithoutCoolDownNestedInput = {
+    create?: XOR<GameCreateWithoutCoolDownInput, GameUncheckedCreateWithoutCoolDownInput>
+    connectOrCreate?: GameCreateOrConnectWithoutCoolDownInput
+    upsert?: GameUpsertWithoutCoolDownInput
     connect?: GameWhereUniqueInput
-    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutCooldownInput, GameUpdateWithoutCooldownInput>, GameUncheckedUpdateWithoutCooldownInput>
-  }
-
-  export type AgentCreateNestedOneWithoutStrategyInput = {
-    create?: XOR<AgentCreateWithoutStrategyInput, AgentUncheckedCreateWithoutStrategyInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutStrategyInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type AgentUpdateOneRequiredWithoutStrategyNestedInput = {
-    create?: XOR<AgentCreateWithoutStrategyInput, AgentUncheckedCreateWithoutStrategyInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutStrategyInput
-    upsert?: AgentUpsertWithoutStrategyInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutStrategyInput, AgentUpdateWithoutStrategyInput>, AgentUncheckedUpdateWithoutStrategyInput>
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutCoolDownInput, GameUpdateWithoutCoolDownInput>, GameUncheckedUpdateWithoutCoolDownInput>
   }
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -20109,21 +17534,15 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedEnumTerrainTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
-  }
-
-  export type NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
-    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumAllianceStatusFilter<$PrismaModel = never> = {
@@ -20131,6 +17550,22 @@ export namespace Prisma {
     in?: $Enums.AllianceStatus[] | ListEnumAllianceStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.AllianceStatus[] | ListEnumAllianceStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumAllianceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -20141,17 +17576,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumAllianceStatusFilter<$PrismaModel>
     _max?: NestedEnumAllianceStatusFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumBattleTypeFilter<$PrismaModel = never> = {
@@ -20177,22 +17601,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumBattleTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -20227,6 +17635,40 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInteractionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.InteractionType | EnumInteractionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInteractionTypeFilter<$PrismaModel> | $Enums.InteractionType
+  }
+
+  export type NestedEnumInteractionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InteractionType | EnumInteractionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InteractionType[] | ListEnumInteractionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInteractionTypeWithAggregatesFilter<$PrismaModel> | $Enums.InteractionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInteractionTypeFilter<$PrismaModel>
+    _max?: NestedEnumInteractionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTerrainTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
+  }
+
+  export type NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
+    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
   }
 
   export type NestedEnumCooldownTypeFilter<$PrismaModel = never> = {
@@ -20265,40 +17707,36 @@ export namespace Prisma {
 
   export type AgentCreateWithoutGameInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutGameInput = {
@@ -20313,20 +17751,20 @@ export namespace Prisma {
 
   export type AllianceCreateWithoutGameInput = {
     id?: string
-    formedAt?: Date | string
-    combinedTokens: number
+    combinedTokens?: number | null
     status?: $Enums.AllianceStatus
-    agent: AgentCreateNestedOneWithoutCurrentAllianceInput
-    alliedAgent: AgentCreateNestedOneWithoutAlliedByInput
+    timestamp?: Date | string
+    initiator: AgentCreateNestedOneWithoutInitiatedAlliancesInput
+    joiner: AgentCreateNestedOneWithoutJoinedAlliancesInput
   }
 
   export type AllianceUncheckedCreateWithoutGameInput = {
     id?: string
-    formedAt?: Date | string
-    combinedTokens: number
+    combinedTokens?: number | null
     status?: $Enums.AllianceStatus
-    agentId: string
-    alliedAgentId: string
+    timestamp?: Date | string
+    initiatorId: string
+    joinerId: string
   }
 
   export type AllianceCreateOrConnectWithoutGameInput = {
@@ -20342,32 +17780,32 @@ export namespace Prisma {
   export type BattleCreateWithoutGameInput = {
     id?: string
     timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
     type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
     status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
+    startTime?: Date | string
     resolvedAt?: Date | string | null
-    agent: AgentCreateNestedOneWithoutBattlesInput
-    opponent: AgentCreateNestedOneWithoutBattlesAsOpponentInput
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
   }
 
   export type BattleUncheckedCreateWithoutGameInput = {
     id?: string
     timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    agentId: string
-    opponentId: string
     type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderId: string
+    defenderAllyId?: string | null
     status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
+    startTime?: Date | string
     resolvedAt?: Date | string | null
   }
 
@@ -20381,29 +17819,27 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type CooldownCreateWithoutGameInput = {
+  export type CoolDownCreateWithoutGameInput = {
     id?: string
     type: $Enums.CooldownType
     endsAt: Date | string
-    targetAgentId?: string | null
-    agent: AgentCreateNestedOneWithoutCooldownsInput
+    cooledAgent: AgentCreateNestedOneWithoutCoolDownInput
   }
 
-  export type CooldownUncheckedCreateWithoutGameInput = {
+  export type CoolDownUncheckedCreateWithoutGameInput = {
     id?: string
     type: $Enums.CooldownType
     endsAt: Date | string
-    agentId: string
-    targetAgentId?: string | null
+    cooledAgentId: string
   }
 
-  export type CooldownCreateOrConnectWithoutGameInput = {
-    where: CooldownWhereUniqueInput
-    create: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput>
+  export type CoolDownCreateOrConnectWithoutGameInput = {
+    where: CoolDownWhereUniqueInput
+    create: XOR<CoolDownCreateWithoutGameInput, CoolDownUncheckedCreateWithoutGameInput>
   }
 
-  export type CooldownCreateManyGameInputEnvelope = {
-    data: CooldownCreateManyGameInput | CooldownCreateManyGameInput[]
+  export type CoolDownCreateManyGameInputEnvelope = {
+    data: CoolDownCreateManyGameInput | CoolDownCreateManyGameInput[]
     skipDuplicates?: boolean
   }
 
@@ -20428,13 +17864,11 @@ export namespace Prisma {
     OR?: AgentScalarWhereInput[]
     NOT?: AgentScalarWhereInput | AgentScalarWhereInput[]
     id?: StringFilter<"Agent"> | string
-    agentId?: IntFilter<"Agent"> | number
-    publicKey?: StringFilter<"Agent"> | string
-    agentProfileId?: StringFilter<"Agent"> | string
+    onchainId?: IntFilter<"Agent"> | number
+    authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
-    createdAt?: DateTimeFilter<"Agent"> | Date | string
-    updatedAt?: DateTimeFilter<"Agent"> | Date | string
     gameId?: StringFilter<"Agent"> | string
+    profileId?: StringFilter<"Agent"> | string
   }
 
   export type AllianceUpsertWithWhereUniqueWithoutGameInput = {
@@ -20458,12 +17892,12 @@ export namespace Prisma {
     OR?: AllianceScalarWhereInput[]
     NOT?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
     id?: StringFilter<"Alliance"> | string
-    formedAt?: DateTimeFilter<"Alliance"> | Date | string
-    combinedTokens?: FloatFilter<"Alliance"> | number
+    combinedTokens?: FloatNullableFilter<"Alliance"> | number | null
     status?: EnumAllianceStatusFilter<"Alliance"> | $Enums.AllianceStatus
+    timestamp?: DateTimeFilter<"Alliance"> | Date | string
     gameId?: StringFilter<"Alliance"> | string
-    agentId?: StringFilter<"Alliance"> | string
-    alliedAgentId?: StringFilter<"Alliance"> | string
+    initiatorId?: StringFilter<"Alliance"> | string
+    joinerId?: StringFilter<"Alliance"> | string
   }
 
   export type BattleUpsertWithWhereUniqueWithoutGameInput = {
@@ -20488,404 +17922,105 @@ export namespace Prisma {
     NOT?: BattleScalarWhereInput | BattleScalarWhereInput[]
     id?: StringFilter<"Battle"> | string
     timestamp?: DateTimeFilter<"Battle"> | Date | string
-    outcome?: StringFilter<"Battle"> | string
-    tokensLost?: FloatNullableFilter<"Battle"> | number | null
-    tokensGained?: FloatNullableFilter<"Battle"> | number | null
-    probability?: FloatFilter<"Battle"> | number
-    gameId?: StringFilter<"Battle"> | string
-    agentId?: StringFilter<"Battle"> | string
-    opponentId?: StringFilter<"Battle"> | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
+    tokensStaked?: FloatFilter<"Battle"> | number
+    tokensLost?: FloatNullableFilter<"Battle"> | number | null
+    outcome?: StringNullableFilter<"Battle"> | string | null
+    attackerId?: StringFilter<"Battle"> | string
+    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
+    defenderId?: StringFilter<"Battle"> | string
+    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
+    gameId?: StringFilter<"Battle"> | string
     startTime?: DateTimeFilter<"Battle"> | Date | string
-    resolutionTime?: DateTimeFilter<"Battle"> | Date | string
     resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
   }
 
-  export type CooldownUpsertWithWhereUniqueWithoutGameInput = {
-    where: CooldownWhereUniqueInput
-    update: XOR<CooldownUpdateWithoutGameInput, CooldownUncheckedUpdateWithoutGameInput>
-    create: XOR<CooldownCreateWithoutGameInput, CooldownUncheckedCreateWithoutGameInput>
+  export type CoolDownUpsertWithWhereUniqueWithoutGameInput = {
+    where: CoolDownWhereUniqueInput
+    update: XOR<CoolDownUpdateWithoutGameInput, CoolDownUncheckedUpdateWithoutGameInput>
+    create: XOR<CoolDownCreateWithoutGameInput, CoolDownUncheckedCreateWithoutGameInput>
   }
 
-  export type CooldownUpdateWithWhereUniqueWithoutGameInput = {
-    where: CooldownWhereUniqueInput
-    data: XOR<CooldownUpdateWithoutGameInput, CooldownUncheckedUpdateWithoutGameInput>
+  export type CoolDownUpdateWithWhereUniqueWithoutGameInput = {
+    where: CoolDownWhereUniqueInput
+    data: XOR<CoolDownUpdateWithoutGameInput, CoolDownUncheckedUpdateWithoutGameInput>
   }
 
-  export type CooldownUpdateManyWithWhereWithoutGameInput = {
-    where: CooldownScalarWhereInput
-    data: XOR<CooldownUpdateManyMutationInput, CooldownUncheckedUpdateManyWithoutGameInput>
+  export type CoolDownUpdateManyWithWhereWithoutGameInput = {
+    where: CoolDownScalarWhereInput
+    data: XOR<CoolDownUpdateManyMutationInput, CoolDownUncheckedUpdateManyWithoutGameInput>
   }
 
-  export type CooldownScalarWhereInput = {
-    AND?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
-    OR?: CooldownScalarWhereInput[]
-    NOT?: CooldownScalarWhereInput | CooldownScalarWhereInput[]
-    id?: StringFilter<"Cooldown"> | string
-    type?: EnumCooldownTypeFilter<"Cooldown"> | $Enums.CooldownType
-    endsAt?: DateTimeFilter<"Cooldown"> | Date | string
-    agentId?: StringFilter<"Cooldown"> | string
-    targetAgentId?: StringNullableFilter<"Cooldown"> | string | null
-    gameId?: StringFilter<"Cooldown"> | string
+  export type CoolDownScalarWhereInput = {
+    AND?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
+    OR?: CoolDownScalarWhereInput[]
+    NOT?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
+    id?: StringFilter<"CoolDown"> | string
+    type?: EnumCooldownTypeFilter<"CoolDown"> | $Enums.CooldownType
+    endsAt?: DateTimeFilter<"CoolDown"> | Date | string
+    cooledAgentId?: StringFilter<"CoolDown"> | string
+    gameId?: StringFilter<"CoolDown"> | string
   }
 
-  export type AgentCreateWithoutAgentProfileInput = {
+  export type AgentCreateWithoutProfileInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
+    tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
   }
 
-  export type AgentUncheckedCreateWithoutAgentProfileInput = {
+  export type AgentUncheckedCreateWithoutProfileInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
-  export type AgentCreateOrConnectWithoutAgentProfileInput = {
+  export type AgentCreateOrConnectWithoutProfileInput = {
     where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutAgentProfileInput, AgentUncheckedCreateWithoutAgentProfileInput>
+    create: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput>
   }
 
-  export type AgentCreateManyAgentProfileInputEnvelope = {
-    data: AgentCreateManyAgentProfileInput | AgentCreateManyAgentProfileInput[]
+  export type AgentCreateManyProfileInputEnvelope = {
+    data: AgentCreateManyProfileInput | AgentCreateManyProfileInput[]
     skipDuplicates?: boolean
   }
 
-  export type AgentUpsertWithWhereUniqueWithoutAgentProfileInput = {
+  export type AgentUpsertWithWhereUniqueWithoutProfileInput = {
     where: AgentWhereUniqueInput
-    update: XOR<AgentUpdateWithoutAgentProfileInput, AgentUncheckedUpdateWithoutAgentProfileInput>
-    create: XOR<AgentCreateWithoutAgentProfileInput, AgentUncheckedCreateWithoutAgentProfileInput>
+    update: XOR<AgentUpdateWithoutProfileInput, AgentUncheckedUpdateWithoutProfileInput>
+    create: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput>
   }
 
-  export type AgentUpdateWithWhereUniqueWithoutAgentProfileInput = {
+  export type AgentUpdateWithWhereUniqueWithoutProfileInput = {
     where: AgentWhereUniqueInput
-    data: XOR<AgentUpdateWithoutAgentProfileInput, AgentUncheckedUpdateWithoutAgentProfileInput>
+    data: XOR<AgentUpdateWithoutProfileInput, AgentUncheckedUpdateWithoutProfileInput>
   }
 
-  export type AgentUpdateManyWithWhereWithoutAgentProfileInput = {
+  export type AgentUpdateManyWithWhereWithoutProfileInput = {
     where: AgentScalarWhereInput
-    data: XOR<AgentUpdateManyMutationInput, AgentUncheckedUpdateManyWithoutAgentProfileInput>
-  }
-
-  export type AgentProfileCreateWithoutAgentInput = {
-    id?: string
-    onchainId: number
-    name: string
-    xHandle: string
-    bio?: AgentProfileCreatebioInput | string[]
-    lore?: AgentProfileCreateloreInput | string[]
-    characteristics?: AgentProfileCreatecharacteristicsInput | string[]
-    knowledge?: AgentProfileCreateknowledgeInput | string[]
-    traits: JsonNullValueInput | InputJsonValue
-  }
-
-  export type AgentProfileUncheckedCreateWithoutAgentInput = {
-    id?: string
-    onchainId: number
-    name: string
-    xHandle: string
-    bio?: AgentProfileCreatebioInput | string[]
-    lore?: AgentProfileCreateloreInput | string[]
-    characteristics?: AgentProfileCreatecharacteristicsInput | string[]
-    knowledge?: AgentProfileCreateknowledgeInput | string[]
-    traits: JsonNullValueInput | InputJsonValue
-  }
-
-  export type AgentProfileCreateOrConnectWithoutAgentInput = {
-    where: AgentProfileWhereUniqueInput
-    create: XOR<AgentProfileCreateWithoutAgentInput, AgentProfileUncheckedCreateWithoutAgentInput>
-  }
-
-  export type GameCreateWithoutAgentsInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    alliances?: AllianceCreateNestedManyWithoutGameInput
-    battles?: BattleCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownCreateNestedManyWithoutGameInput
-  }
-
-  export type GameUncheckedCreateWithoutAgentsInput = {
-    id?: string
-    gameId: bigint | number
-    authority: string
-    tokenMint: string
-    rewardsVault: string
-    mapDiameter: number
-    isActive?: boolean
-    lastUpdate?: Date | string
-    bump: number
-    dailyRewardTokens: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
-    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
-  }
-
-  export type GameCreateOrConnectWithoutAgentsInput = {
-    where: GameWhereUniqueInput
-    create: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
-  }
-
-  export type LocationCreateWithoutAgentInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-  }
-
-  export type LocationUncheckedCreateWithoutAgentInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-  }
-
-  export type LocationCreateOrConnectWithoutAgentInput = {
-    where: LocationWhereUniqueInput
-    create: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
-  }
-
-  export type AllianceCreateWithoutAgentInput = {
-    id?: string
-    formedAt?: Date | string
-    combinedTokens: number
-    status?: $Enums.AllianceStatus
-    game: GameCreateNestedOneWithoutAlliancesInput
-    alliedAgent: AgentCreateNestedOneWithoutAlliedByInput
-  }
-
-  export type AllianceUncheckedCreateWithoutAgentInput = {
-    id?: string
-    formedAt?: Date | string
-    combinedTokens: number
-    status?: $Enums.AllianceStatus
-    gameId: string
-    alliedAgentId: string
-  }
-
-  export type AllianceCreateOrConnectWithoutAgentInput = {
-    where: AllianceWhereUniqueInput
-    create: XOR<AllianceCreateWithoutAgentInput, AllianceUncheckedCreateWithoutAgentInput>
-  }
-
-  export type BattleCreateWithoutAgentInput = {
-    id?: string
-    timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    type?: $Enums.BattleType
-    status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
-    resolvedAt?: Date | string | null
-    game: GameCreateNestedOneWithoutBattlesInput
-    opponent: AgentCreateNestedOneWithoutBattlesAsOpponentInput
-  }
-
-  export type BattleUncheckedCreateWithoutAgentInput = {
-    id?: string
-    timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    gameId: string
-    opponentId: string
-    type?: $Enums.BattleType
-    status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
-    resolvedAt?: Date | string | null
-  }
-
-  export type BattleCreateOrConnectWithoutAgentInput = {
-    where: BattleWhereUniqueInput
-    create: XOR<BattleCreateWithoutAgentInput, BattleUncheckedCreateWithoutAgentInput>
-  }
-
-  export type BattleCreateManyAgentInputEnvelope = {
-    data: BattleCreateManyAgentInput | BattleCreateManyAgentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type AgentStateCreateWithoutAgentInput = {
-    id?: string
-    isAlive?: boolean
-    lastActionType: string
-    lastActionTime?: Date | string
-    lastActionDetails: string
-    influencedByTweet?: string | null
-    influenceScore?: number
-  }
-
-  export type AgentStateUncheckedCreateWithoutAgentInput = {
-    id?: string
-    isAlive?: boolean
-    lastActionType: string
-    lastActionTime?: Date | string
-    lastActionDetails: string
-    influencedByTweet?: string | null
-    influenceScore?: number
-  }
-
-  export type AgentStateCreateOrConnectWithoutAgentInput = {
-    where: AgentStateWhereUniqueInput
-    create: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
-  }
-
-  export type StrategyCreateWithoutAgentInput = {
-    id?: string
-    publicStrategy: string
-    actualStrategy: string
-    deceptionLevel: number
-  }
-
-  export type StrategyUncheckedCreateWithoutAgentInput = {
-    id?: string
-    publicStrategy: string
-    actualStrategy: string
-    deceptionLevel: number
-  }
-
-  export type StrategyCreateOrConnectWithoutAgentInput = {
-    where: StrategyWhereUniqueInput
-    create: XOR<StrategyCreateWithoutAgentInput, StrategyUncheckedCreateWithoutAgentInput>
-  }
-
-  export type CooldownCreateWithoutAgentInput = {
-    id?: string
-    type: $Enums.CooldownType
-    endsAt: Date | string
-    targetAgentId?: string | null
-    game: GameCreateNestedOneWithoutCooldownInput
-  }
-
-  export type CooldownUncheckedCreateWithoutAgentInput = {
-    id?: string
-    type: $Enums.CooldownType
-    endsAt: Date | string
-    targetAgentId?: string | null
-    gameId: string
-  }
-
-  export type CooldownCreateOrConnectWithoutAgentInput = {
-    where: CooldownWhereUniqueInput
-    create: XOR<CooldownCreateWithoutAgentInput, CooldownUncheckedCreateWithoutAgentInput>
-  }
-
-  export type CooldownCreateManyAgentInputEnvelope = {
-    data: CooldownCreateManyAgentInput | CooldownCreateManyAgentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type AllianceCreateWithoutAlliedAgentInput = {
-    id?: string
-    formedAt?: Date | string
-    combinedTokens: number
-    status?: $Enums.AllianceStatus
-    game: GameCreateNestedOneWithoutAlliancesInput
-    agent: AgentCreateNestedOneWithoutCurrentAllianceInput
-  }
-
-  export type AllianceUncheckedCreateWithoutAlliedAgentInput = {
-    id?: string
-    formedAt?: Date | string
-    combinedTokens: number
-    status?: $Enums.AllianceStatus
-    gameId: string
-    agentId: string
-  }
-
-  export type AllianceCreateOrConnectWithoutAlliedAgentInput = {
-    where: AllianceWhereUniqueInput
-    create: XOR<AllianceCreateWithoutAlliedAgentInput, AllianceUncheckedCreateWithoutAlliedAgentInput>
-  }
-
-  export type AllianceCreateManyAlliedAgentInputEnvelope = {
-    data: AllianceCreateManyAlliedAgentInput | AllianceCreateManyAlliedAgentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type BattleCreateWithoutOpponentInput = {
-    id?: string
-    timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    type?: $Enums.BattleType
-    status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
-    resolvedAt?: Date | string | null
-    game: GameCreateNestedOneWithoutBattlesInput
-    agent: AgentCreateNestedOneWithoutBattlesInput
-  }
-
-  export type BattleUncheckedCreateWithoutOpponentInput = {
-    id?: string
-    timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    gameId: string
-    agentId: string
-    type?: $Enums.BattleType
-    status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
-    resolvedAt?: Date | string | null
-  }
-
-  export type BattleCreateOrConnectWithoutOpponentInput = {
-    where: BattleWhereUniqueInput
-    create: XOR<BattleCreateWithoutOpponentInput, BattleUncheckedCreateWithoutOpponentInput>
-  }
-
-  export type BattleCreateManyOpponentInputEnvelope = {
-    data: BattleCreateManyOpponentInput | BattleCreateManyOpponentInput[]
-    skipDuplicates?: boolean
+    data: XOR<AgentUpdateManyMutationInput, AgentUncheckedUpdateManyWithoutProfileInput>
   }
 
   export type TweetCreateWithoutAgentInput = {
@@ -20916,260 +18051,348 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type AgentProfileUpsertWithoutAgentInput = {
-    update: XOR<AgentProfileUpdateWithoutAgentInput, AgentProfileUncheckedUpdateWithoutAgentInput>
-    create: XOR<AgentProfileCreateWithoutAgentInput, AgentProfileUncheckedCreateWithoutAgentInput>
-    where?: AgentProfileWhereInput
+  export type GameCreateWithoutAgentsInput = {
+    id?: string
+    onchainId: bigint | number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    alliances?: AllianceCreateNestedManyWithoutGameInput
+    battles?: BattleCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownCreateNestedManyWithoutGameInput
   }
 
-  export type AgentProfileUpdateToOneWithWhereWithoutAgentInput = {
-    where?: AgentProfileWhereInput
-    data: XOR<AgentProfileUpdateWithoutAgentInput, AgentProfileUncheckedUpdateWithoutAgentInput>
+  export type GameUncheckedCreateWithoutAgentsInput = {
+    id?: string
+    onchainId: bigint | number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
+    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
   }
 
-  export type AgentProfileUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    xHandle?: StringFieldUpdateOperationsInput | string
-    bio?: AgentProfileUpdatebioInput | string[]
-    lore?: AgentProfileUpdateloreInput | string[]
-    characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
-    knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    traits?: JsonNullValueInput | InputJsonValue
-  }
-
-  export type AgentProfileUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    xHandle?: StringFieldUpdateOperationsInput | string
-    bio?: AgentProfileUpdatebioInput | string[]
-    lore?: AgentProfileUpdateloreInput | string[]
-    characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
-    knowledge?: AgentProfileUpdateknowledgeInput | string[]
-    traits?: JsonNullValueInput | InputJsonValue
-  }
-
-  export type GameUpsertWithoutAgentsInput = {
-    update: XOR<GameUpdateWithoutAgentsInput, GameUncheckedUpdateWithoutAgentsInput>
+  export type GameCreateOrConnectWithoutAgentsInput = {
+    where: GameWhereUniqueInput
     create: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
-    where?: GameWhereInput
   }
 
-  export type GameUpdateToOneWithWhereWithoutAgentsInput = {
-    where?: GameWhereInput
-    data: XOR<GameUpdateWithoutAgentsInput, GameUncheckedUpdateWithoutAgentsInput>
+  export type BattleCreateWithoutAttackerInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    status?: $Enums.BattleStatus
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    game: GameCreateNestedOneWithoutBattlesInput
   }
 
-  export type GameUpdateWithoutAgentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alliances?: AllianceUpdateManyWithoutGameNestedInput
-    battles?: BattleUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
+  export type BattleUncheckedCreateWithoutAttackerInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerAllyId?: string | null
+    defenderId: string
+    defenderAllyId?: string | null
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type GameUncheckedUpdateWithoutAgentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
-    authority?: StringFieldUpdateOperationsInput | string
-    tokenMint?: StringFieldUpdateOperationsInput | string
-    rewardsVault?: StringFieldUpdateOperationsInput | string
-    mapDiameter?: IntFieldUpdateOperationsInput | number
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
-    bump?: IntFieldUpdateOperationsInput | number
-    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
-  }
-
-  export type LocationUpsertWithoutAgentInput = {
-    update: XOR<LocationUpdateWithoutAgentInput, LocationUncheckedUpdateWithoutAgentInput>
-    create: XOR<LocationCreateWithoutAgentInput, LocationUncheckedCreateWithoutAgentInput>
-    where?: LocationWhereInput
-  }
-
-  export type LocationUpdateToOneWithWhereWithoutAgentInput = {
-    where?: LocationWhereInput
-    data: XOR<LocationUpdateWithoutAgentInput, LocationUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type LocationUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type LocationUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type AllianceUpsertWithoutAgentInput = {
-    update: XOR<AllianceUpdateWithoutAgentInput, AllianceUncheckedUpdateWithoutAgentInput>
-    create: XOR<AllianceCreateWithoutAgentInput, AllianceUncheckedCreateWithoutAgentInput>
-    where?: AllianceWhereInput
-  }
-
-  export type AllianceUpdateToOneWithWhereWithoutAgentInput = {
-    where?: AllianceWhereInput
-    data: XOR<AllianceUpdateWithoutAgentInput, AllianceUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type AllianceUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
-    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
-    alliedAgent?: AgentUpdateOneRequiredWithoutAlliedByNestedInput
-  }
-
-  export type AllianceUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
-    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    alliedAgentId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type BattleUpsertWithWhereUniqueWithoutAgentInput = {
+  export type BattleCreateOrConnectWithoutAttackerInput = {
     where: BattleWhereUniqueInput
-    update: XOR<BattleUpdateWithoutAgentInput, BattleUncheckedUpdateWithoutAgentInput>
-    create: XOR<BattleCreateWithoutAgentInput, BattleUncheckedCreateWithoutAgentInput>
+    create: XOR<BattleCreateWithoutAttackerInput, BattleUncheckedCreateWithoutAttackerInput>
   }
 
-  export type BattleUpdateWithWhereUniqueWithoutAgentInput = {
+  export type BattleCreateManyAttackerInputEnvelope = {
+    data: BattleCreateManyAttackerInput | BattleCreateManyAttackerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BattleCreateWithoutDefenderInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    status?: $Enums.BattleStatus
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    game: GameCreateNestedOneWithoutBattlesInput
+  }
+
+  export type BattleUncheckedCreateWithoutDefenderInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
+  }
+
+  export type BattleCreateOrConnectWithoutDefenderInput = {
     where: BattleWhereUniqueInput
-    data: XOR<BattleUpdateWithoutAgentInput, BattleUncheckedUpdateWithoutAgentInput>
+    create: XOR<BattleCreateWithoutDefenderInput, BattleUncheckedCreateWithoutDefenderInput>
   }
 
-  export type BattleUpdateManyWithWhereWithoutAgentInput = {
-    where: BattleScalarWhereInput
-    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutAgentInput>
+  export type BattleCreateManyDefenderInputEnvelope = {
+    data: BattleCreateManyDefenderInput | BattleCreateManyDefenderInput[]
+    skipDuplicates?: boolean
   }
 
-  export type AgentStateUpsertWithoutAgentInput = {
-    update: XOR<AgentStateUpdateWithoutAgentInput, AgentStateUncheckedUpdateWithoutAgentInput>
-    create: XOR<AgentStateCreateWithoutAgentInput, AgentStateUncheckedCreateWithoutAgentInput>
-    where?: AgentStateWhereInput
+  export type BattleCreateWithoutAttackerAllyInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    status?: $Enums.BattleStatus
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    game: GameCreateNestedOneWithoutBattlesInput
   }
 
-  export type AgentStateUpdateToOneWithWhereWithoutAgentInput = {
-    where?: AgentStateWhereInput
-    data: XOR<AgentStateUpdateWithoutAgentInput, AgentStateUncheckedUpdateWithoutAgentInput>
+  export type BattleUncheckedCreateWithoutAttackerAllyInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    defenderId: string
+    defenderAllyId?: string | null
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type AgentStateUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    lastActionType?: StringFieldUpdateOperationsInput | string
-    lastActionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastActionDetails?: StringFieldUpdateOperationsInput | string
-    influencedByTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    influenceScore?: FloatFieldUpdateOperationsInput | number
+  export type BattleCreateOrConnectWithoutAttackerAllyInput = {
+    where: BattleWhereUniqueInput
+    create: XOR<BattleCreateWithoutAttackerAllyInput, BattleUncheckedCreateWithoutAttackerAllyInput>
   }
 
-  export type AgentStateUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    lastActionType?: StringFieldUpdateOperationsInput | string
-    lastActionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastActionDetails?: StringFieldUpdateOperationsInput | string
-    influencedByTweet?: NullableStringFieldUpdateOperationsInput | string | null
-    influenceScore?: FloatFieldUpdateOperationsInput | number
+  export type BattleCreateManyAttackerAllyInputEnvelope = {
+    data: BattleCreateManyAttackerAllyInput | BattleCreateManyAttackerAllyInput[]
+    skipDuplicates?: boolean
   }
 
-  export type StrategyUpsertWithoutAgentInput = {
-    update: XOR<StrategyUpdateWithoutAgentInput, StrategyUncheckedUpdateWithoutAgentInput>
-    create: XOR<StrategyCreateWithoutAgentInput, StrategyUncheckedCreateWithoutAgentInput>
-    where?: StrategyWhereInput
+  export type BattleCreateWithoutDefenderAllyInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    status?: $Enums.BattleStatus
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    game: GameCreateNestedOneWithoutBattlesInput
   }
 
-  export type StrategyUpdateToOneWithWhereWithoutAgentInput = {
-    where?: StrategyWhereInput
-    data: XOR<StrategyUpdateWithoutAgentInput, StrategyUncheckedUpdateWithoutAgentInput>
+  export type BattleUncheckedCreateWithoutDefenderAllyInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderId: string
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type StrategyUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    publicStrategy?: StringFieldUpdateOperationsInput | string
-    actualStrategy?: StringFieldUpdateOperationsInput | string
-    deceptionLevel?: IntFieldUpdateOperationsInput | number
+  export type BattleCreateOrConnectWithoutDefenderAllyInput = {
+    where: BattleWhereUniqueInput
+    create: XOR<BattleCreateWithoutDefenderAllyInput, BattleUncheckedCreateWithoutDefenderAllyInput>
   }
 
-  export type StrategyUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    publicStrategy?: StringFieldUpdateOperationsInput | string
-    actualStrategy?: StringFieldUpdateOperationsInput | string
-    deceptionLevel?: IntFieldUpdateOperationsInput | number
+  export type BattleCreateManyDefenderAllyInputEnvelope = {
+    data: BattleCreateManyDefenderAllyInput | BattleCreateManyDefenderAllyInput[]
+    skipDuplicates?: boolean
   }
 
-  export type CooldownUpsertWithWhereUniqueWithoutAgentInput = {
-    where: CooldownWhereUniqueInput
-    update: XOR<CooldownUpdateWithoutAgentInput, CooldownUncheckedUpdateWithoutAgentInput>
-    create: XOR<CooldownCreateWithoutAgentInput, CooldownUncheckedCreateWithoutAgentInput>
+  export type CoolDownCreateWithoutCooledAgentInput = {
+    id?: string
+    type: $Enums.CooldownType
+    endsAt: Date | string
+    game: GameCreateNestedOneWithoutCoolDownInput
   }
 
-  export type CooldownUpdateWithWhereUniqueWithoutAgentInput = {
-    where: CooldownWhereUniqueInput
-    data: XOR<CooldownUpdateWithoutAgentInput, CooldownUncheckedUpdateWithoutAgentInput>
+  export type CoolDownUncheckedCreateWithoutCooledAgentInput = {
+    id?: string
+    type: $Enums.CooldownType
+    endsAt: Date | string
+    gameId: string
   }
 
-  export type CooldownUpdateManyWithWhereWithoutAgentInput = {
-    where: CooldownScalarWhereInput
-    data: XOR<CooldownUpdateManyMutationInput, CooldownUncheckedUpdateManyWithoutAgentInput>
+  export type CoolDownCreateOrConnectWithoutCooledAgentInput = {
+    where: CoolDownWhereUniqueInput
+    create: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput>
   }
 
-  export type AllianceUpsertWithWhereUniqueWithoutAlliedAgentInput = {
+  export type CoolDownCreateManyCooledAgentInputEnvelope = {
+    data: CoolDownCreateManyCooledAgentInput | CoolDownCreateManyCooledAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AllianceCreateWithoutInitiatorInput = {
+    id?: string
+    combinedTokens?: number | null
+    status?: $Enums.AllianceStatus
+    timestamp?: Date | string
+    game: GameCreateNestedOneWithoutAlliancesInput
+    joiner: AgentCreateNestedOneWithoutJoinedAlliancesInput
+  }
+
+  export type AllianceUncheckedCreateWithoutInitiatorInput = {
+    id?: string
+    combinedTokens?: number | null
+    status?: $Enums.AllianceStatus
+    timestamp?: Date | string
+    gameId: string
+    joinerId: string
+  }
+
+  export type AllianceCreateOrConnectWithoutInitiatorInput = {
     where: AllianceWhereUniqueInput
-    update: XOR<AllianceUpdateWithoutAlliedAgentInput, AllianceUncheckedUpdateWithoutAlliedAgentInput>
-    create: XOR<AllianceCreateWithoutAlliedAgentInput, AllianceUncheckedCreateWithoutAlliedAgentInput>
+    create: XOR<AllianceCreateWithoutInitiatorInput, AllianceUncheckedCreateWithoutInitiatorInput>
   }
 
-  export type AllianceUpdateWithWhereUniqueWithoutAlliedAgentInput = {
+  export type AllianceCreateManyInitiatorInputEnvelope = {
+    data: AllianceCreateManyInitiatorInput | AllianceCreateManyInitiatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AllianceCreateWithoutJoinerInput = {
+    id?: string
+    combinedTokens?: number | null
+    status?: $Enums.AllianceStatus
+    timestamp?: Date | string
+    game: GameCreateNestedOneWithoutAlliancesInput
+    initiator: AgentCreateNestedOneWithoutInitiatedAlliancesInput
+  }
+
+  export type AllianceUncheckedCreateWithoutJoinerInput = {
+    id?: string
+    combinedTokens?: number | null
+    status?: $Enums.AllianceStatus
+    timestamp?: Date | string
+    gameId: string
+    initiatorId: string
+  }
+
+  export type AllianceCreateOrConnectWithoutJoinerInput = {
     where: AllianceWhereUniqueInput
-    data: XOR<AllianceUpdateWithoutAlliedAgentInput, AllianceUncheckedUpdateWithoutAlliedAgentInput>
+    create: XOR<AllianceCreateWithoutJoinerInput, AllianceUncheckedCreateWithoutJoinerInput>
   }
 
-  export type AllianceUpdateManyWithWhereWithoutAlliedAgentInput = {
-    where: AllianceScalarWhereInput
-    data: XOR<AllianceUpdateManyMutationInput, AllianceUncheckedUpdateManyWithoutAlliedAgentInput>
+  export type AllianceCreateManyJoinerInputEnvelope = {
+    data: AllianceCreateManyJoinerInput | AllianceCreateManyJoinerInput[]
+    skipDuplicates?: boolean
   }
 
-  export type BattleUpsertWithWhereUniqueWithoutOpponentInput = {
-    where: BattleWhereUniqueInput
-    update: XOR<BattleUpdateWithoutOpponentInput, BattleUncheckedUpdateWithoutOpponentInput>
-    create: XOR<BattleCreateWithoutOpponentInput, BattleUncheckedCreateWithoutOpponentInput>
+  export type MapTileCreateWithoutAgentInput = {
+    id?: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
   }
 
-  export type BattleUpdateWithWhereUniqueWithoutOpponentInput = {
-    where: BattleWhereUniqueInput
-    data: XOR<BattleUpdateWithoutOpponentInput, BattleUncheckedUpdateWithoutOpponentInput>
+  export type MapTileUncheckedCreateWithoutAgentInput = {
+    id?: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
   }
 
-  export type BattleUpdateManyWithWhereWithoutOpponentInput = {
-    where: BattleScalarWhereInput
-    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutOpponentInput>
+  export type MapTileCreateOrConnectWithoutAgentInput = {
+    where: MapTileWhereUniqueInput
+    create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
+  }
+
+  export type MapTileCreateManyAgentInputEnvelope = {
+    data: MapTileCreateManyAgentInput | MapTileCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AgentProfileCreateWithoutAgentsInput = {
+    id?: string
+    onchainId: number
+    name: string
+    xHandle: string
+    followers?: number
+    bio?: AgentProfileCreatebioInput | string[]
+    lore?: AgentProfileCreateloreInput | string[]
+    characteristics?: AgentProfileCreatecharacteristicsInput | string[]
+    knowledge?: AgentProfileCreateknowledgeInput | string[]
+    traits: JsonNullValueInput | InputJsonValue
+  }
+
+  export type AgentProfileUncheckedCreateWithoutAgentsInput = {
+    id?: string
+    onchainId: number
+    name: string
+    xHandle: string
+    followers?: number
+    bio?: AgentProfileCreatebioInput | string[]
+    lore?: AgentProfileCreateloreInput | string[]
+    characteristics?: AgentProfileCreatecharacteristicsInput | string[]
+    knowledge?: AgentProfileCreateknowledgeInput | string[]
+    traits: JsonNullValueInput | InputJsonValue
+  }
+
+  export type AgentProfileCreateOrConnectWithoutAgentsInput = {
+    where: AgentProfileWhereUniqueInput
+    create: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
   }
 
   export type TweetUpsertWithWhereUniqueWithoutAgentInput = {
@@ -21200,54 +18423,273 @@ export namespace Prisma {
     conversationId?: StringNullableFilter<"Tweet"> | string | null
   }
 
-  export type AgentCreateWithoutTweetInput = {
+  export type GameUpsertWithoutAgentsInput = {
+    update: XOR<GameUpdateWithoutAgentsInput, GameUncheckedUpdateWithoutAgentsInput>
+    create: XOR<GameCreateWithoutAgentsInput, GameUncheckedCreateWithoutAgentsInput>
+    where?: GameWhereInput
+  }
+
+  export type GameUpdateToOneWithWhereWithoutAgentsInput = {
+    where?: GameWhereInput
+    data: XOR<GameUpdateWithoutAgentsInput, GameUncheckedUpdateWithoutAgentsInput>
+  }
+
+  export type GameUpdateWithoutAgentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    alliances?: AllianceUpdateManyWithoutGameNestedInput
+    battles?: BattleUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameUncheckedUpdateWithoutAgentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
+    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type BattleUpsertWithWhereUniqueWithoutAttackerInput = {
+    where: BattleWhereUniqueInput
+    update: XOR<BattleUpdateWithoutAttackerInput, BattleUncheckedUpdateWithoutAttackerInput>
+    create: XOR<BattleCreateWithoutAttackerInput, BattleUncheckedCreateWithoutAttackerInput>
+  }
+
+  export type BattleUpdateWithWhereUniqueWithoutAttackerInput = {
+    where: BattleWhereUniqueInput
+    data: XOR<BattleUpdateWithoutAttackerInput, BattleUncheckedUpdateWithoutAttackerInput>
+  }
+
+  export type BattleUpdateManyWithWhereWithoutAttackerInput = {
+    where: BattleScalarWhereInput
+    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutAttackerInput>
+  }
+
+  export type BattleUpsertWithWhereUniqueWithoutDefenderInput = {
+    where: BattleWhereUniqueInput
+    update: XOR<BattleUpdateWithoutDefenderInput, BattleUncheckedUpdateWithoutDefenderInput>
+    create: XOR<BattleCreateWithoutDefenderInput, BattleUncheckedCreateWithoutDefenderInput>
+  }
+
+  export type BattleUpdateWithWhereUniqueWithoutDefenderInput = {
+    where: BattleWhereUniqueInput
+    data: XOR<BattleUpdateWithoutDefenderInput, BattleUncheckedUpdateWithoutDefenderInput>
+  }
+
+  export type BattleUpdateManyWithWhereWithoutDefenderInput = {
+    where: BattleScalarWhereInput
+    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutDefenderInput>
+  }
+
+  export type BattleUpsertWithWhereUniqueWithoutAttackerAllyInput = {
+    where: BattleWhereUniqueInput
+    update: XOR<BattleUpdateWithoutAttackerAllyInput, BattleUncheckedUpdateWithoutAttackerAllyInput>
+    create: XOR<BattleCreateWithoutAttackerAllyInput, BattleUncheckedCreateWithoutAttackerAllyInput>
+  }
+
+  export type BattleUpdateWithWhereUniqueWithoutAttackerAllyInput = {
+    where: BattleWhereUniqueInput
+    data: XOR<BattleUpdateWithoutAttackerAllyInput, BattleUncheckedUpdateWithoutAttackerAllyInput>
+  }
+
+  export type BattleUpdateManyWithWhereWithoutAttackerAllyInput = {
+    where: BattleScalarWhereInput
+    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutAttackerAllyInput>
+  }
+
+  export type BattleUpsertWithWhereUniqueWithoutDefenderAllyInput = {
+    where: BattleWhereUniqueInput
+    update: XOR<BattleUpdateWithoutDefenderAllyInput, BattleUncheckedUpdateWithoutDefenderAllyInput>
+    create: XOR<BattleCreateWithoutDefenderAllyInput, BattleUncheckedCreateWithoutDefenderAllyInput>
+  }
+
+  export type BattleUpdateWithWhereUniqueWithoutDefenderAllyInput = {
+    where: BattleWhereUniqueInput
+    data: XOR<BattleUpdateWithoutDefenderAllyInput, BattleUncheckedUpdateWithoutDefenderAllyInput>
+  }
+
+  export type BattleUpdateManyWithWhereWithoutDefenderAllyInput = {
+    where: BattleScalarWhereInput
+    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutDefenderAllyInput>
+  }
+
+  export type CoolDownUpsertWithWhereUniqueWithoutCooledAgentInput = {
+    where: CoolDownWhereUniqueInput
+    update: XOR<CoolDownUpdateWithoutCooledAgentInput, CoolDownUncheckedUpdateWithoutCooledAgentInput>
+    create: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput>
+  }
+
+  export type CoolDownUpdateWithWhereUniqueWithoutCooledAgentInput = {
+    where: CoolDownWhereUniqueInput
+    data: XOR<CoolDownUpdateWithoutCooledAgentInput, CoolDownUncheckedUpdateWithoutCooledAgentInput>
+  }
+
+  export type CoolDownUpdateManyWithWhereWithoutCooledAgentInput = {
+    where: CoolDownScalarWhereInput
+    data: XOR<CoolDownUpdateManyMutationInput, CoolDownUncheckedUpdateManyWithoutCooledAgentInput>
+  }
+
+  export type AllianceUpsertWithWhereUniqueWithoutInitiatorInput = {
+    where: AllianceWhereUniqueInput
+    update: XOR<AllianceUpdateWithoutInitiatorInput, AllianceUncheckedUpdateWithoutInitiatorInput>
+    create: XOR<AllianceCreateWithoutInitiatorInput, AllianceUncheckedCreateWithoutInitiatorInput>
+  }
+
+  export type AllianceUpdateWithWhereUniqueWithoutInitiatorInput = {
+    where: AllianceWhereUniqueInput
+    data: XOR<AllianceUpdateWithoutInitiatorInput, AllianceUncheckedUpdateWithoutInitiatorInput>
+  }
+
+  export type AllianceUpdateManyWithWhereWithoutInitiatorInput = {
+    where: AllianceScalarWhereInput
+    data: XOR<AllianceUpdateManyMutationInput, AllianceUncheckedUpdateManyWithoutInitiatorInput>
+  }
+
+  export type AllianceUpsertWithWhereUniqueWithoutJoinerInput = {
+    where: AllianceWhereUniqueInput
+    update: XOR<AllianceUpdateWithoutJoinerInput, AllianceUncheckedUpdateWithoutJoinerInput>
+    create: XOR<AllianceCreateWithoutJoinerInput, AllianceUncheckedCreateWithoutJoinerInput>
+  }
+
+  export type AllianceUpdateWithWhereUniqueWithoutJoinerInput = {
+    where: AllianceWhereUniqueInput
+    data: XOR<AllianceUpdateWithoutJoinerInput, AllianceUncheckedUpdateWithoutJoinerInput>
+  }
+
+  export type AllianceUpdateManyWithWhereWithoutJoinerInput = {
+    where: AllianceScalarWhereInput
+    data: XOR<AllianceUpdateManyMutationInput, AllianceUncheckedUpdateManyWithoutJoinerInput>
+  }
+
+  export type MapTileUpsertWithWhereUniqueWithoutAgentInput = {
+    where: MapTileWhereUniqueInput
+    update: XOR<MapTileUpdateWithoutAgentInput, MapTileUncheckedUpdateWithoutAgentInput>
+    create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
+  }
+
+  export type MapTileUpdateWithWhereUniqueWithoutAgentInput = {
+    where: MapTileWhereUniqueInput
+    data: XOR<MapTileUpdateWithoutAgentInput, MapTileUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type MapTileUpdateManyWithWhereWithoutAgentInput = {
+    where: MapTileScalarWhereInput
+    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type MapTileScalarWhereInput = {
+    AND?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
+    OR?: MapTileScalarWhereInput[]
+    NOT?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
+    id?: StringFilter<"MapTile"> | string
+    x?: IntFilter<"MapTile"> | number
+    y?: IntFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
+    occupiedBy?: StringNullableFilter<"MapTile"> | string | null
+  }
+
+  export type AgentProfileUpsertWithoutAgentsInput = {
+    update: XOR<AgentProfileUpdateWithoutAgentsInput, AgentProfileUncheckedUpdateWithoutAgentsInput>
+    create: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
+    where?: AgentProfileWhereInput
+  }
+
+  export type AgentProfileUpdateToOneWithWhereWithoutAgentsInput = {
+    where?: AgentProfileWhereInput
+    data: XOR<AgentProfileUpdateWithoutAgentsInput, AgentProfileUncheckedUpdateWithoutAgentsInput>
+  }
+
+  export type AgentProfileUpdateWithoutAgentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    xHandle?: StringFieldUpdateOperationsInput | string
+    followers?: IntFieldUpdateOperationsInput | number
+    bio?: AgentProfileUpdatebioInput | string[]
+    lore?: AgentProfileUpdateloreInput | string[]
+    characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
+    knowledge?: AgentProfileUpdateknowledgeInput | string[]
+    traits?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type AgentProfileUncheckedUpdateWithoutAgentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    xHandle?: StringFieldUpdateOperationsInput | string
+    followers?: IntFieldUpdateOperationsInput | number
+    bio?: AgentProfileUpdatebioInput | string[]
+    lore?: AgentProfileUpdateloreInput | string[]
+    characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
+    knowledge?: AgentProfileUpdateknowledgeInput | string[]
+    traits?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type AgentCreateWithoutTweetsInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
-  export type AgentUncheckedCreateWithoutTweetInput = {
+  export type AgentUncheckedCreateWithoutTweetsInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
+    profileId: string
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
-  export type AgentCreateOrConnectWithoutTweetInput = {
+  export type AgentCreateOrConnectWithoutTweetsInput = {
     where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
+    create: XOR<AgentCreateWithoutTweetsInput, AgentUncheckedCreateWithoutTweetsInput>
   }
 
   export type InteractionCreateWithoutTweetInput = {
     id?: string
     userId: string
-    type: string
-    content?: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date | string
     userMetrics: JsonNullValueInput | InputJsonValue
   }
@@ -21255,8 +18697,8 @@ export namespace Prisma {
   export type InteractionUncheckedCreateWithoutTweetInput = {
     id?: string
     userId: string
-    type: string
-    content?: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date | string
     userMetrics: JsonNullValueInput | InputJsonValue
   }
@@ -21271,53 +18713,49 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type AgentUpsertWithoutTweetInput = {
-    update: XOR<AgentUpdateWithoutTweetInput, AgentUncheckedUpdateWithoutTweetInput>
-    create: XOR<AgentCreateWithoutTweetInput, AgentUncheckedCreateWithoutTweetInput>
+  export type AgentUpsertWithoutTweetsInput = {
+    update: XOR<AgentUpdateWithoutTweetsInput, AgentUncheckedUpdateWithoutTweetsInput>
+    create: XOR<AgentCreateWithoutTweetsInput, AgentUncheckedCreateWithoutTweetsInput>
     where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutTweetInput = {
+  export type AgentUpdateToOneWithWhereWithoutTweetsInput = {
     where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutTweetInput, AgentUncheckedUpdateWithoutTweetInput>
+    data: XOR<AgentUpdateWithoutTweetsInput, AgentUncheckedUpdateWithoutTweetsInput>
   }
 
-  export type AgentUpdateWithoutTweetInput = {
+  export type AgentUpdateWithoutTweetsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
-  export type AgentUncheckedUpdateWithoutTweetInput = {
+  export type AgentUncheckedUpdateWithoutTweetsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type InteractionUpsertWithWhereUniqueWithoutTweetInput = {
@@ -21343,107 +18781,15 @@ export namespace Prisma {
     id?: StringFilter<"Interaction"> | string
     tweetId?: StringFilter<"Interaction"> | string
     userId?: StringFilter<"Interaction"> | string
-    type?: StringFilter<"Interaction"> | string
-    content?: StringNullableFilter<"Interaction"> | string | null
+    type?: EnumInteractionTypeFilter<"Interaction"> | $Enums.InteractionType
+    content?: StringFilter<"Interaction"> | string
     timestamp?: DateTimeFilter<"Interaction"> | Date | string
     userMetrics?: JsonFilter<"Interaction">
   }
 
-  export type AgentCreateWithoutLocationInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentUncheckedCreateWithoutLocationInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutLocationInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutLocationInput, AgentUncheckedCreateWithoutLocationInput>
-  }
-
-  export type AgentUpsertWithoutLocationInput = {
-    update: XOR<AgentUpdateWithoutLocationInput, AgentUncheckedUpdateWithoutLocationInput>
-    create: XOR<AgentCreateWithoutLocationInput, AgentUncheckedCreateWithoutLocationInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutLocationInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutLocationInput, AgentUncheckedUpdateWithoutLocationInput>
-  }
-
-  export type AgentUpdateWithoutLocationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutLocationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
   export type GameCreateWithoutAlliancesInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -21456,12 +18802,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAlliancesInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -21474,7 +18820,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAlliancesInput = {
@@ -21482,90 +18828,82 @@ export namespace Prisma {
     create: XOR<GameCreateWithoutAlliancesInput, GameUncheckedCreateWithoutAlliancesInput>
   }
 
-  export type AgentCreateWithoutCurrentAllianceInput = {
+  export type AgentCreateWithoutInitiatedAlliancesInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
+    tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
-  export type AgentUncheckedCreateWithoutCurrentAllianceInput = {
+  export type AgentUncheckedCreateWithoutInitiatedAlliancesInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
-  export type AgentCreateOrConnectWithoutCurrentAllianceInput = {
+  export type AgentCreateOrConnectWithoutInitiatedAlliancesInput = {
     where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutCurrentAllianceInput, AgentUncheckedCreateWithoutCurrentAllianceInput>
+    create: XOR<AgentCreateWithoutInitiatedAlliancesInput, AgentUncheckedCreateWithoutInitiatedAlliancesInput>
   }
 
-  export type AgentCreateWithoutAlliedByInput = {
+  export type AgentCreateWithoutJoinedAlliancesInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
+    tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
-  export type AgentUncheckedCreateWithoutAlliedByInput = {
+  export type AgentUncheckedCreateWithoutJoinedAlliancesInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
-  export type AgentCreateOrConnectWithoutAlliedByInput = {
+  export type AgentCreateOrConnectWithoutJoinedAlliancesInput = {
     where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutAlliedByInput, AgentUncheckedCreateWithoutAlliedByInput>
+    create: XOR<AgentCreateWithoutJoinedAlliancesInput, AgentUncheckedCreateWithoutJoinedAlliancesInput>
   }
 
   export type GameUpsertWithoutAlliancesInput = {
@@ -21581,7 +18919,7 @@ export namespace Prisma {
 
   export type GameUpdateWithoutAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -21594,12 +18932,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -21612,110 +18950,258 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
   }
 
-  export type AgentUpsertWithoutCurrentAllianceInput = {
-    update: XOR<AgentUpdateWithoutCurrentAllianceInput, AgentUncheckedUpdateWithoutCurrentAllianceInput>
-    create: XOR<AgentCreateWithoutCurrentAllianceInput, AgentUncheckedCreateWithoutCurrentAllianceInput>
+  export type AgentUpsertWithoutInitiatedAlliancesInput = {
+    update: XOR<AgentUpdateWithoutInitiatedAlliancesInput, AgentUncheckedUpdateWithoutInitiatedAlliancesInput>
+    create: XOR<AgentCreateWithoutInitiatedAlliancesInput, AgentUncheckedCreateWithoutInitiatedAlliancesInput>
     where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutCurrentAllianceInput = {
+  export type AgentUpdateToOneWithWhereWithoutInitiatedAlliancesInput = {
     where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutCurrentAllianceInput, AgentUncheckedUpdateWithoutCurrentAllianceInput>
+    data: XOR<AgentUpdateWithoutInitiatedAlliancesInput, AgentUncheckedUpdateWithoutInitiatedAlliancesInput>
   }
 
-  export type AgentUpdateWithoutCurrentAllianceInput = {
+  export type AgentUpdateWithoutInitiatedAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
-  export type AgentUncheckedUpdateWithoutCurrentAllianceInput = {
+  export type AgentUncheckedUpdateWithoutInitiatedAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
-  export type AgentUpsertWithoutAlliedByInput = {
-    update: XOR<AgentUpdateWithoutAlliedByInput, AgentUncheckedUpdateWithoutAlliedByInput>
-    create: XOR<AgentCreateWithoutAlliedByInput, AgentUncheckedCreateWithoutAlliedByInput>
+  export type AgentUpsertWithoutJoinedAlliancesInput = {
+    update: XOR<AgentUpdateWithoutJoinedAlliancesInput, AgentUncheckedUpdateWithoutJoinedAlliancesInput>
+    create: XOR<AgentCreateWithoutJoinedAlliancesInput, AgentUncheckedCreateWithoutJoinedAlliancesInput>
     where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutAlliedByInput = {
+  export type AgentUpdateToOneWithWhereWithoutJoinedAlliancesInput = {
     where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutAlliedByInput, AgentUncheckedUpdateWithoutAlliedByInput>
+    data: XOR<AgentUpdateWithoutJoinedAlliancesInput, AgentUncheckedUpdateWithoutJoinedAlliancesInput>
   }
 
-  export type AgentUpdateWithoutAlliedByInput = {
+  export type AgentUpdateWithoutJoinedAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
-  export type AgentUncheckedUpdateWithoutAlliedByInput = {
+  export type AgentUncheckedUpdateWithoutJoinedAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentCreateWithoutBattlesAsAttackerInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+  }
+
+  export type AgentUncheckedCreateWithoutBattlesAsAttackerInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutBattlesAsAttackerInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
+  }
+
+  export type AgentCreateWithoutBattlesAsAttackerAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+  }
+
+  export type AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
+  }
+
+  export type AgentCreateWithoutBattlesAsDefenderInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+  }
+
+  export type AgentUncheckedCreateWithoutBattlesAsDefenderInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutBattlesAsDefenderInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
+  }
+
+  export type AgentCreateWithoutBattlesAsDefenderAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+  }
+
+  export type AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
   }
 
   export type GameCreateWithoutBattlesInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -21728,12 +19214,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutBattlesInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -21746,7 +19232,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
-    Cooldown?: CooldownUncheckedCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutBattlesInput = {
@@ -21754,90 +19240,184 @@ export namespace Prisma {
     create: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
   }
 
-  export type AgentCreateWithoutBattlesInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+  export type AgentUpsertWithoutBattlesAsAttackerInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsAttackerInput, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+    create: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
+    where?: AgentWhereInput
   }
 
-  export type AgentUncheckedCreateWithoutBattlesInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsAttackerInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsAttackerInput, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
   }
 
-  export type AgentCreateOrConnectWithoutBattlesInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutBattlesInput, AgentUncheckedCreateWithoutBattlesInput>
+  export type AgentUpdateWithoutBattlesAsAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
-  export type AgentCreateWithoutBattlesAsOpponentInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+  export type AgentUncheckedUpdateWithoutBattlesAsAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
-  export type AgentUncheckedCreateWithoutBattlesAsOpponentInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+  export type AgentUpsertWithoutBattlesAsAttackerAllyInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsAttackerAllyInput, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
+    create: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
+    where?: AgentWhereInput
   }
 
-  export type AgentCreateOrConnectWithoutBattlesAsOpponentInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutBattlesAsOpponentInput, AgentUncheckedCreateWithoutBattlesAsOpponentInput>
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsAttackerAllyInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsAttackerAllyInput, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutBattlesAsDefenderInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsDefenderInput, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+    create: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsDefenderInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsDefenderInput, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutBattlesAsDefenderAllyInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsDefenderAllyInput, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+    create: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsDefenderAllyInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsDefenderAllyInput, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameUpsertWithoutBattlesInput = {
@@ -21853,7 +19433,7 @@ export namespace Prisma {
 
   export type GameUpdateWithoutBattlesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -21866,12 +19446,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutBattlesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -21884,105 +19464,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
-    Cooldown?: CooldownUncheckedUpdateManyWithoutGameNestedInput
-  }
-
-  export type AgentUpsertWithoutBattlesInput = {
-    update: XOR<AgentUpdateWithoutBattlesInput, AgentUncheckedUpdateWithoutBattlesInput>
-    create: XOR<AgentCreateWithoutBattlesInput, AgentUncheckedCreateWithoutBattlesInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutBattlesInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutBattlesInput, AgentUncheckedUpdateWithoutBattlesInput>
-  }
-
-  export type AgentUpdateWithoutBattlesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutBattlesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUpsertWithoutBattlesAsOpponentInput = {
-    update: XOR<AgentUpdateWithoutBattlesAsOpponentInput, AgentUncheckedUpdateWithoutBattlesAsOpponentInput>
-    create: XOR<AgentCreateWithoutBattlesAsOpponentInput, AgentUncheckedCreateWithoutBattlesAsOpponentInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutBattlesAsOpponentInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutBattlesAsOpponentInput, AgentUncheckedUpdateWithoutBattlesAsOpponentInput>
-  }
-
-  export type AgentUpdateWithoutBattlesAsOpponentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutBattlesAsOpponentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type TweetCreateWithoutInteractionsInput = {
@@ -21991,7 +19473,7 @@ export namespace Prisma {
     type: string
     timestamp: Date | string
     conversationId?: string | null
-    agent: AgentCreateNestedOneWithoutTweetInput
+    agent: AgentCreateNestedOneWithoutTweetsInput
   }
 
   export type TweetUncheckedCreateWithoutInteractionsInput = {
@@ -22025,7 +19507,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     conversationId?: NullableStringFieldUpdateOperationsInput | string | null
-    agent?: AgentUpdateOneRequiredWithoutTweetNestedInput
+    agent?: AgentUpdateOneRequiredWithoutTweetsNestedInput
   }
 
   export type TweetUncheckedUpdateWithoutInteractionsInput = {
@@ -22037,144 +19519,132 @@ export namespace Prisma {
     conversationId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type AgentCreateWithoutStateInput = {
+  export type AgentCreateWithoutMapTilesInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
+    tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
-  export type AgentUncheckedCreateWithoutStateInput = {
+  export type AgentUncheckedCreateWithoutMapTilesInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
   }
 
-  export type AgentCreateOrConnectWithoutStateInput = {
+  export type AgentCreateOrConnectWithoutMapTilesInput = {
     where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutStateInput, AgentUncheckedCreateWithoutStateInput>
+    create: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
   }
 
-  export type AgentUpsertWithoutStateInput = {
-    update: XOR<AgentUpdateWithoutStateInput, AgentUncheckedUpdateWithoutStateInput>
-    create: XOR<AgentCreateWithoutStateInput, AgentUncheckedCreateWithoutStateInput>
+  export type AgentUpsertWithoutMapTilesInput = {
+    update: XOR<AgentUpdateWithoutMapTilesInput, AgentUncheckedUpdateWithoutMapTilesInput>
+    create: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
     where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutStateInput = {
+  export type AgentUpdateToOneWithWhereWithoutMapTilesInput = {
     where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutStateInput, AgentUncheckedUpdateWithoutStateInput>
+    data: XOR<AgentUpdateWithoutMapTilesInput, AgentUncheckedUpdateWithoutMapTilesInput>
   }
 
-  export type AgentUpdateWithoutStateInput = {
+  export type AgentUpdateWithoutMapTilesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
-  export type AgentUncheckedUpdateWithoutStateInput = {
+  export type AgentUncheckedUpdateWithoutMapTilesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
-  export type AgentCreateWithoutCooldownsInput = {
+  export type AgentCreateWithoutCoolDownInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
+    tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    strategy?: StrategyCreateNestedOneWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
-  export type AgentUncheckedCreateWithoutCooldownsInput = {
+  export type AgentUncheckedCreateWithoutCoolDownInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    strategy?: StrategyUncheckedCreateNestedOneWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    profileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
   }
 
-  export type AgentCreateOrConnectWithoutCooldownsInput = {
+  export type AgentCreateOrConnectWithoutCoolDownInput = {
     where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
+    create: XOR<AgentCreateWithoutCoolDownInput, AgentUncheckedCreateWithoutCoolDownInput>
   }
 
-  export type GameCreateWithoutCooldownInput = {
+  export type GameCreateWithoutCoolDownInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -22190,9 +19660,9 @@ export namespace Prisma {
     battles?: BattleCreateNestedManyWithoutGameInput
   }
 
-  export type GameUncheckedCreateWithoutCooldownInput = {
+  export type GameUncheckedCreateWithoutCoolDownInput = {
     id?: string
-    gameId: bigint | number
+    onchainId: bigint | number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -22208,74 +19678,70 @@ export namespace Prisma {
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
   }
 
-  export type GameCreateOrConnectWithoutCooldownInput = {
+  export type GameCreateOrConnectWithoutCoolDownInput = {
     where: GameWhereUniqueInput
-    create: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
+    create: XOR<GameCreateWithoutCoolDownInput, GameUncheckedCreateWithoutCoolDownInput>
   }
 
-  export type AgentUpsertWithoutCooldownsInput = {
-    update: XOR<AgentUpdateWithoutCooldownsInput, AgentUncheckedUpdateWithoutCooldownsInput>
-    create: XOR<AgentCreateWithoutCooldownsInput, AgentUncheckedCreateWithoutCooldownsInput>
+  export type AgentUpsertWithoutCoolDownInput = {
+    update: XOR<AgentUpdateWithoutCoolDownInput, AgentUncheckedUpdateWithoutCoolDownInput>
+    create: XOR<AgentCreateWithoutCoolDownInput, AgentUncheckedCreateWithoutCoolDownInput>
     where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutCooldownsInput = {
+  export type AgentUpdateToOneWithWhereWithoutCoolDownInput = {
     where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutCooldownsInput, AgentUncheckedUpdateWithoutCooldownsInput>
+    data: XOR<AgentUpdateWithoutCoolDownInput, AgentUncheckedUpdateWithoutCoolDownInput>
   }
 
-  export type AgentUpdateWithoutCooldownsInput = {
+  export type AgentUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
-  export type AgentUncheckedUpdateWithoutCooldownsInput = {
+  export type AgentUncheckedUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
-  export type GameUpsertWithoutCooldownInput = {
-    update: XOR<GameUpdateWithoutCooldownInput, GameUncheckedUpdateWithoutCooldownInput>
-    create: XOR<GameCreateWithoutCooldownInput, GameUncheckedCreateWithoutCooldownInput>
+  export type GameUpsertWithoutCoolDownInput = {
+    update: XOR<GameUpdateWithoutCoolDownInput, GameUncheckedUpdateWithoutCoolDownInput>
+    create: XOR<GameCreateWithoutCoolDownInput, GameUncheckedCreateWithoutCoolDownInput>
     where?: GameWhereInput
   }
 
-  export type GameUpdateToOneWithWhereWithoutCooldownInput = {
+  export type GameUpdateToOneWithWhereWithoutCoolDownInput = {
     where?: GameWhereInput
-    data: XOR<GameUpdateWithoutCooldownInput, GameUncheckedUpdateWithoutCooldownInput>
+    data: XOR<GameUpdateWithoutCoolDownInput, GameUncheckedUpdateWithoutCoolDownInput>
   }
 
-  export type GameUpdateWithoutCooldownInput = {
+  export type GameUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -22291,9 +19757,9 @@ export namespace Prisma {
     battles?: BattleUpdateManyWithoutGameNestedInput
   }
 
-  export type GameUncheckedUpdateWithoutCooldownInput = {
+  export type GameUncheckedUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
-    gameId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -22309,393 +19775,232 @@ export namespace Prisma {
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
   }
 
-  export type AgentCreateWithoutStrategyInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    agentProfile: AgentProfileCreateNestedOneWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    location?: LocationCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceCreateNestedOneWithoutAgentInput
-    battles?: BattleCreateNestedManyWithoutAgentInput
-    state?: AgentStateCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentUncheckedCreateWithoutStrategyInput = {
-    id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
-    health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    location?: LocationUncheckedCreateNestedOneWithoutAgentInput
-    currentAlliance?: AllianceUncheckedCreateNestedOneWithoutAgentInput
-    battles?: BattleUncheckedCreateNestedManyWithoutAgentInput
-    state?: AgentStateUncheckedCreateNestedOneWithoutAgentInput
-    cooldowns?: CooldownUncheckedCreateNestedManyWithoutAgentInput
-    alliedBy?: AllianceUncheckedCreateNestedManyWithoutAlliedAgentInput
-    battlesAsOpponent?: BattleUncheckedCreateNestedManyWithoutOpponentInput
-    Tweet?: TweetUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutStrategyInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutStrategyInput, AgentUncheckedCreateWithoutStrategyInput>
-  }
-
-  export type AgentUpsertWithoutStrategyInput = {
-    update: XOR<AgentUpdateWithoutStrategyInput, AgentUncheckedUpdateWithoutStrategyInput>
-    create: XOR<AgentCreateWithoutStrategyInput, AgentUncheckedCreateWithoutStrategyInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutStrategyInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutStrategyInput, AgentUncheckedUpdateWithoutStrategyInput>
-  }
-
-  export type AgentUpdateWithoutStrategyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutStrategyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
   export type AgentCreateManyGameInput = {
     id?: string
-    agentId: number
-    publicKey: string
-    agentProfileId: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
+    profileId: string
   }
 
   export type AllianceCreateManyGameInput = {
     id?: string
-    formedAt?: Date | string
-    combinedTokens: number
+    combinedTokens?: number | null
     status?: $Enums.AllianceStatus
-    agentId: string
-    alliedAgentId: string
+    timestamp?: Date | string
+    initiatorId: string
+    joinerId: string
   }
 
   export type BattleCreateManyGameInput = {
     id?: string
     timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    agentId: string
-    opponentId: string
     type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderId: string
+    defenderAllyId?: string | null
     status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
+    startTime?: Date | string
     resolvedAt?: Date | string | null
   }
 
-  export type CooldownCreateManyGameInput = {
+  export type CoolDownCreateManyGameInput = {
     id?: string
     type: $Enums.CooldownType
     endsAt: Date | string
-    agentId: string
-    targetAgentId?: string | null
+    cooledAgentId: string
   }
 
   export type AgentUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentProfile?: AgentProfileUpdateOneRequiredWithoutAgentNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    profileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
-    agentProfileId?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profileId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    agent?: AgentUpdateOneRequiredWithoutCurrentAllianceNestedInput
-    alliedAgent?: AgentUpdateOneRequiredWithoutAlliedByNestedInput
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    initiator?: AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput
+    joiner?: AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput
   }
 
   export type AllianceUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    agentId?: StringFieldUpdateOperationsInput | string
-    alliedAgentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    initiatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    agentId?: StringFieldUpdateOperationsInput | string
-    alliedAgentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    initiatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type BattleUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    agent?: AgentUpdateOneRequiredWithoutBattlesNestedInput
-    opponent?: AgentUpdateOneRequiredWithoutBattlesAsOpponentNestedInput
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
   }
 
   export type BattleUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
-    opponentId?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type BattleUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    agentId?: StringFieldUpdateOperationsInput | string
-    opponentId?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type CooldownUpdateWithoutGameInput = {
+  export type CoolDownUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-    agent?: AgentUpdateOneRequiredWithoutCooldownsNestedInput
+    cooledAgent?: AgentUpdateOneRequiredWithoutCoolDownNestedInput
   }
 
-  export type CooldownUncheckedUpdateWithoutGameInput = {
+  export type CoolDownUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    cooledAgentId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type CooldownUncheckedUpdateManyWithoutGameInput = {
+  export type CoolDownUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
     endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+    cooledAgentId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type AgentCreateManyAgentProfileInput = {
+  export type AgentCreateManyProfileInput = {
     id?: string
-    agentId: number
-    publicKey: string
+    onchainId: number
+    authority: string
     health?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
     gameId: string
   }
 
-  export type AgentUpdateWithoutAgentProfileInput = {
+  export type AgentUpdateWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    location?: LocationUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUpdateOneWithoutAgentNestedInput
-    battles?: BattleUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
   }
 
-  export type AgentUncheckedUpdateWithoutAgentProfileInput = {
+  export type AgentUncheckedUpdateWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-    location?: LocationUncheckedUpdateOneWithoutAgentNestedInput
-    currentAlliance?: AllianceUncheckedUpdateOneWithoutAgentNestedInput
-    battles?: BattleUncheckedUpdateManyWithoutAgentNestedInput
-    state?: AgentStateUncheckedUpdateOneWithoutAgentNestedInput
-    strategy?: StrategyUncheckedUpdateOneWithoutAgentNestedInput
-    cooldowns?: CooldownUncheckedUpdateManyWithoutAgentNestedInput
-    alliedBy?: AllianceUncheckedUpdateManyWithoutAlliedAgentNestedInput
-    battlesAsOpponent?: BattleUncheckedUpdateManyWithoutOpponentNestedInput
-    Tweet?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
   }
 
-  export type AgentUncheckedUpdateManyWithoutAgentProfileInput = {
+  export type AgentUncheckedUpdateManyWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
-    agentId?: IntFieldUpdateOperationsInput | number
-    publicKey?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type BattleCreateManyAgentInput = {
-    id?: string
-    timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    gameId: string
-    opponentId: string
-    type?: $Enums.BattleType
-    status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
-    resolvedAt?: Date | string | null
-  }
-
-  export type CooldownCreateManyAgentInput = {
-    id?: string
-    type: $Enums.CooldownType
-    endsAt: Date | string
-    targetAgentId?: string | null
-    gameId: string
-  }
-
-  export type AllianceCreateManyAlliedAgentInput = {
-    id?: string
-    formedAt?: Date | string
-    combinedTokens: number
-    status?: $Enums.AllianceStatus
-    gameId: string
-    agentId: string
-  }
-
-  export type BattleCreateManyOpponentInput = {
-    id?: string
-    timestamp?: Date | string
-    outcome: string
-    tokensLost?: number | null
-    tokensGained?: number | null
-    probability: number
-    gameId: string
-    agentId: string
-    type?: $Enums.BattleType
-    status?: $Enums.BattleStatus
-    startTime: Date | string
-    resolutionTime: Date | string
-    resolvedAt?: Date | string | null
   }
 
   export type TweetCreateManyAgentInput = {
@@ -22706,151 +20011,100 @@ export namespace Prisma {
     conversationId?: string | null
   }
 
-  export type BattleUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
-    opponent?: AgentUpdateOneRequiredWithoutBattlesAsOpponentNestedInput
+  export type BattleCreateManyAttackerInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerAllyId?: string | null
+    defenderId: string
+    defenderAllyId?: string | null
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type BattleUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    opponentId?: StringFieldUpdateOperationsInput | string
-    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  export type BattleCreateManyDefenderInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type BattleUncheckedUpdateManyWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    opponentId?: StringFieldUpdateOperationsInput | string
-    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  export type BattleCreateManyAttackerAllyInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    defenderId: string
+    defenderAllyId?: string | null
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type CooldownUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
-    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: GameUpdateOneRequiredWithoutCooldownNestedInput
+  export type BattleCreateManyDefenderAllyInput = {
+    id?: string
+    timestamp?: Date | string
+    type?: $Enums.BattleType
+    tokensStaked: number
+    tokensLost?: number | null
+    outcome?: string | null
+    attackerId: string
+    attackerAllyId?: string | null
+    defenderId: string
+    status?: $Enums.BattleStatus
+    gameId: string
+    startTime?: Date | string
+    resolvedAt?: Date | string | null
   }
 
-  export type CooldownUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
-    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-    gameId?: StringFieldUpdateOperationsInput | string
+  export type CoolDownCreateManyCooledAgentInput = {
+    id?: string
+    type: $Enums.CooldownType
+    endsAt: Date | string
+    gameId: string
   }
 
-  export type CooldownUncheckedUpdateManyWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
-    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-    gameId?: StringFieldUpdateOperationsInput | string
+  export type AllianceCreateManyInitiatorInput = {
+    id?: string
+    combinedTokens?: number | null
+    status?: $Enums.AllianceStatus
+    timestamp?: Date | string
+    gameId: string
+    joinerId: string
   }
 
-  export type AllianceUpdateWithoutAlliedAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
-    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
-    agent?: AgentUpdateOneRequiredWithoutCurrentAllianceNestedInput
+  export type AllianceCreateManyJoinerInput = {
+    id?: string
+    combinedTokens?: number | null
+    status?: $Enums.AllianceStatus
+    timestamp?: Date | string
+    gameId: string
+    initiatorId: string
   }
 
-  export type AllianceUncheckedUpdateWithoutAlliedAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
-    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type AllianceUncheckedUpdateManyWithoutAlliedAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    formedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    combinedTokens?: FloatFieldUpdateOperationsInput | number
-    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type BattleUpdateWithoutOpponentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
-    agent?: AgentUpdateOneRequiredWithoutBattlesNestedInput
-  }
-
-  export type BattleUncheckedUpdateWithoutOpponentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type BattleUncheckedUpdateManyWithoutOpponentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    outcome?: StringFieldUpdateOperationsInput | string
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    tokensGained?: NullableFloatFieldUpdateOperationsInput | number | null
-    probability?: FloatFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolutionTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  export type MapTileCreateManyAgentInput = {
+    id?: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
   }
 
   export type TweetUpdateWithoutAgentInput = {
@@ -22879,11 +20133,299 @@ export namespace Prisma {
     conversationId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type BattleUpdateWithoutAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+  }
+
+  export type BattleUncheckedUpdateWithoutAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUncheckedUpdateManyWithoutAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUpdateWithoutDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+  }
+
+  export type BattleUncheckedUpdateWithoutDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUncheckedUpdateManyWithoutDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUpdateWithoutAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+  }
+
+  export type BattleUncheckedUpdateWithoutAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUncheckedUpdateManyWithoutAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUpdateWithoutDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+  }
+
+  export type BattleUncheckedUpdateWithoutDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BattleUncheckedUpdateManyWithoutDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    tokensStaked?: FloatFieldUpdateOperationsInput | number
+    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
+    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderId?: StringFieldUpdateOperationsInput | string
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    gameId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type CoolDownUpdateWithoutCooledAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: GameUpdateOneRequiredWithoutCoolDownNestedInput
+  }
+
+  export type CoolDownUncheckedUpdateWithoutCooledAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CoolDownUncheckedUpdateManyWithoutCooledAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumCooldownTypeFieldUpdateOperationsInput | $Enums.CooldownType
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AllianceUpdateWithoutInitiatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
+    joiner?: AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput
+  }
+
+  export type AllianceUncheckedUpdateWithoutInitiatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    joinerId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AllianceUncheckedUpdateManyWithoutInitiatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    joinerId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AllianceUpdateWithoutJoinerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
+    initiator?: AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput
+  }
+
+  export type AllianceUncheckedUpdateWithoutJoinerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    initiatorId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AllianceUncheckedUpdateManyWithoutJoinerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    initiatorId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type MapTileUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+  }
+
+  export type MapTileUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+  }
+
+  export type MapTileUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+  }
+
   export type InteractionCreateManyTweetInput = {
     id?: string
     userId: string
-    type: string
-    content?: string | null
+    type: $Enums.InteractionType
+    content: string
     timestamp: Date | string
     userMetrics: JsonNullValueInput | InputJsonValue
   }
@@ -22891,8 +20433,8 @@ export namespace Prisma {
   export type InteractionUpdateWithoutTweetInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
   }
@@ -22900,8 +20442,8 @@ export namespace Prisma {
   export type InteractionUncheckedUpdateWithoutTweetInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
   }
@@ -22909,8 +20451,8 @@ export namespace Prisma {
   export type InteractionUncheckedUpdateManyWithoutTweetInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    content?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    content?: StringFieldUpdateOperationsInput | string
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     userMetrics?: JsonNullValueInput | InputJsonValue
   }

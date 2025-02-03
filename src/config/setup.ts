@@ -6,9 +6,7 @@ import { BN } from "@coral-xyz/anchor";
 import { prisma } from "./prisma";
 import { TerrainType } from "@prisma/client";
 import { getRandomCoordinatesWithTerrainType } from "@/constants";
-import { prismaUUID, profiles } from "./game-data";
-import { AgentAccount } from "@/types/program";
-// const randTest = prismaUUID();
+import { profiles } from "./game-data";
 
 export const createNextGame = async () => {
   logger.info(`🎮 Initializing new game world`);
@@ -39,7 +37,7 @@ export const createNextGame = async () => {
         // Create game record in database
         const dbGame = await prismaClient.game.create({
           data: {
-            gameId: nextGameId,
+            onchainId: nextGameId,
             authority: program.provider.publicKey?.toString() ?? "",
             bump: bump,
             tokenMint: gameAccount.tokenMint.toString(),
@@ -60,7 +58,7 @@ export const createNextGame = async () => {
               gamePda,
               new BN(profile.onchainId)
             );
-            const { x, y, terrainType } = getRandomCoordinatesWithTerrainType();
+            const { x, y } = getRandomCoordinatesWithTerrainType();
             // Register agent on-chain
             await program.methods
               .registerAgent(
@@ -80,32 +78,18 @@ export const createNextGame = async () => {
             // Create agent in database
             const agentDb = await prismaClient.agent.create({
               data: {
-                agentId: profile.onchainId,
+                onchainId: profile.onchainId,
                 game: { connect: { id: dbGame.id } },
-                location: {
-                  create: {
-                    x,
-                    y,
-                    terrainType:
-                      Object.keys(terrainType)[0] == "plain"
-                        ? TerrainType.Plain
-                        : Object.keys(terrainType)[0] == "mountain"
-                        ? TerrainType.Mountain
-                        : TerrainType.River,
+                mapTiles: {
+                  connect: {
+                    x_y: {
+                      x,
+                      y,
+                    },
                   },
                 },
-                agentProfile: { connect: { onchainId: profile.onchainId } },
-                publicKey: agentAccount.authority.toString(),
-                state: {
-                  create: {
-                    isAlive: true,
-                    lastActionType: "spawn",
-                    lastActionTime: new Date(),
-                    lastActionDetails: "Initial spawn",
-                    influencedByTweet: null,
-                    influenceScore: 0,
-                  },
-                },
+                profile: { connect: { id: profile.id } },
+                authority: agentAccount.authority.toString(),
               },
             });
             logger.info(
@@ -122,6 +106,7 @@ export const createNextGame = async () => {
         return {
           agents,
           gameAccount: await program.account.game.fetch(gamePda),
+          tx,
         };
       },
       {

@@ -61,9 +61,34 @@ model Agent {
     battlesAsDefenderAlly Battle[]   @relation("defenderAlly")
     Cooldown              Cooldown[]
 
-    // allies   Alliance[] @relation("Allies")
-    // allieds  Alliance[] @relation("Allieds")
-    MapTile MapTile[]
+    // Alliance relationships
+    initiatedAlliances Alliance[] @relation("AllianceInitiator") // Alliances initiated by this agent
+    joinedAlliances    Alliance[] @relation("AllianceJoiner") // Alliances this agent joined
+    MapTile            MapTile[]
+}
+
+model Alliance {
+    id             String         @id @default(cuid())
+    combinedTokens Float?
+    status         AllianceStatus @default(Active)
+    timestamp      DateTime       @default(now())
+
+    // Game relationship
+    game   Game   @relation(fields: [gameId], references: [id])
+    gameId String
+
+    // Alliance relationships
+    initiator   Agent  @relation("AllianceInitiator", fields: [initiatorId], references: [id])
+    initiatorId String
+    joiner      Agent  @relation("AllianceJoiner", fields: [joinerId], references: [id])
+    joinerId    String
+
+    @@unique([initiatorId, joinerId])
+}
+
+enum AllianceStatus {
+    Active
+    Broken
 }
 
 model Battle {
@@ -107,35 +132,12 @@ enum BattleType {
     AllianceVsAlliance
 }
 
-model Alliance {
-    id             String         @id @default(cuid())
-    combinedTokens Float?
-    status         AllianceStatus @default(Active)
-    timestamp      DateTime
-    Game           Game?          @relation(fields: [gameId], references: [id])
-    gameId         String?
-    // ally1          Agent          @relation("allies", fields: [ally1Id], references: [id])
-    // ally1Id        String
-    // allied         Agent          @relation("allieds", fields: [alliedId], references: [id])
-    // alliedId       String
-    // Agent          Agent?         @relation(fields: [agentId], references: [id])
-    // agentId        String?
-
-    // Agent Agent? @relation(fields: [agentId], references: [id])
-    // Agent Agent? @relation(fields: [agentId], references: [id])
-}
-
-enum AllianceStatus {
-    Active
-    Broken
-}
-
 model Tweet {
     id             String        @id @default(cuid())
     agentId        String
     agent          Agent         @relation(fields: [agentId], references: [id])
     content        String
-    type           String 
+    type           String
     timestamp      DateTime
     conversationId String?
     interactions   Interaction[]

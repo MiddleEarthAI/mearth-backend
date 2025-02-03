@@ -1,7 +1,7 @@
 import { TerrainType, Prisma, AgentProfile } from "@prisma/client";
 
 type PrismaAgent = Prisma.AgentGetPayload<{
-  include: { location: true; agentProfile: true; state: true; community: true };
+  include: { location: true; profile: true };
 }>;
 export const profiles: (AgentProfile & { onchainId: number })[] = [
   {
@@ -44,23 +44,20 @@ export const profiles: (AgentProfile & { onchainId: number })[] = [
       "Strategic thinker",
       "Ruthless in combat",
     ],
-    aggressiveness: 90,
-    trustworthiness: 20,
-    manipulativeness: 85,
-    intelligence: 95,
-    adaptability: 60,
-    baseInfluence: 20,
-    followerMultiplier: 0.8,
-    engagementMultiplier: 0.7,
-    consensusMultiplier: 0.6,
-    influenceDifficulty: "hard",
+    traits: {
+      aggressiveness: 90,
+      trustworthiness: 20,
+      manipulativeness: 85,
+      intelligence: 95,
+      adaptability: 60,
+    },
+    followers: 300,
   },
   {
     id: "2",
     onchainId: 2,
     name: "Scootles",
     xHandle: "ScootlesAI",
-    influenceDifficulty: "hard",
     bio: [
       "A former kitchen worker turned relentless pursuer of truth in Middle Earth",
       "Transformed from humble beginnings to a determined seeker of justice",
@@ -96,15 +93,14 @@ export const profiles: (AgentProfile & { onchainId: number })[] = [
       "Willing to form alliances",
       "Driven by revenge",
     ],
-    aggressiveness: 75,
-    trustworthiness: 85,
-    manipulativeness: 30,
-    intelligence: 70,
-    adaptability: 80,
-    baseInfluence: 50,
-    followerMultiplier: 1.2,
-    engagementMultiplier: 1.3,
-    consensusMultiplier: 1.1,
+    traits: {
+      aggressiveness: 75,
+      trustworthiness: 85,
+      manipulativeness: 30,
+      intelligence: 70,
+      adaptability: 80,
+    },
+    followers: 300,
   },
   {
     id: "3",
@@ -146,16 +142,14 @@ export const profiles: (AgentProfile & { onchainId: number })[] = [
       "Eager for alliances",
       "Avoids confrontation",
     ],
-    aggressiveness: 20,
-    trustworthiness: 95,
-    manipulativeness: 15,
-    intelligence: 70,
-    adaptability: 70,
-    baseInfluence: 80,
-    followerMultiplier: 1.5,
-    engagementMultiplier: 1.4,
-    consensusMultiplier: 1.6,
-    influenceDifficulty: "medium",
+    traits: {
+      aggressiveness: 20,
+      trustworthiness: 95,
+      manipulativeness: 15,
+      intelligence: 70,
+      adaptability: 70,
+    },
+    followers: 200,
   },
   {
     id: "4",
@@ -197,137 +191,16 @@ export const profiles: (AgentProfile & { onchainId: number })[] = [
       "Memory issues",
       "Wisdom from experience",
     ],
-    aggressiveness: 30,
-    trustworthiness: 80,
-    manipulativeness: 20,
-    intelligence: 75,
-    adaptability: 85,
-    baseInfluence: 80,
-    followerMultiplier: 1.8,
-    engagementMultiplier: 1.7,
-    consensusMultiplier: 1.9,
-    influenceDifficulty: "easy",
+    traits: {
+      aggressiveness: 30,
+      trustworthiness: 80,
+      manipulativeness: 20,
+      intelligence: 75,
+      adaptability: 85,
+    },
+    followers: 100,
   },
 ];
-
-export const gameData: {
-  agents: Partial<PrismaAgent>[];
-} = {
-  agents: [
-    {
-      location: {
-        id: "2",
-        x: 6,
-        y: 12,
-        terrainType: TerrainType.Mountain,
-        agentId: "2",
-      },
-      state: {
-        id: "2",
-        agentId: "2",
-        isAlive: true,
-        lastActionType: "spawn",
-        lastActionTime: new Date(),
-        lastActionDetails: "Initial spawn",
-        influencedByTweet: null,
-        influenceScore: 0,
-      },
-      community: {
-        id: "2",
-        agentId: "2",
-        followers: 0,
-        averageEngagement: 0,
-        supporterCount: 0,
-        lastInfluenceTime: new Date(),
-        influenceScore: 0,
-      },
-    },
-    {
-      location: {
-        id: "1",
-        x: 27,
-        y: 7,
-        terrainType: TerrainType.River,
-        agentId: "1",
-      },
-      state: {
-        id: "1",
-        agentId: "1",
-        isAlive: true,
-        influencedByTweet: null,
-        influenceScore: 0,
-        lastActionType: "move",
-        lastActionTime: new Date("2025-01-30T09:00:00Z"),
-        lastActionDetails: "Moving north to seek alliance with Purrlock Paws",
-      },
-      community: {
-        id: "1",
-        agentId: "1",
-        followers: 0,
-        averageEngagement: 0,
-        supporterCount: 0,
-        lastInfluenceTime: new Date(),
-        influenceScore: 0,
-      },
-    },
-    {
-      location: {
-        id: "3",
-        x: 15,
-        y: 21,
-        terrainType: TerrainType.Plain,
-        agentId: "3",
-      },
-      state: {
-        id: "3",
-        agentId: "3",
-        isAlive: true,
-        influencedByTweet: null,
-        influenceScore: 0,
-        lastActionType: "spawn",
-        lastActionTime: new Date(),
-        lastActionDetails: "Initial spawn",
-      },
-      community: {
-        id: "3",
-        agentId: "3",
-        followers: 0,
-        averageEngagement: 0,
-        supporterCount: 0,
-        lastInfluenceTime: new Date(),
-        influenceScore: 0,
-      },
-    },
-    {
-      location: {
-        id: "4",
-        x: 10,
-        y: 24,
-        terrainType: TerrainType.Plain,
-        agentId: "4",
-      },
-      state: {
-        id: "4",
-        agentId: "4",
-        isAlive: true,
-        influencedByTweet: null,
-        influenceScore: 0,
-        lastActionType: "spawn",
-        lastActionTime: new Date(),
-        lastActionDetails: "Initial spawn",
-      },
-      community: {
-        id: "4",
-        agentId: "4",
-        followers: 0,
-        averageEngagement: 0,
-        supporterCount: 0,
-        lastInfluenceTime: new Date(),
-        influenceScore: 0,
-      },
-    },
-  ],
-};
 
 type AgentBasicInfo = {
   agentId: number;

@@ -1,4 +1,5 @@
 import { seedAgentProfiles } from "./seed-data/agent-profiles";
+import { seedMapTiles } from "./seed-data/map-tiles";
 
 async function main() {
   console.log("🌱 Starting database seeding...");
@@ -6,6 +7,9 @@ async function main() {
   try {
     // Seed agent profiles
     await seedAgentProfiles();
+
+    // Seed map tiles
+    await seedMapTiles();
 
     console.log("✅ Database seeding completed successfully");
   } catch (error) {

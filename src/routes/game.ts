@@ -17,7 +17,7 @@ import { EventEmitter } from "events";
 import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import CacheManager from "@/agent/CacheManager";
 import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
-import { DecisionEngine } from "@/ideation/DecisionEngine";
+import { DecisionEngine } from "@/agent/DecisionEngine";
 import { HealthMonitor } from "@/agent/HealthMonitor";
 
 const router = Router();
@@ -33,11 +33,11 @@ router.post(
     try {
       await checkDatabaseConnection();
 
-      const { tx, gameAccount, agentAccounts } = await createNextGame();
+      const { tx, gameAccount, agents } = await createNextGame();
       const program = await getProgramWithWallet();
       const prisma = new PrismaClient();
 
-      const agentTwitterClients = agentAccounts.map((agent) => {
+      const agentTwitterClients = agents.map((agent) => {
         const apiKey = process.env.TWITTER_API_KEY;
         const apiSecret = process.env.TWITTER_API_SECRET;
 
@@ -45,7 +45,8 @@ router.post(
           throw new Error("Twitter API keys are not set");
         }
 
-        const agentId = agent.id.toNumber();
+        const agentId = new BN(agent.account.id).toNumber().toString();
+
         const twitterAccessToken =
           process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
         const twitterAccessSecret =
@@ -54,7 +55,7 @@ router.post(
           throw new Error("Twitter API keys are not set");
         }
         return [
-          agent.id.toNumber(),
+          agentId,
           new TwitterApi({
             appKey: apiKey,
             appSecret: apiSecret,
@@ -148,17 +149,12 @@ router.post(
 
       const agents = await prisma.agent.findMany({
         where: {
-          game: {
-            gameId: gameId,
-          },
+          onchainId: gameId,
         },
         include: {
-          agentProfile: true,
-          location: true,
-          battles: true,
-          currentAlliance: true,
-          cooldowns: true,
-          state: true,
+          mapTiles: true,
+          profile: true,
+          joinedAlliances: true,
         },
       });
 

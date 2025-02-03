@@ -27,7 +27,7 @@ class DecisionEngine {
 
     const agent = await this.prisma.agent.findUnique({
       where: { id: agentId },
-      include: { agentProfile: true },
+      include: { profile: true },
     });
 
     if (!agent) {
@@ -49,7 +49,7 @@ class DecisionEngine {
     console.log("⚖️ Calculating character alignment");
     const alignmentScore = this.calculateCharacterAlignment(
       dominantSuggestion.suggestion,
-      agent.agentProfile.traits as unknown as AgentTrait[]
+      agent.profile.traits as unknown as AgentTrait[]
     );
 
     const shouldAct =
