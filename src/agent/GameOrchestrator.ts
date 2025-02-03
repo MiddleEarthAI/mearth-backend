@@ -19,7 +19,7 @@ import { BattleResolver } from "./BattleResolver";
  * Handles game orchestration, agent updates, and event processing
  */
 export class GameOrchestrator {
-  private readonly updateInterval = 60 * 1000; // 1 min for testing
+  private readonly updateInterval = 60 * 60 * 1000; // 1 min for testing
   private readonly cleanupInterval = 3600000; // 1 hour
 
   constructor(
