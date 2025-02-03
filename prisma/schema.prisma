@@ -62,7 +62,9 @@ model Agent {
   battlesAsDefender     Battle[]   @relation("defender")
   battlesAsAttackerAlly Battle[]   @relation("attackerAlly")
   battlesAsDefenderAlly Battle[]   @relation("defenderAlly")
+  wonBattles            Battle[]   @relation("winner")
   coolDown              CoolDown[]
+  isAlive               Boolean    @default(true)
 
   // Alliance relationships
   initiatedAlliances Alliance[] @relation("AllianceInitiator") // Alliances initiated by this agent
@@ -72,6 +74,8 @@ model Agent {
   // Each agent belongs to exactly one profile
   profile   AgentProfile @relation(fields: [profileId], references: [id])
   profileId String
+
+  deathTimestamp DateTime?
 }
 
 model Tweet {
@@ -112,45 +116,44 @@ enum AllianceStatus {
 }
 
 model Battle {
-  id        String     @id @default(cuid())
-  timestamp DateTime   @default(now())
-  type      BattleType @default(Simple)
+  id           String       @id @default(cuid())
+  type         BattleType
+  status       BattleStatus @default(Active)
+  tokensStaked Int
+  startTime    DateTime     @default(now())
+  endTime      DateTime?
 
-  tokensStaked Float
-  tokensLost   Float?
-
-  outcome String? // WIN, LOSS
-
-  // Battle must have both attacker and defender and option ally
-  attackerId     String
-  attacker       Agent   @relation("attacker", fields: [attackerId], references: [id])
-  attackerAllyId String?
-  attackerAlly   Agent?  @relation("attackerAlly", fields: [attackerAllyId], references: [id])
-  defenderId     String
-  defender       Agent   @relation("defender", fields: [defenderId], references: [id])
-  defenderAllyId String?
-  defenderAlly   Agent?  @relation("defenderAlly", fields: [defenderAllyId], references: [id])
-
-  status BattleStatus @default(Active)
-
-  // Battle belongs to a game
+  // Game relationship
   game   Game   @relation(fields: [gameId], references: [id])
   gameId String
 
-  startTime  DateTime  @default(now())
-  resolvedAt DateTime?
+  // Attacker and defender relationships
+  attacker   Agent  @relation("attacker", fields: [attackerId], references: [id])
+  attackerId String
+  defender   Agent  @relation("defender", fields: [defenderId], references: [id])
+  defenderId String
+
+  // Optional ally relationships
+  attackerAlly   Agent?  @relation("attackerAlly", fields: [attackerAllyId], references: [id])
+  attackerAllyId String?
+  defenderAlly   Agent?  @relation("defenderAlly", fields: [defenderAllyId], references: [id])
+  defenderAllyId String?
+
+  // Winner reference
+  winner   Agent?  @relation("winner", fields: [winnerId], references: [id])
+  winnerId String?
+}
+
+enum BattleStatus {
+  Active
+  Resolved
+  Cancelled
 }
 
 enum BattleType {
   Simple
   AgentVsAlliance
   AllianceVsAlliance
-}
-
-enum BattleStatus {
-  Active
-  Resolved
-  Error
 }
 
 model Interaction {

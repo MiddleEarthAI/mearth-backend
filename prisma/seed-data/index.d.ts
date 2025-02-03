@@ -6901,6 +6901,7 @@ export namespace Prisma {
     gameId: string | null
     initiatorId: string | null
     joinerId: string | null
+    endedAt: Date | null
   }
 
   export type AllianceMaxAggregateOutputType = {
@@ -6911,6 +6912,7 @@ export namespace Prisma {
     gameId: string | null
     initiatorId: string | null
     joinerId: string | null
+    endedAt: Date | null
   }
 
   export type AllianceCountAggregateOutputType = {
@@ -6921,6 +6923,7 @@ export namespace Prisma {
     gameId: number
     initiatorId: number
     joinerId: number
+    endedAt: number
     _all: number
   }
 
@@ -6941,6 +6944,7 @@ export namespace Prisma {
     gameId?: true
     initiatorId?: true
     joinerId?: true
+    endedAt?: true
   }
 
   export type AllianceMaxAggregateInputType = {
@@ -6951,6 +6955,7 @@ export namespace Prisma {
     gameId?: true
     initiatorId?: true
     joinerId?: true
+    endedAt?: true
   }
 
   export type AllianceCountAggregateInputType = {
@@ -6961,6 +6966,7 @@ export namespace Prisma {
     gameId?: true
     initiatorId?: true
     joinerId?: true
+    endedAt?: true
     _all?: true
   }
 
@@ -7058,6 +7064,7 @@ export namespace Prisma {
     gameId: string
     initiatorId: string
     joinerId: string
+    endedAt: Date | null
     _count: AllianceCountAggregateOutputType | null
     _avg: AllianceAvgAggregateOutputType | null
     _sum: AllianceSumAggregateOutputType | null
@@ -7087,6 +7094,7 @@ export namespace Prisma {
     gameId?: boolean
     initiatorId?: boolean
     joinerId?: boolean
+    endedAt?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     initiator?: boolean | AgentDefaultArgs<ExtArgs>
     joiner?: boolean | AgentDefaultArgs<ExtArgs>
@@ -7100,6 +7108,7 @@ export namespace Prisma {
     gameId?: boolean
     initiatorId?: boolean
     joinerId?: boolean
+    endedAt?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     initiator?: boolean | AgentDefaultArgs<ExtArgs>
     joiner?: boolean | AgentDefaultArgs<ExtArgs>
@@ -7113,6 +7122,7 @@ export namespace Prisma {
     gameId?: boolean
     initiatorId?: boolean
     joinerId?: boolean
+    endedAt?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     initiator?: boolean | AgentDefaultArgs<ExtArgs>
     joiner?: boolean | AgentDefaultArgs<ExtArgs>
@@ -7126,9 +7136,10 @@ export namespace Prisma {
     gameId?: boolean
     initiatorId?: boolean
     joinerId?: boolean
+    endedAt?: boolean
   }
 
-  export type AllianceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "combinedTokens" | "status" | "timestamp" | "gameId" | "initiatorId" | "joinerId", ExtArgs["result"]["alliance"]>
+  export type AllianceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "combinedTokens" | "status" | "timestamp" | "gameId" | "initiatorId" | "joinerId" | "endedAt", ExtArgs["result"]["alliance"]>
   export type AllianceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
     initiator?: boolean | AgentDefaultArgs<ExtArgs>
@@ -7160,6 +7171,7 @@ export namespace Prisma {
       gameId: string
       initiatorId: string
       joinerId: string
+      endedAt: Date | null
     }, ExtArgs["result"]["alliance"]>
     composites: {}
   }
@@ -7593,6 +7605,7 @@ export namespace Prisma {
     readonly gameId: FieldRef<"Alliance", 'String'>
     readonly initiatorId: FieldRef<"Alliance", 'String'>
     readonly joinerId: FieldRef<"Alliance", 'String'>
+    readonly endedAt: FieldRef<"Alliance", 'DateTime'>
   }
     
 
@@ -13579,7 +13592,8 @@ export namespace Prisma {
     timestamp: 'timestamp',
     gameId: 'gameId',
     initiatorId: 'initiatorId',
-    joinerId: 'joinerId'
+    joinerId: 'joinerId',
+    endedAt: 'endedAt'
   };
 
   export type AllianceScalarFieldEnum = (typeof AllianceScalarFieldEnum)[keyof typeof AllianceScalarFieldEnum]
@@ -14232,6 +14246,7 @@ export namespace Prisma {
     gameId?: StringFilter<"Alliance"> | string
     initiatorId?: StringFilter<"Alliance"> | string
     joinerId?: StringFilter<"Alliance"> | string
+    endedAt?: DateTimeNullableFilter<"Alliance"> | Date | string | null
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     initiator?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     joiner?: XOR<AgentScalarRelationFilter, AgentWhereInput>
@@ -14245,6 +14260,7 @@ export namespace Prisma {
     gameId?: SortOrder
     initiatorId?: SortOrder
     joinerId?: SortOrder
+    endedAt?: SortOrderInput | SortOrder
     game?: GameOrderByWithRelationInput
     initiator?: AgentOrderByWithRelationInput
     joiner?: AgentOrderByWithRelationInput
@@ -14262,6 +14278,7 @@ export namespace Prisma {
     gameId?: StringFilter<"Alliance"> | string
     initiatorId?: StringFilter<"Alliance"> | string
     joinerId?: StringFilter<"Alliance"> | string
+    endedAt?: DateTimeNullableFilter<"Alliance"> | Date | string | null
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     initiator?: XOR<AgentScalarRelationFilter, AgentWhereInput>
     joiner?: XOR<AgentScalarRelationFilter, AgentWhereInput>
@@ -14275,6 +14292,7 @@ export namespace Prisma {
     gameId?: SortOrder
     initiatorId?: SortOrder
     joinerId?: SortOrder
+    endedAt?: SortOrderInput | SortOrder
     _count?: AllianceCountOrderByAggregateInput
     _avg?: AllianceAvgOrderByAggregateInput
     _max?: AllianceMaxOrderByAggregateInput
@@ -14293,6 +14311,7 @@ export namespace Prisma {
     gameId?: StringWithAggregatesFilter<"Alliance"> | string
     initiatorId?: StringWithAggregatesFilter<"Alliance"> | string
     joinerId?: StringWithAggregatesFilter<"Alliance"> | string
+    endedAt?: DateTimeNullableWithAggregatesFilter<"Alliance"> | Date | string | null
   }
 
   export type BattleWhereInput = {
@@ -15036,6 +15055,7 @@ export namespace Prisma {
     combinedTokens?: number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
+    endedAt?: Date | string | null
     game: GameCreateNestedOneWithoutAlliancesInput
     initiator: AgentCreateNestedOneWithoutInitiatedAlliancesInput
     joiner: AgentCreateNestedOneWithoutJoinedAlliancesInput
@@ -15049,6 +15069,7 @@ export namespace Prisma {
     gameId: string
     initiatorId: string
     joinerId: string
+    endedAt?: Date | string | null
   }
 
   export type AllianceUpdateInput = {
@@ -15056,6 +15077,7 @@ export namespace Prisma {
     combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
     initiator?: AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput
     joiner?: AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput
@@ -15069,6 +15091,7 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     initiatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceCreateManyInput = {
@@ -15079,6 +15102,7 @@ export namespace Prisma {
     gameId: string
     initiatorId: string
     joinerId: string
+    endedAt?: Date | string | null
   }
 
   export type AllianceUpdateManyMutationInput = {
@@ -15086,6 +15110,7 @@ export namespace Prisma {
     combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceUncheckedUpdateManyInput = {
@@ -15096,6 +15121,7 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     initiatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type BattleCreateInput = {
@@ -15970,6 +15996,17 @@ export namespace Prisma {
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type AllianceInitiatorIdJoinerIdCompoundUniqueInput = {
     initiatorId: string
     joinerId: string
@@ -15983,6 +16020,7 @@ export namespace Prisma {
     gameId?: SortOrder
     initiatorId?: SortOrder
     joinerId?: SortOrder
+    endedAt?: SortOrder
   }
 
   export type AllianceAvgOrderByAggregateInput = {
@@ -15997,6 +16035,7 @@ export namespace Prisma {
     gameId?: SortOrder
     initiatorId?: SortOrder
     joinerId?: SortOrder
+    endedAt?: SortOrder
   }
 
   export type AllianceMinOrderByAggregateInput = {
@@ -16007,6 +16046,7 @@ export namespace Prisma {
     gameId?: SortOrder
     initiatorId?: SortOrder
     joinerId?: SortOrder
+    endedAt?: SortOrder
   }
 
   export type AllianceSumOrderByAggregateInput = {
@@ -16039,6 +16079,20 @@ export namespace Prisma {
     _max?: NestedEnumAllianceStatusFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type EnumBattleTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.BattleType | EnumBattleTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BattleType[] | ListEnumBattleTypeFieldRefInput<$PrismaModel>
@@ -16051,17 +16105,6 @@ export namespace Prisma {
     in?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBattleStatusFilter<$PrismaModel> | $Enums.BattleStatus
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type AgentNullableScalarRelationFilter = {
@@ -16148,20 +16191,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBattleStatusFilter<$PrismaModel>
     _max?: NestedEnumBattleStatusFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumInteractionTypeFilter<$PrismaModel = never> = {
@@ -17136,6 +17165,10 @@ export namespace Prisma {
     set?: $Enums.AllianceStatus
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type GameUpdateOneRequiredWithoutAlliancesNestedInput = {
     create?: XOR<GameCreateWithoutAlliancesInput, GameUncheckedCreateWithoutAlliancesInput>
     connectOrCreate?: GameCreateOrConnectWithoutAlliancesInput
@@ -17196,10 +17229,6 @@ export namespace Prisma {
 
   export type EnumBattleStatusFieldUpdateOperationsInput = {
     set?: $Enums.BattleStatus
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput = {
@@ -17552,6 +17581,17 @@ export namespace Prisma {
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -17578,6 +17618,20 @@ export namespace Prisma {
     _max?: NestedEnumAllianceStatusFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumBattleTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.BattleType | EnumBattleTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BattleType[] | ListEnumBattleTypeFieldRefInput<$PrismaModel>
@@ -17590,17 +17644,6 @@ export namespace Prisma {
     in?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBattleStatusFilter<$PrismaModel> | $Enums.BattleStatus
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedEnumBattleTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -17621,20 +17664,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBattleStatusFilter<$PrismaModel>
     _max?: NestedEnumBattleStatusFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumInteractionTypeFilter<$PrismaModel = never> = {
@@ -17754,6 +17783,7 @@ export namespace Prisma {
     combinedTokens?: number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
+    endedAt?: Date | string | null
     initiator: AgentCreateNestedOneWithoutInitiatedAlliancesInput
     joiner: AgentCreateNestedOneWithoutJoinedAlliancesInput
   }
@@ -17765,6 +17795,7 @@ export namespace Prisma {
     timestamp?: Date | string
     initiatorId: string
     joinerId: string
+    endedAt?: Date | string | null
   }
 
   export type AllianceCreateOrConnectWithoutGameInput = {
@@ -17898,6 +17929,7 @@ export namespace Prisma {
     gameId?: StringFilter<"Alliance"> | string
     initiatorId?: StringFilter<"Alliance"> | string
     joinerId?: StringFilter<"Alliance"> | string
+    endedAt?: DateTimeNullableFilter<"Alliance"> | Date | string | null
   }
 
   export type BattleUpsertWithWhereUniqueWithoutGameInput = {
@@ -18289,6 +18321,7 @@ export namespace Prisma {
     combinedTokens?: number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
+    endedAt?: Date | string | null
     game: GameCreateNestedOneWithoutAlliancesInput
     joiner: AgentCreateNestedOneWithoutJoinedAlliancesInput
   }
@@ -18300,6 +18333,7 @@ export namespace Prisma {
     timestamp?: Date | string
     gameId: string
     joinerId: string
+    endedAt?: Date | string | null
   }
 
   export type AllianceCreateOrConnectWithoutInitiatorInput = {
@@ -18317,6 +18351,7 @@ export namespace Prisma {
     combinedTokens?: number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
+    endedAt?: Date | string | null
     game: GameCreateNestedOneWithoutAlliancesInput
     initiator: AgentCreateNestedOneWithoutInitiatedAlliancesInput
   }
@@ -18328,6 +18363,7 @@ export namespace Prisma {
     timestamp?: Date | string
     gameId: string
     initiatorId: string
+    endedAt?: Date | string | null
   }
 
   export type AllianceCreateOrConnectWithoutJoinerInput = {
@@ -19790,6 +19826,7 @@ export namespace Prisma {
     timestamp?: Date | string
     initiatorId: string
     joinerId: string
+    endedAt?: Date | string | null
   }
 
   export type BattleCreateManyGameInput = {
@@ -19862,6 +19899,7 @@ export namespace Prisma {
     combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     initiator?: AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput
     joiner?: AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput
   }
@@ -19873,6 +19911,7 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     initiatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceUncheckedUpdateManyWithoutGameInput = {
@@ -19882,6 +19921,7 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     initiatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type BattleUpdateWithoutGameInput = {
@@ -20089,6 +20129,7 @@ export namespace Prisma {
     timestamp?: Date | string
     gameId: string
     joinerId: string
+    endedAt?: Date | string | null
   }
 
   export type AllianceCreateManyJoinerInput = {
@@ -20098,6 +20139,7 @@ export namespace Prisma {
     timestamp?: Date | string
     gameId: string
     initiatorId: string
+    endedAt?: Date | string | null
   }
 
   export type MapTileCreateManyAgentInput = {
@@ -20351,6 +20393,7 @@ export namespace Prisma {
     combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
     joiner?: AgentUpdateOneRequiredWithoutJoinedAlliancesNestedInput
   }
@@ -20362,6 +20405,7 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
     joinerId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceUncheckedUpdateManyWithoutInitiatorInput = {
@@ -20371,6 +20415,7 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
     joinerId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceUpdateWithoutJoinerInput = {
@@ -20378,6 +20423,7 @@ export namespace Prisma {
     combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutAlliancesNestedInput
     initiator?: AgentUpdateOneRequiredWithoutInitiatedAlliancesNestedInput
   }
@@ -20389,6 +20435,7 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
     initiatorId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceUncheckedUpdateManyWithoutJoinerInput = {
@@ -20398,6 +20445,7 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
     initiatorId?: StringFieldUpdateOperationsInput | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type MapTileUpdateWithoutAgentInput = {

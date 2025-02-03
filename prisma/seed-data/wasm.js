@@ -170,7 +170,8 @@ exports.Prisma.AllianceScalarFieldEnum = {
   timestamp: 'timestamp',
   gameId: 'gameId',
   initiatorId: 'initiatorId',
-  joinerId: 'joinerId'
+  joinerId: 'joinerId',
+  endedAt: 'endedAt'
 };
 
 exports.Prisma.BattleScalarFieldEnum = {

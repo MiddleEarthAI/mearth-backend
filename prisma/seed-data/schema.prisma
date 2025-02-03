@@ -96,10 +96,11 @@ model Alliance {
   gameId String
 
   // Alliance relationships
-  initiator   Agent  @relation("AllianceInitiator", fields: [initiatorId], references: [id])
+  initiator   Agent     @relation("AllianceInitiator", fields: [initiatorId], references: [id])
   initiatorId String
-  joiner      Agent  @relation("AllianceJoiner", fields: [joinerId], references: [id])
+  joiner      Agent     @relation("AllianceJoiner", fields: [joinerId], references: [id])
   joinerId    String
+  endedAt     DateTime?
 
   @@unique([initiatorId, joinerId])
 }

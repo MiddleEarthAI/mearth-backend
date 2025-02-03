@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import TwitterManager, { AgentId } from "@/agent/TwitterManager";
-import { DecisionEngine } from "@/agent/DecisionEngine";
+import { AgentBasicInfo, DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
 import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
 import EventEmitter from "events";
@@ -15,6 +15,7 @@ import { BN } from "@coral-xyz/anchor";
 import { BattleResolver } from "./BattleResolver";
 import { stringToUuid } from "@/utils/uuid";
 import { TweetV2 } from "twitter-api-v2";
+import { ActionManager, GameAction } from "./ActionManager";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -25,6 +26,7 @@ export class GameOrchestrator {
     ? parseInt(process.env.UPDATE_INTERVAL)
     : 60 * 60 * 1000; // 1 min for testing
   private readonly cleanupInterval = 3600000; // 1 hour
+  private readonly actionManager: ActionManager;
 
   constructor(
     private currentGameId: number,
@@ -37,6 +39,7 @@ export class GameOrchestrator {
     private eventEmitter: EventEmitter,
     private battleResolver: BattleResolver
   ) {
+    this.actionManager = new ActionManager(program, currentGameId, prisma);
     this.setupEventHandlers();
   }
 
@@ -83,7 +86,7 @@ export class GameOrchestrator {
 
   private async handleNewAction(data: {
     agentId: string;
-    action: ActionSuggestion;
+    action: GameAction;
   }): Promise<void> {
     try {
       logger.info("🎲 Processing new action", {
@@ -91,18 +94,8 @@ export class GameOrchestrator {
         actionType: data.action.type,
       });
 
-      // Update agent state
-      await this.updateAgentState(data.agentId, data.action);
-
-      // Create and post new tweet
-      // const tweet = await this.prisma.tweet.create({
-      //   data: {
-      //     agentId: data.agentId,
-      //     content: data.action.content,
-      //     type: data.action.type,
-      //     timestamp: new Date(),
-      //   },
-      // });
+      // Execute action through ActionManager
+      await this.actionManager.executeAction(data.agentId, data.action);
 
       logger.info("✅ Action successfully processed", {
         agentId: data.agentId,
@@ -133,39 +126,51 @@ export class GameOrchestrator {
     logger.info("👥 Processing all active agents");
     const agents = await prisma.agent.findMany({
       where: { game: { isActive: true }, health: { gt: 0 } },
+      include: {
+        game: {
+          select: {
+            id: true,
+            onchainId: true,
+          },
+        },
+      },
       take: 1,
     });
 
     await Promise.all(
-      agents.map((agent) => this.processAgent(agent.id, agent.onchainId))
+      agents.map((agent) =>
+        this.processAgent({
+          agentId: agent.id,
+          agentOnchainId: agent.onchainId,
+          gameId: agent.game.id,
+          gameOnchainId: agent.game.onchainId,
+        })
+      )
     );
     logger.info(`✅ Processed ${agents.length} agents`);
   }
 
-  private async processAgent(
-    agentId: string,
-    agentOnchainId: number
-  ): Promise<void> {
-    logger.info(`🤖 Processing agent ${agentId}`);
-    const recentTweets = await this.twitter.fetchRecentTweets(
-      agentOnchainId.toString() as AgentId,
-      5
-    );
+  private async processAgent(agentInfo: AgentBasicInfo): Promise<void> {
+    logger.info(`🤖 Processing agent ${agentInfo.agentId}`);
 
     try {
+      throw "testing ";
+
+      const recentTweets = await this.twitter.fetchRecentTweets(
+        agentInfo.agentOnchainId.toString() as AgentId,
+        5
+      );
       for (const tweet of recentTweets) {
-        await this.processTweetInteractions(agentId, tweet);
+        await this.processTweetInteractions(agentInfo.agentId, tweet);
       }
     } catch (error) {
       logger.error(
         "Error processing community interactions, continue anyway...",
-        { agentId, error }
+        { agentId: agentInfo.agentId, error }
       );
     }
 
-    this.engine.proceedWithoutInteractions(
-      new BN(agentOnchainId).toNumber().toString() as AgentId
-    );
+    this.engine.proceedWithoutInteractions(agentInfo);
   }
 
   private async processTweetInteractions(
@@ -222,88 +227,6 @@ export class GameOrchestrator {
     // Process scores through decision engine
     await this.engine.processInfluenceScores(agentId, scores);
     logger.info(`✅ Processed ${scores.length} interactions`);
-  }
-
-  private async updateAgentState(
-    agentId: string,
-    action: ActionSuggestion
-  ): Promise<void> {
-    logger.info(`🔄 Updating state for agent ${agentId}`, {
-      actionType: action.type,
-    });
-    switch (action.type) {
-      case "MOVE":
-        if (action.position) {
-          const [gamePda] = getGamePDA(
-            this.program.programId,
-            this.currentGameId
-          );
-
-          const [agentPda] = getAgentPDA(
-            this.program.programId,
-            gamePda,
-            agentId
-          );
-          this.program.methods
-            .moveAgent(
-              agentId,
-              new BN(action.position.x),
-              new BN(action.position.y)
-            )
-            .accounts({
-              agent: agentPda,
-            })
-            .rpc();
-          await prisma.agent.update({
-            where: { id: agentId },
-            data: {
-              mapTiles: {
-                connect: {
-                  x_y: {
-                    x: action.position.x,
-                    y: action.position.y,
-                  },
-                },
-              },
-            },
-          });
-          logger.info("🚶 Agent movement updated", {
-            x: action.position.x,
-            y: action.position.y,
-          });
-        }
-        break;
-
-      case "BATTLE":
-        if (action.target) {
-          const [gamePda] = getGamePDA(
-            this.program.programId,
-            this.currentGameId
-          );
-
-          const [agentPda] = getAgentPDA(
-            this.program.programId,
-            gamePda,
-            action.target
-          );
-          logger.info("⚔️ Battle initiated", { target: action.target });
-        }
-      case "ALLIANCE":
-        if (action.target) {
-          const [gamePda] = getGamePDA(
-            this.program.programId,
-            this.currentGameId
-          );
-
-          const [agentPda] = getAgentPDA(
-            this.program.programId,
-            gamePda,
-            action.target
-          );
-          logger.info("🤝 Alliance formed", { target: action.target });
-        }
-        break;
-    }
   }
 
   private async cleanup(): Promise<void> {

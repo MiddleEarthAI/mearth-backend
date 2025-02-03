@@ -1,8 +1,17 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { PrismaClient } from "@prisma/client";
+import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
 import { AgentId } from "./TwitterManager";
+import { logger } from "@/utils/logger";
+import { BN } from "@coral-xyz/anchor";
+
+export type AgentBasicInfo = {
+  agentId: string;
+  agentOnchainId: number;
+  gameId: string;
+  gameOnchainId: BN;
+};
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -191,6 +200,7 @@ Your action must reflect your traits and advance survival goals while maintainin
       ALLIANCE: ["trust", "cooperation"],
       MOVE: ["caution", "exploration"],
       STRATEGY: ["intelligence", "planning"],
+      IGNORE: ["caution", "exploration"],
     };
 
     const relevantTraits = traitMapping[suggestion.type] || [];
@@ -209,41 +219,67 @@ Your action must reflect your traits and advance survival goals while maintainin
     return JSON.parse(action);
   }
 
-  async proceedWithoutInteractions(agentId: AgentId): Promise<void> {
-    console.log("🤔 Deciding without interactions for agent", agentId);
-    const prompt = `You are an AI agent in Middle Earth. Generate a JSON response with your next action. The action must follow game rules and your character traits.
+  async proceedWithoutInteractions(agentInfo: AgentBasicInfo): Promise<void> {
+    console.log(
+      "🤔 Deciding without interactions for agent",
+      agentInfo.agentOnchainId
+    );
+    //     const prompt = `You are an AI agent in Middle Earth. Generate a JSON response with your next action. The action must follow game rules and your character traits.
 
-Action Types:
-{
-  "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE", 
-  "target": string | null, // Agent ID if targeting another agent
-  "position": {
-    "x": number,
-    "y": number
-  },
+    // Action Types:
+    // {
+    //   "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
+    //   "target": string | null, // Agent ID if targeting another agent
+    //   "position": {
+    //     "x": number,
+    //     "y": number
+    //   },
 
-  "tweet": string // X-ready post text. example: "I'm moving to the mountains to gather resources and scout the area for potential threats."
-}
-`;
+    //   "tweet": string // X-ready post text. example: "I'm moving to the mountains to gather resources and scout the area for potential threats."
+    // }
+    // `;
+    const prompt = await this.buildPrompt(agentInfo);
 
-    const response = await generateText({
-      model: anthropic("claude-3-5-sonnet-20240620"),
-      messages: [
-        { role: "user", content: prompt },
-        { role: "assistant", content: ":\n{" },
-      ],
-    });
-    const action = this.parseActionJson(response.text) as ActionSuggestion;
+    logger.info("🤖 Prompt");
+    logger.info(prompt);
 
-    console.log("🤖 Generated AI response");
-    console.log(action);
+    if (prompt) {
+      const response = await generateText({
+        model: anthropic("claude-3-5-sonnet-20240620"),
+        messages: [
+          { role: "user", content: prompt },
+          // Trick the AI to generate the JSON response
+          { role: "assistant", content: "Here is the JSON requested:\n{" },
+        ],
+      });
+      logger.info("🤖 Generated AI response 🔥🔥🔥");
+      logger.info(response.text);
+      // append back the '{' to the json and parse it
+      const action = this.parseActionJson(
+        `{${response.text}`
+      ) as ActionSuggestion;
 
-    this.eventEmitter.emit("newAction", { agentId, action });
+      console.log("🤖 Generated AI response");
+      console.log(action);
+
+      this.eventEmitter.emit("newAction", {
+        agentId: agentInfo.agentId,
+        action,
+      });
+    } else {
+      this.eventEmitter.emit("newAction", {
+        agentId: agentInfo.agentId,
+        action: { type: "IGNORE" },
+      });
+    }
   }
 
-  private async buildPrompt(agentId: AgentId): Promise<string> {
+  private async buildPrompt(agentInfo: AgentBasicInfo): Promise<string> {
     const agent = await this.prisma.agent.findUnique({
-      where: { id: agentId },
+      where: {
+        id: agentInfo.agentId,
+        gameId: agentInfo.gameId,
+      },
       include: {
         profile: true,
         game: {
@@ -313,7 +349,9 @@ Action Types:
     });
 
     // Get other agents' info for context
-    const otherAgents = agent.game.agents.filter((a) => a.id !== agentId);
+    const otherAgents = agent.game.agents.filter(
+      (a) => a.onchainId !== agentInfo.agentOnchainId
+    );
     const otherAgentsContext = otherAgents
       .map((a) => {
         const agentPosition = a.mapTiles[0];
@@ -326,8 +364,12 @@ Action Types:
 
         // Get active alliances
         const activeAlliances = [
-          ...a.initiatedAlliances.filter((alliance) => !alliance.endedAt),
-          ...a.joinedAlliances.filter((alliance) => !alliance.endedAt),
+          ...a.initiatedAlliances.filter(
+            (alliance) => alliance.status === AllianceStatus.Active
+          ),
+          ...a.joinedAlliances.filter(
+            (alliance) => alliance.status === AllianceStatus.Active
+          ),
         ];
 
         const recentBattles = [
@@ -341,17 +383,19 @@ Action Types:
                 .map(
                   (alliance) =>
                     `with ${
-                      alliance.targetId === a.id
+                      alliance.joinerId === a.id
                         ? alliance.initiatorId
-                        : alliance.targetId
+                        : alliance.joinerId
                     }`
                 )
                 .join(", ")}`
             : "";
 
         return `
-- ${a.profile.name} (@${a.profile.handle})
-  Position: ${agentPosition?.x}, ${agentPosition?.y} (${
+- ${a.profile.name} (@${a.profile.xHandle})
+  Position: (${agentPosition?.x}, ${agentPosition?.y}) ${
+          agentPosition?.terrainType
+        } (${
           distance <= 1
             ? "⚠️ Within range!"
             : `${distance.toFixed(1)} fields away`
@@ -364,11 +408,11 @@ Action Types:
       .join("\n");
 
     const surroundingTerrainInfo = nearbyTiles
-      .map((tile) => `${tile.type} at (${tile.x}, ${tile.y})`)
+      .map((tile) => `${tile.terrainType} at (${tile.x}, ${tile.y})`)
       .join("\n");
 
     const nearbyFieldsInfo = nearbyFields
-      .map((field) => `${field.type} at (${field.x}, ${field.y})`)
+      .map((field) => `${field.terrainType} at (${field.x}, ${field.y})`)
       .join("\n");
 
     const characterPrompt = `You are ${
@@ -381,14 +425,33 @@ ${agent.profile.lore.join("\n")}
 
 Your knowledge and traits:
 ${agent.profile.knowledge.join("\n")}
-${JSON.stringify(agent.profile.traits, null, 2)}
+Your traits:
+${(
+  agent.profile.traits as Array<{
+    name: string;
+    value: number;
+    description: string;
+  }>
+)
+  .map(
+    (trait) =>
+      `- ${trait.name.charAt(0).toUpperCase() + trait.name.slice(1)}: ${
+        trait.value
+      }/100 (${
+        trait.value < 30 ? "Low" : trait.value > 70 ? "High" : "Moderate"
+      }) - ${trait.description}`
+  )
+  .join("\n")}
 
 Current game state:
 - Your health: ${agent.health}/100
-- Your current position: ${currentPosition.x}, ${currentPosition.y}
-- Active cooldowns: ${agent.coolDown
-      .map((cd) => `${cd.type} until ${cd.endsAt}`)
-      .join(", ")}
+- Your current position(MapTile/Coordinate): (${currentPosition.x}, ${
+      currentPosition.y
+    }) ${currentPosition.terrainType}
+- Active cooldowns: ${
+      agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") &&
+      "None"
+    }
 
 Surrounding terrain (immediate vicinity):
 ${surroundingTerrainInfo}
@@ -411,12 +474,12 @@ Game rules:
 Generate a JSON response with your next action:
 {
   "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
-  "target": string | null, // Agent ID if targeting another agent
+  "target": string | null, // other agent Twitter handle if targeting another agent
   "position": {
-    "x": number,
-    "y": number
+    "x": number, // MapTile x coordinate if moving
+    "y": number // MapTile y coordinate if moving
   },
-  "tweet": string // X/Twitter-ready post text that matches your character's personality and your actions.
+  "tweet": string // X/Twitter-ready post text that matches your character's personality and your current action or happenings.
 }`;
 
     return characterPrompt;
@@ -425,6 +488,7 @@ Generate a JSON response with your next action:
 
   // Efficiently parse the JSON response
   private parseActionJson(response: string): ActionSuggestion {
+    logger.info("🔍 Parsing action JSON: ", response);
     try {
       // Remove any potential preamble and get just the JSON object
       const jsonStr = response.substring(response.indexOf("{"));
