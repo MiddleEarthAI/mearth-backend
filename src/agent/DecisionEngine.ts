@@ -2,9 +2,10 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
-import { AgentId } from "./TwitterManager";
 import { logger } from "@/utils/logger";
 import { BN } from "@coral-xyz/anchor";
+import { AgentTrait } from "@/types/agent";
+import { ActionSuggestion, InfluenceScore } from "@/types/twitter";
 
 export type AgentBasicInfo = {
   agentId: string;
@@ -479,7 +480,7 @@ Generate a JSON response with your next action:
     "x": number, // MapTile x coordinate if moving
     "y": number // MapTile y coordinate if moving
   },
-  "tweet": string // X/Twitter-ready post text that matches your character's personality and your current action or happenings.
+  "tweet": string // X/Twitter-ready post text that matches your character's personality also use this to share your moves, actions and strategies.
 }`;
 
     return characterPrompt;

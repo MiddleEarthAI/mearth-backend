@@ -1,3 +1,4 @@
+import { ActionSuggestion, InfluenceScore, UserMetrics } from "@/types/twitter";
 import { logger } from "@/utils/logger";
 
 /**

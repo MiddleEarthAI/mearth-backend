@@ -536,7 +536,6 @@ export class BattleResolver {
               .killAgent()
               .accounts({
                 agent: agentPda,
-                authority: this.program.provider.publicKey,
               })
               .rpc();
 

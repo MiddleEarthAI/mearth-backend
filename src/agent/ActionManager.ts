@@ -11,7 +11,8 @@ const BATTLE_COOLDOWN = 3600000; // 1 hour in ms
 const MOVEMENT_COOLDOWN = 1800000; // 30 minutes in ms
 const ALLIANCE_COOLDOWN = 86400000; // 24 hours in ms
 const BATTLE_RANGE = 2;
-const CURRENT_TIMESTAMP = () => new BN(Math.floor(Date.now() / 1000)); //
+
+const CURRENT_TIMESTAMP = () => new BN(Math.floor(Date.now() / 1000)); // 1 second precision
 
 export interface ActionContext {
   program: MearthProgram;
@@ -45,9 +46,9 @@ export type GameAction = MoveAction | BattleAction | AllianceAction;
 export class ActionManager {
   private readonly program: MearthProgram;
   private readonly gameId: number;
-  private readonly prisma?: PrismaClient;
+  private readonly prisma: PrismaClient;
 
-  constructor(program: MearthProgram, gameId: number, prisma?: PrismaClient) {
+  constructor(program: MearthProgram, gameId: number, prisma: PrismaClient) {
     this.program = program;
     this.gameId = gameId;
     this.prisma = prisma;
@@ -222,9 +223,9 @@ export class ActionManager {
       }
 
       // Validate token balances
-      if (attackerAccount.tokenBalance.lt(new BN(action.tokensToStake))) {
-        throw new Error("Insufficient tokens for battle");
-      }
+      // if (attackerAccount.tokenBalance.lt(new BN(action.tokensToStake))) {
+      //   throw new Error("Insufficient tokens for battle");
+      // }
 
       // Additional offchain validations
       await this.validateBattle(context, action);

@@ -3,8 +3,6 @@ import { logger } from "@/utils/logger";
 import { prisma } from "@/config/prisma";
 import { PrismaClient } from "@prisma/client";
 
-import { getAgentPDA, getGamePDA } from "@/utils/pda";
-
 import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import { AgentBasicInfo, DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";

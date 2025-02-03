@@ -145,7 +145,11 @@ export async function startServer() {
   const eventEmitter = new EventEmitter();
   const engine = new DecisionEngine(prisma, eventEmitter);
 
-  const battleResolver = new BattleResolver(gameAccount.gameId, program);
+  const battleResolver = new BattleResolver(
+    gameAccount.gameId,
+    program,
+    prisma
+  );
 
   const orchestrator = new GameOrchestrator(
     gameAccount.gameId,

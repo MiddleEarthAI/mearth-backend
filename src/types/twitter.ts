@@ -1,15 +1,15 @@
-interface AgentTrait {
+export interface AgentTrait {
   name: string;
   value: number;
   description: string;
 }
 
-interface Position {
+export interface Position {
   x: number;
   y: number;
 }
 
-interface UserMetrics {
+export interface UserMetrics {
   followerCount: number;
   averageEngagement: number;
   accountAge: number;
@@ -17,17 +17,18 @@ interface UserMetrics {
   reputationScore: number;
 }
 
-interface InfluenceScore {
+export interface InfluenceScore {
   interactionId: string;
   score: number;
   suggestion: ActionSuggestion;
 }
 
-interface ActionSuggestion {
-  type: "MOVE" | "BATTLE" | "ALLIANCE" | "STRATEGY";
+export interface ActionSuggestion {
+  type: "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE" | "STRATEGY";
   target?: string; // agentId
   position?: Position;
-  content: string;
+  content?: string;
+  tweet?: string;
 }
 
 export interface TweetData {

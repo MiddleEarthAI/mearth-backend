@@ -63,6 +63,11 @@ export type CoolDown = $Result.DefaultSelection<Prisma.$CoolDownPayload>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model AgentHistory
+ * 
+ */
+export type AgentHistory = $Result.DefaultSelection<Prisma.$AgentHistoryPayload>
 
 /**
  * Enums
@@ -77,6 +82,15 @@ export namespace $Enums {
 export type AllianceStatus = (typeof AllianceStatus)[keyof typeof AllianceStatus]
 
 
+export const BattleStatus: {
+  Active: 'Active',
+  Resolved: 'Resolved',
+  Cancelled: 'Cancelled'
+};
+
+export type BattleStatus = (typeof BattleStatus)[keyof typeof BattleStatus]
+
+
 export const BattleType: {
   Simple: 'Simple',
   AgentVsAlliance: 'AgentVsAlliance',
@@ -84,15 +98,6 @@ export const BattleType: {
 };
 
 export type BattleType = (typeof BattleType)[keyof typeof BattleType]
-
-
-export const BattleStatus: {
-  Active: 'Active',
-  Resolved: 'Resolved',
-  Error: 'Error'
-};
-
-export type BattleStatus = (typeof BattleStatus)[keyof typeof BattleStatus]
 
 
 export const InteractionType: {
@@ -138,13 +143,13 @@ export type AllianceStatus = $Enums.AllianceStatus
 
 export const AllianceStatus: typeof $Enums.AllianceStatus
 
-export type BattleType = $Enums.BattleType
-
-export const BattleType: typeof $Enums.BattleType
-
 export type BattleStatus = $Enums.BattleStatus
 
 export const BattleStatus: typeof $Enums.BattleStatus
+
+export type BattleType = $Enums.BattleType
+
+export const BattleType: typeof $Enums.BattleType
 
 export type InteractionType = $Enums.InteractionType
 
@@ -386,6 +391,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.agentHistory`: Exposes CRUD operations for the **AgentHistory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AgentHistories
+    * const agentHistories = await prisma.agentHistory.findMany()
+    * ```
+    */
+  get agentHistory(): Prisma.AgentHistoryDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -835,7 +850,8 @@ export namespace Prisma {
     Interaction: 'Interaction',
     MapTile: 'MapTile',
     CoolDown: 'CoolDown',
-    User: 'User'
+    User: 'User',
+    AgentHistory: 'AgentHistory'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -851,7 +867,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "game" | "agentProfile" | "agent" | "tweet" | "alliance" | "battle" | "interaction" | "mapTile" | "coolDown" | "user"
+      modelProps: "game" | "agentProfile" | "agent" | "tweet" | "alliance" | "battle" | "interaction" | "mapTile" | "coolDown" | "user" | "agentHistory"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1595,6 +1611,80 @@ export namespace Prisma {
           }
         }
       }
+      AgentHistory: {
+        payload: Prisma.$AgentHistoryPayload<ExtArgs>
+        fields: Prisma.AgentHistoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AgentHistoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AgentHistoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
+          }
+          findFirst: {
+            args: Prisma.AgentHistoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AgentHistoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
+          }
+          findMany: {
+            args: Prisma.AgentHistoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>[]
+          }
+          create: {
+            args: Prisma.AgentHistoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
+          }
+          createMany: {
+            args: Prisma.AgentHistoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AgentHistoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>[]
+          }
+          delete: {
+            args: Prisma.AgentHistoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
+          }
+          update: {
+            args: Prisma.AgentHistoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.AgentHistoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AgentHistoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AgentHistoryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>[]
+          }
+          upsert: {
+            args: Prisma.AgentHistoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
+          }
+          aggregate: {
+            args: Prisma.AgentHistoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAgentHistory>
+          }
+          groupBy: {
+            args: Prisma.AgentHistoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AgentHistoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AgentHistoryCountArgs<ExtArgs>
+            result: $Utils.Optional<AgentHistoryCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1689,6 +1779,7 @@ export namespace Prisma {
     mapTile?: MapTileOmit
     coolDown?: CoolDownOmit
     user?: UserOmit
+    agentHistory?: AgentHistoryOmit
   }
 
   /* Types for Logging */
@@ -1877,10 +1968,13 @@ export namespace Prisma {
     battlesAsDefender: number
     battlesAsAttackerAlly: number
     battlesAsDefenderAlly: number
+    wonBattles: number
     coolDown: number
     initiatedAlliances: number
     joinedAlliances: number
     mapTiles: number
+    history: number
+    historyAsTarget: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1889,10 +1983,13 @@ export namespace Prisma {
     battlesAsDefender?: boolean | AgentCountOutputTypeCountBattlesAsDefenderArgs
     battlesAsAttackerAlly?: boolean | AgentCountOutputTypeCountBattlesAsAttackerAllyArgs
     battlesAsDefenderAlly?: boolean | AgentCountOutputTypeCountBattlesAsDefenderAllyArgs
+    wonBattles?: boolean | AgentCountOutputTypeCountWonBattlesArgs
     coolDown?: boolean | AgentCountOutputTypeCountCoolDownArgs
     initiatedAlliances?: boolean | AgentCountOutputTypeCountInitiatedAlliancesArgs
     joinedAlliances?: boolean | AgentCountOutputTypeCountJoinedAlliancesArgs
     mapTiles?: boolean | AgentCountOutputTypeCountMapTilesArgs
+    history?: boolean | AgentCountOutputTypeCountHistoryArgs
+    historyAsTarget?: boolean | AgentCountOutputTypeCountHistoryAsTargetArgs
   }
 
   // Custom InputTypes
@@ -1944,6 +2041,13 @@ export namespace Prisma {
   /**
    * AgentCountOutputType without action
    */
+  export type AgentCountOutputTypeCountWonBattlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BattleWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
   export type AgentCountOutputTypeCountCoolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CoolDownWhereInput
   }
@@ -1967,6 +2071,20 @@ export namespace Prisma {
    */
   export type AgentCountOutputTypeCountMapTilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MapTileWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentHistoryWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountHistoryAsTargetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentHistoryWhereInput
   }
 
 
@@ -4453,7 +4571,9 @@ export namespace Prisma {
     authority: string | null
     health: number | null
     gameId: string | null
+    isAlive: boolean | null
     profileId: string | null
+    deathTimestamp: Date | null
   }
 
   export type AgentMaxAggregateOutputType = {
@@ -4462,7 +4582,9 @@ export namespace Prisma {
     authority: string | null
     health: number | null
     gameId: string | null
+    isAlive: boolean | null
     profileId: string | null
+    deathTimestamp: Date | null
   }
 
   export type AgentCountAggregateOutputType = {
@@ -4471,7 +4593,9 @@ export namespace Prisma {
     authority: number
     health: number
     gameId: number
+    isAlive: number
     profileId: number
+    deathTimestamp: number
     _all: number
   }
 
@@ -4492,7 +4616,9 @@ export namespace Prisma {
     authority?: true
     health?: true
     gameId?: true
+    isAlive?: true
     profileId?: true
+    deathTimestamp?: true
   }
 
   export type AgentMaxAggregateInputType = {
@@ -4501,7 +4627,9 @@ export namespace Prisma {
     authority?: true
     health?: true
     gameId?: true
+    isAlive?: true
     profileId?: true
+    deathTimestamp?: true
   }
 
   export type AgentCountAggregateInputType = {
@@ -4510,7 +4638,9 @@ export namespace Prisma {
     authority?: true
     health?: true
     gameId?: true
+    isAlive?: true
     profileId?: true
+    deathTimestamp?: true
     _all?: true
   }
 
@@ -4606,7 +4736,9 @@ export namespace Prisma {
     authority: string
     health: number
     gameId: string
+    isAlive: boolean
     profileId: string
+    deathTimestamp: Date | null
     _count: AgentCountAggregateOutputType | null
     _avg: AgentAvgAggregateOutputType | null
     _sum: AgentSumAggregateOutputType | null
@@ -4634,18 +4766,23 @@ export namespace Prisma {
     authority?: boolean
     health?: boolean
     gameId?: boolean
+    isAlive?: boolean
     profileId?: boolean
+    deathTimestamp?: boolean
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
     battlesAsAttacker?: boolean | Agent$battlesAsAttackerArgs<ExtArgs>
     battlesAsDefender?: boolean | Agent$battlesAsDefenderArgs<ExtArgs>
     battlesAsAttackerAlly?: boolean | Agent$battlesAsAttackerAllyArgs<ExtArgs>
     battlesAsDefenderAlly?: boolean | Agent$battlesAsDefenderAllyArgs<ExtArgs>
+    wonBattles?: boolean | Agent$wonBattlesArgs<ExtArgs>
     coolDown?: boolean | Agent$coolDownArgs<ExtArgs>
     initiatedAlliances?: boolean | Agent$initiatedAlliancesArgs<ExtArgs>
     joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
     mapTiles?: boolean | Agent$mapTilesArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    history?: boolean | Agent$historyArgs<ExtArgs>
+    historyAsTarget?: boolean | Agent$historyAsTargetArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -4655,7 +4792,9 @@ export namespace Prisma {
     authority?: boolean
     health?: boolean
     gameId?: boolean
+    isAlive?: boolean
     profileId?: boolean
+    deathTimestamp?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
@@ -4666,7 +4805,9 @@ export namespace Prisma {
     authority?: boolean
     health?: boolean
     gameId?: boolean
+    isAlive?: boolean
     profileId?: boolean
+    deathTimestamp?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
@@ -4677,10 +4818,12 @@ export namespace Prisma {
     authority?: boolean
     health?: boolean
     gameId?: boolean
+    isAlive?: boolean
     profileId?: boolean
+    deathTimestamp?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "health" | "gameId" | "profileId", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "health" | "gameId" | "isAlive" | "profileId" | "deathTimestamp", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
@@ -4688,11 +4831,14 @@ export namespace Prisma {
     battlesAsDefender?: boolean | Agent$battlesAsDefenderArgs<ExtArgs>
     battlesAsAttackerAlly?: boolean | Agent$battlesAsAttackerAllyArgs<ExtArgs>
     battlesAsDefenderAlly?: boolean | Agent$battlesAsDefenderAllyArgs<ExtArgs>
+    wonBattles?: boolean | Agent$wonBattlesArgs<ExtArgs>
     coolDown?: boolean | Agent$coolDownArgs<ExtArgs>
     initiatedAlliances?: boolean | Agent$initiatedAlliancesArgs<ExtArgs>
     joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
     mapTiles?: boolean | Agent$mapTilesArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    history?: boolean | Agent$historyArgs<ExtArgs>
+    historyAsTarget?: boolean | Agent$historyAsTargetArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4713,11 +4859,14 @@ export namespace Prisma {
       battlesAsDefender: Prisma.$BattlePayload<ExtArgs>[]
       battlesAsAttackerAlly: Prisma.$BattlePayload<ExtArgs>[]
       battlesAsDefenderAlly: Prisma.$BattlePayload<ExtArgs>[]
+      wonBattles: Prisma.$BattlePayload<ExtArgs>[]
       coolDown: Prisma.$CoolDownPayload<ExtArgs>[]
       initiatedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
       joinedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
       mapTiles: Prisma.$MapTilePayload<ExtArgs>[]
       profile: Prisma.$AgentProfilePayload<ExtArgs>
+      history: Prisma.$AgentHistoryPayload<ExtArgs>[]
+      historyAsTarget: Prisma.$AgentHistoryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4725,7 +4874,9 @@ export namespace Prisma {
       authority: string
       health: number
       gameId: string
+      isAlive: boolean
       profileId: string
+      deathTimestamp: Date | null
     }, ExtArgs["result"]["agent"]>
     composites: {}
   }
@@ -5126,11 +5277,14 @@ export namespace Prisma {
     battlesAsDefender<T extends Agent$battlesAsDefenderArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsDefenderArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battlesAsAttackerAlly<T extends Agent$battlesAsAttackerAllyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsAttackerAllyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battlesAsDefenderAlly<T extends Agent$battlesAsDefenderAllyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$battlesAsDefenderAllyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    wonBattles<T extends Agent$wonBattlesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$wonBattlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     coolDown<T extends Agent$coolDownArgs<ExtArgs> = {}>(args?: Subset<T, Agent$coolDownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     initiatedAlliances<T extends Agent$initiatedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$initiatedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     joinedAlliances<T extends Agent$joinedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$joinedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     mapTiles<T extends Agent$mapTilesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$mapTilesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     profile<T extends AgentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfileDefaultArgs<ExtArgs>>): Prisma__AgentProfileClient<$Result.GetResult<Prisma.$AgentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    history<T extends Agent$historyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$historyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    historyAsTarget<T extends Agent$historyAsTargetArgs<ExtArgs> = {}>(args?: Subset<T, Agent$historyAsTargetArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5165,7 +5319,9 @@ export namespace Prisma {
     readonly authority: FieldRef<"Agent", 'String'>
     readonly health: FieldRef<"Agent", 'Int'>
     readonly gameId: FieldRef<"Agent", 'String'>
+    readonly isAlive: FieldRef<"Agent", 'Boolean'>
     readonly profileId: FieldRef<"Agent", 'String'>
+    readonly deathTimestamp: FieldRef<"Agent", 'DateTime'>
   }
     
 
@@ -5670,6 +5826,30 @@ export namespace Prisma {
   }
 
   /**
+   * Agent.wonBattles
+   */
+  export type Agent$wonBattlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Battle
+     */
+    select?: BattleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Battle
+     */
+    omit?: BattleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BattleInclude<ExtArgs> | null
+    where?: BattleWhereInput
+    orderBy?: BattleOrderByWithRelationInput | BattleOrderByWithRelationInput[]
+    cursor?: BattleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BattleScalarFieldEnum | BattleScalarFieldEnum[]
+  }
+
+  /**
    * Agent.coolDown
    */
   export type Agent$coolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5763,6 +5943,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.history
+   */
+  export type Agent$historyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    where?: AgentHistoryWhereInput
+    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
+    cursor?: AgentHistoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.historyAsTarget
+   */
+  export type Agent$historyAsTargetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    where?: AgentHistoryWhereInput
+    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
+    cursor?: AgentHistoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
   }
 
   /**
@@ -8022,126 +8250,110 @@ export namespace Prisma {
 
   export type BattleAvgAggregateOutputType = {
     tokensStaked: number | null
-    tokensLost: number | null
   }
 
   export type BattleSumAggregateOutputType = {
     tokensStaked: number | null
-    tokensLost: number | null
   }
 
   export type BattleMinAggregateOutputType = {
     id: string | null
-    timestamp: Date | null
     type: $Enums.BattleType | null
-    tokensStaked: number | null
-    tokensLost: number | null
-    outcome: string | null
-    attackerId: string | null
-    attackerAllyId: string | null
-    defenderId: string | null
-    defenderAllyId: string | null
     status: $Enums.BattleStatus | null
-    gameId: string | null
+    tokensStaked: number | null
     startTime: Date | null
-    resolvedAt: Date | null
+    endTime: Date | null
+    gameId: string | null
+    attackerId: string | null
+    defenderId: string | null
+    attackerAllyId: string | null
+    defenderAllyId: string | null
+    winnerId: string | null
   }
 
   export type BattleMaxAggregateOutputType = {
     id: string | null
-    timestamp: Date | null
     type: $Enums.BattleType | null
-    tokensStaked: number | null
-    tokensLost: number | null
-    outcome: string | null
-    attackerId: string | null
-    attackerAllyId: string | null
-    defenderId: string | null
-    defenderAllyId: string | null
     status: $Enums.BattleStatus | null
-    gameId: string | null
+    tokensStaked: number | null
     startTime: Date | null
-    resolvedAt: Date | null
+    endTime: Date | null
+    gameId: string | null
+    attackerId: string | null
+    defenderId: string | null
+    attackerAllyId: string | null
+    defenderAllyId: string | null
+    winnerId: string | null
   }
 
   export type BattleCountAggregateOutputType = {
     id: number
-    timestamp: number
     type: number
-    tokensStaked: number
-    tokensLost: number
-    outcome: number
-    attackerId: number
-    attackerAllyId: number
-    defenderId: number
-    defenderAllyId: number
     status: number
-    gameId: number
+    tokensStaked: number
     startTime: number
-    resolvedAt: number
+    endTime: number
+    gameId: number
+    attackerId: number
+    defenderId: number
+    attackerAllyId: number
+    defenderAllyId: number
+    winnerId: number
     _all: number
   }
 
 
   export type BattleAvgAggregateInputType = {
     tokensStaked?: true
-    tokensLost?: true
   }
 
   export type BattleSumAggregateInputType = {
     tokensStaked?: true
-    tokensLost?: true
   }
 
   export type BattleMinAggregateInputType = {
     id?: true
-    timestamp?: true
     type?: true
-    tokensStaked?: true
-    tokensLost?: true
-    outcome?: true
-    attackerId?: true
-    attackerAllyId?: true
-    defenderId?: true
-    defenderAllyId?: true
     status?: true
-    gameId?: true
+    tokensStaked?: true
     startTime?: true
-    resolvedAt?: true
+    endTime?: true
+    gameId?: true
+    attackerId?: true
+    defenderId?: true
+    attackerAllyId?: true
+    defenderAllyId?: true
+    winnerId?: true
   }
 
   export type BattleMaxAggregateInputType = {
     id?: true
-    timestamp?: true
     type?: true
-    tokensStaked?: true
-    tokensLost?: true
-    outcome?: true
-    attackerId?: true
-    attackerAllyId?: true
-    defenderId?: true
-    defenderAllyId?: true
     status?: true
-    gameId?: true
+    tokensStaked?: true
     startTime?: true
-    resolvedAt?: true
+    endTime?: true
+    gameId?: true
+    attackerId?: true
+    defenderId?: true
+    attackerAllyId?: true
+    defenderAllyId?: true
+    winnerId?: true
   }
 
   export type BattleCountAggregateInputType = {
     id?: true
-    timestamp?: true
     type?: true
-    tokensStaked?: true
-    tokensLost?: true
-    outcome?: true
-    attackerId?: true
-    attackerAllyId?: true
-    defenderId?: true
-    defenderAllyId?: true
     status?: true
-    gameId?: true
+    tokensStaked?: true
     startTime?: true
-    resolvedAt?: true
+    endTime?: true
+    gameId?: true
+    attackerId?: true
+    defenderId?: true
+    attackerAllyId?: true
+    defenderAllyId?: true
+    winnerId?: true
     _all?: true
   }
 
@@ -8233,19 +8445,17 @@ export namespace Prisma {
 
   export type BattleGroupByOutputType = {
     id: string
-    timestamp: Date
     type: $Enums.BattleType
-    tokensStaked: number
-    tokensLost: number | null
-    outcome: string | null
-    attackerId: string
-    attackerAllyId: string | null
-    defenderId: string
-    defenderAllyId: string | null
     status: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime: Date
-    resolvedAt: Date | null
+    endTime: Date | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId: string | null
+    defenderAllyId: string | null
+    winnerId: string | null
     _count: BattleCountAggregateOutputType | null
     _avg: BattleAvgAggregateOutputType | null
     _sum: BattleSumAggregateOutputType | null
@@ -8269,134 +8479,131 @@ export namespace Prisma {
 
   export type BattleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    timestamp?: boolean
     type?: boolean
-    tokensStaked?: boolean
-    tokensLost?: boolean
-    outcome?: boolean
-    attackerId?: boolean
-    attackerAllyId?: boolean
-    defenderId?: boolean
-    defenderAllyId?: boolean
     status?: boolean
-    gameId?: boolean
+    tokensStaked?: boolean
     startTime?: boolean
-    resolvedAt?: boolean
-    attacker?: boolean | AgentDefaultArgs<ExtArgs>
-    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
-    defender?: boolean | AgentDefaultArgs<ExtArgs>
-    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    endTime?: boolean
+    gameId?: boolean
+    attackerId?: boolean
+    defenderId?: boolean
+    attackerAllyId?: boolean
+    defenderAllyId?: boolean
+    winnerId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    winner?: boolean | Battle$winnerArgs<ExtArgs>
   }, ExtArgs["result"]["battle"]>
 
   export type BattleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    timestamp?: boolean
     type?: boolean
-    tokensStaked?: boolean
-    tokensLost?: boolean
-    outcome?: boolean
-    attackerId?: boolean
-    attackerAllyId?: boolean
-    defenderId?: boolean
-    defenderAllyId?: boolean
     status?: boolean
-    gameId?: boolean
+    tokensStaked?: boolean
     startTime?: boolean
-    resolvedAt?: boolean
-    attacker?: boolean | AgentDefaultArgs<ExtArgs>
-    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
-    defender?: boolean | AgentDefaultArgs<ExtArgs>
-    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    endTime?: boolean
+    gameId?: boolean
+    attackerId?: boolean
+    defenderId?: boolean
+    attackerAllyId?: boolean
+    defenderAllyId?: boolean
+    winnerId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    winner?: boolean | Battle$winnerArgs<ExtArgs>
   }, ExtArgs["result"]["battle"]>
 
   export type BattleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    timestamp?: boolean
     type?: boolean
-    tokensStaked?: boolean
-    tokensLost?: boolean
-    outcome?: boolean
-    attackerId?: boolean
-    attackerAllyId?: boolean
-    defenderId?: boolean
-    defenderAllyId?: boolean
     status?: boolean
-    gameId?: boolean
+    tokensStaked?: boolean
     startTime?: boolean
-    resolvedAt?: boolean
-    attacker?: boolean | AgentDefaultArgs<ExtArgs>
-    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
-    defender?: boolean | AgentDefaultArgs<ExtArgs>
-    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    endTime?: boolean
+    gameId?: boolean
+    attackerId?: boolean
+    defenderId?: boolean
+    attackerAllyId?: boolean
+    defenderAllyId?: boolean
+    winnerId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    winner?: boolean | Battle$winnerArgs<ExtArgs>
   }, ExtArgs["result"]["battle"]>
 
   export type BattleSelectScalar = {
     id?: boolean
-    timestamp?: boolean
     type?: boolean
-    tokensStaked?: boolean
-    tokensLost?: boolean
-    outcome?: boolean
-    attackerId?: boolean
-    attackerAllyId?: boolean
-    defenderId?: boolean
-    defenderAllyId?: boolean
     status?: boolean
-    gameId?: boolean
+    tokensStaked?: boolean
     startTime?: boolean
-    resolvedAt?: boolean
+    endTime?: boolean
+    gameId?: boolean
+    attackerId?: boolean
+    defenderId?: boolean
+    attackerAllyId?: boolean
+    defenderAllyId?: boolean
+    winnerId?: boolean
   }
 
-  export type BattleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "timestamp" | "type" | "tokensStaked" | "tokensLost" | "outcome" | "attackerId" | "attackerAllyId" | "defenderId" | "defenderAllyId" | "status" | "gameId" | "startTime" | "resolvedAt", ExtArgs["result"]["battle"]>
+  export type BattleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "status" | "tokensStaked" | "startTime" | "endTime" | "gameId" | "attackerId" | "defenderId" | "attackerAllyId" | "defenderAllyId" | "winnerId", ExtArgs["result"]["battle"]>
   export type BattleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    attacker?: boolean | AgentDefaultArgs<ExtArgs>
-    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
-    defender?: boolean | AgentDefaultArgs<ExtArgs>
-    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    winner?: boolean | Battle$winnerArgs<ExtArgs>
   }
   export type BattleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    attacker?: boolean | AgentDefaultArgs<ExtArgs>
-    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
-    defender?: boolean | AgentDefaultArgs<ExtArgs>
-    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    winner?: boolean | Battle$winnerArgs<ExtArgs>
   }
   export type BattleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    attacker?: boolean | AgentDefaultArgs<ExtArgs>
-    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
-    defender?: boolean | AgentDefaultArgs<ExtArgs>
-    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
+    attacker?: boolean | AgentDefaultArgs<ExtArgs>
+    defender?: boolean | AgentDefaultArgs<ExtArgs>
+    attackerAlly?: boolean | Battle$attackerAllyArgs<ExtArgs>
+    defenderAlly?: boolean | Battle$defenderAllyArgs<ExtArgs>
+    winner?: boolean | Battle$winnerArgs<ExtArgs>
   }
 
   export type $BattlePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Battle"
     objects: {
-      attacker: Prisma.$AgentPayload<ExtArgs>
-      attackerAlly: Prisma.$AgentPayload<ExtArgs> | null
-      defender: Prisma.$AgentPayload<ExtArgs>
-      defenderAlly: Prisma.$AgentPayload<ExtArgs> | null
       game: Prisma.$GamePayload<ExtArgs>
+      attacker: Prisma.$AgentPayload<ExtArgs>
+      defender: Prisma.$AgentPayload<ExtArgs>
+      attackerAlly: Prisma.$AgentPayload<ExtArgs> | null
+      defenderAlly: Prisma.$AgentPayload<ExtArgs> | null
+      winner: Prisma.$AgentPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      timestamp: Date
       type: $Enums.BattleType
-      tokensStaked: number
-      tokensLost: number | null
-      outcome: string | null
-      attackerId: string
-      attackerAllyId: string | null
-      defenderId: string
-      defenderAllyId: string | null
       status: $Enums.BattleStatus
-      gameId: string
+      tokensStaked: number
       startTime: Date
-      resolvedAt: Date | null
+      endTime: Date | null
+      gameId: string
+      attackerId: string
+      defenderId: string
+      attackerAllyId: string | null
+      defenderAllyId: string | null
+      winnerId: string | null
     }, ExtArgs["result"]["battle"]>
     composites: {}
   }
@@ -8791,11 +8998,12 @@ export namespace Prisma {
    */
   export interface Prisma__BattleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    attacker<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    attackerAlly<T extends Battle$attackerAllyArgs<ExtArgs> = {}>(args?: Subset<T, Battle$attackerAllyArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    defender<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    defenderAlly<T extends Battle$defenderAllyArgs<ExtArgs> = {}>(args?: Subset<T, Battle$defenderAllyArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    attacker<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    defender<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    attackerAlly<T extends Battle$attackerAllyArgs<ExtArgs> = {}>(args?: Subset<T, Battle$attackerAllyArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    defenderAlly<T extends Battle$defenderAllyArgs<ExtArgs> = {}>(args?: Subset<T, Battle$defenderAllyArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    winner<T extends Battle$winnerArgs<ExtArgs> = {}>(args?: Subset<T, Battle$winnerArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8826,19 +9034,17 @@ export namespace Prisma {
    */ 
   interface BattleFieldRefs {
     readonly id: FieldRef<"Battle", 'String'>
-    readonly timestamp: FieldRef<"Battle", 'DateTime'>
     readonly type: FieldRef<"Battle", 'BattleType'>
-    readonly tokensStaked: FieldRef<"Battle", 'Float'>
-    readonly tokensLost: FieldRef<"Battle", 'Float'>
-    readonly outcome: FieldRef<"Battle", 'String'>
-    readonly attackerId: FieldRef<"Battle", 'String'>
-    readonly attackerAllyId: FieldRef<"Battle", 'String'>
-    readonly defenderId: FieldRef<"Battle", 'String'>
-    readonly defenderAllyId: FieldRef<"Battle", 'String'>
     readonly status: FieldRef<"Battle", 'BattleStatus'>
-    readonly gameId: FieldRef<"Battle", 'String'>
+    readonly tokensStaked: FieldRef<"Battle", 'Int'>
     readonly startTime: FieldRef<"Battle", 'DateTime'>
-    readonly resolvedAt: FieldRef<"Battle", 'DateTime'>
+    readonly endTime: FieldRef<"Battle", 'DateTime'>
+    readonly gameId: FieldRef<"Battle", 'String'>
+    readonly attackerId: FieldRef<"Battle", 'String'>
+    readonly defenderId: FieldRef<"Battle", 'String'>
+    readonly attackerAllyId: FieldRef<"Battle", 'String'>
+    readonly defenderAllyId: FieldRef<"Battle", 'String'>
+    readonly winnerId: FieldRef<"Battle", 'String'>
   }
     
 
@@ -9245,6 +9451,25 @@ export namespace Prisma {
    * Battle.defenderAlly
    */
   export type Battle$defenderAllyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Agent
+     */
+    select?: AgentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Agent
+     */
+    omit?: AgentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
+   * Battle.winner
+   */
+  export type Battle$winnerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Agent
      */
@@ -13514,6 +13739,1092 @@ export namespace Prisma {
 
 
   /**
+   * Model AgentHistory
+   */
+
+  export type AggregateAgentHistory = {
+    _count: AgentHistoryCountAggregateOutputType | null
+    _min: AgentHistoryMinAggregateOutputType | null
+    _max: AgentHistoryMaxAggregateOutputType | null
+  }
+
+  export type AgentHistoryMinAggregateOutputType = {
+    id: string | null
+    agentId: string | null
+    type: string | null
+    details: string | null
+    timestamp: Date | null
+    targetAgentId: string | null
+  }
+
+  export type AgentHistoryMaxAggregateOutputType = {
+    id: string | null
+    agentId: string | null
+    type: string | null
+    details: string | null
+    timestamp: Date | null
+    targetAgentId: string | null
+  }
+
+  export type AgentHistoryCountAggregateOutputType = {
+    id: number
+    agentId: number
+    type: number
+    details: number
+    timestamp: number
+    targetAgentId: number
+    _all: number
+  }
+
+
+  export type AgentHistoryMinAggregateInputType = {
+    id?: true
+    agentId?: true
+    type?: true
+    details?: true
+    timestamp?: true
+    targetAgentId?: true
+  }
+
+  export type AgentHistoryMaxAggregateInputType = {
+    id?: true
+    agentId?: true
+    type?: true
+    details?: true
+    timestamp?: true
+    targetAgentId?: true
+  }
+
+  export type AgentHistoryCountAggregateInputType = {
+    id?: true
+    agentId?: true
+    type?: true
+    details?: true
+    timestamp?: true
+    targetAgentId?: true
+    _all?: true
+  }
+
+  export type AgentHistoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentHistory to aggregate.
+     */
+    where?: AgentHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentHistories to fetch.
+     */
+    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AgentHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AgentHistories
+    **/
+    _count?: true | AgentHistoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AgentHistoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AgentHistoryMaxAggregateInputType
+  }
+
+  export type GetAgentHistoryAggregateType<T extends AgentHistoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateAgentHistory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAgentHistory[P]>
+      : GetScalarType<T[P], AggregateAgentHistory[P]>
+  }
+
+
+
+
+  export type AgentHistoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgentHistoryWhereInput
+    orderBy?: AgentHistoryOrderByWithAggregationInput | AgentHistoryOrderByWithAggregationInput[]
+    by: AgentHistoryScalarFieldEnum[] | AgentHistoryScalarFieldEnum
+    having?: AgentHistoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AgentHistoryCountAggregateInputType | true
+    _min?: AgentHistoryMinAggregateInputType
+    _max?: AgentHistoryMaxAggregateInputType
+  }
+
+  export type AgentHistoryGroupByOutputType = {
+    id: string
+    agentId: string
+    type: string
+    details: string
+    timestamp: Date
+    targetAgentId: string | null
+    _count: AgentHistoryCountAggregateOutputType | null
+    _min: AgentHistoryMinAggregateOutputType | null
+    _max: AgentHistoryMaxAggregateOutputType | null
+  }
+
+  type GetAgentHistoryGroupByPayload<T extends AgentHistoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AgentHistoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AgentHistoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AgentHistoryGroupByOutputType[P]>
+            : GetScalarType<T[P], AgentHistoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AgentHistorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    type?: boolean
+    details?: boolean
+    timestamp?: boolean
+    targetAgentId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
+  }, ExtArgs["result"]["agentHistory"]>
+
+  export type AgentHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    type?: boolean
+    details?: boolean
+    timestamp?: boolean
+    targetAgentId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
+  }, ExtArgs["result"]["agentHistory"]>
+
+  export type AgentHistorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    type?: boolean
+    details?: boolean
+    timestamp?: boolean
+    targetAgentId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
+  }, ExtArgs["result"]["agentHistory"]>
+
+  export type AgentHistorySelectScalar = {
+    id?: boolean
+    agentId?: boolean
+    type?: boolean
+    details?: boolean
+    timestamp?: boolean
+    targetAgentId?: boolean
+  }
+
+  export type AgentHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "type" | "details" | "timestamp" | "targetAgentId", ExtArgs["result"]["agentHistory"]>
+  export type AgentHistoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
+  }
+  export type AgentHistoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
+  }
+  export type AgentHistoryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
+  }
+
+  export type $AgentHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AgentHistory"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs>
+      targetAgent: Prisma.$AgentPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      agentId: string
+      type: string
+      details: string
+      timestamp: Date
+      targetAgentId: string | null
+    }, ExtArgs["result"]["agentHistory"]>
+    composites: {}
+  }
+
+  type AgentHistoryGetPayload<S extends boolean | null | undefined | AgentHistoryDefaultArgs> = $Result.GetResult<Prisma.$AgentHistoryPayload, S>
+
+  type AgentHistoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AgentHistoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AgentHistoryCountAggregateInputType | true
+    }
+
+  export interface AgentHistoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgentHistory'], meta: { name: 'AgentHistory' } }
+    /**
+     * Find zero or one AgentHistory that matches the filter.
+     * @param {AgentHistoryFindUniqueArgs} args - Arguments to find a AgentHistory
+     * @example
+     * // Get one AgentHistory
+     * const agentHistory = await prisma.agentHistory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AgentHistoryFindUniqueArgs>(args: SelectSubset<T, AgentHistoryFindUniqueArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find one AgentHistory that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AgentHistoryFindUniqueOrThrowArgs} args - Arguments to find a AgentHistory
+     * @example
+     * // Get one AgentHistory
+     * const agentHistory = await prisma.agentHistory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AgentHistoryFindUniqueOrThrowArgs>(args: SelectSubset<T, AgentHistoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first AgentHistory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryFindFirstArgs} args - Arguments to find a AgentHistory
+     * @example
+     * // Get one AgentHistory
+     * const agentHistory = await prisma.agentHistory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AgentHistoryFindFirstArgs>(args?: SelectSubset<T, AgentHistoryFindFirstArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first AgentHistory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryFindFirstOrThrowArgs} args - Arguments to find a AgentHistory
+     * @example
+     * // Get one AgentHistory
+     * const agentHistory = await prisma.agentHistory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AgentHistoryFindFirstOrThrowArgs>(args?: SelectSubset<T, AgentHistoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find zero or more AgentHistories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AgentHistories
+     * const agentHistories = await prisma.agentHistory.findMany()
+     * 
+     * // Get first 10 AgentHistories
+     * const agentHistories = await prisma.agentHistory.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const agentHistoryWithIdOnly = await prisma.agentHistory.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AgentHistoryFindManyArgs>(args?: SelectSubset<T, AgentHistoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", ClientOptions>>
+
+    /**
+     * Create a AgentHistory.
+     * @param {AgentHistoryCreateArgs} args - Arguments to create a AgentHistory.
+     * @example
+     * // Create one AgentHistory
+     * const AgentHistory = await prisma.agentHistory.create({
+     *   data: {
+     *     // ... data to create a AgentHistory
+     *   }
+     * })
+     * 
+     */
+    create<T extends AgentHistoryCreateArgs>(args: SelectSubset<T, AgentHistoryCreateArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Create many AgentHistories.
+     * @param {AgentHistoryCreateManyArgs} args - Arguments to create many AgentHistories.
+     * @example
+     * // Create many AgentHistories
+     * const agentHistory = await prisma.agentHistory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AgentHistoryCreateManyArgs>(args?: SelectSubset<T, AgentHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AgentHistories and returns the data saved in the database.
+     * @param {AgentHistoryCreateManyAndReturnArgs} args - Arguments to create many AgentHistories.
+     * @example
+     * // Create many AgentHistories
+     * const agentHistory = await prisma.agentHistory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AgentHistories and only return the `id`
+     * const agentHistoryWithIdOnly = await prisma.agentHistory.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AgentHistoryCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+
+    /**
+     * Delete a AgentHistory.
+     * @param {AgentHistoryDeleteArgs} args - Arguments to delete one AgentHistory.
+     * @example
+     * // Delete one AgentHistory
+     * const AgentHistory = await prisma.agentHistory.delete({
+     *   where: {
+     *     // ... filter to delete one AgentHistory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AgentHistoryDeleteArgs>(args: SelectSubset<T, AgentHistoryDeleteArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Update one AgentHistory.
+     * @param {AgentHistoryUpdateArgs} args - Arguments to update one AgentHistory.
+     * @example
+     * // Update one AgentHistory
+     * const agentHistory = await prisma.agentHistory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AgentHistoryUpdateArgs>(args: SelectSubset<T, AgentHistoryUpdateArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Delete zero or more AgentHistories.
+     * @param {AgentHistoryDeleteManyArgs} args - Arguments to filter AgentHistories to delete.
+     * @example
+     * // Delete a few AgentHistories
+     * const { count } = await prisma.agentHistory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AgentHistoryDeleteManyArgs>(args?: SelectSubset<T, AgentHistoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AgentHistories
+     * const agentHistory = await prisma.agentHistory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AgentHistoryUpdateManyArgs>(args: SelectSubset<T, AgentHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgentHistories and returns the data updated in the database.
+     * @param {AgentHistoryUpdateManyAndReturnArgs} args - Arguments to update many AgentHistories.
+     * @example
+     * // Update many AgentHistories
+     * const agentHistory = await prisma.agentHistory.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AgentHistories and only return the `id`
+     * const agentHistoryWithIdOnly = await prisma.agentHistory.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AgentHistoryUpdateManyAndReturnArgs>(args: SelectSubset<T, AgentHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+
+    /**
+     * Create or update one AgentHistory.
+     * @param {AgentHistoryUpsertArgs} args - Arguments to update or create a AgentHistory.
+     * @example
+     * // Update or create a AgentHistory
+     * const agentHistory = await prisma.agentHistory.upsert({
+     *   create: {
+     *     // ... data to create a AgentHistory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AgentHistory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AgentHistoryUpsertArgs>(args: SelectSubset<T, AgentHistoryUpsertArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+
+
+    /**
+     * Count the number of AgentHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryCountArgs} args - Arguments to filter AgentHistories to count.
+     * @example
+     * // Count the number of AgentHistories
+     * const count = await prisma.agentHistory.count({
+     *   where: {
+     *     // ... the filter for the AgentHistories we want to count
+     *   }
+     * })
+    **/
+    count<T extends AgentHistoryCountArgs>(
+      args?: Subset<T, AgentHistoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AgentHistoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AgentHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AgentHistoryAggregateArgs>(args: Subset<T, AgentHistoryAggregateArgs>): Prisma.PrismaPromise<GetAgentHistoryAggregateType<T>>
+
+    /**
+     * Group by AgentHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgentHistoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AgentHistoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AgentHistoryGroupByArgs['orderBy'] }
+        : { orderBy?: AgentHistoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AgentHistoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgentHistoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AgentHistory model
+   */
+  readonly fields: AgentHistoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AgentHistory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AgentHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    targetAgent<T extends AgentHistory$targetAgentArgs<ExtArgs> = {}>(args?: Subset<T, AgentHistory$targetAgentArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AgentHistory model
+   */ 
+  interface AgentHistoryFieldRefs {
+    readonly id: FieldRef<"AgentHistory", 'String'>
+    readonly agentId: FieldRef<"AgentHistory", 'String'>
+    readonly type: FieldRef<"AgentHistory", 'String'>
+    readonly details: FieldRef<"AgentHistory", 'String'>
+    readonly timestamp: FieldRef<"AgentHistory", 'DateTime'>
+    readonly targetAgentId: FieldRef<"AgentHistory", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AgentHistory findUnique
+   */
+  export type AgentHistoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentHistory to fetch.
+     */
+    where: AgentHistoryWhereUniqueInput
+  }
+
+  /**
+   * AgentHistory findUniqueOrThrow
+   */
+  export type AgentHistoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentHistory to fetch.
+     */
+    where: AgentHistoryWhereUniqueInput
+  }
+
+  /**
+   * AgentHistory findFirst
+   */
+  export type AgentHistoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentHistory to fetch.
+     */
+    where?: AgentHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentHistories to fetch.
+     */
+    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentHistories.
+     */
+    cursor?: AgentHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentHistories.
+     */
+    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * AgentHistory findFirstOrThrow
+   */
+  export type AgentHistoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentHistory to fetch.
+     */
+    where?: AgentHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentHistories to fetch.
+     */
+    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgentHistories.
+     */
+    cursor?: AgentHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgentHistories.
+     */
+    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * AgentHistory findMany
+   */
+  export type AgentHistoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which AgentHistories to fetch.
+     */
+    where?: AgentHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgentHistories to fetch.
+     */
+    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AgentHistories.
+     */
+    cursor?: AgentHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgentHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgentHistories.
+     */
+    skip?: number
+    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * AgentHistory create
+   */
+  export type AgentHistoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AgentHistory.
+     */
+    data: XOR<AgentHistoryCreateInput, AgentHistoryUncheckedCreateInput>
+  }
+
+  /**
+   * AgentHistory createMany
+   */
+  export type AgentHistoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AgentHistories.
+     */
+    data: AgentHistoryCreateManyInput | AgentHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgentHistory createManyAndReturn
+   */
+  export type AgentHistoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * The data used to create many AgentHistories.
+     */
+    data: AgentHistoryCreateManyInput | AgentHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AgentHistory update
+   */
+  export type AgentHistoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AgentHistory.
+     */
+    data: XOR<AgentHistoryUpdateInput, AgentHistoryUncheckedUpdateInput>
+    /**
+     * Choose, which AgentHistory to update.
+     */
+    where: AgentHistoryWhereUniqueInput
+  }
+
+  /**
+   * AgentHistory updateMany
+   */
+  export type AgentHistoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AgentHistories.
+     */
+    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentHistories to update
+     */
+    where?: AgentHistoryWhereInput
+  }
+
+  /**
+   * AgentHistory updateManyAndReturn
+   */
+  export type AgentHistoryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * The data used to update AgentHistories.
+     */
+    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which AgentHistories to update
+     */
+    where?: AgentHistoryWhereInput
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AgentHistory upsert
+   */
+  export type AgentHistoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AgentHistory to update in case it exists.
+     */
+    where: AgentHistoryWhereUniqueInput
+    /**
+     * In case the AgentHistory found by the `where` argument doesn't exist, create a new AgentHistory with this data.
+     */
+    create: XOR<AgentHistoryCreateInput, AgentHistoryUncheckedCreateInput>
+    /**
+     * In case the AgentHistory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AgentHistoryUpdateInput, AgentHistoryUncheckedUpdateInput>
+  }
+
+  /**
+   * AgentHistory delete
+   */
+  export type AgentHistoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+    /**
+     * Filter which AgentHistory to delete.
+     */
+    where: AgentHistoryWhereUniqueInput
+  }
+
+  /**
+   * AgentHistory deleteMany
+   */
+  export type AgentHistoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgentHistories to delete
+     */
+    where?: AgentHistoryWhereInput
+  }
+
+  /**
+   * AgentHistory.targetAgent
+   */
+  export type AgentHistory$targetAgentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Agent
+     */
+    select?: AgentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Agent
+     */
+    omit?: AgentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
+   * AgentHistory without action
+   */
+  export type AgentHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgentHistory
+     */
+    select?: AgentHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AgentHistory
+     */
+    omit?: AgentHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentHistoryInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -13567,7 +14878,9 @@ export namespace Prisma {
     authority: 'authority',
     health: 'health',
     gameId: 'gameId',
-    profileId: 'profileId'
+    isAlive: 'isAlive',
+    profileId: 'profileId',
+    deathTimestamp: 'deathTimestamp'
   };
 
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
@@ -13601,19 +14914,17 @@ export namespace Prisma {
 
   export const BattleScalarFieldEnum: {
     id: 'id',
-    timestamp: 'timestamp',
     type: 'type',
-    tokensStaked: 'tokensStaked',
-    tokensLost: 'tokensLost',
-    outcome: 'outcome',
-    attackerId: 'attackerId',
-    attackerAllyId: 'attackerAllyId',
-    defenderId: 'defenderId',
-    defenderAllyId: 'defenderAllyId',
     status: 'status',
-    gameId: 'gameId',
+    tokensStaked: 'tokensStaked',
     startTime: 'startTime',
-    resolvedAt: 'resolvedAt'
+    endTime: 'endTime',
+    gameId: 'gameId',
+    attackerId: 'attackerId',
+    defenderId: 'defenderId',
+    attackerAllyId: 'attackerAllyId',
+    defenderAllyId: 'defenderAllyId',
+    winnerId: 'winnerId'
   };
 
   export type BattleScalarFieldEnum = (typeof BattleScalarFieldEnum)[keyof typeof BattleScalarFieldEnum]
@@ -13665,6 +14976,18 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const AgentHistoryScalarFieldEnum: {
+    id: 'id',
+    agentId: 'agentId',
+    type: 'type',
+    details: 'details',
+    timestamp: 'timestamp',
+    targetAgentId: 'targetAgentId'
+  };
+
+  export type AgentHistoryScalarFieldEnum = (typeof AgentHistoryScalarFieldEnum)[keyof typeof AgentHistoryScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -14089,18 +15412,23 @@ export namespace Prisma {
     authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
+    isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
+    deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
     tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     battlesAsAttacker?: BattleListRelationFilter
     battlesAsDefender?: BattleListRelationFilter
     battlesAsAttackerAlly?: BattleListRelationFilter
     battlesAsDefenderAlly?: BattleListRelationFilter
+    wonBattles?: BattleListRelationFilter
     coolDown?: CoolDownListRelationFilter
     initiatedAlliances?: AllianceListRelationFilter
     joinedAlliances?: AllianceListRelationFilter
     mapTiles?: MapTileListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
+    history?: AgentHistoryListRelationFilter
+    historyAsTarget?: AgentHistoryListRelationFilter
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -14109,18 +15437,23 @@ export namespace Prisma {
     authority?: SortOrder
     health?: SortOrder
     gameId?: SortOrder
+    isAlive?: SortOrder
     profileId?: SortOrder
+    deathTimestamp?: SortOrderInput | SortOrder
     tweets?: TweetOrderByRelationAggregateInput
     game?: GameOrderByWithRelationInput
     battlesAsAttacker?: BattleOrderByRelationAggregateInput
     battlesAsDefender?: BattleOrderByRelationAggregateInput
     battlesAsAttackerAlly?: BattleOrderByRelationAggregateInput
     battlesAsDefenderAlly?: BattleOrderByRelationAggregateInput
+    wonBattles?: BattleOrderByRelationAggregateInput
     coolDown?: CoolDownOrderByRelationAggregateInput
     initiatedAlliances?: AllianceOrderByRelationAggregateInput
     joinedAlliances?: AllianceOrderByRelationAggregateInput
     mapTiles?: MapTileOrderByRelationAggregateInput
     profile?: AgentProfileOrderByWithRelationInput
+    history?: AgentHistoryOrderByRelationAggregateInput
+    historyAsTarget?: AgentHistoryOrderByRelationAggregateInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -14132,18 +15465,23 @@ export namespace Prisma {
     authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
+    isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
+    deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
     tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     battlesAsAttacker?: BattleListRelationFilter
     battlesAsDefender?: BattleListRelationFilter
     battlesAsAttackerAlly?: BattleListRelationFilter
     battlesAsDefenderAlly?: BattleListRelationFilter
+    wonBattles?: BattleListRelationFilter
     coolDown?: CoolDownListRelationFilter
     initiatedAlliances?: AllianceListRelationFilter
     joinedAlliances?: AllianceListRelationFilter
     mapTiles?: MapTileListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
+    history?: AgentHistoryListRelationFilter
+    historyAsTarget?: AgentHistoryListRelationFilter
   }, "id">
 
   export type AgentOrderByWithAggregationInput = {
@@ -14152,7 +15490,9 @@ export namespace Prisma {
     authority?: SortOrder
     health?: SortOrder
     gameId?: SortOrder
+    isAlive?: SortOrder
     profileId?: SortOrder
+    deathTimestamp?: SortOrderInput | SortOrder
     _count?: AgentCountOrderByAggregateInput
     _avg?: AgentAvgOrderByAggregateInput
     _max?: AgentMaxOrderByAggregateInput
@@ -14169,7 +15509,9 @@ export namespace Prisma {
     authority?: StringWithAggregatesFilter<"Agent"> | string
     health?: IntWithAggregatesFilter<"Agent"> | number
     gameId?: StringWithAggregatesFilter<"Agent"> | string
+    isAlive?: BoolWithAggregatesFilter<"Agent"> | boolean
     profileId?: StringWithAggregatesFilter<"Agent"> | string
+    deathTimestamp?: DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
   }
 
   export type TweetWhereInput = {
@@ -14319,46 +15661,44 @@ export namespace Prisma {
     OR?: BattleWhereInput[]
     NOT?: BattleWhereInput | BattleWhereInput[]
     id?: StringFilter<"Battle"> | string
-    timestamp?: DateTimeFilter<"Battle"> | Date | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
-    tokensStaked?: FloatFilter<"Battle"> | number
-    tokensLost?: FloatNullableFilter<"Battle"> | number | null
-    outcome?: StringNullableFilter<"Battle"> | string | null
-    attackerId?: StringFilter<"Battle"> | string
-    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
-    defenderId?: StringFilter<"Battle"> | string
-    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
-    gameId?: StringFilter<"Battle"> | string
+    tokensStaked?: IntFilter<"Battle"> | number
     startTime?: DateTimeFilter<"Battle"> | Date | string
-    resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
-    attacker?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-    defender?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    endTime?: DateTimeNullableFilter<"Battle"> | Date | string | null
+    gameId?: StringFilter<"Battle"> | string
+    attackerId?: StringFilter<"Battle"> | string
+    defenderId?: StringFilter<"Battle"> | string
+    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
+    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
+    winnerId?: StringNullableFilter<"Battle"> | string | null
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
+    attacker?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    defender?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    winner?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
   }
 
   export type BattleOrderByWithRelationInput = {
     id?: SortOrder
-    timestamp?: SortOrder
     type?: SortOrder
-    tokensStaked?: SortOrder
-    tokensLost?: SortOrderInput | SortOrder
-    outcome?: SortOrderInput | SortOrder
-    attackerId?: SortOrder
-    attackerAllyId?: SortOrderInput | SortOrder
-    defenderId?: SortOrder
-    defenderAllyId?: SortOrderInput | SortOrder
     status?: SortOrder
-    gameId?: SortOrder
+    tokensStaked?: SortOrder
     startTime?: SortOrder
-    resolvedAt?: SortOrderInput | SortOrder
-    attacker?: AgentOrderByWithRelationInput
-    attackerAlly?: AgentOrderByWithRelationInput
-    defender?: AgentOrderByWithRelationInput
-    defenderAlly?: AgentOrderByWithRelationInput
+    endTime?: SortOrderInput | SortOrder
+    gameId?: SortOrder
+    attackerId?: SortOrder
+    defenderId?: SortOrder
+    attackerAllyId?: SortOrderInput | SortOrder
+    defenderAllyId?: SortOrderInput | SortOrder
+    winnerId?: SortOrderInput | SortOrder
     game?: GameOrderByWithRelationInput
+    attacker?: AgentOrderByWithRelationInput
+    defender?: AgentOrderByWithRelationInput
+    attackerAlly?: AgentOrderByWithRelationInput
+    defenderAlly?: AgentOrderByWithRelationInput
+    winner?: AgentOrderByWithRelationInput
   }
 
   export type BattleWhereUniqueInput = Prisma.AtLeast<{
@@ -14366,41 +15706,38 @@ export namespace Prisma {
     AND?: BattleWhereInput | BattleWhereInput[]
     OR?: BattleWhereInput[]
     NOT?: BattleWhereInput | BattleWhereInput[]
-    timestamp?: DateTimeFilter<"Battle"> | Date | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
-    tokensStaked?: FloatFilter<"Battle"> | number
-    tokensLost?: FloatNullableFilter<"Battle"> | number | null
-    outcome?: StringNullableFilter<"Battle"> | string | null
-    attackerId?: StringFilter<"Battle"> | string
-    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
-    defenderId?: StringFilter<"Battle"> | string
-    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
-    gameId?: StringFilter<"Battle"> | string
+    tokensStaked?: IntFilter<"Battle"> | number
     startTime?: DateTimeFilter<"Battle"> | Date | string
-    resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
-    attacker?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-    defender?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    endTime?: DateTimeNullableFilter<"Battle"> | Date | string | null
+    gameId?: StringFilter<"Battle"> | string
+    attackerId?: StringFilter<"Battle"> | string
+    defenderId?: StringFilter<"Battle"> | string
+    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
+    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
+    winnerId?: StringNullableFilter<"Battle"> | string | null
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
+    attacker?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    defender?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    winner?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
   }, "id">
 
   export type BattleOrderByWithAggregationInput = {
     id?: SortOrder
-    timestamp?: SortOrder
     type?: SortOrder
-    tokensStaked?: SortOrder
-    tokensLost?: SortOrderInput | SortOrder
-    outcome?: SortOrderInput | SortOrder
-    attackerId?: SortOrder
-    attackerAllyId?: SortOrderInput | SortOrder
-    defenderId?: SortOrder
-    defenderAllyId?: SortOrderInput | SortOrder
     status?: SortOrder
-    gameId?: SortOrder
+    tokensStaked?: SortOrder
     startTime?: SortOrder
-    resolvedAt?: SortOrderInput | SortOrder
+    endTime?: SortOrderInput | SortOrder
+    gameId?: SortOrder
+    attackerId?: SortOrder
+    defenderId?: SortOrder
+    attackerAllyId?: SortOrderInput | SortOrder
+    defenderAllyId?: SortOrderInput | SortOrder
+    winnerId?: SortOrderInput | SortOrder
     _count?: BattleCountOrderByAggregateInput
     _avg?: BattleAvgOrderByAggregateInput
     _max?: BattleMaxOrderByAggregateInput
@@ -14413,19 +15750,17 @@ export namespace Prisma {
     OR?: BattleScalarWhereWithAggregatesInput[]
     NOT?: BattleScalarWhereWithAggregatesInput | BattleScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Battle"> | string
-    timestamp?: DateTimeWithAggregatesFilter<"Battle"> | Date | string
     type?: EnumBattleTypeWithAggregatesFilter<"Battle"> | $Enums.BattleType
-    tokensStaked?: FloatWithAggregatesFilter<"Battle"> | number
-    tokensLost?: FloatNullableWithAggregatesFilter<"Battle"> | number | null
-    outcome?: StringNullableWithAggregatesFilter<"Battle"> | string | null
-    attackerId?: StringWithAggregatesFilter<"Battle"> | string
-    attackerAllyId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
-    defenderId?: StringWithAggregatesFilter<"Battle"> | string
-    defenderAllyId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
     status?: EnumBattleStatusWithAggregatesFilter<"Battle"> | $Enums.BattleStatus
-    gameId?: StringWithAggregatesFilter<"Battle"> | string
+    tokensStaked?: IntWithAggregatesFilter<"Battle"> | number
     startTime?: DateTimeWithAggregatesFilter<"Battle"> | Date | string
-    resolvedAt?: DateTimeNullableWithAggregatesFilter<"Battle"> | Date | string | null
+    endTime?: DateTimeNullableWithAggregatesFilter<"Battle"> | Date | string | null
+    gameId?: StringWithAggregatesFilter<"Battle"> | string
+    attackerId?: StringWithAggregatesFilter<"Battle"> | string
+    defenderId?: StringWithAggregatesFilter<"Battle"> | string
+    attackerAllyId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
+    defenderAllyId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
+    winnerId?: StringNullableWithAggregatesFilter<"Battle"> | string | null
   }
 
   export type InteractionWhereInput = {
@@ -14671,6 +16006,69 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
+  export type AgentHistoryWhereInput = {
+    AND?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
+    OR?: AgentHistoryWhereInput[]
+    NOT?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
+    id?: StringFilter<"AgentHistory"> | string
+    agentId?: StringFilter<"AgentHistory"> | string
+    type?: StringFilter<"AgentHistory"> | string
+    details?: StringFilter<"AgentHistory"> | string
+    timestamp?: DateTimeFilter<"AgentHistory"> | Date | string
+    targetAgentId?: StringNullableFilter<"AgentHistory"> | string | null
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    targetAgent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+  }
+
+  export type AgentHistoryOrderByWithRelationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    type?: SortOrder
+    details?: SortOrder
+    timestamp?: SortOrder
+    targetAgentId?: SortOrderInput | SortOrder
+    agent?: AgentOrderByWithRelationInput
+    targetAgent?: AgentOrderByWithRelationInput
+  }
+
+  export type AgentHistoryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
+    OR?: AgentHistoryWhereInput[]
+    NOT?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
+    agentId?: StringFilter<"AgentHistory"> | string
+    type?: StringFilter<"AgentHistory"> | string
+    details?: StringFilter<"AgentHistory"> | string
+    timestamp?: DateTimeFilter<"AgentHistory"> | Date | string
+    targetAgentId?: StringNullableFilter<"AgentHistory"> | string | null
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    targetAgent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+  }, "id">
+
+  export type AgentHistoryOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    type?: SortOrder
+    details?: SortOrder
+    timestamp?: SortOrder
+    targetAgentId?: SortOrderInput | SortOrder
+    _count?: AgentHistoryCountOrderByAggregateInput
+    _max?: AgentHistoryMaxOrderByAggregateInput
+    _min?: AgentHistoryMinOrderByAggregateInput
+  }
+
+  export type AgentHistoryScalarWhereWithAggregatesInput = {
+    AND?: AgentHistoryScalarWhereWithAggregatesInput | AgentHistoryScalarWhereWithAggregatesInput[]
+    OR?: AgentHistoryScalarWhereWithAggregatesInput[]
+    NOT?: AgentHistoryScalarWhereWithAggregatesInput | AgentHistoryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AgentHistory"> | string
+    agentId?: StringWithAggregatesFilter<"AgentHistory"> | string
+    type?: StringWithAggregatesFilter<"AgentHistory"> | string
+    details?: StringWithAggregatesFilter<"AgentHistory"> | string
+    timestamp?: DateTimeWithAggregatesFilter<"AgentHistory"> | Date | string
+    targetAgentId?: StringNullableWithAggregatesFilter<"AgentHistory"> | string | null
+  }
+
   export type GameCreateInput = {
     id?: string
     onchainId: bigint | number
@@ -14892,17 +16290,22 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -14911,16 +16314,21 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUpdateInput = {
@@ -14928,17 +16336,22 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -14947,16 +16360,21 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
@@ -14965,7 +16383,9 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
   }
 
   export type AgentUpdateManyMutationInput = {
@@ -14973,6 +16393,8 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AgentUncheckedUpdateManyInput = {
@@ -14981,7 +16403,9 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TweetCreateInput = {
@@ -15126,116 +16550,101 @@ export namespace Prisma {
 
   export type BattleCreateInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
-    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
-    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
-    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
-    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    winner?: AgentCreateNestedOneWithoutWonBattlesInput
   }
 
   export type BattleUncheckedCreateInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerId: string
-    attackerAllyId?: string | null
-    defenderId: string
-    defenderAllyId?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type BattleUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
-    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
-    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
-    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    winner?: AgentUpdateOneWithoutWonBattlesNestedInput
   }
 
   export type BattleUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerId?: StringFieldUpdateOperationsInput | string
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
-    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleCreateManyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerId: string
-    attackerAllyId?: string | null
-    defenderId: string
-    defenderAllyId?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type BattleUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type BattleUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerId?: StringFieldUpdateOperationsInput | string
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
-    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type InteractionCreateInput = {
@@ -15484,6 +16893,67 @@ export namespace Prisma {
     walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentHistoryCreateInput = {
+    id?: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    agent: AgentCreateNestedOneWithoutHistoryInput
+    targetAgent?: AgentCreateNestedOneWithoutHistoryAsTargetInput
+  }
+
+  export type AgentHistoryUncheckedCreateInput = {
+    id?: string
+    agentId: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    targetAgentId?: string | null
+  }
+
+  export type AgentHistoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutHistoryNestedInput
+    targetAgent?: AgentUpdateOneWithoutHistoryAsTargetNestedInput
+  }
+
+  export type AgentHistoryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AgentHistoryCreateManyInput = {
+    id?: string
+    agentId: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    targetAgentId?: string | null
+  }
+
+  export type AgentHistoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentHistoryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -15831,6 +17301,17 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type TweetListRelationFilter = {
     every?: TweetWhereInput
     some?: TweetWhereInput
@@ -15853,11 +17334,26 @@ export namespace Prisma {
     isNot?: AgentProfileWhereInput
   }
 
+  export type AgentHistoryListRelationFilter = {
+    every?: AgentHistoryWhereInput
+    some?: AgentHistoryWhereInput
+    none?: AgentHistoryWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type TweetOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type MapTileOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AgentHistoryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15867,7 +17363,9 @@ export namespace Prisma {
     authority?: SortOrder
     health?: SortOrder
     gameId?: SortOrder
+    isAlive?: SortOrder
     profileId?: SortOrder
+    deathTimestamp?: SortOrder
   }
 
   export type AgentAvgOrderByAggregateInput = {
@@ -15881,7 +17379,9 @@ export namespace Prisma {
     authority?: SortOrder
     health?: SortOrder
     gameId?: SortOrder
+    isAlive?: SortOrder
     profileId?: SortOrder
+    deathTimestamp?: SortOrder
   }
 
   export type AgentMinOrderByAggregateInput = {
@@ -15890,12 +17390,28 @@ export namespace Prisma {
     authority?: SortOrder
     health?: SortOrder
     gameId?: SortOrder
+    isAlive?: SortOrder
     profileId?: SortOrder
+    deathTimestamp?: SortOrder
   }
 
   export type AgentSumOrderByAggregateInput = {
     onchainId?: SortOrder
     health?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type StringNullableFilter<$PrismaModel = never> = {
@@ -15922,11 +17438,6 @@ export namespace Prisma {
     every?: InteractionWhereInput
     some?: InteractionWhereInput
     none?: InteractionWhereInput
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type InteractionOrderByRelationAggregateInput = {
@@ -15994,17 +17505,6 @@ export namespace Prisma {
     in?: $Enums.AllianceStatus[] | ListEnumAllianceStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.AllianceStatus[] | ListEnumAllianceStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type AllianceInitiatorIdJoinerIdCompoundUniqueInput = {
@@ -16079,20 +17579,6 @@ export namespace Prisma {
     _max?: NestedEnumAllianceStatusFilter<$PrismaModel>
   }
 
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
   export type EnumBattleTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.BattleType | EnumBattleTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BattleType[] | ListEnumBattleTypeFieldRefInput<$PrismaModel>
@@ -16114,63 +17600,55 @@ export namespace Prisma {
 
   export type BattleCountOrderByAggregateInput = {
     id?: SortOrder
-    timestamp?: SortOrder
     type?: SortOrder
-    tokensStaked?: SortOrder
-    tokensLost?: SortOrder
-    outcome?: SortOrder
-    attackerId?: SortOrder
-    attackerAllyId?: SortOrder
-    defenderId?: SortOrder
-    defenderAllyId?: SortOrder
     status?: SortOrder
-    gameId?: SortOrder
+    tokensStaked?: SortOrder
     startTime?: SortOrder
-    resolvedAt?: SortOrder
+    endTime?: SortOrder
+    gameId?: SortOrder
+    attackerId?: SortOrder
+    defenderId?: SortOrder
+    attackerAllyId?: SortOrder
+    defenderAllyId?: SortOrder
+    winnerId?: SortOrder
   }
 
   export type BattleAvgOrderByAggregateInput = {
     tokensStaked?: SortOrder
-    tokensLost?: SortOrder
   }
 
   export type BattleMaxOrderByAggregateInput = {
     id?: SortOrder
-    timestamp?: SortOrder
     type?: SortOrder
-    tokensStaked?: SortOrder
-    tokensLost?: SortOrder
-    outcome?: SortOrder
-    attackerId?: SortOrder
-    attackerAllyId?: SortOrder
-    defenderId?: SortOrder
-    defenderAllyId?: SortOrder
     status?: SortOrder
-    gameId?: SortOrder
+    tokensStaked?: SortOrder
     startTime?: SortOrder
-    resolvedAt?: SortOrder
+    endTime?: SortOrder
+    gameId?: SortOrder
+    attackerId?: SortOrder
+    defenderId?: SortOrder
+    attackerAllyId?: SortOrder
+    defenderAllyId?: SortOrder
+    winnerId?: SortOrder
   }
 
   export type BattleMinOrderByAggregateInput = {
     id?: SortOrder
-    timestamp?: SortOrder
     type?: SortOrder
-    tokensStaked?: SortOrder
-    tokensLost?: SortOrder
-    outcome?: SortOrder
-    attackerId?: SortOrder
-    attackerAllyId?: SortOrder
-    defenderId?: SortOrder
-    defenderAllyId?: SortOrder
     status?: SortOrder
-    gameId?: SortOrder
+    tokensStaked?: SortOrder
     startTime?: SortOrder
-    resolvedAt?: SortOrder
+    endTime?: SortOrder
+    gameId?: SortOrder
+    attackerId?: SortOrder
+    defenderId?: SortOrder
+    attackerAllyId?: SortOrder
+    defenderAllyId?: SortOrder
+    winnerId?: SortOrder
   }
 
   export type BattleSumOrderByAggregateInput = {
     tokensStaked?: SortOrder
-    tokensLost?: SortOrder
   }
 
   export type EnumBattleTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -16385,6 +17863,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
+  }
+
+  export type AgentHistoryCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    type?: SortOrder
+    details?: SortOrder
+    timestamp?: SortOrder
+    targetAgentId?: SortOrder
+  }
+
+  export type AgentHistoryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    type?: SortOrder
+    details?: SortOrder
+    timestamp?: SortOrder
+    targetAgentId?: SortOrder
+  }
+
+  export type AgentHistoryMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    type?: SortOrder
+    details?: SortOrder
+    timestamp?: SortOrder
+    targetAgentId?: SortOrder
   }
 
   export type AgentCreateNestedManyWithoutGameInput = {
@@ -16710,6 +18215,13 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
+  export type BattleCreateNestedManyWithoutWinnerInput = {
+    create?: XOR<BattleCreateWithoutWinnerInput, BattleUncheckedCreateWithoutWinnerInput> | BattleCreateWithoutWinnerInput[] | BattleUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutWinnerInput | BattleCreateOrConnectWithoutWinnerInput[]
+    createMany?: BattleCreateManyWinnerInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+  }
+
   export type CoolDownCreateNestedManyWithoutCooledAgentInput = {
     create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
     connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
@@ -16742,6 +18254,20 @@ export namespace Prisma {
     create?: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
     connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentsInput
     connect?: AgentProfileWhereUniqueInput
+  }
+
+  export type AgentHistoryCreateNestedManyWithoutAgentInput = {
+    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
+    createMany?: AgentHistoryCreateManyAgentInputEnvelope
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+  }
+
+  export type AgentHistoryCreateNestedManyWithoutTargetAgentInput = {
+    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
+    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
   }
 
   export type TweetUncheckedCreateNestedManyWithoutAgentInput = {
@@ -16779,6 +18305,13 @@ export namespace Prisma {
     connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
   }
 
+  export type BattleUncheckedCreateNestedManyWithoutWinnerInput = {
+    create?: XOR<BattleCreateWithoutWinnerInput, BattleUncheckedCreateWithoutWinnerInput> | BattleCreateWithoutWinnerInput[] | BattleUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutWinnerInput | BattleCreateOrConnectWithoutWinnerInput[]
+    createMany?: BattleCreateManyWinnerInputEnvelope
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+  }
+
   export type CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput = {
     create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
     connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
@@ -16805,6 +18338,24 @@ export namespace Prisma {
     connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
     createMany?: MapTileCreateManyAgentInputEnvelope
     connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
+  }
+
+  export type AgentHistoryUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
+    createMany?: AgentHistoryCreateManyAgentInputEnvelope
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+  }
+
+  export type AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput = {
+    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
+    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type TweetUpdateManyWithoutAgentNestedInput = {
@@ -16885,6 +18436,20 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
+  export type BattleUpdateManyWithoutWinnerNestedInput = {
+    create?: XOR<BattleCreateWithoutWinnerInput, BattleUncheckedCreateWithoutWinnerInput> | BattleCreateWithoutWinnerInput[] | BattleUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutWinnerInput | BattleCreateOrConnectWithoutWinnerInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutWinnerInput | BattleUpsertWithWhereUniqueWithoutWinnerInput[]
+    createMany?: BattleCreateManyWinnerInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutWinnerInput | BattleUpdateWithWhereUniqueWithoutWinnerInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutWinnerInput | BattleUpdateManyWithWhereWithoutWinnerInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
   export type CoolDownUpdateManyWithoutCooledAgentNestedInput = {
     create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
     connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
@@ -16947,6 +18512,34 @@ export namespace Prisma {
     upsert?: AgentProfileUpsertWithoutAgentsInput
     connect?: AgentProfileWhereUniqueInput
     update?: XOR<XOR<AgentProfileUpdateToOneWithWhereWithoutAgentsInput, AgentProfileUpdateWithoutAgentsInput>, AgentProfileUncheckedUpdateWithoutAgentsInput>
+  }
+
+  export type AgentHistoryUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
+    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: AgentHistoryCreateManyAgentInputEnvelope
+    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    update?: AgentHistoryUpdateWithWhereUniqueWithoutAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: AgentHistoryUpdateManyWithWhereWithoutAgentInput | AgentHistoryUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+  }
+
+  export type AgentHistoryUpdateManyWithoutTargetAgentNestedInput = {
+    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
+    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput[]
+    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
+    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    update?: AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput[]
+    updateMany?: AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput | AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput[]
+    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
   }
 
   export type TweetUncheckedUpdateManyWithoutAgentNestedInput = {
@@ -17019,6 +18612,20 @@ export namespace Prisma {
     deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
   }
 
+  export type BattleUncheckedUpdateManyWithoutWinnerNestedInput = {
+    create?: XOR<BattleCreateWithoutWinnerInput, BattleUncheckedCreateWithoutWinnerInput> | BattleCreateWithoutWinnerInput[] | BattleUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: BattleCreateOrConnectWithoutWinnerInput | BattleCreateOrConnectWithoutWinnerInput[]
+    upsert?: BattleUpsertWithWhereUniqueWithoutWinnerInput | BattleUpsertWithWhereUniqueWithoutWinnerInput[]
+    createMany?: BattleCreateManyWinnerInputEnvelope
+    set?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    disconnect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    delete?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    connect?: BattleWhereUniqueInput | BattleWhereUniqueInput[]
+    update?: BattleUpdateWithWhereUniqueWithoutWinnerInput | BattleUpdateWithWhereUniqueWithoutWinnerInput[]
+    updateMany?: BattleUpdateManyWithWhereWithoutWinnerInput | BattleUpdateManyWithWhereWithoutWinnerInput[]
+    deleteMany?: BattleScalarWhereInput | BattleScalarWhereInput[]
+  }
+
   export type CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput = {
     create?: XOR<CoolDownCreateWithoutCooledAgentInput, CoolDownUncheckedCreateWithoutCooledAgentInput> | CoolDownCreateWithoutCooledAgentInput[] | CoolDownUncheckedCreateWithoutCooledAgentInput[]
     connectOrCreate?: CoolDownCreateOrConnectWithoutCooledAgentInput | CoolDownCreateOrConnectWithoutCooledAgentInput[]
@@ -17073,6 +18680,34 @@ export namespace Prisma {
     update?: MapTileUpdateWithWhereUniqueWithoutAgentInput | MapTileUpdateWithWhereUniqueWithoutAgentInput[]
     updateMany?: MapTileUpdateManyWithWhereWithoutAgentInput | MapTileUpdateManyWithWhereWithoutAgentInput[]
     deleteMany?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
+  }
+
+  export type AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
+    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: AgentHistoryCreateManyAgentInputEnvelope
+    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    update?: AgentHistoryUpdateWithWhereUniqueWithoutAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: AgentHistoryUpdateManyWithWhereWithoutAgentInput | AgentHistoryUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+  }
+
+  export type AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput = {
+    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
+    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
+    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput[]
+    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
+    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+    update?: AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput[]
+    updateMany?: AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput | AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput[]
+    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
   }
 
   export type AgentCreateNestedOneWithoutTweetsInput = {
@@ -17165,10 +18800,6 @@ export namespace Prisma {
     set?: $Enums.AllianceStatus
   }
 
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
-  }
-
   export type GameUpdateOneRequiredWithoutAlliancesNestedInput = {
     create?: XOR<GameCreateWithoutAlliancesInput, GameUncheckedCreateWithoutAlliancesInput>
     connectOrCreate?: GameCreateOrConnectWithoutAlliancesInput
@@ -17193,15 +18824,15 @@ export namespace Prisma {
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutJoinedAlliancesInput, AgentUpdateWithoutJoinedAlliancesInput>, AgentUncheckedUpdateWithoutJoinedAlliancesInput>
   }
 
+  export type GameCreateNestedOneWithoutBattlesInput = {
+    create?: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
+    connectOrCreate?: GameCreateOrConnectWithoutBattlesInput
+    connect?: GameWhereUniqueInput
+  }
+
   export type AgentCreateNestedOneWithoutBattlesAsAttackerInput = {
     create?: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
     connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput = {
-    create?: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput
     connect?: AgentWhereUniqueInput
   }
 
@@ -17211,16 +18842,22 @@ export namespace Prisma {
     connect?: AgentWhereUniqueInput
   }
 
+  export type AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput
+    connect?: AgentWhereUniqueInput
+  }
+
   export type AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput = {
     create?: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
     connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput
     connect?: AgentWhereUniqueInput
   }
 
-  export type GameCreateNestedOneWithoutBattlesInput = {
-    create?: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
-    connectOrCreate?: GameCreateOrConnectWithoutBattlesInput
-    connect?: GameWhereUniqueInput
+  export type AgentCreateNestedOneWithoutWonBattlesInput = {
+    create?: XOR<AgentCreateWithoutWonBattlesInput, AgentUncheckedCreateWithoutWonBattlesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutWonBattlesInput
+    connect?: AgentWhereUniqueInput
   }
 
   export type EnumBattleTypeFieldUpdateOperationsInput = {
@@ -17231,12 +18868,28 @@ export namespace Prisma {
     set?: $Enums.BattleStatus
   }
 
+  export type GameUpdateOneRequiredWithoutBattlesNestedInput = {
+    create?: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
+    connectOrCreate?: GameCreateOrConnectWithoutBattlesInput
+    upsert?: GameUpsertWithoutBattlesInput
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutBattlesInput, GameUpdateWithoutBattlesInput>, GameUncheckedUpdateWithoutBattlesInput>
+  }
+
   export type AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput = {
     create?: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
     connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsAttackerInput
     upsert?: AgentUpsertWithoutBattlesAsAttackerInput
     connect?: AgentWhereUniqueInput
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsAttackerInput, AgentUpdateWithoutBattlesAsAttackerInput>, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+  }
+
+  export type AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput = {
+    create?: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderInput
+    upsert?: AgentUpsertWithoutBattlesAsDefenderInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsDefenderInput, AgentUpdateWithoutBattlesAsDefenderInput>, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
   }
 
   export type AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput = {
@@ -17249,14 +18902,6 @@ export namespace Prisma {
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsAttackerAllyInput, AgentUpdateWithoutBattlesAsAttackerAllyInput>, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
   }
 
-  export type AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput = {
-    create?: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderInput
-    upsert?: AgentUpsertWithoutBattlesAsDefenderInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsDefenderInput, AgentUpdateWithoutBattlesAsDefenderInput>, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
-  }
-
   export type AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput = {
     create?: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
     connectOrCreate?: AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput
@@ -17267,12 +18912,14 @@ export namespace Prisma {
     update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutBattlesAsDefenderAllyInput, AgentUpdateWithoutBattlesAsDefenderAllyInput>, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
   }
 
-  export type GameUpdateOneRequiredWithoutBattlesNestedInput = {
-    create?: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
-    connectOrCreate?: GameCreateOrConnectWithoutBattlesInput
-    upsert?: GameUpsertWithoutBattlesInput
-    connect?: GameWhereUniqueInput
-    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutBattlesInput, GameUpdateWithoutBattlesInput>, GameUncheckedUpdateWithoutBattlesInput>
+  export type AgentUpdateOneWithoutWonBattlesNestedInput = {
+    create?: XOR<AgentCreateWithoutWonBattlesInput, AgentUncheckedCreateWithoutWonBattlesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutWonBattlesInput
+    upsert?: AgentUpsertWithoutWonBattlesInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutWonBattlesInput, AgentUpdateWithoutWonBattlesInput>, AgentUncheckedUpdateWithoutWonBattlesInput>
   }
 
   export type TweetCreateNestedOneWithoutInteractionsInput = {
@@ -17347,6 +18994,36 @@ export namespace Prisma {
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole
+  }
+
+  export type AgentCreateNestedOneWithoutHistoryInput = {
+    create?: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutHistoryInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutHistoryAsTargetInput = {
+    create?: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutHistoryAsTargetInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentUpdateOneRequiredWithoutHistoryNestedInput = {
+    create?: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutHistoryInput
+    upsert?: AgentUpsertWithoutHistoryInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutHistoryInput, AgentUpdateWithoutHistoryInput>, AgentUncheckedUpdateWithoutHistoryInput>
+  }
+
+  export type AgentUpdateOneWithoutHistoryAsTargetNestedInput = {
+    create?: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutHistoryAsTargetInput
+    upsert?: AgentUpsertWithoutHistoryAsTargetInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutHistoryAsTargetInput, AgentUpdateWithoutHistoryAsTargetInput>, AgentUncheckedUpdateWithoutHistoryAsTargetInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -17521,6 +19198,42 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -17552,17 +19265,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -17579,17 +19281,6 @@ export namespace Prisma {
     in?: $Enums.AllianceStatus[] | ListEnumAllianceStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.AllianceStatus[] | ListEnumAllianceStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -17616,20 +19307,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumAllianceStatusFilter<$PrismaModel>
     _max?: NestedEnumAllianceStatusFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumBattleTypeFilter<$PrismaModel = never> = {
@@ -17739,16 +19416,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
@@ -17756,16 +19438,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutGameInput = {
@@ -17810,34 +19497,30 @@ export namespace Prisma {
 
   export type BattleCreateWithoutGameInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
     attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
-    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
     defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
     defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    winner?: AgentCreateNestedOneWithoutWonBattlesInput
   }
 
   export type BattleUncheckedCreateWithoutGameInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerId: string
-    attackerAllyId?: string | null
-    defenderId: string
-    defenderAllyId?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateOrConnectWithoutGameInput = {
@@ -17899,7 +19582,9 @@ export namespace Prisma {
     authority?: StringFilter<"Agent"> | string
     health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
+    isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
+    deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
   }
 
   export type AllianceUpsertWithWhereUniqueWithoutGameInput = {
@@ -17953,19 +19638,17 @@ export namespace Prisma {
     OR?: BattleScalarWhereInput[]
     NOT?: BattleScalarWhereInput | BattleScalarWhereInput[]
     id?: StringFilter<"Battle"> | string
-    timestamp?: DateTimeFilter<"Battle"> | Date | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
-    tokensStaked?: FloatFilter<"Battle"> | number
-    tokensLost?: FloatNullableFilter<"Battle"> | number | null
-    outcome?: StringNullableFilter<"Battle"> | string | null
-    attackerId?: StringFilter<"Battle"> | string
-    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
-    defenderId?: StringFilter<"Battle"> | string
-    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
-    gameId?: StringFilter<"Battle"> | string
+    tokensStaked?: IntFilter<"Battle"> | number
     startTime?: DateTimeFilter<"Battle"> | Date | string
-    resolvedAt?: DateTimeNullableFilter<"Battle"> | Date | string | null
+    endTime?: DateTimeNullableFilter<"Battle"> | Date | string | null
+    gameId?: StringFilter<"Battle"> | string
+    attackerId?: StringFilter<"Battle"> | string
+    defenderId?: StringFilter<"Battle"> | string
+    attackerAllyId?: StringNullableFilter<"Battle"> | string | null
+    defenderAllyId?: StringNullableFilter<"Battle"> | string | null
+    winnerId?: StringNullableFilter<"Battle"> | string | null
   }
 
   export type CoolDownUpsertWithWhereUniqueWithoutGameInput = {
@@ -18000,16 +19683,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutProfileInput = {
@@ -18018,15 +19706,20 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutProfileInput = {
@@ -18126,34 +19819,30 @@ export namespace Prisma {
 
   export type BattleCreateWithoutAttackerInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
-    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
-    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
-    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+    winner?: AgentCreateNestedOneWithoutWonBattlesInput
   }
 
   export type BattleUncheckedCreateWithoutAttackerInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerAllyId?: string | null
-    defenderId: string
-    defenderAllyId?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    gameId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateOrConnectWithoutAttackerInput = {
@@ -18168,34 +19857,30 @@ export namespace Prisma {
 
   export type BattleCreateWithoutDefenderInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    game: GameCreateNestedOneWithoutBattlesInput
     attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
     attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
     defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
-    game: GameCreateNestedOneWithoutBattlesInput
+    winner?: AgentCreateNestedOneWithoutWonBattlesInput
   }
 
   export type BattleUncheckedCreateWithoutDefenderInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
     tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    startTime?: Date | string
+    endTime?: Date | string | null
+    gameId: string
     attackerId: string
     attackerAllyId?: string | null
     defenderAllyId?: string | null
-    status?: $Enums.BattleStatus
-    gameId: string
-    startTime?: Date | string
-    resolvedAt?: Date | string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateOrConnectWithoutDefenderInput = {
@@ -18210,34 +19895,30 @@ export namespace Prisma {
 
   export type BattleCreateWithoutAttackerAllyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    game: GameCreateNestedOneWithoutBattlesInput
     attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
     defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
     defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
-    game: GameCreateNestedOneWithoutBattlesInput
+    winner?: AgentCreateNestedOneWithoutWonBattlesInput
   }
 
   export type BattleUncheckedCreateWithoutAttackerAllyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
     tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    startTime?: Date | string
+    endTime?: Date | string | null
+    gameId: string
     attackerId: string
     defenderId: string
     defenderAllyId?: string | null
-    status?: $Enums.BattleStatus
-    gameId: string
-    startTime?: Date | string
-    resolvedAt?: Date | string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateOrConnectWithoutAttackerAllyInput = {
@@ -18252,34 +19933,30 @@ export namespace Prisma {
 
   export type BattleCreateWithoutDefenderAllyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
-    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
-    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
-    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    winner?: AgentCreateNestedOneWithoutWonBattlesInput
   }
 
   export type BattleUncheckedCreateWithoutDefenderAllyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerId: string
-    attackerAllyId?: string | null
-    defenderId: string
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateOrConnectWithoutDefenderAllyInput = {
@@ -18289,6 +19966,44 @@ export namespace Prisma {
 
   export type BattleCreateManyDefenderAllyInputEnvelope = {
     data: BattleCreateManyDefenderAllyInput | BattleCreateManyDefenderAllyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BattleCreateWithoutWinnerInput = {
+    id?: string
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
+    tokensStaked: number
+    startTime?: Date | string
+    endTime?: Date | string | null
+    game: GameCreateNestedOneWithoutBattlesInput
+    attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
+    defender: AgentCreateNestedOneWithoutBattlesAsDefenderInput
+    attackerAlly?: AgentCreateNestedOneWithoutBattlesAsAttackerAllyInput
+    defenderAlly?: AgentCreateNestedOneWithoutBattlesAsDefenderAllyInput
+  }
+
+  export type BattleUncheckedCreateWithoutWinnerInput = {
+    id?: string
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
+    tokensStaked: number
+    startTime?: Date | string
+    endTime?: Date | string | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+  }
+
+  export type BattleCreateOrConnectWithoutWinnerInput = {
+    where: BattleWhereUniqueInput
+    create: XOR<BattleCreateWithoutWinnerInput, BattleUncheckedCreateWithoutWinnerInput>
+  }
+
+  export type BattleCreateManyWinnerInputEnvelope = {
+    data: BattleCreateManyWinnerInput | BattleCreateManyWinnerInput[]
     skipDuplicates?: boolean
   }
 
@@ -18431,6 +20146,58 @@ export namespace Prisma {
     create: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
   }
 
+  export type AgentHistoryCreateWithoutAgentInput = {
+    id?: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    targetAgent?: AgentCreateNestedOneWithoutHistoryAsTargetInput
+  }
+
+  export type AgentHistoryUncheckedCreateWithoutAgentInput = {
+    id?: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    targetAgentId?: string | null
+  }
+
+  export type AgentHistoryCreateOrConnectWithoutAgentInput = {
+    where: AgentHistoryWhereUniqueInput
+    create: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput>
+  }
+
+  export type AgentHistoryCreateManyAgentInputEnvelope = {
+    data: AgentHistoryCreateManyAgentInput | AgentHistoryCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AgentHistoryCreateWithoutTargetAgentInput = {
+    id?: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    agent: AgentCreateNestedOneWithoutHistoryInput
+  }
+
+  export type AgentHistoryUncheckedCreateWithoutTargetAgentInput = {
+    id?: string
+    agentId: string
+    type: string
+    details: string
+    timestamp?: Date | string
+  }
+
+  export type AgentHistoryCreateOrConnectWithoutTargetAgentInput = {
+    where: AgentHistoryWhereUniqueInput
+    create: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput>
+  }
+
+  export type AgentHistoryCreateManyTargetAgentInputEnvelope = {
+    data: AgentHistoryCreateManyTargetAgentInput | AgentHistoryCreateManyTargetAgentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type TweetUpsertWithWhereUniqueWithoutAgentInput = {
     where: TweetWhereUniqueInput
     update: XOR<TweetUpdateWithoutAgentInput, TweetUncheckedUpdateWithoutAgentInput>
@@ -18570,6 +20337,22 @@ export namespace Prisma {
     data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutDefenderAllyInput>
   }
 
+  export type BattleUpsertWithWhereUniqueWithoutWinnerInput = {
+    where: BattleWhereUniqueInput
+    update: XOR<BattleUpdateWithoutWinnerInput, BattleUncheckedUpdateWithoutWinnerInput>
+    create: XOR<BattleCreateWithoutWinnerInput, BattleUncheckedCreateWithoutWinnerInput>
+  }
+
+  export type BattleUpdateWithWhereUniqueWithoutWinnerInput = {
+    where: BattleWhereUniqueInput
+    data: XOR<BattleUpdateWithoutWinnerInput, BattleUncheckedUpdateWithoutWinnerInput>
+  }
+
+  export type BattleUpdateManyWithWhereWithoutWinnerInput = {
+    where: BattleScalarWhereInput
+    data: XOR<BattleUpdateManyMutationInput, BattleUncheckedUpdateManyWithoutWinnerInput>
+  }
+
   export type CoolDownUpsertWithWhereUniqueWithoutCooledAgentInput = {
     where: CoolDownWhereUniqueInput
     update: XOR<CoolDownUpdateWithoutCooledAgentInput, CoolDownUncheckedUpdateWithoutCooledAgentInput>
@@ -18682,21 +20465,70 @@ export namespace Prisma {
     traits?: JsonNullValueInput | InputJsonValue
   }
 
+  export type AgentHistoryUpsertWithWhereUniqueWithoutAgentInput = {
+    where: AgentHistoryWhereUniqueInput
+    update: XOR<AgentHistoryUpdateWithoutAgentInput, AgentHistoryUncheckedUpdateWithoutAgentInput>
+    create: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput>
+  }
+
+  export type AgentHistoryUpdateWithWhereUniqueWithoutAgentInput = {
+    where: AgentHistoryWhereUniqueInput
+    data: XOR<AgentHistoryUpdateWithoutAgentInput, AgentHistoryUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type AgentHistoryUpdateManyWithWhereWithoutAgentInput = {
+    where: AgentHistoryScalarWhereInput
+    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type AgentHistoryScalarWhereInput = {
+    AND?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+    OR?: AgentHistoryScalarWhereInput[]
+    NOT?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+    id?: StringFilter<"AgentHistory"> | string
+    agentId?: StringFilter<"AgentHistory"> | string
+    type?: StringFilter<"AgentHistory"> | string
+    details?: StringFilter<"AgentHistory"> | string
+    timestamp?: DateTimeFilter<"AgentHistory"> | Date | string
+    targetAgentId?: StringNullableFilter<"AgentHistory"> | string | null
+  }
+
+  export type AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput = {
+    where: AgentHistoryWhereUniqueInput
+    update: XOR<AgentHistoryUpdateWithoutTargetAgentInput, AgentHistoryUncheckedUpdateWithoutTargetAgentInput>
+    create: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput>
+  }
+
+  export type AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput = {
+    where: AgentHistoryWhereUniqueInput
+    data: XOR<AgentHistoryUpdateWithoutTargetAgentInput, AgentHistoryUncheckedUpdateWithoutTargetAgentInput>
+  }
+
+  export type AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput = {
+    where: AgentHistoryScalarWhereInput
+    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyWithoutTargetAgentInput>
+  }
+
   export type AgentCreateWithoutTweetsInput = {
     id?: string
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutTweetsInput = {
@@ -18705,15 +20537,20 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutTweetsInput = {
@@ -18765,16 +20602,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutTweetsInput = {
@@ -18783,15 +20625,20 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type InteractionUpsertWithWhereUniqueWithoutTweetInput = {
@@ -18869,16 +20716,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutInitiatedAlliancesInput = {
@@ -18887,15 +20739,20 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutInitiatedAlliancesInput = {
@@ -18908,16 +20765,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutJoinedAlliancesInput = {
@@ -18926,15 +20788,20 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutJoinedAlliancesInput = {
@@ -19005,16 +20872,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutInitiatedAlliancesInput = {
@@ -19023,15 +20895,20 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUpsertWithoutJoinedAlliancesInput = {
@@ -19050,16 +20927,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutJoinedAlliancesInput = {
@@ -19068,171 +20950,20 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentCreateWithoutBattlesAsAttackerInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-  }
-
-  export type AgentUncheckedCreateWithoutBattlesAsAttackerInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    profileId: string
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutBattlesAsAttackerInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
-  }
-
-  export type AgentCreateWithoutBattlesAsAttackerAllyInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
-    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-  }
-
-  export type AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    profileId: string
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
-    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
-  }
-
-  export type AgentCreateWithoutBattlesAsDefenderInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
-    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-  }
-
-  export type AgentUncheckedCreateWithoutBattlesAsDefenderInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    profileId: string
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
-    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutBattlesAsDefenderInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
-  }
-
-  export type AgentCreateWithoutBattlesAsDefenderAllyInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-  }
-
-  export type AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    profileId: string
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type GameCreateWithoutBattlesInput = {
@@ -19276,184 +21007,249 @@ export namespace Prisma {
     create: XOR<GameCreateWithoutBattlesInput, GameUncheckedCreateWithoutBattlesInput>
   }
 
-  export type AgentUpsertWithoutBattlesAsAttackerInput = {
-    update: XOR<AgentUpdateWithoutBattlesAsAttackerInput, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+  export type AgentCreateWithoutBattlesAsAttackerInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutBattlesAsAttackerInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutBattlesAsAttackerInput = {
+    where: AgentWhereUniqueInput
     create: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
-    where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutBattlesAsAttackerInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutBattlesAsAttackerInput, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+  export type AgentCreateWithoutBattlesAsDefenderInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
-  export type AgentUpdateWithoutBattlesAsAttackerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  export type AgentUncheckedCreateWithoutBattlesAsDefenderInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
-  export type AgentUncheckedUpdateWithoutBattlesAsAttackerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    profileId?: StringFieldUpdateOperationsInput | string
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUpsertWithoutBattlesAsAttackerAllyInput = {
-    update: XOR<AgentUpdateWithoutBattlesAsAttackerAllyInput, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
-    create: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutBattlesAsAttackerAllyInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutBattlesAsAttackerAllyInput, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
-  }
-
-  export type AgentUpdateWithoutBattlesAsAttackerAllyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
-    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    profileId?: StringFieldUpdateOperationsInput | string
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
-    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUpsertWithoutBattlesAsDefenderInput = {
-    update: XOR<AgentUpdateWithoutBattlesAsDefenderInput, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+  export type AgentCreateOrConnectWithoutBattlesAsDefenderInput = {
+    where: AgentWhereUniqueInput
     create: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
-    where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutBattlesAsDefenderInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutBattlesAsDefenderInput, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+  export type AgentCreateWithoutBattlesAsAttackerAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
-  export type AgentUpdateWithoutBattlesAsDefenderInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
-    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  export type AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
-  export type AgentUncheckedUpdateWithoutBattlesAsDefenderInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    profileId?: StringFieldUpdateOperationsInput | string
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
-    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+  export type AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
   }
 
-  export type AgentUpsertWithoutBattlesAsDefenderAllyInput = {
-    update: XOR<AgentUpdateWithoutBattlesAsDefenderAllyInput, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+  export type AgentCreateWithoutBattlesAsDefenderAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput = {
+    where: AgentWhereUniqueInput
     create: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
-    where?: AgentWhereInput
   }
 
-  export type AgentUpdateToOneWithWhereWithoutBattlesAsDefenderAllyInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutBattlesAsDefenderAllyInput, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+  export type AgentCreateWithoutWonBattlesInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
-  export type AgentUpdateWithoutBattlesAsDefenderAllyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  export type AgentUncheckedCreateWithoutWonBattlesInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
-  export type AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    profileId?: StringFieldUpdateOperationsInput | string
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+  export type AgentCreateOrConnectWithoutWonBattlesInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutWonBattlesInput, AgentUncheckedCreateWithoutWonBattlesInput>
   }
 
   export type GameUpsertWithoutBattlesInput = {
@@ -19501,6 +21297,281 @@ export namespace Prisma {
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type AgentUpsertWithoutBattlesAsAttackerInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsAttackerInput, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+    create: XOR<AgentCreateWithoutBattlesAsAttackerInput, AgentUncheckedCreateWithoutBattlesAsAttackerInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsAttackerInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsAttackerInput, AgentUncheckedUpdateWithoutBattlesAsAttackerInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsAttackerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutBattlesAsDefenderInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsDefenderInput, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+    create: XOR<AgentCreateWithoutBattlesAsDefenderInput, AgentUncheckedCreateWithoutBattlesAsDefenderInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsDefenderInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsDefenderInput, AgentUncheckedUpdateWithoutBattlesAsDefenderInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsDefenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutBattlesAsAttackerAllyInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsAttackerAllyInput, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
+    create: XOR<AgentCreateWithoutBattlesAsAttackerAllyInput, AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsAttackerAllyInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsAttackerAllyInput, AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutBattlesAsDefenderAllyInput = {
+    update: XOR<AgentUpdateWithoutBattlesAsDefenderAllyInput, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+    create: XOR<AgentCreateWithoutBattlesAsDefenderAllyInput, AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutBattlesAsDefenderAllyInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutBattlesAsDefenderAllyInput, AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput>
+  }
+
+  export type AgentUpdateWithoutBattlesAsDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutWonBattlesInput = {
+    update: XOR<AgentUpdateWithoutWonBattlesInput, AgentUncheckedUpdateWithoutWonBattlesInput>
+    create: XOR<AgentCreateWithoutWonBattlesInput, AgentUncheckedCreateWithoutWonBattlesInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutWonBattlesInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutWonBattlesInput, AgentUncheckedUpdateWithoutWonBattlesInput>
+  }
+
+  export type AgentUpdateWithoutWonBattlesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutWonBattlesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type TweetCreateWithoutInteractionsInput = {
@@ -19560,16 +21631,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutMapTilesInput = {
@@ -19578,15 +21654,20 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutMapTilesInput = {
@@ -19610,16 +21691,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutMapTilesInput = {
@@ -19628,15 +21714,20 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentCreateWithoutCoolDownInput = {
@@ -19644,16 +21735,21 @@ export namespace Prisma {
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUncheckedCreateWithoutCoolDownInput = {
@@ -19662,15 +21758,20 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
     battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutCoolDownInput = {
@@ -19735,16 +21836,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCoolDownInput = {
@@ -19753,15 +21859,20 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type GameUpsertWithoutCoolDownInput = {
@@ -19811,12 +21922,222 @@ export namespace Prisma {
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
   }
 
+  export type AgentCreateWithoutHistoryInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutHistoryInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutHistoryInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
+  }
+
+  export type AgentCreateWithoutHistoryAsTargetInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    history?: AgentHistoryCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutHistoryAsTargetInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
+    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutHistoryAsTargetInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
+  }
+
+  export type AgentUpsertWithoutHistoryInput = {
+    update: XOR<AgentUpdateWithoutHistoryInput, AgentUncheckedUpdateWithoutHistoryInput>
+    create: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutHistoryInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutHistoryInput, AgentUncheckedUpdateWithoutHistoryInput>
+  }
+
+  export type AgentUpdateWithoutHistoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutHistoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
+  }
+
+  export type AgentUpsertWithoutHistoryAsTargetInput = {
+    update: XOR<AgentUpdateWithoutHistoryAsTargetInput, AgentUncheckedUpdateWithoutHistoryAsTargetInput>
+    create: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutHistoryAsTargetInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutHistoryAsTargetInput, AgentUncheckedUpdateWithoutHistoryAsTargetInput>
+  }
+
+  export type AgentUpdateWithoutHistoryAsTargetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutHistoryAsTargetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
   export type AgentCreateManyGameInput = {
     id?: string
     onchainId: number
     authority: string
     health?: number
+    isAlive?: boolean
     profileId: string
+    deathTimestamp?: Date | string | null
   }
 
   export type AllianceCreateManyGameInput = {
@@ -19831,18 +22152,16 @@ export namespace Prisma {
 
   export type BattleCreateManyGameInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerId: string
-    attackerAllyId?: string | null
-    defenderId: string
-    defenderAllyId?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type CoolDownCreateManyGameInput = {
@@ -19857,16 +22176,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
@@ -19874,16 +22198,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutGameInput = {
@@ -19891,7 +22220,9 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AllianceUpdateWithoutGameInput = {
@@ -19926,50 +22257,44 @@ export namespace Prisma {
 
   export type BattleUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
-    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
     defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
     defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    winner?: AgentUpdateOneWithoutWonBattlesNestedInput
   }
 
   export type BattleUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerId?: StringFieldUpdateOperationsInput | string
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
-    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerId?: StringFieldUpdateOperationsInput | string
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
-    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CoolDownUpdateWithoutGameInput = {
@@ -19999,6 +22324,8 @@ export namespace Prisma {
     authority: string
     health?: number
     gameId: string
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
   }
 
   export type AgentUpdateWithoutProfileInput = {
@@ -20006,16 +22333,21 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutProfileInput = {
@@ -20024,15 +22356,20 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
     battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
+    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
+    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutProfileInput = {
@@ -20041,6 +22378,8 @@ export namespace Prisma {
     authority?: StringFieldUpdateOperationsInput | string
     health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TweetCreateManyAgentInput = {
@@ -20053,66 +22392,72 @@ export namespace Prisma {
 
   export type BattleCreateManyAttackerInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerAllyId?: string | null
-    defenderId: string
-    defenderAllyId?: string | null
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    gameId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateManyDefenderInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
     tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    startTime?: Date | string
+    endTime?: Date | string | null
+    gameId: string
     attackerId: string
     attackerAllyId?: string | null
     defenderAllyId?: string | null
-    status?: $Enums.BattleStatus
-    gameId: string
-    startTime?: Date | string
-    resolvedAt?: Date | string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateManyAttackerAllyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
     tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
+    startTime?: Date | string
+    endTime?: Date | string | null
+    gameId: string
     attackerId: string
     defenderId: string
     defenderAllyId?: string | null
-    status?: $Enums.BattleStatus
-    gameId: string
-    startTime?: Date | string
-    resolvedAt?: Date | string | null
+    winnerId?: string | null
   }
 
   export type BattleCreateManyDefenderAllyInput = {
     id?: string
-    timestamp?: Date | string
-    type?: $Enums.BattleType
-    tokensStaked: number
-    tokensLost?: number | null
-    outcome?: string | null
-    attackerId: string
-    attackerAllyId?: string | null
-    defenderId: string
+    type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    gameId: string
+    tokensStaked: number
     startTime?: Date | string
-    resolvedAt?: Date | string | null
+    endTime?: Date | string | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    winnerId?: string | null
+  }
+
+  export type BattleCreateManyWinnerInput = {
+    id?: string
+    type: $Enums.BattleType
+    status?: $Enums.BattleStatus
+    tokensStaked: number
+    startTime?: Date | string
+    endTime?: Date | string | null
+    gameId: string
+    attackerId: string
+    defenderId: string
+    attackerAllyId?: string | null
+    defenderAllyId?: string | null
   }
 
   export type CoolDownCreateManyCooledAgentInput = {
@@ -20149,6 +22494,22 @@ export namespace Prisma {
     terrainType: $Enums.TerrainType
   }
 
+  export type AgentHistoryCreateManyAgentInput = {
+    id?: string
+    type: string
+    details: string
+    timestamp?: Date | string
+    targetAgentId?: string | null
+  }
+
+  export type AgentHistoryCreateManyTargetAgentInput = {
+    id?: string
+    agentId: string
+    type: string
+    details: string
+    timestamp?: Date | string
+  }
+
   export type TweetUpdateWithoutAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -20177,194 +22538,212 @@ export namespace Prisma {
 
   export type BattleUpdateWithoutAttackerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
-    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
-    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+    winner?: AgentUpdateOneWithoutWonBattlesNestedInput
   }
 
   export type BattleUncheckedUpdateWithoutAttackerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
-    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUncheckedUpdateManyWithoutAttackerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
-    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUpdateWithoutDefenderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
     attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
     attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
     defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
-    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+    winner?: AgentUpdateOneWithoutWonBattlesNestedInput
   }
 
   export type BattleUncheckedUpdateWithoutDefenderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
     attackerId?: StringFieldUpdateOperationsInput | string
     attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUncheckedUpdateManyWithoutDefenderInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
     attackerId?: StringFieldUpdateOperationsInput | string
     attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
     defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUpdateWithoutAttackerAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
     attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
     defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
     defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
-    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+    winner?: AgentUpdateOneWithoutWonBattlesNestedInput
   }
 
   export type BattleUncheckedUpdateWithoutAttackerAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
     attackerId?: StringFieldUpdateOperationsInput | string
     defenderId?: StringFieldUpdateOperationsInput | string
     defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUncheckedUpdateManyWithoutAttackerAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
     attackerId?: StringFieldUpdateOperationsInput | string
     defenderId?: StringFieldUpdateOperationsInput | string
     defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
-    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUpdateWithoutDefenderAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
-    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
-    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    winner?: AgentUpdateOneWithoutWonBattlesNestedInput
   }
 
   export type BattleUncheckedUpdateWithoutDefenderAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerId?: StringFieldUpdateOperationsInput | string
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BattleUncheckedUpdateManyWithoutDefenderAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
-    tokensStaked?: FloatFieldUpdateOperationsInput | number
-    tokensLost?: NullableFloatFieldUpdateOperationsInput | number | null
-    outcome?: NullableStringFieldUpdateOperationsInput | string | null
-    attackerId?: StringFieldUpdateOperationsInput | string
-    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
-    defenderId?: StringFieldUpdateOperationsInput | string
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    gameId?: StringFieldUpdateOperationsInput | string
+    tokensStaked?: IntFieldUpdateOperationsInput | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BattleUpdateWithoutWinnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    game?: GameUpdateOneRequiredWithoutBattlesNestedInput
+    attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
+    defender?: AgentUpdateOneRequiredWithoutBattlesAsDefenderNestedInput
+    attackerAlly?: AgentUpdateOneWithoutBattlesAsAttackerAllyNestedInput
+    defenderAlly?: AgentUpdateOneWithoutBattlesAsDefenderAllyNestedInput
+  }
+
+  export type BattleUncheckedUpdateWithoutWinnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BattleUncheckedUpdateManyWithoutWinnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
+    status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
+    tokensStaked?: IntFieldUpdateOperationsInput | number
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    gameId?: StringFieldUpdateOperationsInput | string
+    attackerId?: StringFieldUpdateOperationsInput | string
+    defenderId?: StringFieldUpdateOperationsInput | string
+    attackerAllyId?: NullableStringFieldUpdateOperationsInput | string | null
+    defenderAllyId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type CoolDownUpdateWithoutCooledAgentInput = {
@@ -20467,6 +22846,54 @@ export namespace Prisma {
     x?: IntFieldUpdateOperationsInput | number
     y?: IntFieldUpdateOperationsInput | number
     terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+  }
+
+  export type AgentHistoryUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    targetAgent?: AgentUpdateOneWithoutHistoryAsTargetNestedInput
+  }
+
+  export type AgentHistoryUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AgentHistoryUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AgentHistoryUpdateWithoutTargetAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    agent?: AgentUpdateOneRequiredWithoutHistoryNestedInput
+  }
+
+  export type AgentHistoryUncheckedUpdateWithoutTargetAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgentHistoryUncheckedUpdateManyWithoutTargetAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    details?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InteractionCreateManyTweetInput = {

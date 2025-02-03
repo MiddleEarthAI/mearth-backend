@@ -151,7 +151,9 @@ exports.Prisma.AgentScalarFieldEnum = {
   authority: 'authority',
   health: 'health',
   gameId: 'gameId',
-  profileId: 'profileId'
+  isAlive: 'isAlive',
+  profileId: 'profileId',
+  deathTimestamp: 'deathTimestamp'
 };
 
 exports.Prisma.TweetScalarFieldEnum = {
@@ -176,19 +178,17 @@ exports.Prisma.AllianceScalarFieldEnum = {
 
 exports.Prisma.BattleScalarFieldEnum = {
   id: 'id',
-  timestamp: 'timestamp',
   type: 'type',
-  tokensStaked: 'tokensStaked',
-  tokensLost: 'tokensLost',
-  outcome: 'outcome',
-  attackerId: 'attackerId',
-  attackerAllyId: 'attackerAllyId',
-  defenderId: 'defenderId',
-  defenderAllyId: 'defenderAllyId',
   status: 'status',
-  gameId: 'gameId',
+  tokensStaked: 'tokensStaked',
   startTime: 'startTime',
-  resolvedAt: 'resolvedAt'
+  endTime: 'endTime',
+  gameId: 'gameId',
+  attackerId: 'attackerId',
+  defenderId: 'defenderId',
+  attackerAllyId: 'attackerAllyId',
+  defenderAllyId: 'defenderAllyId',
+  winnerId: 'winnerId'
 };
 
 exports.Prisma.InteractionScalarFieldEnum = {
@@ -225,6 +225,15 @@ exports.Prisma.UserScalarFieldEnum = {
   walletAddress: 'walletAddress',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AgentHistoryScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  type: 'type',
+  details: 'details',
+  timestamp: 'timestamp',
+  targetAgentId: 'targetAgentId'
 };
 
 exports.Prisma.SortOrder = {
@@ -266,7 +275,7 @@ exports.BattleType = exports.$Enums.BattleType = {
 exports.BattleStatus = exports.$Enums.BattleStatus = {
   Active: 'Active',
   Resolved: 'Resolved',
-  Error: 'Error'
+  Cancelled: 'Cancelled'
 };
 
 exports.InteractionType = exports.$Enums.InteractionType = {
@@ -305,7 +314,8 @@ exports.Prisma.ModelName = {
   Interaction: 'Interaction',
   MapTile: 'MapTile',
   CoolDown: 'CoolDown',
-  User: 'User'
+  User: 'User',
+  AgentHistory: 'AgentHistory'
 };
 
 /**

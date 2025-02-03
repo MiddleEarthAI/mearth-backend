@@ -76,6 +76,9 @@ model Agent {
   profileId String
 
   deathTimestamp DateTime?
+
+  history         AgentHistory[] // History entries where this agent is the main actor
+  historyAsTarget AgentHistory[] @relation("historyTarget") // History entries where this agent is the target
 }
 
 model Tweet {
@@ -225,4 +228,15 @@ enum UserRole {
   ADMIN
   MANAGER
   USER
+}
+
+model AgentHistory {
+  id            String   @id @default(cuid())
+  agentId       String
+  agent         Agent    @relation(fields: [agentId], references: [id])
+  type          String // MOVE, BATTLE, ALLIANCE, INTERACTION
+  details       String // JSON string of interaction details
+  timestamp     DateTime @default(now())
+  targetAgentId String? // Optional target agent for interactions
+  targetAgent   Agent?   @relation("historyTarget", fields: [targetAgentId], references: [id])
 }
