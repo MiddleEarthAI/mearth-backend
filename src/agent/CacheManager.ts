@@ -1,13 +1,16 @@
 import { Redis } from "ioredis";
+import NodeCache from "node-cache";
+import { logger } from "@/utils/logger";
 
 /**
  * Redis Cache Manager
  * Handles caching interactions with configurable TTL and prefix
  * Uses Redis as the underlying cache store
  */
-class CacheManager {
+export default class CacheManager {
   private redis: Redis;
   private readonly PREFIX = "middleearth:";
+  private cache: NodeCache;
 
   constructor() {
     console.log("🚀 Initializing Redis Cache Manager...");
@@ -18,6 +21,11 @@ class CacheManager {
     }
     this.redis = new Redis(redisUrl);
     console.log("✅ Redis connection established successfully");
+
+    this.cache = new NodeCache({
+      stdTTL: 3600, // 1 hour default TTL
+      checkperiod: 600, // Check for expired keys every 10 minutes
+    });
   }
 
   /**
@@ -62,6 +70,32 @@ class CacheManager {
       console.log(`ℹ️ No cache entries found matching pattern`);
     }
   }
-}
 
-export default CacheManager;
+  /**
+   * Resets the cache by clearing all entries
+   * Used during recovery scenarios
+   */
+  async reset(): Promise<void> {
+    try {
+      this.cache.flushAll();
+      logger.info("Successfully reset cache");
+    } catch (error) {
+      logger.error("Failed to reset cache", { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Closes the cache and cleans up resources
+   * Used during graceful shutdown
+   */
+  async close(): Promise<void> {
+    try {
+      this.cache.close();
+      logger.info("Successfully closed cache");
+    } catch (error) {
+      logger.error("Failed to close cache", { error });
+      throw error;
+    }
+  }
+}

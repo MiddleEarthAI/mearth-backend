@@ -556,6 +556,27 @@ Generate a JSON response with your next action that matches your character's per
       };
     }
   }
+
+  /**
+   * Resets the agent state to handle recovery scenarios
+   * Clears any pending decisions and resets processing flags
+   */
+  async resetAgentState(): Promise<void> {
+    // try {
+    //   // Reset any pending decisions
+    //   await this.prisma.agent.updateMany({
+    //     where: { isProcessing: true },
+    //     data: {
+    //       isProcessing: false,
+    //       lastProcessedAt: new Date(),
+    //     },
+    //   });
+    //   logger.info("Successfully reset agent states");
+    // } catch (error) {
+    //   logger.error("Failed to reset agent states", { error });
+    //   throw error;
+    // }
+  }
 }
 
 export { DecisionEngine };

@@ -19,6 +19,7 @@ import { checkDatabaseConnection } from "./utils";
 import { getProgramWithWallet } from "./utils/program";
 import { PrismaClient } from "@prisma/client";
 import { BN } from "@coral-xyz/anchor";
+import { ActionManager } from "./agent/ActionManager";
 
 const app = express();
 
@@ -150,10 +151,11 @@ export async function startServer() {
     program,
     prisma
   );
+  const actionManager = new ActionManager(program, gameAccount.gameId, prisma);
 
   const orchestrator = new GameOrchestrator(
     gameAccount.gameId,
-    program,
+    actionManager,
     twitter,
     cache,
     calculator,

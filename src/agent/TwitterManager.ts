@@ -438,6 +438,67 @@ class TwitterManager {
     console.log(`⏳ Waiting for ${ms}ms...`);
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+
+  /**
+   * Reconnects Twitter clients in case of connection issues
+   * Attempts to reestablish connections for all agents
+   */
+  async reconnect(): Promise<void> {
+    try {
+      // Store current clients for cleanup
+      const oldClients = new Map(this._clients);
+
+      // Clear current clients
+      this._clients.clear();
+
+      // Reconnect each client
+      for (const [agentId, client] of oldClients) {
+        const newClient = await this.createNewClient(agentId);
+        this._clients.set(agentId, newClient);
+      }
+
+      logger.info("Successfully reconnected Twitter clients");
+    } catch (error) {
+      logger.error("Failed to reconnect Twitter clients", { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Gracefully disconnects all Twitter clients
+   * Ensures proper cleanup of resources
+   */
+  async disconnect(): Promise<void> {
+    try {
+      // Clear all clients
+      this._clients.clear();
+      logger.info("Successfully disconnected Twitter clients");
+    } catch (error) {
+      logger.error("Failed to disconnect Twitter clients", { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Creates a new Twitter client for an agent
+   */
+  private async createNewClient(agentId: AgentId): Promise<TwitterApi> {
+    const apiKey = process.env.TWITTER_API_KEY;
+    const apiSecret = process.env.TWITTER_API_SECRET;
+    const accessToken = process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
+    const accessSecret = process.env[`TWITTER_ACCESS_TOKEN_SECRET_${agentId}`];
+
+    if (!apiKey || !apiSecret || !accessToken || !accessSecret) {
+      throw new Error(`Missing Twitter credentials for agent ${agentId}`);
+    }
+
+    return new TwitterApi({
+      appKey: apiKey,
+      appSecret: apiSecret,
+      accessToken,
+      accessSecret,
+    });
+  }
 }
 
 export default TwitterManager;
