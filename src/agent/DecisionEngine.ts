@@ -363,6 +363,33 @@ Your action must reflect your traits and advance survival goals while maintainin
             )
           : Infinity;
 
+        // Calculate direction vector to other agent
+        const directionX = agentPosition
+          ? agentPosition.x - currentPosition.x
+          : 0;
+        const directionY = agentPosition
+          ? agentPosition.y - currentPosition.y
+          : 0;
+
+        // Get compass direction
+        const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
+        const compassDirection =
+          angle >= -22.5 && angle < 22.5
+            ? "East"
+            : angle >= 22.5 && angle < 67.5
+            ? "Northeast"
+            : angle >= 67.5 && angle < 112.5
+            ? "North"
+            : angle >= 112.5 && angle < 157.5
+            ? "Northwest"
+            : angle >= 157.5 || angle < -157.5
+            ? "West"
+            : angle >= -157.5 && angle < -112.5
+            ? "Southwest"
+            : angle >= -112.5 && angle < -67.5
+            ? "South"
+            : "Southeast";
+
         // Get active alliances
         const activeAlliances = [
           ...a.initiatedAlliances.filter(
@@ -394,17 +421,17 @@ Your action must reflect your traits and advance survival goals while maintainin
 
         return `
 - ${a.profile.name} (@${a.profile.xHandle})
-  Position: (${agentPosition?.x}, ${agentPosition?.y}) ${
+  Position: ${compassDirection} (${agentPosition?.x}, ${agentPosition?.y}) ${
           agentPosition?.terrainType
         } (${
           distance <= 1
-            ? "⚠️ Within range!"
+            ? "⚠️ CRITICAL: Within battle range!"
             : `${distance.toFixed(1)} fields away`
         })
   Health: ${a.health}/100
   Recent actions: ${[...recentBattles].join(", ")}
   ${allianceInfo}
-  ${distance <= 1 ? "⚠️ INTERACTION POSSIBLE!" : ""}`;
+  ${distance <= 1 ? "⚠️ INTERACTION REQUIRED - Battle/Alliance/Ignore!" : ""}`;
       })
       .join("\n");
 
@@ -450,7 +477,7 @@ Current game state:
       currentPosition.y
     }) ${currentPosition.terrainType}
 - Active cooldowns: ${
-      agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") &&
+      agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") ||
       "None"
     }
 
@@ -463,16 +490,23 @@ ${nearbyFieldsInfo}
 Other agents in the game:
 ${otherAgentsContext}
 
-Game rules:
-1. You can move one field per hour to any of the 8 neighboring tiles
-2. Mountains slow you down for 2 turns, rivers for 1 turn
-3. You can battle or form alliances with agents within 1 field distance
-4. Battles are probability-based on token holdings
-5. Lost battles have a 5% death chance and 21-30% token loss
-6. Alliances combine token power but have cooldown restrictions
-7. Ignoring has a 4-hour cooldown
+CRITICAL BATTLE MECHANICS:
+- When within 1 field range of another agent, you MUST choose: BATTLE, ALLIANCE, or IGNORE
+- If any agent chooses BATTLE, combat is mandatory
+- ALLIANCE requires mutual agreement, otherwise defaults to IGNORE
+- Lost battles have 5% death risk and 21-30% token loss
+- Alliances combine token power but have cooldown restrictions
+- Ignoring has a 4-hour cooldown
 
-Generate a JSON response with your next action:
+Strategic Tweet Examples (match your personality):
+- Aggressive: "Marching to confront @{handle} in the {terrain}. Your reign ends today! 🗡️"
+- Alliance: "Spotted @{handle} nearby. Our combined strength could reshape Middle Earth. Alliance? 🤝"
+- Defensive: "Fortifying my position against @{handle}'s approach. Allies, send aid! 🛡️"
+- Threatening: "@{handle} I see you lurking. Your treachery ends here! ⚔️"
+- Strategic: "The winds whisper of @{handle}'s weakness. Time to strike! 🎯"
+- Warning: "Beware @{handle} - they plot against us all! ⚠️"
+
+Generate a JSON response with your next action that matches your character's personality and current situation:
 {
   "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
   "target": string | null, // other agent Twitter handle if targeting another agent
@@ -480,11 +514,12 @@ Generate a JSON response with your next action:
     "x": number, // MapTile x coordinate if moving
     "y": number // MapTile y coordinate if moving
   },
-  "tweet": string // X/Twitter-ready post text that matches your character's personality also use this to share your moves, actions and strategies.
+  "tweet": string // Write an engaging tweet that reflects your character's personality and the strategic nature of your action
 }`;
 
     return characterPrompt;
   }
+  // End of Selection
   // End of Selection
 
   // Efficiently parse the JSON response

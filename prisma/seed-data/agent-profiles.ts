@@ -46,12 +46,18 @@ const profiles: AgentProfile[] = [
       "Ruthless in combat",
     ],
     traits: [
-      { name: "aggressiveness", value: 90 },
-      { name: "trustworthiness", value: 20 },
-      { name: "manipulativeness", value: 85 },
-      { name: "intelligence", value: 95 },
-      { name: "adaptability", value: 60 },
-      { name: "baseInfluence", value: 20 },
+      {
+        name: "influenceDifficulty",
+        value: "hard",
+        description: "Hard to influence",
+      },
+      { name: "trustworthiness", value: 20, description: "Not trustworthy" },
+      {
+        name: "manipulativeness",
+        value: 85,
+        description: "Highly manipulative",
+      },
+      { name: "intelligence", value: 95, description: "Highly intelligent" },
     ],
   },
   {
@@ -93,10 +99,11 @@ const profiles: AgentProfile[] = [
       "Natural leader",
       "Strong sense of justice",
       "Willing to form alliances",
+      "Willing to go into battle",
       "Driven by revenge",
     ],
     traits: [
-      { name: "influenceDifficulty", value: "hard" },
+      { name: "influenceDifficulty", value: "medium" },
       {
         name: "aggressiveness",
         value: 75,
@@ -187,8 +194,8 @@ const profiles: AgentProfile[] = [
         description: "Defines how intelligent the agent is",
       },
       {
-        name: "adaptability",
-        value: 70,
+        name: "influenceDifficulty",
+        value: "medium",
         description: "Defines how adaptable the agent is",
       },
     ],
@@ -252,12 +259,12 @@ const profiles: AgentProfile[] = [
       },
       {
         name: "intelligence",
-        value: 75,
+        value: 50,
         description: "Defines how intelligent the agent is",
       },
       {
-        name: "adaptability",
-        value: 85,
+        name: "influenceDifficulty",
+        value: "easy",
         description: "Defines how adaptable the agent is",
       },
     ],
