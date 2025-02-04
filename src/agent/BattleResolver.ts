@@ -529,7 +529,8 @@ export class BattleResolver {
             const [agentPda] = getAgentPDA(
               this.program.programId,
               gamePda,
-              agentId
+              // agentId 1
+              new BN(1) // refactor to use agentOnchainId
             );
 
             await this.program.methods

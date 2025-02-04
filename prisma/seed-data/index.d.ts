@@ -15458,6 +15458,7 @@ export namespace Prisma {
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    onchainId_gameId?: AgentOnchainIdGameIdCompoundUniqueInput
     AND?: AgentWhereInput | AgentWhereInput[]
     OR?: AgentWhereInput[]
     NOT?: AgentWhereInput | AgentWhereInput[]
@@ -15482,7 +15483,7 @@ export namespace Prisma {
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
     history?: AgentHistoryListRelationFilter
     historyAsTarget?: AgentHistoryListRelationFilter
-  }, "id">
+  }, "id" | "onchainId_gameId">
 
   export type AgentOrderByWithAggregationInput = {
     id?: SortOrder
@@ -17355,6 +17356,11 @@ export namespace Prisma {
 
   export type AgentHistoryOrderByRelationAggregateInput = {
     _count?: SortOrder
+  }
+
+  export type AgentOnchainIdGameIdCompoundUniqueInput = {
+    onchainId: number
+    gameId: string
   }
 
   export type AgentCountOrderByAggregateInput = {

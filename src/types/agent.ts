@@ -3,3 +3,9 @@ export interface AgentTrait {
   value: number;
   description: string;
 }
+
+export interface ActionContext {
+  agentId: number;
+  gameId: number;
+  currentState: any;
+}

@@ -3,16 +3,24 @@ import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
 import { logger } from "@/utils/logger";
-import { BN } from "@coral-xyz/anchor";
 import { AgentTrait } from "@/types/agent";
 import { ActionSuggestion, InfluenceScore } from "@/types/twitter";
+import {
+  ActionResult,
+  GameAction,
+  MearthProgram,
+  ValidationFeedback,
+} from "@/types";
+import { getAgentPDA, getGamePDA } from "@/utils/pda";
+import { ActionContext } from "./ActionManager";
+import { ActionManager } from "./ActionManager";
 
-export type AgentBasicInfo = {
-  agentId: string;
-  agentOnchainId: number;
-  gameId: string;
-  gameOnchainId: BN;
-};
+interface RetryContext {
+  currentRetry: number;
+  failureReason: string;
+  previousAttempt: any;
+  maxRetries: number;
+}
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -22,23 +30,28 @@ class DecisionEngine {
   private readonly INFLUENCE_THRESHOLD = 0.7;
   private readonly CONSENSUS_THRESHOLD = 0.6;
   private readonly CHARACTER_ALIGNMENT_WEIGHT = 0.4;
+  private readonly MAX_RETRIES = 3;
 
   constructor(
     private prisma: PrismaClient,
-    private eventEmitter: EventEmitter
+    private eventEmitter: EventEmitter,
+    private program: MearthProgram,
+    private readonly actionManager: ActionManager
   ) {
     console.log("🎮 Decision Engine initialized");
   }
 
   async processInfluenceScores(
-    agentId: string,
+    actionContext: ActionContext,
     scores: InfluenceScore[]
   ): Promise<ActionSuggestion | null> {
-    console.log(`🎯 Processing influence scores for agent ${agentId}`);
+    console.log(
+      `🎯 Processing influence scores for agent ${actionContext.agentId}`
+    );
 
     const agent = await this.prisma.agent.findUnique({
-      where: { id: agentId },
-      include: { profile: true },
+      where: { id: actionContext.agentId },
+      include: { profile: true, game: { select: { onchainId: true } } },
     });
 
     if (!agent) {
@@ -73,50 +86,14 @@ class DecisionEngine {
       - Consensus: ${dominantSuggestion.consensus}
       - Alignment: ${alignmentScore}
       - Should Act: ${shouldAct}`);
+    const { prompt } = await this.buildPrompt(actionContext);
 
     const response = await generateText({
       model: anthropic("claude-3-5-sonnet-20240620"),
       messages: [
         {
           role: "user",
-          content: `You are an AI agent in Middle Earth. Generate a JSON response with your next action. The action must follow game rules and your character traits.
-
-Action Types:
-{
-  "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
-  "target": string | null, // Agent ID if targeting another agent
-  "position": {
-    "x": number,
-    "y": number
-  },
-  "reason": string, // Strategic explanation
-  "announcement": string // X-ready post text
-}
-
-Character Traits:
-- Scootles: Social, medium influence, alliance-seeking but battle-ready
-- Purrlock Paws: Hostile loner, hard to influence, aggressive when approached  
-- Wanderleaf: Insecure wanderer, easily influenced, guidance-seeking
-- Sir Gullihop: Naive, friendly, medium influence, trusting
-
-Game Rules:
-- Move 1 field/hour on 689-field map
-- Mountain: 2 turn delay
-- River: 1 turn delay
-- Combat within 1 field range
-- Battle outcomes based on $mearth tokens
-- Alliances combine token pools
-- Ignore sets 4 hour cooldown
-
-Consider:
-- Map position
-- Agent relationships
-- Battle history
-- Token holdings
-- Human engagement
-- Character personality
-
-Your action must reflect your traits and advance survival goals while maintaining character authenticity.`,
+          content: prompt,
         },
         { role: "assistant", content: "Here is the JSON requested:\n{" },
       ],
@@ -127,7 +104,7 @@ Your action must reflect your traits and advance survival goals while maintainin
 
     if (action) {
       console.log(`✨ Emitting new action: ${action.type}`);
-      this.eventEmitter.emit("newAction", { agentId, action });
+      this.eventEmitter.emit("newAction", { actionContext, action });
       return action;
     }
 
@@ -220,26 +197,119 @@ Your action must reflect your traits and advance survival goals while maintainin
     return JSON.parse(action);
   }
 
-  async proceedWithoutInteractions(agentInfo: AgentBasicInfo): Promise<void> {
+  /**
+   * Handles action execution with feedback and retries
+   */
+  private async executeActionWithFeedback(
+    actionContext: ActionContext,
+    action: GameAction,
+    retryContext?: RetryContext
+  ): Promise<void> {
+    const result = await this.actionManager.executeAction(
+      actionContext,
+      action
+    );
+
+    if (!result.success && result.feedback) {
+      if (!retryContext || retryContext.currentRetry < this.MAX_RETRIES) {
+        await this.handleActionFailure(actionContext, result, retryContext);
+      } else {
+        logger.error("Max retries exceeded, giving up", {
+          actionContext,
+          action,
+          retryContext,
+        });
+      }
+    }
+  }
+
+  /**
+   * Handles failed actions by generating new decisions based on feedback
+   */
+  private async handleActionFailure(
+    actionContext: ActionContext,
+    result: ActionResult,
+    retryContext?: RetryContext
+  ): Promise<void> {
+    const currentRetry = (retryContext?.currentRetry || 0) + 1;
+
+    // Build feedback prompt
+    const feedbackPrompt = this.buildFeedbackPrompt(
+      result.feedback!,
+      actionContext
+    );
+
+    logger.info("🔄 Retrying action with feedback", {
+      attempt: currentRetry,
+      feedback: result.feedback,
+    });
+
+    const response = await generateText({
+      model: anthropic("claude-3-5-sonnet-20240620"),
+      messages: [
+        {
+          role: "user",
+          content: feedbackPrompt,
+        },
+        {
+          role: "assistant",
+          content: "Here is the JSON for the adjusted action:\n{",
+        },
+      ],
+    });
+
+    const newAction = this.parseActionJson(`{${response.text}`);
+
+    // Retry with new action
+    await this.executeActionWithFeedback(actionContext, newAction, {
+      currentRetry,
+      maxRetries: this.MAX_RETRIES,
+      failureReason: result.feedback!.error?.message || "Unknown error",
+      previousAttempt: result,
+    });
+  }
+
+  /**
+   * Builds a prompt that includes feedback about the failed action
+   */
+  private buildFeedbackPrompt(
+    feedback: ValidationFeedback,
+    actionContext: ActionContext
+  ): string {
+    const { error } = feedback;
+    if (!error) return "";
+
+    let prompt = `Your last action failed with the following feedback:
+Type: ${error.type}
+Message: ${error.message}
+Current State: ${JSON.stringify(error.context.currentState, null, 2)}
+Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
+${
+  error.context.suggestedFix
+    ? `Suggested Fix: ${error.context.suggestedFix}`
+    : ""
+}
+
+Please provide a new action that addresses this feedback. Consider:
+1. The specific error type and message
+2. The current state of the game
+3. Any suggested fixes provided
+4. Your character's traits and goals
+
+Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
+
+    return prompt;
+  }
+
+  async proceedWithoutInteractions(
+    actionContext: ActionContext
+  ): Promise<void> {
     console.log(
       "🤔 Deciding without interactions for agent",
-      agentInfo.agentOnchainId
+      actionContext.agentOnchainId
     );
-    //     const prompt = `You are an AI agent in Middle Earth. Generate a JSON response with your next action. The action must follow game rules and your character traits.
 
-    // Action Types:
-    // {
-    //   "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
-    //   "target": string | null, // Agent ID if targeting another agent
-    //   "position": {
-    //     "x": number,
-    //     "y": number
-    //   },
-
-    //   "tweet": string // X-ready post text. example: "I'm moving to the mountains to gather resources and scout the area for potential threats."
-    // }
-    // `;
-    const prompt = await this.buildPrompt(agentInfo);
+    const { prompt } = await this.buildPrompt(actionContext);
 
     logger.info("🤖 Prompt");
     logger.info(prompt);
@@ -249,37 +319,52 @@ Your action must reflect your traits and advance survival goals while maintainin
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: [
           { role: "user", content: prompt },
-          // Trick the AI to generate the JSON response
+          // Trick the AI to return only the JSON response
           { role: "assistant", content: "Here is the JSON requested:\n{" },
         ],
       });
       logger.info("🤖 Generated AI response 🔥🔥🔥");
       logger.info(response.text);
       // append back the '{' to the json and parse it
-      const action = this.parseActionJson(
-        `{${response.text}`
-      ) as ActionSuggestion;
+      const action = this.parseActionJson(`{${response.text}`);
 
       console.log("🤖 Generated AI response");
       console.log(action);
 
-      this.eventEmitter.emit("newAction", {
-        agentId: agentInfo.agentId,
-        action,
-      });
+      // Execute with feedback handling
+      await this.executeActionWithFeedback(actionContext, action);
     } else {
       this.eventEmitter.emit("newAction", {
-        agentId: agentInfo.agentId,
+        actionContext,
         action: { type: "IGNORE" },
       });
     }
   }
 
-  private async buildPrompt(agentInfo: AgentBasicInfo): Promise<string> {
+  private async buildPrompt(actionContext: ActionContext): Promise<{
+    prompt: string;
+    actionContext: ActionContext;
+  }> {
+    const [gamePda] = getGamePDA(
+      this.program.programId,
+      actionContext.gameOnchainId
+    );
+    const [agentPda] = getAgentPDA(
+      this.program.programId,
+      gamePda,
+      actionContext.agentOnchainId
+    );
+    const agentAccount = await this.program.account.agent.fetch(agentPda);
+    console.log("🤖 Agent account", agentAccount);
+    if (!agentAccount) {
+      console.log("❌ Agent not found");
+
+      return { prompt: "", actionContext };
+    }
     const agent = await this.prisma.agent.findUnique({
       where: {
-        id: agentInfo.agentId,
-        gameId: agentInfo.gameId,
+        id: actionContext.agentId,
+        gameId: actionContext.gameId,
       },
       include: {
         profile: true,
@@ -304,14 +389,15 @@ Your action must reflect your traits and advance survival goals while maintainin
 
     if (!agent) {
       console.log("❌ Agent not found");
-      return "";
+      return { prompt: "", actionContext };
     }
 
     // Get current position
     const currentPosition = agent.mapTiles[0];
+    logger.info("🔍 Current position", { currentPosition });
     if (!currentPosition) {
       console.log("❌ Agent position not found");
-      return "";
+      return { prompt: "", actionContext };
     }
 
     // Get nearby map tiles (8 surrounding tiles)
@@ -350,106 +436,126 @@ Your action must reflect your traits and advance survival goals while maintainin
     });
 
     // Get other agents' info for context
-    const otherAgents = agent.game.agents.filter(
-      (a) => a.onchainId !== agentInfo.agentOnchainId
-    );
-    const otherAgentsContext = otherAgents
-      .map((a) => {
-        const agentPosition = a.mapTiles[0];
-        const distance = agentPosition
-          ? Math.sqrt(
-              Math.pow(currentPosition.x - agentPosition.x, 2) +
-                Math.pow(currentPosition.y - agentPosition.y, 2)
-            )
-          : Infinity;
+    const otherAgentsPromises = agent.game.agents
+      .filter((a) => a.id !== actionContext.agentId)
+      .map(async (a) => {
+        const [otherAgentPda] = getAgentPDA(
+          this.program.programId,
+          gamePda,
+          a.onchainId
+        );
+        const agentAccount = await this.program.account.agent.fetch(
+          otherAgentPda
+        );
+        return {
+          agent: a,
+          account: agentAccount,
+        };
+      });
 
-        // Calculate direction vector to other agent
-        const directionX = agentPosition
-          ? agentPosition.x - currentPosition.x
-          : 0;
-        const directionY = agentPosition
-          ? agentPosition.y - currentPosition.y
-          : 0;
+    const otherAgents = await Promise.all(otherAgentsPromises);
 
-        // Calculate optimal path coordinates
-        const pathCoords = [];
-        if (agentPosition) {
-          const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
-          for (let i = 1; i <= steps; i++) {
-            const stepX = Math.round(
-              currentPosition.x + (directionX * i) / steps
-            );
-            const stepY = Math.round(
-              currentPosition.y + (directionY * i) / steps
-            );
-            pathCoords.push(`(${stepX}, ${stepY})`);
-          }
+    const otherAgentsContextPromises = otherAgents.map(async (a) => {
+      const agentPosition = a.agent.mapTiles[0];
+      const distance = agentPosition
+        ? Math.sqrt(
+            Math.pow(currentPosition.x - agentPosition.x, 2) +
+              Math.pow(currentPosition.y - agentPosition.y, 2)
+          )
+        : Infinity;
+
+      // Calculate direction vector to other agent
+      const directionX = agentPosition
+        ? agentPosition.x - currentPosition.x
+        : 0;
+      const directionY = agentPosition
+        ? agentPosition.y - currentPosition.y
+        : 0;
+
+      // Calculate optimal path coordinates
+      const pathCoords = [];
+      if (agentPosition) {
+        const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
+        for (let i = 1; i <= steps; i++) {
+          const stepX = Math.round(
+            currentPosition.x + (directionX * i) / steps
+          );
+          const stepY = Math.round(
+            currentPosition.y + (directionY * i) / steps
+          );
+          pathCoords.push(`(${stepX}, ${stepY})`);
         }
+      }
 
-        // Get compass direction
-        const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
-        const compassDirection =
-          angle >= -22.5 && angle < 22.5
-            ? "East"
-            : angle >= 22.5 && angle < 67.5
-            ? "Northeast"
-            : angle >= 67.5 && angle < 112.5
-            ? "North"
-            : angle >= 112.5 && angle < 157.5
-            ? "Northwest"
-            : angle >= 157.5 || angle < -157.5
-            ? "West"
-            : angle >= -157.5 && angle < -112.5
-            ? "Southwest"
-            : angle >= -112.5 && angle < -67.5
-            ? "South"
-            : "Southeast";
+      // Get compass direction
+      const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
+      const compassDirection =
+        angle >= -22.5 && angle < 22.5
+          ? "East"
+          : angle >= 22.5 && angle < 67.5
+          ? "Northeast"
+          : angle >= 67.5 && angle < 112.5
+          ? "North"
+          : angle >= 112.5 && angle < 157.5
+          ? "Northwest"
+          : angle >= 157.5 || angle < -157.5
+          ? "West"
+          : angle >= -157.5 && angle < -112.5
+          ? "Southwest"
+          : angle >= -112.5 && angle < -67.5
+          ? "South"
+          : "Southeast";
 
-        // Get active alliances
-        const activeAlliances = [
-          ...a.initiatedAlliances.filter(
-            (alliance) => alliance.status === AllianceStatus.Active
-          ),
-          ...a.joinedAlliances.filter(
-            (alliance) => alliance.status === AllianceStatus.Active
-          ),
-        ];
+      // Get active alliances
+      const activeAlliances = [
+        ...a.agent.initiatedAlliances.filter(
+          (alliance) => alliance.status === AllianceStatus.Active
+        ),
+        ...a.agent.joinedAlliances.filter(
+          (alliance) => alliance.status === AllianceStatus.Active
+        ),
+      ];
 
-        const recentBattles = [
-          ...a.battlesAsAttacker.slice(-2),
-          ...a.battlesAsDefender.slice(-2),
-        ].map((b) => b.type);
+      const recentBattles = [
+        ...a.agent.battlesAsAttacker.slice(-2),
+        ...a.agent.battlesAsDefender.slice(-2),
+      ].map((b) => b.type);
 
-        const allianceInfo =
-          activeAlliances.length > 0
-            ? `Active alliances: ${activeAlliances
-                .map(
-                  (alliance) =>
-                    `with ${
-                      alliance.joinerId === a.id
-                        ? alliance.initiatorId
-                        : alliance.joinerId
-                    }`
-                )
-                .join(", ")}`
-            : "";
+      const allianceInfo =
+        activeAlliances.length > 0
+          ? `Active alliances: ${activeAlliances
+              .map(
+                (alliance) =>
+                  `with ${
+                    alliance.joinerId === a.agent.id
+                      ? alliance.initiatorId
+                      : alliance.joinerId
+                  }`
+              )
+              .join(", ")}`
+          : "";
 
-        return `
-- ${a.profile.name} (@${a.profile.xHandle})
+      return `
+- ${a.agent.profile.name} (@${a.agent.profile.xHandle}) [MID: ${
+        a.agent.onchainId
+      }]
   Position: ${compassDirection} (${agentPosition?.x}, ${agentPosition?.y}) ${
-          agentPosition?.terrainType
-        } (${
-          distance <= 1
-            ? "⚠️ CRITICAL: Within battle range!"
-            : `${distance.toFixed(1)} fields away`
-        })
+        agentPosition?.terrainType
+      } (${
+        distance <= 1
+          ? "⚠️ CRITICAL: Within battle range!"
+          : `${distance.toFixed(1)} fields away`
+      })
   Path to reach: ${pathCoords.join(" → ")}
-  Health: ${a.health}/100
+  Health: ${agent.health}/100
   Recent actions: ${[...recentBattles].join(", ")}
   ${allianceInfo}
   ${distance <= 1 ? "⚠️ INTERACTION REQUIRED - Battle/Alliance/Ignore!" : ""}`;
-      })
-      .join("\n");
+    });
+
+    const otherAgentsContext = (
+      await Promise.all(otherAgentsContextPromises)
+    ).join("\n");
 
     const surroundingTerrainInfo = nearbyTiles
       .map((tile) => `${tile.terrainType} at (${tile.x}, ${tile.y})`)
@@ -459,9 +565,11 @@ Your action must reflect your traits and advance survival goals while maintainin
       .map((field) => `${field.terrainType} at (${field.x}, ${field.y})`)
       .join("\n");
 
-    const characterPrompt = `You are ${
-      agent.profile.name
-    }, an AI agent in Middle Earth. Your core characteristics are:
+    const characterPrompt = `You are ${agent.profile.name} (@${
+      agent.profile.xHandle
+    }) [MID: ${
+      actionContext.agentOnchainId
+    }], an AI agent in Middle Earth. Your core characteristics are:
 ${agent.profile.characteristics.join(", ")}
 
 Your background and lore:
@@ -492,11 +600,11 @@ Current game state:
 - Your current position(MapTile/Coordinate): (${currentPosition.x}, ${
       currentPosition.y
     }) ${currentPosition.terrainType}
+- Your current token balance: ${agentAccount.tokenBalance} Mearth
 - Active cooldowns: ${
       agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") ||
       "None"
     }
-
 Surrounding terrain (immediate vicinity):
 ${surroundingTerrainInfo}
 
@@ -525,58 +633,39 @@ Strategic Tweet Examples (match your personality):
 Generate a JSON response with your next action that matches your character's personality and current situation:
 {
   "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
-  "target": string | null, // other agent Twitter handle if targeting another agent
+  "targetId": number | null, // Target agent's MID (1-4) if targeting another agent
   "position": {
     "x": number, // MapTile x coordinate if moving
     "y": number // MapTile y coordinate if moving
   },
   "tweet": string // Write an engaging tweet that reflects your character's personality and the strategic nature of your action
-}`;
+}
 
-    return characterPrompt;
+IMPORTANT: When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.`;
+
+    return { prompt: characterPrompt, actionContext };
   }
-  // End of Selection
-  // End of Selection
 
   // Efficiently parse the JSON response
-  private parseActionJson(response: string): ActionSuggestion {
+  private parseActionJson(response: string): GameAction {
     logger.info("🔍 Parsing action JSON: ", response);
     try {
       // Remove any potential preamble and get just the JSON object
       const jsonStr = response.substring(response.indexOf("{"));
-      return JSON.parse(jsonStr) as ActionSuggestion;
+      return JSON.parse(jsonStr) as GameAction;
     } catch (error) {
       console.error("Failed to parse action JSON:", error);
       // Return a default IGNORE action if parsing fails
       return {
         type: "IGNORE",
-        target: undefined,
+        targetId: undefined,
         position: undefined,
         tweet: "Failed to parse action",
       };
     }
   }
 
-  /**
-   * Resets the agent state to handle recovery scenarios
-   * Clears any pending decisions and resets processing flags
-   */
-  async resetAgentState(): Promise<void> {
-    // try {
-    //   // Reset any pending decisions
-    //   await this.prisma.agent.updateMany({
-    //     where: { isProcessing: true },
-    //     data: {
-    //       isProcessing: false,
-    //       lastProcessedAt: new Date(),
-    //     },
-    //   });
-    //   logger.info("Successfully reset agent states");
-    // } catch (error) {
-    //   logger.error("Failed to reset agent states", { error });
-    //   throw error;
-    // }
-  }
+  async resetAgentState() {}
 }
 
 export { DecisionEngine };

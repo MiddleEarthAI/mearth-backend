@@ -1,12 +1,9 @@
+import { Position } from ".";
+
 export interface AgentTrait {
   name: string;
   value: number;
   description: string;
-}
-
-export interface Position {
-  x: number;
-  y: number;
 }
 
 export interface UserMetrics {

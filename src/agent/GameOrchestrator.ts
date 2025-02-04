@@ -4,16 +4,15 @@ import { prisma } from "@/config/prisma";
 import { PrismaClient } from "@prisma/client";
 
 import TwitterManager, { AgentId } from "@/agent/TwitterManager";
-import { AgentBasicInfo, DecisionEngine } from "@/agent/DecisionEngine";
+import { DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
 import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
 import EventEmitter from "events";
-import { MearthProgram } from "@/types";
-import { BN } from "@coral-xyz/anchor";
 import { BattleResolver } from "./BattleResolver";
 import { stringToUuid } from "@/utils/uuid";
 import { TweetV2 } from "twitter-api-v2";
-import { ActionManager, GameAction } from "./ActionManager";
+import { ActionContext, ActionManager } from "./ActionManager";
+import { GameAction } from "@/types";
 
 // Error types for better error handling
 enum OrchestratorErrorType {
@@ -52,7 +51,8 @@ export class GameOrchestrator {
   private readonly retryDelay: number = 5000; // 5 seconds
 
   constructor(
-    private currentGameId: number,
+    private readonly currentGameOnchainId: number,
+    private readonly gameId: string,
     private readonly actionManager: ActionManager,
     private readonly twitter: TwitterManager,
     private readonly cache: CacheManager,
@@ -72,7 +72,7 @@ export class GameOrchestrator {
   async start(): Promise<void> {
     try {
       logger.info("🎮 Game Orchestrator starting up...", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         updateInterval: this.updateInterval,
         cleanupInterval: this.cleanupInterval,
       });
@@ -83,7 +83,7 @@ export class GameOrchestrator {
       await this.battleResolver.start();
 
       logger.info("🚀 Game Orchestrator successfully started", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -98,7 +98,9 @@ export class GameOrchestrator {
   }
 
   private async startUpdateLoop(): Promise<void> {
-    logger.info("⏰ Starting update loop", { gameId: this.currentGameId });
+    logger.info("⏰ Starting update loop", {
+      gameId: this.currentGameOnchainId,
+    });
 
     const processWithRetry = async () => {
       let retries = 0;
@@ -112,7 +114,7 @@ export class GameOrchestrator {
         } catch (error) {
           retries++;
           logger.error("Update loop iteration failed", {
-            gameId: this.currentGameId,
+            gameId: this.currentGameOnchainId,
             retryAttempt: retries,
             error: error instanceof Error ? error.message : String(error),
           });
@@ -134,7 +136,7 @@ export class GameOrchestrator {
 
     processWithRetry().catch((error) => {
       logger.error("Fatal error in update loop", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
       });
       this.isRunning = false;
@@ -143,7 +145,9 @@ export class GameOrchestrator {
   }
 
   private async startCleanupLoop(): Promise<void> {
-    logger.info("🧹 Starting cleanup loop", { gameId: this.currentGameId });
+    logger.info("🧹 Starting cleanup loop", {
+      gameId: this.currentGameOnchainId,
+    });
 
     const cleanupWithRetry = async () => {
       let retries = 0;
@@ -157,7 +161,7 @@ export class GameOrchestrator {
         } catch (error) {
           retries++;
           logger.error("Cleanup loop iteration failed", {
-            gameId: this.currentGameId,
+            gameId: this.currentGameOnchainId,
             retryAttempt: retries,
             error: error instanceof Error ? error.message : String(error),
           });
@@ -179,7 +183,7 @@ export class GameOrchestrator {
 
     cleanupWithRetry().catch((error) => {
       logger.error("Fatal error in cleanup loop", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
       });
       this.isRunning = false;
@@ -188,7 +192,9 @@ export class GameOrchestrator {
   }
 
   private setupEventHandlers(): void {
-    logger.info("🎯 Setting up event handlers", { gameId: this.currentGameId });
+    logger.info("🎯 Setting up event handlers", {
+      gameId: this.currentGameOnchainId,
+    });
 
     this.eventEmitter.on("newAction", this.handleNewAction.bind(this));
     this.eventEmitter.on("error", this.handleError.bind(this));
@@ -196,7 +202,7 @@ export class GameOrchestrator {
     // Add handler for uncaught promise rejections
     process.on("unhandledRejection", (reason, promise) => {
       logger.error("Unhandled Promise Rejection", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         reason: reason instanceof Error ? reason.message : String(reason),
       });
     });
@@ -205,7 +211,7 @@ export class GameOrchestrator {
   private setupErrorBoundary(): void {
     process.on("uncaughtException", (error) => {
       logger.error("Uncaught Exception", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
@@ -213,7 +219,7 @@ export class GameOrchestrator {
       // Attempt graceful shutdown
       this.shutdown().catch((shutdownError) => {
         logger.error("Failed to shutdown gracefully", {
-          gameId: this.currentGameId,
+          gameId: this.currentGameOnchainId,
           error:
             shutdownError instanceof Error
               ? shutdownError.message
@@ -225,21 +231,21 @@ export class GameOrchestrator {
   }
 
   private async handleNewAction(data: {
-    agentId: string;
+    actionContext: ActionContext;
     action: GameAction;
   }): Promise<void> {
     try {
       logger.info("🎲 Processing new action", {
-        gameId: this.currentGameId,
-        agentId: data.agentId,
+        gameId: this.currentGameOnchainId,
+        agentId: data.actionContext.agentId,
         actionType: data.action.type,
       });
 
-      await this.actionManager.executeAction(data.agentId, data.action);
+      await this.actionManager.executeAction(data.actionContext, data.action);
 
       logger.info("✅ Action successfully processed", {
-        gameId: this.currentGameId,
-        agentId: data.agentId,
+        gameId: this.currentGameOnchainId,
+        agentId: data.actionContext.agentId,
         actionType: data.action.type,
       });
     } catch (error) {
@@ -247,7 +253,7 @@ export class GameOrchestrator {
         OrchestratorErrorType.ACTION_EXECUTION,
         "Failed to handle new action",
         {
-          agentId: data.agentId,
+          agentId: data.actionContext.agentId,
           actionType: data.action.type,
           error: error instanceof Error ? error.message : String(error),
         }
@@ -263,7 +269,7 @@ export class GameOrchestrator {
         : { type: "UNKNOWN_ERROR" };
 
     logger.error("⚠️ System error occurred", {
-      gameId: this.currentGameId,
+      gameId: this.currentGameOnchainId,
       ...errorDetails,
       error: error.message,
       stack: error.stack,
@@ -276,7 +282,7 @@ export class GameOrchestrator {
     error: Error | OrchestratorError
   ): Promise<void> {
     logger.info("🔄 Attempting system recovery...", {
-      gameId: this.currentGameId,
+      gameId: this.currentGameOnchainId,
     });
 
     try {
@@ -295,18 +301,17 @@ export class GameOrchestrator {
           case OrchestratorErrorType.CACHE:
             await this.cache.reset();
             break;
-          // Add more specific recovery strategies as needed
         }
       }
 
       logger.info("✅ Recovery attempt completed successfully", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         errorType:
           error instanceof OrchestratorError ? error.type : "UNKNOWN_ERROR",
       });
     } catch (recoveryError) {
       logger.error("❌ Recovery attempt failed", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         error:
           recoveryError instanceof Error
             ? recoveryError.message
@@ -323,6 +328,7 @@ export class GameOrchestrator {
 
   private shouldShutdown(error: Error | OrchestratorError): boolean {
     if (error instanceof OrchestratorError) {
+      // explanation: we want to shutdown if the error is related to initialization or recovery
       return [
         OrchestratorErrorType.INITIALIZATION,
         OrchestratorErrorType.RECOVERY,
@@ -333,7 +339,7 @@ export class GameOrchestrator {
 
   private async shutdown(): Promise<void> {
     logger.info("🛑 Initiating graceful shutdown", {
-      gameId: this.currentGameId,
+      gameId: this.currentGameOnchainId,
     });
 
     this.isRunning = false;
@@ -347,11 +353,11 @@ export class GameOrchestrator {
       ]);
 
       logger.info("👋 Graceful shutdown completed", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
       });
     } catch (error) {
       logger.error("💥 Error during shutdown", {
-        gameId: this.currentGameId,
+        gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
       });
       throw error;
@@ -386,34 +392,36 @@ export class GameOrchestrator {
     logger.info(`✅ Processed ${agents.length} agents`);
   }
 
-  private async processAgent(agentInfo: AgentBasicInfo): Promise<void> {
-    logger.info(`🤖 Processing agent ${agentInfo.agentId}`);
+  private async processAgent(actionContext: ActionContext): Promise<void> {
+    logger.info(`🤖 Processing agent ${actionContext.agentId}`);
 
     try {
       throw "testing ";
 
       const recentTweets = await this.twitter.fetchRecentTweets(
-        agentInfo.agentOnchainId.toString() as AgentId,
+        actionContext.agentOnchainId.toString() as AgentId,
         5
       );
       for (const tweet of recentTweets) {
-        await this.processTweetInteractions(agentInfo.agentId, tweet);
+        await this.processTweetInteractions(actionContext, tweet);
       }
     } catch (error) {
       logger.error(
         "Error processing community interactions, continue anyway...",
-        { agentId: agentInfo.agentId, error }
+        { agentId: actionContext.agentId, error }
       );
     }
 
-    this.engine.proceedWithoutInteractions(agentInfo);
+    this.engine.proceedWithoutInteractions(actionContext);
   }
 
   private async processTweetInteractions(
-    agentId: string,
+    actionContext: ActionContext,
     tweet: TweetV2
   ): Promise<void> {
-    logger.info(`📱 Processing tweet interactions for agent ${agentId}`);
+    logger.info(
+      `📱 Processing tweet interactions for agent ${actionContext.agentId}`
+    );
     // Get new interactions from Twitter
     const newInteractions = await this.twitter.fetchTweetInteractions(tweet.id);
     // Process each interaction
@@ -439,7 +447,7 @@ export class GameOrchestrator {
       })
     );
     // Process scores through decision engine
-    await this.engine.processInfluenceScores(agentId, scores);
+    await this.engine.processInfluenceScores(actionContext, scores);
     logger.info(`✅ Processed ${scores.length} interactions`);
   }
 

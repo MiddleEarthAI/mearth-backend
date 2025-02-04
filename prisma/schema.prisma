@@ -79,6 +79,8 @@ model Agent {
 
   history         AgentHistory[] // History entries where this agent is the main actor
   historyAsTarget AgentHistory[] @relation("historyTarget") // History entries where this agent is the target
+
+  @@unique([onchainId, gameId])
 }
 
 model Tweet {
@@ -183,7 +185,7 @@ enum TerrainType {
 }
 
 model MapTile {
-  id          String      @id @default(uuid())
+  id          String      @id @default(cuid())
   x           Int         @db.Integer
   y           Int         @db.Integer
   terrainType TerrainType

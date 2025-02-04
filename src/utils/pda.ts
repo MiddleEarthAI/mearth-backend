@@ -7,9 +7,10 @@ import { PublicKey } from "@solana/web3.js";
  * @param gameId The game ID
  * @returns [PDA, bump]
  */
-export const getGamePDA = (programId: PublicKey, gameId: number) => {
+export const getGamePDA = (programId: PublicKey, gameId: BN) => {
+  const gId = new BN(gameId);
   return PublicKey.findProgramAddressSync(
-    [Buffer.from("game"), new BN(gameId).toArrayLike(Buffer, "le", 4)],
+    [Buffer.from("game"), gId.toBuffer("le", 4)],
     programId
   );
 };
@@ -24,28 +25,10 @@ export const getGamePDA = (programId: PublicKey, gameId: number) => {
 export const getAgentPDA = (
   programId: PublicKey,
   gamePDA: PublicKey,
-  agentId: BN
+  agentId: number
 ) => {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from("agent"), gamePDA.toBuffer(), Buffer.from([agentId])],
-    programId
-  );
-};
-
-/**
- * Get the PDA for stake info
- * @param programId The program ID
- * @param agentPDA The agent PDA
- * @param authority The authority public key
- * @returns [PDA, bump]
- */
-export const getStakeInfoPDA = (
-  programId: PublicKey,
-  agentPDA: PublicKey,
-  authority: PublicKey
-) => {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from("stake"), agentPDA.toBuffer(), authority.toBuffer()],
+    [Buffer.from("agent"), gamePDA.toBuffer(), Uint8Array.of(agentId)],
     programId
   );
 };

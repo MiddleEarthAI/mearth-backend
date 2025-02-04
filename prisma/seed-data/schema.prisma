@@ -79,6 +79,8 @@ model Agent {
 
   history         AgentHistory[] // History entries where this agent is the main actor
   historyAsTarget AgentHistory[] @relation("historyTarget") // History entries where this agent is the target
+
+  @@unique([onchainId, gameId])
 }
 
 model Tweet {

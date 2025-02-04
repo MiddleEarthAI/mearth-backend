@@ -115,10 +115,7 @@ export async function startServer() {
     }
 
     const agentId = new BN(agent.account.id).toString() as AgentId;
-    console.log(
-      "agentId:🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥",
-      agentId
-    );
+
     const accessToken = process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
     const accessSecret = process.env[`TWITTER_ACCESS_SECRET_${agentId}`];
 
@@ -144,7 +141,6 @@ export async function startServer() {
   const cache = new CacheManager();
   const calculator = new InfluenceCalculator();
   const eventEmitter = new EventEmitter();
-  const engine = new DecisionEngine(prisma, eventEmitter);
 
   const battleResolver = new BattleResolver(
     gameAccount.gameId,
@@ -152,9 +148,16 @@ export async function startServer() {
     prisma
   );
   const actionManager = new ActionManager(program, gameAccount.gameId, prisma);
+  const engine = new DecisionEngine(
+    prisma,
+    eventEmitter,
+    program,
+    actionManager
+  );
 
   const orchestrator = new GameOrchestrator(
     gameAccount.gameId,
+    agents[0].agent.gameId,
     actionManager,
     twitter,
     cache,
