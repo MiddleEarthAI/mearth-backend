@@ -50,7 +50,7 @@ model AgentProfile {
 }
 
 model Agent {
-  id                    String     @id @default(cuid())
+  id                    String     @id @default(uuid())
   onchainId             Int
   authority             String
   health                Int        @default(100)
@@ -84,7 +84,7 @@ model Agent {
 }
 
 model Tweet {
-  id             String        @id @default(cuid())
+  id             String        @id @default(uuid())
   agentId        String
   agent          Agent         @relation(fields: [agentId], references: [id])
   content        String
@@ -95,7 +95,7 @@ model Tweet {
 }
 
 model Alliance {
-  id             String         @id @default(cuid())
+  id             String         @id @default(uuid())
   combinedTokens Float?
   status         AllianceStatus @default(Active)
   timestamp      DateTime       @default(now())
@@ -121,7 +121,7 @@ enum AllianceStatus {
 }
 
 model Battle {
-  id           String       @id @default(cuid())
+  id           String       @id @default(uuid())
   type         BattleType
   status       BattleStatus @default(Active)
   tokensStaked Int
@@ -162,7 +162,7 @@ enum BattleType {
 }
 
 model Interaction {
-  id          String          @id @default(cuid())
+  id          String          @id @default(uuid())
   tweetId     String
   userId      String
   type        InteractionType
@@ -185,7 +185,7 @@ enum TerrainType {
 }
 
 model MapTile {
-  id          String      @id @default(cuid())
+  id          String      @id @default(uuid())
   x           Int         @db.Integer
   y           Int         @db.Integer
   terrainType TerrainType
@@ -233,7 +233,7 @@ enum UserRole {
 }
 
 model AgentHistory {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   agentId       String
   agent         Agent    @relation(fields: [agentId], references: [id])
   type          String // MOVE, BATTLE, ALLIANCE, INTERACTION

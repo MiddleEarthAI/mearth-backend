@@ -6,17 +6,17 @@ import { PrismaClient } from "@prisma/client";
  * Follows singleton pattern to prevent multiple client instances
  */
 declare global {
-	var prismaClient: PrismaClient | undefined; // Renamed to avoid redeclaration
+  var prismaClient: PrismaClient | undefined; // Renamed to avoid redeclaration
 }
 
 const prisma =
-	global.prismaClient ||
-	new PrismaClient({
-		log: [],
-	});
+  global.prismaClient ||
+  new PrismaClient({
+    log: [],
+  });
 
 if (process.env.NODE_ENV !== "production") {
-	global.prismaClient = prisma;
+  global.prismaClient = prisma;
 }
 
 export { prisma };

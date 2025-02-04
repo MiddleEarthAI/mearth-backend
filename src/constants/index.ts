@@ -1,19 +1,45 @@
 import { TerrainType } from "@/types/program";
 
-export const BATTLE_RANGE = parseInt(process.env.BATTLE_RANGE || "1");
+// Token burn range for battle outcomes (31-50% of tokens)
 export const TOKEN_BURN_MIN = parseInt(process.env.TOKEN_BURN_MIN || "31");
 export const TOKEN_BURN_MAX = parseInt(process.env.TOKEN_BURN_MAX || "50");
-export const DEATH_CHANCE = parseFloat(process.env.DEATH_CHANCE || "0.05");
+
+// Chance of agent death in battle (5%)
+export const DEATH_CHANCE = parseFloat(process.env.DEATH_CHANCE || "5");
+
+// Cooldown period after battle (4 hours)
 export const BATTLE_COOLDOWN = parseInt(process.env.BATTLE_COOLDOWN || "14400"); // 4 hours in seconds
+
+export const BATTLE_DURATION = parseInt(process.env.BATTLE_DURATION || "3600"); // 1 hour in seconds
+
+// Movement speed and cooldown
+export const MOVE_SPEED = 1; // 1 field per hour
+
 export const MOVE_COOLDOWN_MS = parseInt(
   process.env.MOVE_COOLDOWN_MS || "3600000"
 ); // 1 hour in milliseconds
-export const MOVEMENT_UNITS_PER_HOUR = parseInt(
-  process.env.MOVEMENT_UNITS_PER_HOUR || "10"
-); // 1 units per hour
-export const ALLIANCE_COOLDOWN_MS = parseInt(
-  process.env.ALLIANCE_COOLDOWN_MS || "14400000"
-); // 4 hours in milliseconds
+
+export const MAX_ADJACENT_MOVES = 8; // Can move to any of 8 neighboring fields
+
+// Terrain movement penalties
+export const MOUNTAIN_DELAY_TURNS = 2; // Stuck for 2 turns on mountains.
+
+export const RIVER_DELAY_TURNS = 1; // Stuck for 1 turn on rivers
+
+// Alliance related cooldowns
+export const BATTLE_AFTER_ALLIANCE_COOLDOWN = parseInt(
+  process.env.BATTLE_AFTER_ALLIANCE_COOLDOWN || "14400"
+); // 4 hours in seconds
+
+export const NEW_ALLIANCE_COOLDOWN = parseInt(
+  process.env.NEW_ALLIANCE_COOLDOWN || "86400"
+); // 24 hours in seconds
+
+// Ignore cooldown period (4 hours before new interaction possible)
+export const IGNORE_COOLDOWN = parseInt(process.env.IGNORE_COOLDOWN || "14400"); // 4 hours in seconds
+
+// Interaction trigger distance
+export const INTERACTION_DISTANCE = 1; // One field separation triggers interaction
 
 export const rivers = {
   type: TerrainType.Rivers,

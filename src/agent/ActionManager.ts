@@ -10,30 +10,19 @@ import {
   ALLIANCE_COOLDOWN,
 } from "@/types/program";
 import { PrismaClient } from "@prisma/client";
-import { BATTLE_RANGE } from "@/constants";
+import { INTERACTION_DISTANCE } from "@/constants";
 import { ValidationFeedback, ActionResult } from "@/types";
-
+import { ActionContext } from "@/types";
 import { MoveAction, BattleAction, AllianceAction, GameAction } from "@/types";
 
 const CURRENT_TIMESTAMP = () => new BN(Math.floor(Date.now() / 1000)); // 1 second precision
-
-export interface ActionContext {
-  gameId: string;
-  gameOnchainId: BN;
-  agentId: string;
-  agentOnchainId: number;
-}
 
 export class ActionManager {
   private readonly program: MearthProgram;
   private readonly gameOnchainId: BN;
   private readonly prisma: PrismaClient;
 
-  constructor(
-    program: MearthProgram,
-    gameOnchainId: number,
-    prisma: PrismaClient
-  ) {
+  constructor(program: MearthProgram, gameOnchainId: BN, prisma: PrismaClient) {
     this.program = program;
     this.gameOnchainId = gameOnchainId;
     this.prisma = prisma;
@@ -72,14 +61,6 @@ export class ActionManager {
     try {
       // const [gamePda] = getGamePDA(this.program.programId, this.gameOnchainId);
       // const [agentPda] = getAgentPDA(this.program.programId, gamePda, agentId);
-
-      // Add account existence check
-      const accountExists =
-        await this.program.provider.connection.getAccountInfo(agentPda);
-      if (!accountExists) {
-        logger.error(`❌ Agent account does not exist: ${agentPda.toString()}`);
-        throw new Error(`Agent account ${agentPda.toString()} does not exist`);
-      }
 
       const agentAccount = await this.program.account.agent.fetch(agentPda);
 
@@ -132,7 +113,7 @@ export class ActionManager {
         case "BATTLE":
           result = await this.handleBattle(ctx, action);
           break;
-        case "ALLIANCE":
+        case "ALLY":
           result = await this.handleAlliance(ctx, action);
           break;
         default:
@@ -178,11 +159,6 @@ export class ActionManager {
     ctx: ActionContext,
     action: MoveAction
   ): Promise<ActionResult> {
-    logger.info("🚶😭😭😭😭Processing movement request", {
-      ctx,
-      action,
-    });
-
     const currentTime = CURRENT_TIMESTAMP();
 
     logger.info("🚶 Processing movement request", {
@@ -360,7 +336,6 @@ export class ActionManager {
       logger.info("✨ Battle initiated successfully", {
         attackerId: agentId,
         defenderId: action.targetId,
-        tokensStaked: action.tokensToStake,
         battleType: this.determineBattleType(attackerAccount, defenderAccount),
         transactionHash: tx,
       });
@@ -681,19 +656,19 @@ export class ActionManager {
           Math.pow(attacker.mapTiles[0].y - defender.mapTiles[0].y, 2)
       );
 
-      if (distance > BATTLE_RANGE) {
+      if (distance > INTERACTION_DISTANCE) {
         logger.error("🎯 Battle rejected - Target out of range");
         throw new Error(
-          `Target is out of range. Maximum range is ${BATTLE_RANGE}`
+          `Target is out of range. Maximum range is ${INTERACTION_DISTANCE}`
         );
       }
 
       // Check if any involved agent is on cooldown
       const involvedAgents = [context.agentId, action.targetId];
 
-      if (action.allyId) {
-        involvedAgents.push(action.allyId);
-      }
+      // if (action.allyId) {
+      //   involvedAgents.push(action.allyId);
+      // }
 
       const activeCooldown = await this.prisma.coolDown.findFirst({
         where: {
@@ -838,6 +813,15 @@ export class ActionManager {
     logger.info("💾 Updating alliance data in database");
     const game = await this.prisma.game.findUnique({
       where: { onchainId: context.gameOnchainId },
+      include: {
+        agents: {
+          where: {
+            onchainId: {
+              in: [context.agentOnchainId, action.targetId],
+            },
+          },
+        },
+      },
     });
 
     if (!game) {
@@ -863,7 +847,7 @@ export class ActionManager {
 
     await this.prisma.alliance.create({
       data: {
-        combinedTokens: action.combinedTokens,
+        // combinedTokens: game,
         gameId: game.id,
         initiatorId: context.agentId,
         joinerId: joiner.id,

@@ -7,7 +7,7 @@ export interface Position {
   y: number;
 }
 
-export type ActionType = "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE";
+export type ActionType = "MOVE" | "BATTLE" | "ALLY" | "IGNORE";
 
 export type MearthProgram = anchor.Program<MiddleEarthAiProgram>;
 
@@ -41,29 +41,25 @@ export interface MoveAction {
   x: number;
   y: number;
   terrain?: TerrainType;
+  tweet: string;
 }
 
 export interface BattleAction {
   type: "BATTLE";
   targetId: number;
-  allyId?: number;
-  tokensToStake: number;
+  tweet: string;
 }
 
 export interface AllianceAction {
-  type: "ALLIANCE";
+  type: "ALLY";
   targetId: number;
-  allyId?: number;
-  combinedTokens?: number;
+  tweet: string;
 }
 
 export interface IgnoreAction {
   type: "IGNORE";
-  targetId?: number;
-  allyId?: number;
-  position?: Position;
-  content?: string;
-  tweet?: string;
+  targetId: number;
+  tweet: string;
 }
 
 export type GameAction =
@@ -71,3 +67,10 @@ export type GameAction =
   | BattleAction
   | AllianceAction
   | IgnoreAction;
+
+export interface ActionContext {
+  gameId: string;
+  gameOnchainId: anchor.BN;
+  agentId: string;
+  agentOnchainId: number;
+}

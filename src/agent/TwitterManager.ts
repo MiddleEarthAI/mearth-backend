@@ -79,27 +79,27 @@ class TwitterManager {
       this.requestCount++;
 
       // Fetch quotes
-      const quotes = await this.fetchTweetQuotes(tweetId);
-      for (const quote of quotes) {
-        const user = await this.fetchUserInfo(this.client, quote.author_id!);
-        interactions.push({
-          type: "quote",
-          userId: user.id,
-          username: user.username,
-          tweetId: quote.id,
-          content: quote.text,
-          timestamp: new Date(quote.created_at!),
-          userMetrics: {
-            followerCount: user.public_metrics?.followers_count || 0,
-            averageEngagement: await this.calculateAverageEngagementScore(
-              quote
-            ),
-            accountAge: 0,
-            verificationStatus: user.verified || false,
-            reputationScore: 0,
-          },
-        });
-      }
+      // const quotes = await this.fetchTweetQuotes(tweetId);
+      // for (const quote of quotes) {
+      //   const user = await this.fetchUserInfo(this.client, quote.author_id!);
+      //   interactions.push({
+      //     type: "quote",
+      //     userId: user.id,
+      //     username: user.username,
+      //     tweetId: quote.id,
+      //     content: quote.text,
+      //     timestamp: new Date(quote.created_at!),
+      //     userMetrics: {
+      //       followerCount: user.public_metrics?.followers_count || 0,
+      //       averageEngagement: await this.calculateAverageEngagementScore(
+      //         quote
+      //       ),
+      //       accountAge: 0,
+      //       verificationStatus: user.verified || false,
+      //       reputationScore: 0,
+      //     },
+      //   });
+      // }
 
       // // Check rate limiting between requests
       // if (this.shouldThrottle()) {
@@ -141,7 +141,7 @@ class TwitterManager {
     }
   }
 
-  async postTweet(content: string) {
+  async postTweet(agentId: AgentId, content: string) {
     // Check rate limiting before posting
     if (this.shouldThrottle()) {
       const backoffTime = this.calculateBackoff();
@@ -149,8 +149,14 @@ class TwitterManager {
     }
     this.requestCount++;
 
+    const agentClient = this._clients.get(agentId);
+    if (!agentClient) {
+      console.error("❌ Error: Client not found for agentId", agentId);
+      throw new Error(`Client for agent Id ${agentId} not found`);
+    }
+
     console.log("📝 Posting new tweet...");
-    return this.client.v2
+    return agentClient.v2
       .tweet(content, {})
       .then(() => {
         console.log("✅ Tweet posted successfully");

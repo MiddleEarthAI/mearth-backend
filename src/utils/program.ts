@@ -37,20 +37,12 @@ export async function getProgramWithWallet() {
 
   const privateKey = bs58.decode(privateKeyString);
   const keypair = Keypair.fromSecretKey(privateKey);
-  logger.info("🔑 Authority wallet initialized", {
-    publicKey: keypair.publicKey.toBase58(),
-  });
 
   // Set up Anchor with optimized configuration
   const wallet = new anchor.Wallet(keypair);
 
   const provider = new anchor.AnchorProvider(connection, wallet, {
     commitment: "confirmed",
-  });
-
-  logger.info("⚓ Anchor provider configured", {
-    commitment: provider.connection.commitment,
-    wallet: wallet.publicKey.toBase58(),
   });
 
   const program = new anchor.Program(

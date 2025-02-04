@@ -19,6 +19,7 @@ import CacheManager from "@/agent/CacheManager";
 import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import { HealthMonitor } from "@/agent/HealthMonitor";
+import { ActionManager } from "@/agent/ActionManager";
 
 const router = Router();
 
@@ -74,20 +75,34 @@ router.post(
       const cache = new CacheManager();
       const calculator = new InfluenceCalculator();
       const eventEmitter = new EventEmitter();
-      const engine = new DecisionEngine(prisma, eventEmitter);
+      const actionManager = new ActionManager(
+        program,
+        gameAccount.gameId,
+        prisma
+      );
+      const engine = new DecisionEngine(
+        prisma,
+        eventEmitter,
+        program,
+        actionManager
+      );
 
-      const battleResolver = new BattleResolver(gameAccount.gameId, program);
+      const battleResolver = new BattleResolver(
+        gameAccount.gameId,
+        program,
+        prisma
+      );
 
       const orchestrator = new GameOrchestrator(
         gameAccount.gameId,
-        program,
+        agents[0].agent.gameId,
+        actionManager,
         twitter,
         cache,
         calculator,
         engine,
         prisma,
         eventEmitter,
-
         battleResolver
       );
 

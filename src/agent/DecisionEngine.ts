@@ -12,7 +12,7 @@ import {
   ValidationFeedback,
 } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { ActionContext } from "./ActionManager";
+import { ActionContext } from "@/types";
 import { ActionManager } from "./ActionManager";
 
 interface RetryContext {
@@ -35,8 +35,7 @@ class DecisionEngine {
   constructor(
     private prisma: PrismaClient,
     private eventEmitter: EventEmitter,
-    private program: MearthProgram,
-    private readonly actionManager: ActionManager
+    private program: MearthProgram
   ) {
     console.log("🎮 Decision Engine initialized");
   }
@@ -44,7 +43,7 @@ class DecisionEngine {
   async processInfluenceScores(
     actionContext: ActionContext,
     scores: InfluenceScore[]
-  ): Promise<ActionSuggestion | null> {
+  ) {
     console.log(
       `🎯 Processing influence scores for agent ${actionContext.agentId}`
     );
@@ -86,6 +85,7 @@ class DecisionEngine {
       - Consensus: ${dominantSuggestion.consensus}
       - Alignment: ${alignmentScore}
       - Should Act: ${shouldAct}`);
+
     const { prompt } = await this.buildPrompt(actionContext);
 
     const response = await generateText({
@@ -99,8 +99,7 @@ class DecisionEngine {
       ],
     });
 
-    console.log("🤖 Generated AI response");
-    const action = this.extractAction(response.text);
+    const action = this.extractActionJson(response.text);
 
     if (action) {
       console.log(`✨ Emitting new action: ${action.type}`);
@@ -192,115 +191,6 @@ class DecisionEngine {
       : 0.5;
   }
 
-  private extractAction(action: string): ActionSuggestion {
-    console.log("📦 Extracting action from AI response");
-    return JSON.parse(action);
-  }
-
-  /**
-   * Handles action execution with feedback and retries
-   */
-  private async executeActionWithFeedback(
-    actionContext: ActionContext,
-    action: GameAction,
-    retryContext?: RetryContext
-  ): Promise<void> {
-    const result = await this.actionManager.executeAction(
-      actionContext,
-      action
-    );
-
-    if (!result.success && result.feedback) {
-      if (!retryContext || retryContext.currentRetry < this.MAX_RETRIES) {
-        await this.handleActionFailure(actionContext, result, retryContext);
-      } else {
-        logger.error("Max retries exceeded, giving up", {
-          actionContext,
-          action,
-          retryContext,
-        });
-      }
-    }
-  }
-
-  /**
-   * Handles failed actions by generating new decisions based on feedback
-   */
-  private async handleActionFailure(
-    actionContext: ActionContext,
-    result: ActionResult,
-    retryContext?: RetryContext
-  ): Promise<void> {
-    const currentRetry = (retryContext?.currentRetry || 0) + 1;
-
-    // Build feedback prompt
-    const feedbackPrompt = this.buildFeedbackPrompt(
-      result.feedback!,
-      actionContext
-    );
-
-    logger.info("🔄 Retrying action with feedback", {
-      attempt: currentRetry,
-      feedback: result.feedback,
-    });
-
-    const response = await generateText({
-      model: anthropic("claude-3-5-sonnet-20240620"),
-      messages: [
-        {
-          role: "user",
-          content: feedbackPrompt,
-        },
-        {
-          role: "assistant",
-          content: "Here is the JSON for the adjusted action:\n{",
-        },
-      ],
-    });
-
-    const newAction = this.parseActionJson(`{${response.text}`);
-
-    // Retry with new action
-    await this.executeActionWithFeedback(actionContext, newAction, {
-      currentRetry,
-      maxRetries: this.MAX_RETRIES,
-      failureReason: result.feedback!.error?.message || "Unknown error",
-      previousAttempt: result,
-    });
-  }
-
-  /**
-   * Builds a prompt that includes feedback about the failed action
-   */
-  private buildFeedbackPrompt(
-    feedback: ValidationFeedback,
-    actionContext: ActionContext
-  ): string {
-    const { error } = feedback;
-    if (!error) return "";
-
-    let prompt = `Your last action failed with the following feedback:
-Type: ${error.type}
-Message: ${error.message}
-Current State: ${JSON.stringify(error.context.currentState, null, 2)}
-Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
-${
-  error.context.suggestedFix
-    ? `Suggested Fix: ${error.context.suggestedFix}`
-    : ""
-}
-
-Please provide a new action that addresses this feedback. Consider:
-1. The specific error type and message
-2. The current state of the game
-3. Any suggested fixes provided
-4. Your character's traits and goals
-
-Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
-
-    return prompt;
-  }
-
   async proceedWithoutInteractions(
     actionContext: ActionContext
   ): Promise<void> {
@@ -311,8 +201,8 @@ Generate a new action that avoids the previous error while still working towards
 
     const { prompt } = await this.buildPrompt(actionContext);
 
-    logger.info("🤖 Prompt");
-    logger.info(prompt);
+    // logger.info("🤖 Prompt");
+    // logger.info(prompt);
 
     if (prompt) {
       const response = await generateText({
@@ -325,19 +215,15 @@ Generate a new action that avoids the previous error while still working towards
       });
       logger.info("🤖 Generated AI response 🔥🔥🔥");
       logger.info(response.text);
-      // append back the '{' to the json and parse it
+      // append back the '{' to the json and parse
       const action = this.parseActionJson(`{${response.text}`);
 
       console.log("🤖 Generated AI response");
       console.log(action);
 
       // Execute with feedback handling
-      await this.executeActionWithFeedback(actionContext, action);
-    } else {
-      this.eventEmitter.emit("newAction", {
-        actionContext,
-        action: { type: "IGNORE" },
-      });
+      // await this.executeActionWithFeedback(actionContext, action);
+      this.eventEmitter.emit("newAction", { actionContext, action });
     }
   }
 
@@ -647,7 +533,7 @@ IMPORTANT: When targeting another agent, you MUST use their MID (Middleearth ID)
   }
 
   // Efficiently parse the JSON response
-  private parseActionJson(response: string): GameAction {
+  private parseActionJson(response: string): GameAction | null {
     logger.info("🔍 Parsing action JSON: ", response);
     try {
       // Remove any potential preamble and get just the JSON object
@@ -656,14 +542,119 @@ IMPORTANT: When targeting another agent, you MUST use their MID (Middleearth ID)
     } catch (error) {
       console.error("Failed to parse action JSON:", error);
       // Return a default IGNORE action if parsing fails
-      return {
-        type: "IGNORE",
-        targetId: undefined,
-        position: undefined,
-        tweet: "Failed to parse action",
-      };
+      return null;
     }
   }
+
+  private extractActionJson(action: string): GameAction {
+    console.log("📦 Extracting action from AI response");
+    return JSON.parse(action);
+  }
+
+  /**
+   * Handles action execution with feedback and retries
+   */
+  // private async executeActionWithFeedback(
+  //   actionContext: ActionContext,
+  //   action: GameAction,
+  //   retryContext?: RetryContext
+  // ): Promise<void> {
+  //   const result = await this.actionManager.executeAction(
+  //     actionContext,
+  //     action
+  //   );
+
+  //   if (!result.success && result.feedback) {
+  //     if (!retryContext || retryContext.currentRetry < this.MAX_RETRIES) {
+  //       await this.handleActionFailure(actionContext, result, retryContext);
+  //     } else {
+  //       logger.error("Max retries exceeded, giving up", {
+  //         actionContext,
+  //         action,
+  //         retryContext,
+  //       });
+  //     }
+  //   }
+  // }
+
+  /**
+   * Handles failed actions by generating new decisions based on feedback
+   */
+
+  // private async handleActionFailure(
+  //   actionContext: ActionContext,
+  //   result: ActionResult,
+  //   retryContext?: RetryContext
+  // ): Promise<void> {
+  //   const currentRetry = (retryContext?.currentRetry || 0) + 1;
+
+  //   // Build feedback prompt
+  //   const feedbackPrompt = this.buildFeedbackPrompt(
+  //     result.feedback!,
+  //     actionContext
+  //   );
+
+  //   logger.info("🔄 Retrying action with feedback", {
+  //     attempt: currentRetry,
+  //     feedback: result.feedback,
+  //   });
+
+  //   const response = await generateText({
+  //     model: anthropic("claude-3-5-sonnet-20240620"),
+  //     messages: [
+  //       {
+  //         role: "user",
+  //         content: feedbackPrompt,
+  //       },
+  //       {
+  //         role: "assistant",
+  //         content: "Here is the JSON for the adjusted action:\n{",
+  //       },
+  //     ],
+  //   });
+
+  //   const newAction = this.parseActionJson(`{${response.text}`);
+
+  //   // Retry with new action
+  //   // await this.executeActionWithFeedback(actionContext, newAction, {
+  //   //   currentRetry,
+  //   //   maxRetries: this.MAX_RETRIES,
+  //   //   failureReason: result.feedback!.error?.message || "Unknown error",
+  //   //   previousAttempt: result,
+  //   // });
+  // }
+
+  /**
+   * Builds a prompt that includes feedback about the failed action
+   */
+  //   private buildFeedbackPrompt(
+  //     feedback: ValidationFeedback,
+  //     actionContext: ActionContext
+  //   ): string {
+  //     const { error } = feedback;
+  //     if (!error) return "";
+
+  //     let prompt = `Your last action failed with the following feedback:
+  // Type: ${error.type}
+  // Message: ${error.message}
+  // Current State: ${JSON.stringify(error.context.currentState, null, 2)}
+  // Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
+  // ${
+  //   error.context.suggestedFix
+  //     ? `Suggested Fix: ${error.context.suggestedFix}`
+  //     : ""
+  // }
+
+  // Please provide a new action that addresses this feedback. Consider:
+  // 1. The specific error type and message
+  // 2. The current state of the game
+  // 3. Any suggested fixes provided
+  // 4. Your character's traits and goals
+
+  // Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
+
+  //     return prompt;
+  //   }
 
   async resetAgentState() {}
 }

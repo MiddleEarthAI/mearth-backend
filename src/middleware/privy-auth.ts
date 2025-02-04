@@ -3,10 +3,10 @@ import { PrivyClient, AuthTokenClaims } from "@privy-io/server-auth";
 import { logger } from "@/utils/logger";
 
 // Initialize Privy client
-const privyClient = new PrivyClient(
-  process.env.PRIVY_APP_ID!,
-  process.env.PRIVY_APP_SECRET!
-);
+// const privyClient = new PrivyClient(
+//   process.env.PRIVY_APP_ID!,
+//   process.env.PRIVY_APP_SECRET!
+// );
 
 // Custom interface for authenticated request
 export interface AuthenticatedRequest extends Request {

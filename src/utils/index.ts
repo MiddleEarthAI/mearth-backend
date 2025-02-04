@@ -26,24 +26,6 @@ export function getAgentConfigById(id: number) {
 }
 
 /**
- * Get the Middle Earth program instance
- */
-export async function getProgram(
-  provider: AnchorProvider
-): Promise<Program<MiddleEarthAiProgram>> {
-  try {
-    const program = new Program<MiddleEarthAiProgram>(
-      mearthIdl as MiddleEarthAiProgram,
-      provider
-    );
-    return program;
-  } catch (error) {
-    logger.error("Failed to get program:", error);
-    throw error;
-  }
-}
-
-/**
  * Generates a unique game ID that fits within u16 constraints
  * Uses a combination of timestamp and random number to ensure uniqueness
  * @returns {number} A unique game ID as a number (u16 compatible)

@@ -9,7 +9,7 @@ import CacheManager from "./CacheManager";
  * 🏥 Monitors: Database, Cache, Twitter API
  */
 class HealthMonitor {
-  private readonly checkInterval = 300000; // 5 minutes
+  private readonly checkInterval = 900000; // 15 minutes
 
   constructor(
     private orchestrator: GameOrchestrator,
@@ -66,13 +66,13 @@ class HealthMonitor {
 
   private async checkTwitterAPI(): Promise<void> {
     logger.info("🐦 Checking Twitter API connection");
-    // Implement Twitter API health check
+    // TODO: Implement Twitter API health check
     logger.info("⚠️ Twitter API check not implemented");
   }
 
   private async handleHealthCheckFailure(error: Error): Promise<void> {
     logger.error("🚨 Handling health check failure", { error });
-    // Implement failure handling (notifications, recovery attempts, etc.)
+    // TODO: Implement failure handling (notifications, recovery attempts, etc.)
     logger.info("⚠️ Health check failure handling not implemented");
   }
 }

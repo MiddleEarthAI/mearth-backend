@@ -202,35 +202,6 @@ export const profiles: (AgentProfile & { onchainId: number })[] = [
   },
 ];
 
-type AgentBasicInfo = {
-  agentId: number;
-  name: string;
-  xHandle: string;
-};
-
-export const getAgentsBasicInfoById: { [key: number]: AgentBasicInfo } = {
-  1: {
-    agentId: 1,
-    name: "Purrlock Paws",
-    xHandle: "@PurrlockPawsAI",
-  },
-  2: {
-    agentId: 2,
-    name: "Scootles",
-    xHandle: "@ScootlesAI",
-  },
-  3: {
-    agentId: 3,
-    name: "Sir Gullihop",
-    xHandle: "@SirGullihopAI",
-  },
-  4: {
-    agentId: 4,
-    name: "Wanderleaf",
-    xHandle: "@WanderleafAI",
-  },
-};
-
 export const prismaUUID = () => {
   return crypto.randomUUID();
 };

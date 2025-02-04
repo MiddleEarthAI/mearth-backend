@@ -11,31 +11,10 @@ import EventEmitter from "events";
 import { BattleResolver } from "./BattleResolver";
 import { stringToUuid } from "@/utils/uuid";
 import { TweetV2 } from "twitter-api-v2";
-import { ActionContext, ActionManager } from "./ActionManager";
-import { GameAction } from "@/types";
-
-// Error types for better error handling
-enum OrchestratorErrorType {
-  INITIALIZATION = "INITIALIZATION_ERROR",
-  AGENT_PROCESSING = "AGENT_PROCESSING_ERROR",
-  TWEET_PROCESSING = "TWEET_PROCESSING_ERROR",
-  INTERACTION_PROCESSING = "INTERACTION_PROCESSING_ERROR",
-  CLEANUP = "CLEANUP_ERROR",
-  ACTION_EXECUTION = "ACTION_EXECUTION_ERROR",
-  CACHE = "CACHE_ERROR",
-  RECOVERY = "RECOVERY_ERROR",
-}
-
-class OrchestratorError extends Error {
-  constructor(
-    public type: OrchestratorErrorType,
-    message: string,
-    public metadata?: Record<string, any>
-  ) {
-    super(message);
-    this.name = "OrchestratorError";
-  }
-}
+import { ActionContext, GameAction } from "@/types";
+import { OrchestratorError, OrchestratorErrorType } from "@/utils/error";
+import { BN } from "@coral-xyz/anchor";
+import { ActionManager } from "./ActionManager";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -44,7 +23,12 @@ class OrchestratorError extends Error {
 export class GameOrchestrator {
   private readonly updateInterval = process.env.UPDATE_INTERVAL
     ? parseInt(process.env.UPDATE_INTERVAL)
-    : 60 * 60 * 1000; // 1 min for testing
+    : 3600000; // 1 hour
+
+  private readonly agentProcessingDelay = process.env.AGENT_PROCESSING_DELAY
+    ? parseInt(process.env.AGENT_PROCESSING_DELAY)
+    : 120000; // Default 2 minutes delay between agents
+
   private readonly cleanupInterval = 3600000; // 1 hour
   private isRunning: boolean = false;
   private readonly maxRetries: number = 3;
@@ -90,7 +74,7 @@ export class GameOrchestrator {
       const orchestratorError = new OrchestratorError(
         OrchestratorErrorType.INITIALIZATION,
         "Failed to start Game Orchestrator",
-        { error: error instanceof Error ? error.message : String(error) }
+        { error: String(error) }
       );
       this.handleError(orchestratorError);
       throw orchestratorError;
@@ -116,7 +100,7 @@ export class GameOrchestrator {
           logger.error("Update loop iteration failed", {
             gameId: this.currentGameOnchainId,
             retryAttempt: retries,
-            error: error instanceof Error ? error.message : String(error),
+            error: String(error),
           });
 
           if (retries >= this.maxRetries) {
@@ -137,7 +121,7 @@ export class GameOrchestrator {
     processWithRetry().catch((error) => {
       logger.error("Fatal error in update loop", {
         gameId: this.currentGameOnchainId,
-        error: error instanceof Error ? error.message : String(error),
+        error: String(error),
       });
       this.isRunning = false;
       this.eventEmitter.emit("error", error);
@@ -203,7 +187,7 @@ export class GameOrchestrator {
     process.on("unhandledRejection", (reason, promise) => {
       logger.error("Unhandled Promise Rejection", {
         gameId: this.currentGameOnchainId,
-        reason: reason instanceof Error ? reason.message : String(reason),
+        reason: String(reason),
       });
     });
   }
@@ -241,7 +225,18 @@ export class GameOrchestrator {
         actionType: data.action.type,
       });
 
-      await this.actionManager.executeAction(data.actionContext, data.action);
+      // const result = await this.actionManager.executeAction(
+      //   data.actionContext,
+      //   data.action
+      // );
+
+      // if action is successful, post a tweet
+      if (true) {
+        await this.twitter.postTweet(
+          data.actionContext.agentOnchainId.toString() as AgentId,
+          data.action.tweet
+        );
+      }
 
       logger.info("✅ Action successfully processed", {
         gameId: this.currentGameOnchainId,
@@ -255,7 +250,7 @@ export class GameOrchestrator {
         {
           agentId: data.actionContext.agentId,
           actionType: data.action.type,
-          error: error instanceof Error ? error.message : String(error),
+          error: String(error),
         }
       );
       this.handleError(orchestratorError);
@@ -379,17 +374,27 @@ export class GameOrchestrator {
       take: 1,
     });
 
-    await Promise.all(
-      agents.map((agent) =>
-        this.processAgent({
-          agentId: agent.id,
-          agentOnchainId: agent.onchainId,
-          gameId: agent.game.id,
-          gameOnchainId: agent.game.onchainId,
-        })
-      )
-    );
-    logger.info(`✅ Processed ${agents.length} agents`);
+    // Process agents sequentially with delay
+    for (const agent of agents) {
+      await this.processAgent({
+        agentId: agent.id,
+        agentOnchainId: agent.onchainId,
+        gameId: agent.game.id,
+        gameOnchainId: new BN(agent.game.onchainId),
+      });
+
+      // Add delay between processing agents
+      if (agents.indexOf(agent) < agents.length - 1) {
+        logger.info(
+          `⏳ Waiting ${this.agentProcessingDelay}ms before processing next agent`
+        );
+        await new Promise((resolve) =>
+          setTimeout(resolve, this.agentProcessingDelay)
+        );
+      }
+    }
+
+    logger.info(`✅ Processed ${agents.length} agents sequentially`);
   }
 
   private async processAgent(actionContext: ActionContext): Promise<void> {
