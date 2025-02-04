@@ -371,6 +371,21 @@ Your action must reflect your traits and advance survival goals while maintainin
           ? agentPosition.y - currentPosition.y
           : 0;
 
+        // Calculate optimal path coordinates
+        const pathCoords = [];
+        if (agentPosition) {
+          const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
+          for (let i = 1; i <= steps; i++) {
+            const stepX = Math.round(
+              currentPosition.x + (directionX * i) / steps
+            );
+            const stepY = Math.round(
+              currentPosition.y + (directionY * i) / steps
+            );
+            pathCoords.push(`(${stepX}, ${stepY})`);
+          }
+        }
+
         // Get compass direction
         const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
         const compassDirection =
@@ -428,6 +443,7 @@ Your action must reflect your traits and advance survival goals while maintainin
             ? "⚠️ CRITICAL: Within battle range!"
             : `${distance.toFixed(1)} fields away`
         })
+  Path to reach: ${pathCoords.join(" → ")}
   Health: ${a.health}/100
   Recent actions: ${[...recentBattles].join(", ")}
   ${allianceInfo}
@@ -499,12 +515,12 @@ CRITICAL BATTLE MECHANICS:
 - Ignoring has a 4-hour cooldown
 
 Strategic Tweet Examples (match your personality):
-- Aggressive: "Marching to confront @{handle} in the {terrain}. Your reign ends today! 🗡️"
-- Alliance: "Spotted @{handle} nearby. Our combined strength could reshape Middle Earth. Alliance? 🤝"
-- Defensive: "Fortifying my position against @{handle}'s approach. Allies, send aid! 🛡️"
-- Threatening: "@{handle} I see you lurking. Your treachery ends here! ⚔️"
-- Strategic: "The winds whisper of @{handle}'s weakness. Time to strike! 🎯"
-- Warning: "Beware @{handle} - they plot against us all! ⚠️"
+- Aggressive: "Spotted @{handle} in the {terrain}. Your reign ends here! Time to test your strength in battle! ⚔️"
+- Alliance: "A worthy ally in @{handle}! Let's combine our forces and dominate Middle Earth together! 🤝"
+- Defensive: "Fortifying my position at {terrain}. @{handle}, approach with caution or face the consequences! 🛡️"
+- Threatening: "The shadows whisper of @{handle}'s weakness. Your time in Middle Earth grows short! ⚔️"
+- Strategic: "Moving through {terrain} to intercept @{handle}. Victory awaits! 🎯"
+- Warning: "@{handle} spreads lies and deception! Their true nature will be revealed in battle! ⚠️"
 
 Generate a JSON response with your next action that matches your character's personality and current situation:
 {

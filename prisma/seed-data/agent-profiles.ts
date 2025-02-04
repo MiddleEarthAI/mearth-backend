@@ -48,7 +48,7 @@ const profiles: AgentProfile[] = [
     traits: [
       {
         name: "influenceDifficulty",
-        value: "hard",
+        value: 97,
         description: "Hard to influence",
       },
       { name: "trustworthiness", value: 20, description: "Not trustworthy" },
@@ -103,7 +103,7 @@ const profiles: AgentProfile[] = [
       "Driven by revenge",
     ],
     traits: [
-      { name: "influenceDifficulty", value: "medium" },
+      { name: "influenceDifficulty", value: 50, description: "Medium" },
       {
         name: "aggressiveness",
         value: 75,
@@ -195,7 +195,7 @@ const profiles: AgentProfile[] = [
       },
       {
         name: "influenceDifficulty",
-        value: "medium",
+        value: 50,
         description: "Defines how adaptable the agent is",
       },
     ],
@@ -264,7 +264,7 @@ const profiles: AgentProfile[] = [
       },
       {
         name: "influenceDifficulty",
-        value: "easy",
+        value: 10,
         description: "Defines how adaptable the agent is",
       },
     ],
