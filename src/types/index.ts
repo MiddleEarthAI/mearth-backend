@@ -40,7 +40,7 @@ export interface MoveAction {
   type: "MOVE";
   x: number;
   y: number;
-  terrain?: TerrainType;
+  terrain: { [key: string]: {} };
   tweet: string;
 }
 

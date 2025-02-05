@@ -13,13 +13,13 @@ import { InfluenceCalculator } from "./agent/InfluenceCalculator";
 import CacheManager from "./agent/CacheManager";
 import TwitterManager from "./agent/TwitterManager";
 import { DecisionEngine } from "./agent/DecisionEngine";
-import TwitterApi from "twitter-api-v2";
-import { createNextGame } from "./config/setup";
+
 import { checkDatabaseConnection } from "./utils";
 import { getProgramWithWallet } from "./utils/program";
 import { PrismaClient } from "@prisma/client";
 import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./agent/ActionManager";
+import { GameManager } from "./agent/GameManager";
 
 const app = express();
 
@@ -101,59 +101,24 @@ const PORT = process.env.PORT || 3001;
 export async function startServer() {
   await checkDatabaseConnection();
 
-  const { gameAccount, agents } = await createNextGame();
   const program = await getProgramWithWallet();
   const prisma = new PrismaClient();
+  const gameManager = new GameManager(program, prisma);
+  const { gameAccount, agents } = await gameManager.createNewGame();
 
-  const _twitterClients = new Map<AgentId, TwitterApi>();
-  agents.forEach((agent) => {
-    const appKey = process.env.TWITTER_API_KEY;
-    const appSecret = process.env.TWITTER_API_SECRET;
-
-    if (!appKey || !appSecret) {
-      throw new Error("Twitter AppKey and AppSecret are not set");
-    }
-
-    const agentId = new BN(agent.account.id).toString() as AgentId;
-
-    const accessToken = process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
-    const accessSecret = process.env[`TWITTER_ACCESS_SECRET_${agentId}`];
-
-    if (!accessToken || !accessSecret) {
-      throw new Error(
-        `Twitter Access Token and Access Secret are not set env key: ${
-          process.env[`TWITTER_ACCESS_TOKEN_${agentId}`]
-        } ${process.env[`TWITTER_ACCESS_SECRET_${agentId}`]}`
-      );
-    }
-    _twitterClients.set(
-      agentId,
-      new TwitterApi({
-        appKey,
-        appSecret,
-        accessSecret,
-        accessToken,
-      })
-    );
-  });
-
-  const twitter = new TwitterManager(_twitterClients);
+  const twitter = new TwitterManager(agents);
   const cache = new CacheManager();
   const calculator = new InfluenceCalculator();
   const eventEmitter = new EventEmitter();
 
   const battleResolver = new BattleResolver(
     gameAccount.gameId,
+    agents[0].agent.gameId,
     program,
     prisma
   );
   const actionManager = new ActionManager(program, gameAccount.gameId, prisma);
-  const engine = new DecisionEngine(
-    prisma,
-    eventEmitter,
-    program,
-    actionManager
-  );
+  const engine = new DecisionEngine(prisma, eventEmitter, program);
 
   const orchestrator = new GameOrchestrator(
     gameAccount.gameId,
@@ -218,8 +183,4 @@ export async function startServer() {
     process.exit(1);
   }
 }
-
-// Start server if this file is run directly
-if (require.main === module) {
-  startServer();
-}
+startServer();

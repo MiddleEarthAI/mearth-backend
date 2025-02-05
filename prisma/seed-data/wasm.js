@@ -142,7 +142,8 @@ exports.Prisma.AgentProfileScalarFieldEnum = {
   lore: 'lore',
   characteristics: 'characteristics',
   knowledge: 'knowledge',
-  traits: 'traits'
+  traits: 'traits',
+  postExamples: 'postExamples'
 };
 
 exports.Prisma.AgentScalarFieldEnum = {
@@ -153,7 +154,16 @@ exports.Prisma.AgentScalarFieldEnum = {
   gameId: 'gameId',
   isAlive: 'isAlive',
   profileId: 'profileId',
-  deathTimestamp: 'deathTimestamp'
+  deathTimestamp: 'deathTimestamp',
+  mapTileId: 'mapTileId'
+};
+
+exports.Prisma.MapTileScalarFieldEnum = {
+  id: 'id',
+  x: 'x',
+  y: 'y',
+  terrainType: 'terrainType',
+  agentId: 'agentId'
 };
 
 exports.Prisma.TweetScalarFieldEnum = {
@@ -201,14 +211,6 @@ exports.Prisma.InteractionScalarFieldEnum = {
   userMetrics: 'userMetrics'
 };
 
-exports.Prisma.MapTileScalarFieldEnum = {
-  id: 'id',
-  x: 'x',
-  y: 'y',
-  terrainType: 'terrainType',
-  occupiedBy: 'occupiedBy'
-};
-
 exports.Prisma.CoolDownScalarFieldEnum = {
   id: 'id',
   type: 'type',
@@ -225,15 +227,6 @@ exports.Prisma.UserScalarFieldEnum = {
   walletAddress: 'walletAddress',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-};
-
-exports.Prisma.AgentHistoryScalarFieldEnum = {
-  id: 'id',
-  agentId: 'agentId',
-  type: 'type',
-  details: 'details',
-  timestamp: 'timestamp',
-  targetAgentId: 'targetAgentId'
 };
 
 exports.Prisma.SortOrder = {
@@ -260,6 +253,12 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.TerrainType = exports.$Enums.TerrainType = {
+  Plain: 'Plain',
+  Mountain: 'Mountain',
+  River: 'River'
+};
+
 exports.AllianceStatus = exports.$Enums.AllianceStatus = {
   Active: 'Active',
   Pending: 'Pending',
@@ -284,12 +283,6 @@ exports.InteractionType = exports.$Enums.InteractionType = {
   Mention: 'Mention'
 };
 
-exports.TerrainType = exports.$Enums.TerrainType = {
-  Plain: 'Plain',
-  Mountain: 'Mountain',
-  River: 'River'
-};
-
 exports.CooldownType = exports.$Enums.CooldownType = {
   Alliance: 'Alliance',
   Battle: 'Battle',
@@ -308,14 +301,13 @@ exports.Prisma.ModelName = {
   Game: 'Game',
   AgentProfile: 'AgentProfile',
   Agent: 'Agent',
+  MapTile: 'MapTile',
   Tweet: 'Tweet',
   Alliance: 'Alliance',
   Battle: 'Battle',
   Interaction: 'Interaction',
-  MapTile: 'MapTile',
   CoolDown: 'CoolDown',
-  User: 'User',
-  AgentHistory: 'AgentHistory'
+  User: 'User'
 };
 
 /**

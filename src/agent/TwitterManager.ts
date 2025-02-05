@@ -1,6 +1,7 @@
 import { logger } from "@/utils/logger";
 import { TweetData, TwitterInteraction } from "@/types/twitter";
 import { TwitterApi, UserV2 } from "twitter-api-v2";
+import { twitterConfig } from "@/config/env";
 
 export type AgentId = "1" | "2" | "3" | "4";
 
@@ -14,18 +15,51 @@ class TwitterManager {
   private requestCount: number = 0;
   private client: TwitterApi;
 
-  constructor(_clients: Map<AgentId, TwitterApi>) {
+  /**
+   * Initializes Twitter Manager with API clients for each agent
+   * @param agents Array of agent accounts
+   * @param twitterConfig Twitter API configuration containing keys and tokens
+   * @throws Error if API credentials are missing or invalid
+   */
+  constructor(agents: Array<{ account: { id: number } }>) {
     console.log("🚀 Initializing Twitter Manager...");
-    this._clients = _clients;
-    if (
-      !_clients.has("1") ||
-      !_clients.has("2") ||
-      !_clients.has("3") ||
-      !_clients.has("4")
-    ) {
-      console.error("❌ Error: Missing required client");
-      throw new Error("Client for agent Id not found");
+    this._clients = new Map();
+
+    // Initialize Twitter clients for each agent
+    for (const agent of agents) {
+      const agentId = agent.account.id.toString() as AgentId;
+      const agentConfig = twitterConfig.agents[agentId];
+
+      if (
+        !twitterConfig.apiKey ||
+        !twitterConfig.apiSecret ||
+        !agentConfig?.accessToken ||
+        !agentConfig?.accessSecret
+      ) {
+        throw new Error(`Missing Twitter credentials for agent ${agentId}`);
+      }
+
+      this._clients.set(
+        agentId,
+        new TwitterApi({
+          appKey: twitterConfig.apiKey,
+          appSecret: twitterConfig.apiSecret,
+          accessToken: agentConfig.accessToken,
+          accessSecret: agentConfig.accessSecret,
+        })
+      );
     }
+
+    // Validate all required clients exist
+    if (
+      !this._clients.has("1") ||
+      !this._clients.has("2") ||
+      !this._clients.has("3") ||
+      !this._clients.has("4")
+    ) {
+      throw new Error("Missing required Twitter clients");
+    }
+
     this.client = this._clients.get("1")!;
     console.log("✅ Twitter Manager initialized successfully");
   }

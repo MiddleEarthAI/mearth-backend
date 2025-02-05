@@ -29,6 +29,11 @@ export type AgentProfile = $Result.DefaultSelection<Prisma.$AgentProfilePayload>
  */
 export type Agent = $Result.DefaultSelection<Prisma.$AgentPayload>
 /**
+ * Model MapTile
+ * 
+ */
+export type MapTile = $Result.DefaultSelection<Prisma.$MapTilePayload>
+/**
  * Model Tweet
  * 
  */
@@ -49,11 +54,6 @@ export type Battle = $Result.DefaultSelection<Prisma.$BattlePayload>
  */
 export type Interaction = $Result.DefaultSelection<Prisma.$InteractionPayload>
 /**
- * Model MapTile
- * 
- */
-export type MapTile = $Result.DefaultSelection<Prisma.$MapTilePayload>
-/**
  * Model CoolDown
  * 
  */
@@ -63,11 +63,6 @@ export type CoolDown = $Result.DefaultSelection<Prisma.$CoolDownPayload>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
-/**
- * Model AgentHistory
- * 
- */
-export type AgentHistory = $Result.DefaultSelection<Prisma.$AgentHistoryPayload>
 
 /**
  * Enums
@@ -323,6 +318,16 @@ export class PrismaClient<
   get agent(): Prisma.AgentDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.mapTile`: Exposes CRUD operations for the **MapTile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MapTiles
+    * const mapTiles = await prisma.mapTile.findMany()
+    * ```
+    */
+  get mapTile(): Prisma.MapTileDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.tweet`: Exposes CRUD operations for the **Tweet** model.
     * Example usage:
     * ```ts
@@ -363,16 +368,6 @@ export class PrismaClient<
   get interaction(): Prisma.InteractionDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.mapTile`: Exposes CRUD operations for the **MapTile** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more MapTiles
-    * const mapTiles = await prisma.mapTile.findMany()
-    * ```
-    */
-  get mapTile(): Prisma.MapTileDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.coolDown`: Exposes CRUD operations for the **CoolDown** model.
     * Example usage:
     * ```ts
@@ -391,16 +386,6 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.agentHistory`: Exposes CRUD operations for the **AgentHistory** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more AgentHistories
-    * const agentHistories = await prisma.agentHistory.findMany()
-    * ```
-    */
-  get agentHistory(): Prisma.AgentHistoryDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -844,14 +829,13 @@ export namespace Prisma {
     Game: 'Game',
     AgentProfile: 'AgentProfile',
     Agent: 'Agent',
+    MapTile: 'MapTile',
     Tweet: 'Tweet',
     Alliance: 'Alliance',
     Battle: 'Battle',
     Interaction: 'Interaction',
-    MapTile: 'MapTile',
     CoolDown: 'CoolDown',
-    User: 'User',
-    AgentHistory: 'AgentHistory'
+    User: 'User'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -867,7 +851,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "game" | "agentProfile" | "agent" | "tweet" | "alliance" | "battle" | "interaction" | "mapTile" | "coolDown" | "user" | "agentHistory"
+      modelProps: "game" | "agentProfile" | "agent" | "mapTile" | "tweet" | "alliance" | "battle" | "interaction" | "coolDown" | "user"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1090,6 +1074,80 @@ export namespace Prisma {
           count: {
             args: Prisma.AgentCountArgs<ExtArgs>
             result: $Utils.Optional<AgentCountAggregateOutputType> | number
+          }
+        }
+      }
+      MapTile: {
+        payload: Prisma.$MapTilePayload<ExtArgs>
+        fields: Prisma.MapTileFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MapTileFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MapTileFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
+          }
+          findFirst: {
+            args: Prisma.MapTileFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MapTileFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
+          }
+          findMany: {
+            args: Prisma.MapTileFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
+          }
+          create: {
+            args: Prisma.MapTileCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
+          }
+          createMany: {
+            args: Prisma.MapTileCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MapTileCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
+          }
+          delete: {
+            args: Prisma.MapTileDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
+          }
+          update: {
+            args: Prisma.MapTileUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
+          }
+          deleteMany: {
+            args: Prisma.MapTileDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MapTileUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MapTileUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
+          }
+          upsert: {
+            args: Prisma.MapTileUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
+          }
+          aggregate: {
+            args: Prisma.MapTileAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMapTile>
+          }
+          groupBy: {
+            args: Prisma.MapTileGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MapTileGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MapTileCountArgs<ExtArgs>
+            result: $Utils.Optional<MapTileCountAggregateOutputType> | number
           }
         }
       }
@@ -1389,80 +1447,6 @@ export namespace Prisma {
           }
         }
       }
-      MapTile: {
-        payload: Prisma.$MapTilePayload<ExtArgs>
-        fields: Prisma.MapTileFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.MapTileFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.MapTileFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
-          }
-          findFirst: {
-            args: Prisma.MapTileFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.MapTileFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
-          }
-          findMany: {
-            args: Prisma.MapTileFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
-          }
-          create: {
-            args: Prisma.MapTileCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
-          }
-          createMany: {
-            args: Prisma.MapTileCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.MapTileCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
-          }
-          delete: {
-            args: Prisma.MapTileDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
-          }
-          update: {
-            args: Prisma.MapTileUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
-          }
-          deleteMany: {
-            args: Prisma.MapTileDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.MapTileUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.MapTileUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>[]
-          }
-          upsert: {
-            args: Prisma.MapTileUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$MapTilePayload>
-          }
-          aggregate: {
-            args: Prisma.MapTileAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateMapTile>
-          }
-          groupBy: {
-            args: Prisma.MapTileGroupByArgs<ExtArgs>
-            result: $Utils.Optional<MapTileGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.MapTileCountArgs<ExtArgs>
-            result: $Utils.Optional<MapTileCountAggregateOutputType> | number
-          }
-        }
-      }
       CoolDown: {
         payload: Prisma.$CoolDownPayload<ExtArgs>
         fields: Prisma.CoolDownFieldRefs
@@ -1611,80 +1595,6 @@ export namespace Prisma {
           }
         }
       }
-      AgentHistory: {
-        payload: Prisma.$AgentHistoryPayload<ExtArgs>
-        fields: Prisma.AgentHistoryFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.AgentHistoryFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.AgentHistoryFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
-          }
-          findFirst: {
-            args: Prisma.AgentHistoryFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.AgentHistoryFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
-          }
-          findMany: {
-            args: Prisma.AgentHistoryFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>[]
-          }
-          create: {
-            args: Prisma.AgentHistoryCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
-          }
-          createMany: {
-            args: Prisma.AgentHistoryCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.AgentHistoryCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>[]
-          }
-          delete: {
-            args: Prisma.AgentHistoryDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
-          }
-          update: {
-            args: Prisma.AgentHistoryUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
-          }
-          deleteMany: {
-            args: Prisma.AgentHistoryDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.AgentHistoryUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.AgentHistoryUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>[]
-          }
-          upsert: {
-            args: Prisma.AgentHistoryUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$AgentHistoryPayload>
-          }
-          aggregate: {
-            args: Prisma.AgentHistoryAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateAgentHistory>
-          }
-          groupBy: {
-            args: Prisma.AgentHistoryGroupByArgs<ExtArgs>
-            result: $Utils.Optional<AgentHistoryGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.AgentHistoryCountArgs<ExtArgs>
-            result: $Utils.Optional<AgentHistoryCountAggregateOutputType> | number
-          }
-        }
-      }
     }
   } & {
     other: {
@@ -1772,14 +1682,13 @@ export namespace Prisma {
     game?: GameOmit
     agentProfile?: AgentProfileOmit
     agent?: AgentOmit
+    mapTile?: MapTileOmit
     tweet?: TweetOmit
     alliance?: AllianceOmit
     battle?: BattleOmit
     interaction?: InteractionOmit
-    mapTile?: MapTileOmit
     coolDown?: CoolDownOmit
     user?: UserOmit
-    agentHistory?: AgentHistoryOmit
   }
 
   /* Types for Logging */
@@ -1972,9 +1881,6 @@ export namespace Prisma {
     coolDown: number
     initiatedAlliances: number
     joinedAlliances: number
-    mapTiles: number
-    history: number
-    historyAsTarget: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1987,9 +1893,6 @@ export namespace Prisma {
     coolDown?: boolean | AgentCountOutputTypeCountCoolDownArgs
     initiatedAlliances?: boolean | AgentCountOutputTypeCountInitiatedAlliancesArgs
     joinedAlliances?: boolean | AgentCountOutputTypeCountJoinedAlliancesArgs
-    mapTiles?: boolean | AgentCountOutputTypeCountMapTilesArgs
-    history?: boolean | AgentCountOutputTypeCountHistoryArgs
-    historyAsTarget?: boolean | AgentCountOutputTypeCountHistoryAsTargetArgs
   }
 
   // Custom InputTypes
@@ -2064,27 +1967,6 @@ export namespace Prisma {
    */
   export type AgentCountOutputTypeCountJoinedAlliancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AllianceWhereInput
-  }
-
-  /**
-   * AgentCountOutputType without action
-   */
-  export type AgentCountOutputTypeCountMapTilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MapTileWhereInput
-  }
-
-  /**
-   * AgentCountOutputType without action
-   */
-  export type AgentCountOutputTypeCountHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AgentHistoryWhereInput
-  }
-
-  /**
-   * AgentCountOutputType without action
-   */
-  export type AgentCountOutputTypeCountHistoryAsTargetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AgentHistoryWhereInput
   }
 
 
@@ -3451,6 +3333,7 @@ export namespace Prisma {
     characteristics: number
     knowledge: number
     traits: number
+    postExamples: number
     _all: number
   }
 
@@ -3492,6 +3375,7 @@ export namespace Prisma {
     characteristics?: true
     knowledge?: true
     traits?: true
+    postExamples?: true
     _all?: true
   }
 
@@ -3592,6 +3476,7 @@ export namespace Prisma {
     characteristics: string[]
     knowledge: string[]
     traits: JsonValue
+    postExamples: string[]
     _count: AgentProfileCountAggregateOutputType | null
     _avg: AgentProfileAvgAggregateOutputType | null
     _sum: AgentProfileSumAggregateOutputType | null
@@ -3624,6 +3509,7 @@ export namespace Prisma {
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
+    postExamples?: boolean
     agents?: boolean | AgentProfile$agentsArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agentProfile"]>
@@ -3639,6 +3525,7 @@ export namespace Prisma {
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
+    postExamples?: boolean
   }, ExtArgs["result"]["agentProfile"]>
 
   export type AgentProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3652,6 +3539,7 @@ export namespace Prisma {
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
+    postExamples?: boolean
   }, ExtArgs["result"]["agentProfile"]>
 
   export type AgentProfileSelectScalar = {
@@ -3665,9 +3553,10 @@ export namespace Prisma {
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
+    postExamples?: boolean
   }
 
-  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "followers" | "bio" | "lore" | "characteristics" | "knowledge" | "traits", ExtArgs["result"]["agentProfile"]>
+  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "followers" | "bio" | "lore" | "characteristics" | "knowledge" | "traits" | "postExamples", ExtArgs["result"]["agentProfile"]>
   export type AgentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | AgentProfile$agentsArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -3691,6 +3580,7 @@ export namespace Prisma {
       characteristics: string[]
       knowledge: string[]
       traits: Prisma.JsonValue
+      postExamples: string[]
     }, ExtArgs["result"]["agentProfile"]>
     composites: {}
   }
@@ -4125,6 +4015,7 @@ export namespace Prisma {
     readonly characteristics: FieldRef<"AgentProfile", 'String[]'>
     readonly knowledge: FieldRef<"AgentProfile", 'String[]'>
     readonly traits: FieldRef<"AgentProfile", 'Json'>
+    readonly postExamples: FieldRef<"AgentProfile", 'String[]'>
   }
     
 
@@ -4574,6 +4465,7 @@ export namespace Prisma {
     isAlive: boolean | null
     profileId: string | null
     deathTimestamp: Date | null
+    mapTileId: string | null
   }
 
   export type AgentMaxAggregateOutputType = {
@@ -4585,6 +4477,7 @@ export namespace Prisma {
     isAlive: boolean | null
     profileId: string | null
     deathTimestamp: Date | null
+    mapTileId: string | null
   }
 
   export type AgentCountAggregateOutputType = {
@@ -4596,6 +4489,7 @@ export namespace Prisma {
     isAlive: number
     profileId: number
     deathTimestamp: number
+    mapTileId: number
     _all: number
   }
 
@@ -4619,6 +4513,7 @@ export namespace Prisma {
     isAlive?: true
     profileId?: true
     deathTimestamp?: true
+    mapTileId?: true
   }
 
   export type AgentMaxAggregateInputType = {
@@ -4630,6 +4525,7 @@ export namespace Prisma {
     isAlive?: true
     profileId?: true
     deathTimestamp?: true
+    mapTileId?: true
   }
 
   export type AgentCountAggregateInputType = {
@@ -4641,6 +4537,7 @@ export namespace Prisma {
     isAlive?: true
     profileId?: true
     deathTimestamp?: true
+    mapTileId?: true
     _all?: true
   }
 
@@ -4739,6 +4636,7 @@ export namespace Prisma {
     isAlive: boolean
     profileId: string
     deathTimestamp: Date | null
+    mapTileId: string
     _count: AgentCountAggregateOutputType | null
     _avg: AgentAvgAggregateOutputType | null
     _sum: AgentSumAggregateOutputType | null
@@ -4769,6 +4667,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId?: boolean
     deathTimestamp?: boolean
+    mapTileId?: boolean
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
     battlesAsAttacker?: boolean | Agent$battlesAsAttackerArgs<ExtArgs>
@@ -4779,10 +4678,8 @@ export namespace Prisma {
     coolDown?: boolean | Agent$coolDownArgs<ExtArgs>
     initiatedAlliances?: boolean | Agent$initiatedAlliancesArgs<ExtArgs>
     joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
-    mapTiles?: boolean | Agent$mapTilesArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
-    history?: boolean | Agent$historyArgs<ExtArgs>
-    historyAsTarget?: boolean | Agent$historyAsTargetArgs<ExtArgs>
+    mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -4795,8 +4692,10 @@ export namespace Prisma {
     isAlive?: boolean
     profileId?: boolean
     deathTimestamp?: boolean
+    mapTileId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4808,8 +4707,10 @@ export namespace Prisma {
     isAlive?: boolean
     profileId?: boolean
     deathTimestamp?: boolean
+    mapTileId?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
   export type AgentSelectScalar = {
@@ -4821,9 +4722,10 @@ export namespace Prisma {
     isAlive?: boolean
     profileId?: boolean
     deathTimestamp?: boolean
+    mapTileId?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "health" | "gameId" | "isAlive" | "profileId" | "deathTimestamp", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "health" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
@@ -4835,19 +4737,19 @@ export namespace Prisma {
     coolDown?: boolean | Agent$coolDownArgs<ExtArgs>
     initiatedAlliances?: boolean | Agent$initiatedAlliancesArgs<ExtArgs>
     joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
-    mapTiles?: boolean | Agent$mapTilesArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
-    history?: boolean | Agent$historyArgs<ExtArgs>
-    historyAsTarget?: boolean | Agent$historyAsTargetArgs<ExtArgs>
+    mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
   }
   export type AgentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
+    mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
   }
 
   export type $AgentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4863,10 +4765,8 @@ export namespace Prisma {
       coolDown: Prisma.$CoolDownPayload<ExtArgs>[]
       initiatedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
       joinedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
-      mapTiles: Prisma.$MapTilePayload<ExtArgs>[]
       profile: Prisma.$AgentProfilePayload<ExtArgs>
-      history: Prisma.$AgentHistoryPayload<ExtArgs>[]
-      historyAsTarget: Prisma.$AgentHistoryPayload<ExtArgs>[]
+      mapTile: Prisma.$MapTilePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4877,6 +4777,7 @@ export namespace Prisma {
       isAlive: boolean
       profileId: string
       deathTimestamp: Date | null
+      mapTileId: string
     }, ExtArgs["result"]["agent"]>
     composites: {}
   }
@@ -5281,10 +5182,8 @@ export namespace Prisma {
     coolDown<T extends Agent$coolDownArgs<ExtArgs> = {}>(args?: Subset<T, Agent$coolDownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     initiatedAlliances<T extends Agent$initiatedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$initiatedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     joinedAlliances<T extends Agent$joinedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$joinedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    mapTiles<T extends Agent$mapTilesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$mapTilesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     profile<T extends AgentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfileDefaultArgs<ExtArgs>>): Prisma__AgentProfileClient<$Result.GetResult<Prisma.$AgentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    history<T extends Agent$historyArgs<ExtArgs> = {}>(args?: Subset<T, Agent$historyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
-    historyAsTarget<T extends Agent$historyAsTargetArgs<ExtArgs> = {}>(args?: Subset<T, Agent$historyAsTargetArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    mapTile<T extends MapTileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MapTileDefaultArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5322,6 +5221,7 @@ export namespace Prisma {
     readonly isAlive: FieldRef<"Agent", 'Boolean'>
     readonly profileId: FieldRef<"Agent", 'String'>
     readonly deathTimestamp: FieldRef<"Agent", 'DateTime'>
+    readonly mapTileId: FieldRef<"Agent", 'String'>
   }
     
 
@@ -5922,78 +5822,6 @@ export namespace Prisma {
   }
 
   /**
-   * Agent.mapTiles
-   */
-  export type Agent$mapTilesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    where?: MapTileWhereInput
-    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
-    cursor?: MapTileWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
-  }
-
-  /**
-   * Agent.history
-   */
-  export type Agent$historyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    where?: AgentHistoryWhereInput
-    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
-    cursor?: AgentHistoryWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
-  }
-
-  /**
-   * Agent.historyAsTarget
-   */
-  export type Agent$historyAsTargetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    where?: AgentHistoryWhereInput
-    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
-    cursor?: AgentHistoryWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
-  }
-
-  /**
    * Agent without action
    */
   export type AgentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6009,6 +5837,1095 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: AgentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MapTile
+   */
+
+  export type AggregateMapTile = {
+    _count: MapTileCountAggregateOutputType | null
+    _avg: MapTileAvgAggregateOutputType | null
+    _sum: MapTileSumAggregateOutputType | null
+    _min: MapTileMinAggregateOutputType | null
+    _max: MapTileMaxAggregateOutputType | null
+  }
+
+  export type MapTileAvgAggregateOutputType = {
+    x: number | null
+    y: number | null
+  }
+
+  export type MapTileSumAggregateOutputType = {
+    x: number | null
+    y: number | null
+  }
+
+  export type MapTileMinAggregateOutputType = {
+    id: string | null
+    x: number | null
+    y: number | null
+    terrainType: $Enums.TerrainType | null
+    agentId: string | null
+  }
+
+  export type MapTileMaxAggregateOutputType = {
+    id: string | null
+    x: number | null
+    y: number | null
+    terrainType: $Enums.TerrainType | null
+    agentId: string | null
+  }
+
+  export type MapTileCountAggregateOutputType = {
+    id: number
+    x: number
+    y: number
+    terrainType: number
+    agentId: number
+    _all: number
+  }
+
+
+  export type MapTileAvgAggregateInputType = {
+    x?: true
+    y?: true
+  }
+
+  export type MapTileSumAggregateInputType = {
+    x?: true
+    y?: true
+  }
+
+  export type MapTileMinAggregateInputType = {
+    id?: true
+    x?: true
+    y?: true
+    terrainType?: true
+    agentId?: true
+  }
+
+  export type MapTileMaxAggregateInputType = {
+    id?: true
+    x?: true
+    y?: true
+    terrainType?: true
+    agentId?: true
+  }
+
+  export type MapTileCountAggregateInputType = {
+    id?: true
+    x?: true
+    y?: true
+    terrainType?: true
+    agentId?: true
+    _all?: true
+  }
+
+  export type MapTileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapTile to aggregate.
+     */
+    where?: MapTileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapTiles to fetch.
+     */
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MapTileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapTiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapTiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MapTiles
+    **/
+    _count?: true | MapTileCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MapTileAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MapTileSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MapTileMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MapTileMaxAggregateInputType
+  }
+
+  export type GetMapTileAggregateType<T extends MapTileAggregateArgs> = {
+        [P in keyof T & keyof AggregateMapTile]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMapTile[P]>
+      : GetScalarType<T[P], AggregateMapTile[P]>
+  }
+
+
+
+
+  export type MapTileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MapTileWhereInput
+    orderBy?: MapTileOrderByWithAggregationInput | MapTileOrderByWithAggregationInput[]
+    by: MapTileScalarFieldEnum[] | MapTileScalarFieldEnum
+    having?: MapTileScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MapTileCountAggregateInputType | true
+    _avg?: MapTileAvgAggregateInputType
+    _sum?: MapTileSumAggregateInputType
+    _min?: MapTileMinAggregateInputType
+    _max?: MapTileMaxAggregateInputType
+  }
+
+  export type MapTileGroupByOutputType = {
+    id: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agentId: string | null
+    _count: MapTileCountAggregateOutputType | null
+    _avg: MapTileAvgAggregateOutputType | null
+    _sum: MapTileSumAggregateOutputType | null
+    _min: MapTileMinAggregateOutputType | null
+    _max: MapTileMaxAggregateOutputType | null
+  }
+
+  type GetMapTileGroupByPayload<T extends MapTileGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MapTileGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MapTileGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MapTileGroupByOutputType[P]>
+            : GetScalarType<T[P], MapTileGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MapTileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    agentId?: boolean
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
+  }, ExtArgs["result"]["mapTile"]>
+
+  export type MapTileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    agentId?: boolean
+  }, ExtArgs["result"]["mapTile"]>
+
+  export type MapTileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    agentId?: boolean
+  }, ExtArgs["result"]["mapTile"]>
+
+  export type MapTileSelectScalar = {
+    id?: boolean
+    x?: boolean
+    y?: boolean
+    terrainType?: boolean
+    agentId?: boolean
+  }
+
+  export type MapTileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "x" | "y" | "terrainType" | "agentId", ExtArgs["result"]["mapTile"]>
+  export type MapTileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | MapTile$agentArgs<ExtArgs>
+  }
+  export type MapTileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type MapTileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $MapTilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MapTile"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      x: number
+      y: number
+      terrainType: $Enums.TerrainType
+      agentId: string | null
+    }, ExtArgs["result"]["mapTile"]>
+    composites: {}
+  }
+
+  type MapTileGetPayload<S extends boolean | null | undefined | MapTileDefaultArgs> = $Result.GetResult<Prisma.$MapTilePayload, S>
+
+  type MapTileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MapTileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MapTileCountAggregateInputType | true
+    }
+
+  export interface MapTileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MapTile'], meta: { name: 'MapTile' } }
+    /**
+     * Find zero or one MapTile that matches the filter.
+     * @param {MapTileFindUniqueArgs} args - Arguments to find a MapTile
+     * @example
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MapTileFindUniqueArgs>(args: SelectSubset<T, MapTileFindUniqueArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find one MapTile that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MapTileFindUniqueOrThrowArgs} args - Arguments to find a MapTile
+     * @example
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MapTileFindUniqueOrThrowArgs>(args: SelectSubset<T, MapTileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first MapTile that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileFindFirstArgs} args - Arguments to find a MapTile
+     * @example
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MapTileFindFirstArgs>(args?: SelectSubset<T, MapTileFindFirstArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first MapTile that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileFindFirstOrThrowArgs} args - Arguments to find a MapTile
+     * @example
+     * // Get one MapTile
+     * const mapTile = await prisma.mapTile.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MapTileFindFirstOrThrowArgs>(args?: SelectSubset<T, MapTileFindFirstOrThrowArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find zero or more MapTiles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MapTiles
+     * const mapTiles = await prisma.mapTile.findMany()
+     * 
+     * // Get first 10 MapTiles
+     * const mapTiles = await prisma.mapTile.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mapTileWithIdOnly = await prisma.mapTile.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MapTileFindManyArgs>(args?: SelectSubset<T, MapTileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findMany", ClientOptions>>
+
+    /**
+     * Create a MapTile.
+     * @param {MapTileCreateArgs} args - Arguments to create a MapTile.
+     * @example
+     * // Create one MapTile
+     * const MapTile = await prisma.mapTile.create({
+     *   data: {
+     *     // ... data to create a MapTile
+     *   }
+     * })
+     * 
+     */
+    create<T extends MapTileCreateArgs>(args: SelectSubset<T, MapTileCreateArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Create many MapTiles.
+     * @param {MapTileCreateManyArgs} args - Arguments to create many MapTiles.
+     * @example
+     * // Create many MapTiles
+     * const mapTile = await prisma.mapTile.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MapTileCreateManyArgs>(args?: SelectSubset<T, MapTileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MapTiles and returns the data saved in the database.
+     * @param {MapTileCreateManyAndReturnArgs} args - Arguments to create many MapTiles.
+     * @example
+     * // Create many MapTiles
+     * const mapTile = await prisma.mapTile.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MapTiles and only return the `id`
+     * const mapTileWithIdOnly = await prisma.mapTile.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MapTileCreateManyAndReturnArgs>(args?: SelectSubset<T, MapTileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+
+    /**
+     * Delete a MapTile.
+     * @param {MapTileDeleteArgs} args - Arguments to delete one MapTile.
+     * @example
+     * // Delete one MapTile
+     * const MapTile = await prisma.mapTile.delete({
+     *   where: {
+     *     // ... filter to delete one MapTile
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MapTileDeleteArgs>(args: SelectSubset<T, MapTileDeleteArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Update one MapTile.
+     * @param {MapTileUpdateArgs} args - Arguments to update one MapTile.
+     * @example
+     * // Update one MapTile
+     * const mapTile = await prisma.mapTile.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MapTileUpdateArgs>(args: SelectSubset<T, MapTileUpdateArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Delete zero or more MapTiles.
+     * @param {MapTileDeleteManyArgs} args - Arguments to filter MapTiles to delete.
+     * @example
+     * // Delete a few MapTiles
+     * const { count } = await prisma.mapTile.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MapTileDeleteManyArgs>(args?: SelectSubset<T, MapTileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapTiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MapTiles
+     * const mapTile = await prisma.mapTile.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MapTileUpdateManyArgs>(args: SelectSubset<T, MapTileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapTiles and returns the data updated in the database.
+     * @param {MapTileUpdateManyAndReturnArgs} args - Arguments to update many MapTiles.
+     * @example
+     * // Update many MapTiles
+     * const mapTile = await prisma.mapTile.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MapTiles and only return the `id`
+     * const mapTileWithIdOnly = await prisma.mapTile.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MapTileUpdateManyAndReturnArgs>(args: SelectSubset<T, MapTileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+
+    /**
+     * Create or update one MapTile.
+     * @param {MapTileUpsertArgs} args - Arguments to update or create a MapTile.
+     * @example
+     * // Update or create a MapTile
+     * const mapTile = await prisma.mapTile.upsert({
+     *   create: {
+     *     // ... data to create a MapTile
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MapTile we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MapTileUpsertArgs>(args: SelectSubset<T, MapTileUpsertArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+
+
+    /**
+     * Count the number of MapTiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileCountArgs} args - Arguments to filter MapTiles to count.
+     * @example
+     * // Count the number of MapTiles
+     * const count = await prisma.mapTile.count({
+     *   where: {
+     *     // ... the filter for the MapTiles we want to count
+     *   }
+     * })
+    **/
+    count<T extends MapTileCountArgs>(
+      args?: Subset<T, MapTileCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MapTileCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MapTile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MapTileAggregateArgs>(args: Subset<T, MapTileAggregateArgs>): Prisma.PrismaPromise<GetMapTileAggregateType<T>>
+
+    /**
+     * Group by MapTile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapTileGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MapTileGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MapTileGroupByArgs['orderBy'] }
+        : { orderBy?: MapTileGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MapTileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMapTileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MapTile model
+   */
+  readonly fields: MapTileFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MapTile.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MapTileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends MapTile$agentArgs<ExtArgs> = {}>(args?: Subset<T, MapTile$agentArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MapTile model
+   */ 
+  interface MapTileFieldRefs {
+    readonly id: FieldRef<"MapTile", 'String'>
+    readonly x: FieldRef<"MapTile", 'Int'>
+    readonly y: FieldRef<"MapTile", 'Int'>
+    readonly terrainType: FieldRef<"MapTile", 'TerrainType'>
+    readonly agentId: FieldRef<"MapTile", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MapTile findUnique
+   */
+  export type MapTileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * Filter, which MapTile to fetch.
+     */
+    where: MapTileWhereUniqueInput
+  }
+
+  /**
+   * MapTile findUniqueOrThrow
+   */
+  export type MapTileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * Filter, which MapTile to fetch.
+     */
+    where: MapTileWhereUniqueInput
+  }
+
+  /**
+   * MapTile findFirst
+   */
+  export type MapTileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * Filter, which MapTile to fetch.
+     */
+    where?: MapTileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapTiles to fetch.
+     */
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapTiles.
+     */
+    cursor?: MapTileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapTiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapTiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapTiles.
+     */
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
+  }
+
+  /**
+   * MapTile findFirstOrThrow
+   */
+  export type MapTileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * Filter, which MapTile to fetch.
+     */
+    where?: MapTileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapTiles to fetch.
+     */
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapTiles.
+     */
+    cursor?: MapTileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapTiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapTiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapTiles.
+     */
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
+  }
+
+  /**
+   * MapTile findMany
+   */
+  export type MapTileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * Filter, which MapTiles to fetch.
+     */
+    where?: MapTileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapTiles to fetch.
+     */
+    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MapTiles.
+     */
+    cursor?: MapTileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapTiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapTiles.
+     */
+    skip?: number
+    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
+  }
+
+  /**
+   * MapTile create
+   */
+  export type MapTileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MapTile.
+     */
+    data: XOR<MapTileCreateInput, MapTileUncheckedCreateInput>
+  }
+
+  /**
+   * MapTile createMany
+   */
+  export type MapTileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MapTiles.
+     */
+    data: MapTileCreateManyInput | MapTileCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapTile createManyAndReturn
+   */
+  export type MapTileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * The data used to create many MapTiles.
+     */
+    data: MapTileCreateManyInput | MapTileCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapTile update
+   */
+  export type MapTileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MapTile.
+     */
+    data: XOR<MapTileUpdateInput, MapTileUncheckedUpdateInput>
+    /**
+     * Choose, which MapTile to update.
+     */
+    where: MapTileWhereUniqueInput
+  }
+
+  /**
+   * MapTile updateMany
+   */
+  export type MapTileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MapTiles.
+     */
+    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyInput>
+    /**
+     * Filter which MapTiles to update
+     */
+    where?: MapTileWhereInput
+  }
+
+  /**
+   * MapTile updateManyAndReturn
+   */
+  export type MapTileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * The data used to update MapTiles.
+     */
+    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyInput>
+    /**
+     * Filter which MapTiles to update
+     */
+    where?: MapTileWhereInput
+  }
+
+  /**
+   * MapTile upsert
+   */
+  export type MapTileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MapTile to update in case it exists.
+     */
+    where: MapTileWhereUniqueInput
+    /**
+     * In case the MapTile found by the `where` argument doesn't exist, create a new MapTile with this data.
+     */
+    create: XOR<MapTileCreateInput, MapTileUncheckedCreateInput>
+    /**
+     * In case the MapTile was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MapTileUpdateInput, MapTileUncheckedUpdateInput>
+  }
+
+  /**
+   * MapTile delete
+   */
+  export type MapTileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
+    /**
+     * Filter which MapTile to delete.
+     */
+    where: MapTileWhereUniqueInput
+  }
+
+  /**
+   * MapTile deleteMany
+   */
+  export type MapTileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapTiles to delete
+     */
+    where?: MapTileWhereInput
+  }
+
+  /**
+   * MapTile.agent
+   */
+  export type MapTile$agentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Agent
+     */
+    select?: AgentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Agent
+     */
+    omit?: AgentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
+   * MapTile without action
+   */
+  export type MapTileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapTile
+     */
+    select?: MapTileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapTile
+     */
+    omit?: MapTileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapTileInclude<ExtArgs> | null
   }
 
 
@@ -10573,1109 +11490,6 @@ export namespace Prisma {
 
 
   /**
-   * Model MapTile
-   */
-
-  export type AggregateMapTile = {
-    _count: MapTileCountAggregateOutputType | null
-    _avg: MapTileAvgAggregateOutputType | null
-    _sum: MapTileSumAggregateOutputType | null
-    _min: MapTileMinAggregateOutputType | null
-    _max: MapTileMaxAggregateOutputType | null
-  }
-
-  export type MapTileAvgAggregateOutputType = {
-    x: number | null
-    y: number | null
-  }
-
-  export type MapTileSumAggregateOutputType = {
-    x: number | null
-    y: number | null
-  }
-
-  export type MapTileMinAggregateOutputType = {
-    id: string | null
-    x: number | null
-    y: number | null
-    terrainType: $Enums.TerrainType | null
-    occupiedBy: string | null
-  }
-
-  export type MapTileMaxAggregateOutputType = {
-    id: string | null
-    x: number | null
-    y: number | null
-    terrainType: $Enums.TerrainType | null
-    occupiedBy: string | null
-  }
-
-  export type MapTileCountAggregateOutputType = {
-    id: number
-    x: number
-    y: number
-    terrainType: number
-    occupiedBy: number
-    _all: number
-  }
-
-
-  export type MapTileAvgAggregateInputType = {
-    x?: true
-    y?: true
-  }
-
-  export type MapTileSumAggregateInputType = {
-    x?: true
-    y?: true
-  }
-
-  export type MapTileMinAggregateInputType = {
-    id?: true
-    x?: true
-    y?: true
-    terrainType?: true
-    occupiedBy?: true
-  }
-
-  export type MapTileMaxAggregateInputType = {
-    id?: true
-    x?: true
-    y?: true
-    terrainType?: true
-    occupiedBy?: true
-  }
-
-  export type MapTileCountAggregateInputType = {
-    id?: true
-    x?: true
-    y?: true
-    terrainType?: true
-    occupiedBy?: true
-    _all?: true
-  }
-
-  export type MapTileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which MapTile to aggregate.
-     */
-    where?: MapTileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MapTiles to fetch.
-     */
-    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: MapTileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MapTiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MapTiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned MapTiles
-    **/
-    _count?: true | MapTileCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: MapTileAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: MapTileSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: MapTileMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: MapTileMaxAggregateInputType
-  }
-
-  export type GetMapTileAggregateType<T extends MapTileAggregateArgs> = {
-        [P in keyof T & keyof AggregateMapTile]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateMapTile[P]>
-      : GetScalarType<T[P], AggregateMapTile[P]>
-  }
-
-
-
-
-  export type MapTileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MapTileWhereInput
-    orderBy?: MapTileOrderByWithAggregationInput | MapTileOrderByWithAggregationInput[]
-    by: MapTileScalarFieldEnum[] | MapTileScalarFieldEnum
-    having?: MapTileScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: MapTileCountAggregateInputType | true
-    _avg?: MapTileAvgAggregateInputType
-    _sum?: MapTileSumAggregateInputType
-    _min?: MapTileMinAggregateInputType
-    _max?: MapTileMaxAggregateInputType
-  }
-
-  export type MapTileGroupByOutputType = {
-    id: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    occupiedBy: string | null
-    _count: MapTileCountAggregateOutputType | null
-    _avg: MapTileAvgAggregateOutputType | null
-    _sum: MapTileSumAggregateOutputType | null
-    _min: MapTileMinAggregateOutputType | null
-    _max: MapTileMaxAggregateOutputType | null
-  }
-
-  type GetMapTileGroupByPayload<T extends MapTileGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<MapTileGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof MapTileGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], MapTileGroupByOutputType[P]>
-            : GetScalarType<T[P], MapTileGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type MapTileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    occupiedBy?: boolean
-    agent?: boolean | MapTile$agentArgs<ExtArgs>
-  }, ExtArgs["result"]["mapTile"]>
-
-  export type MapTileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    occupiedBy?: boolean
-    agent?: boolean | MapTile$agentArgs<ExtArgs>
-  }, ExtArgs["result"]["mapTile"]>
-
-  export type MapTileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    occupiedBy?: boolean
-    agent?: boolean | MapTile$agentArgs<ExtArgs>
-  }, ExtArgs["result"]["mapTile"]>
-
-  export type MapTileSelectScalar = {
-    id?: boolean
-    x?: boolean
-    y?: boolean
-    terrainType?: boolean
-    occupiedBy?: boolean
-  }
-
-  export type MapTileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "x" | "y" | "terrainType" | "occupiedBy", ExtArgs["result"]["mapTile"]>
-  export type MapTileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | MapTile$agentArgs<ExtArgs>
-  }
-  export type MapTileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | MapTile$agentArgs<ExtArgs>
-  }
-  export type MapTileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | MapTile$agentArgs<ExtArgs>
-  }
-
-  export type $MapTilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "MapTile"
-    objects: {
-      agent: Prisma.$AgentPayload<ExtArgs> | null
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      x: number
-      y: number
-      terrainType: $Enums.TerrainType
-      occupiedBy: string | null
-    }, ExtArgs["result"]["mapTile"]>
-    composites: {}
-  }
-
-  type MapTileGetPayload<S extends boolean | null | undefined | MapTileDefaultArgs> = $Result.GetResult<Prisma.$MapTilePayload, S>
-
-  type MapTileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<MapTileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: MapTileCountAggregateInputType | true
-    }
-
-  export interface MapTileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MapTile'], meta: { name: 'MapTile' } }
-    /**
-     * Find zero or one MapTile that matches the filter.
-     * @param {MapTileFindUniqueArgs} args - Arguments to find a MapTile
-     * @example
-     * // Get one MapTile
-     * const mapTile = await prisma.mapTile.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends MapTileFindUniqueArgs>(args: SelectSubset<T, MapTileFindUniqueArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find one MapTile that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {MapTileFindUniqueOrThrowArgs} args - Arguments to find a MapTile
-     * @example
-     * // Get one MapTile
-     * const mapTile = await prisma.mapTile.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends MapTileFindUniqueOrThrowArgs>(args: SelectSubset<T, MapTileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first MapTile that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileFindFirstArgs} args - Arguments to find a MapTile
-     * @example
-     * // Get one MapTile
-     * const mapTile = await prisma.mapTile.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends MapTileFindFirstArgs>(args?: SelectSubset<T, MapTileFindFirstArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first MapTile that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileFindFirstOrThrowArgs} args - Arguments to find a MapTile
-     * @example
-     * // Get one MapTile
-     * const mapTile = await prisma.mapTile.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends MapTileFindFirstOrThrowArgs>(args?: SelectSubset<T, MapTileFindFirstOrThrowArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find zero or more MapTiles that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all MapTiles
-     * const mapTiles = await prisma.mapTile.findMany()
-     * 
-     * // Get first 10 MapTiles
-     * const mapTiles = await prisma.mapTile.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const mapTileWithIdOnly = await prisma.mapTile.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends MapTileFindManyArgs>(args?: SelectSubset<T, MapTileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findMany", ClientOptions>>
-
-    /**
-     * Create a MapTile.
-     * @param {MapTileCreateArgs} args - Arguments to create a MapTile.
-     * @example
-     * // Create one MapTile
-     * const MapTile = await prisma.mapTile.create({
-     *   data: {
-     *     // ... data to create a MapTile
-     *   }
-     * })
-     * 
-     */
-    create<T extends MapTileCreateArgs>(args: SelectSubset<T, MapTileCreateArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Create many MapTiles.
-     * @param {MapTileCreateManyArgs} args - Arguments to create many MapTiles.
-     * @example
-     * // Create many MapTiles
-     * const mapTile = await prisma.mapTile.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends MapTileCreateManyArgs>(args?: SelectSubset<T, MapTileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many MapTiles and returns the data saved in the database.
-     * @param {MapTileCreateManyAndReturnArgs} args - Arguments to create many MapTiles.
-     * @example
-     * // Create many MapTiles
-     * const mapTile = await prisma.mapTile.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many MapTiles and only return the `id`
-     * const mapTileWithIdOnly = await prisma.mapTile.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends MapTileCreateManyAndReturnArgs>(args?: SelectSubset<T, MapTileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
-
-    /**
-     * Delete a MapTile.
-     * @param {MapTileDeleteArgs} args - Arguments to delete one MapTile.
-     * @example
-     * // Delete one MapTile
-     * const MapTile = await prisma.mapTile.delete({
-     *   where: {
-     *     // ... filter to delete one MapTile
-     *   }
-     * })
-     * 
-     */
-    delete<T extends MapTileDeleteArgs>(args: SelectSubset<T, MapTileDeleteArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Update one MapTile.
-     * @param {MapTileUpdateArgs} args - Arguments to update one MapTile.
-     * @example
-     * // Update one MapTile
-     * const mapTile = await prisma.mapTile.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends MapTileUpdateArgs>(args: SelectSubset<T, MapTileUpdateArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Delete zero or more MapTiles.
-     * @param {MapTileDeleteManyArgs} args - Arguments to filter MapTiles to delete.
-     * @example
-     * // Delete a few MapTiles
-     * const { count } = await prisma.mapTile.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends MapTileDeleteManyArgs>(args?: SelectSubset<T, MapTileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more MapTiles.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many MapTiles
-     * const mapTile = await prisma.mapTile.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends MapTileUpdateManyArgs>(args: SelectSubset<T, MapTileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more MapTiles and returns the data updated in the database.
-     * @param {MapTileUpdateManyAndReturnArgs} args - Arguments to update many MapTiles.
-     * @example
-     * // Update many MapTiles
-     * const mapTile = await prisma.mapTile.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more MapTiles and only return the `id`
-     * const mapTileWithIdOnly = await prisma.mapTile.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends MapTileUpdateManyAndReturnArgs>(args: SelectSubset<T, MapTileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
-
-    /**
-     * Create or update one MapTile.
-     * @param {MapTileUpsertArgs} args - Arguments to update or create a MapTile.
-     * @example
-     * // Update or create a MapTile
-     * const mapTile = await prisma.mapTile.upsert({
-     *   create: {
-     *     // ... data to create a MapTile
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the MapTile we want to update
-     *   }
-     * })
-     */
-    upsert<T extends MapTileUpsertArgs>(args: SelectSubset<T, MapTileUpsertArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
-
-
-    /**
-     * Count the number of MapTiles.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileCountArgs} args - Arguments to filter MapTiles to count.
-     * @example
-     * // Count the number of MapTiles
-     * const count = await prisma.mapTile.count({
-     *   where: {
-     *     // ... the filter for the MapTiles we want to count
-     *   }
-     * })
-    **/
-    count<T extends MapTileCountArgs>(
-      args?: Subset<T, MapTileCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], MapTileCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a MapTile.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends MapTileAggregateArgs>(args: Subset<T, MapTileAggregateArgs>): Prisma.PrismaPromise<GetMapTileAggregateType<T>>
-
-    /**
-     * Group by MapTile.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {MapTileGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends MapTileGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: MapTileGroupByArgs['orderBy'] }
-        : { orderBy?: MapTileGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, MapTileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMapTileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the MapTile model
-   */
-  readonly fields: MapTileFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for MapTile.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__MapTileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends MapTile$agentArgs<ExtArgs> = {}>(args?: Subset<T, MapTile$agentArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the MapTile model
-   */ 
-  interface MapTileFieldRefs {
-    readonly id: FieldRef<"MapTile", 'String'>
-    readonly x: FieldRef<"MapTile", 'Int'>
-    readonly y: FieldRef<"MapTile", 'Int'>
-    readonly terrainType: FieldRef<"MapTile", 'TerrainType'>
-    readonly occupiedBy: FieldRef<"MapTile", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * MapTile findUnique
-   */
-  export type MapTileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * Filter, which MapTile to fetch.
-     */
-    where: MapTileWhereUniqueInput
-  }
-
-  /**
-   * MapTile findUniqueOrThrow
-   */
-  export type MapTileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * Filter, which MapTile to fetch.
-     */
-    where: MapTileWhereUniqueInput
-  }
-
-  /**
-   * MapTile findFirst
-   */
-  export type MapTileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * Filter, which MapTile to fetch.
-     */
-    where?: MapTileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MapTiles to fetch.
-     */
-    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for MapTiles.
-     */
-    cursor?: MapTileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MapTiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MapTiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of MapTiles.
-     */
-    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
-  }
-
-  /**
-   * MapTile findFirstOrThrow
-   */
-  export type MapTileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * Filter, which MapTile to fetch.
-     */
-    where?: MapTileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MapTiles to fetch.
-     */
-    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for MapTiles.
-     */
-    cursor?: MapTileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MapTiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MapTiles.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of MapTiles.
-     */
-    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
-  }
-
-  /**
-   * MapTile findMany
-   */
-  export type MapTileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * Filter, which MapTiles to fetch.
-     */
-    where?: MapTileWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of MapTiles to fetch.
-     */
-    orderBy?: MapTileOrderByWithRelationInput | MapTileOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing MapTiles.
-     */
-    cursor?: MapTileWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` MapTiles from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` MapTiles.
-     */
-    skip?: number
-    distinct?: MapTileScalarFieldEnum | MapTileScalarFieldEnum[]
-  }
-
-  /**
-   * MapTile create
-   */
-  export type MapTileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * The data needed to create a MapTile.
-     */
-    data: XOR<MapTileCreateInput, MapTileUncheckedCreateInput>
-  }
-
-  /**
-   * MapTile createMany
-   */
-  export type MapTileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many MapTiles.
-     */
-    data: MapTileCreateManyInput | MapTileCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * MapTile createManyAndReturn
-   */
-  export type MapTileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * The data used to create many MapTiles.
-     */
-    data: MapTileCreateManyInput | MapTileCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * MapTile update
-   */
-  export type MapTileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * The data needed to update a MapTile.
-     */
-    data: XOR<MapTileUpdateInput, MapTileUncheckedUpdateInput>
-    /**
-     * Choose, which MapTile to update.
-     */
-    where: MapTileWhereUniqueInput
-  }
-
-  /**
-   * MapTile updateMany
-   */
-  export type MapTileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update MapTiles.
-     */
-    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyInput>
-    /**
-     * Filter which MapTiles to update
-     */
-    where?: MapTileWhereInput
-  }
-
-  /**
-   * MapTile updateManyAndReturn
-   */
-  export type MapTileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * The data used to update MapTiles.
-     */
-    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyInput>
-    /**
-     * Filter which MapTiles to update
-     */
-    where?: MapTileWhereInput
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * MapTile upsert
-   */
-  export type MapTileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * The filter to search for the MapTile to update in case it exists.
-     */
-    where: MapTileWhereUniqueInput
-    /**
-     * In case the MapTile found by the `where` argument doesn't exist, create a new MapTile with this data.
-     */
-    create: XOR<MapTileCreateInput, MapTileUncheckedCreateInput>
-    /**
-     * In case the MapTile was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<MapTileUpdateInput, MapTileUncheckedUpdateInput>
-  }
-
-  /**
-   * MapTile delete
-   */
-  export type MapTileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-    /**
-     * Filter which MapTile to delete.
-     */
-    where: MapTileWhereUniqueInput
-  }
-
-  /**
-   * MapTile deleteMany
-   */
-  export type MapTileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which MapTiles to delete
-     */
-    where?: MapTileWhereInput
-  }
-
-  /**
-   * MapTile.agent
-   */
-  export type MapTile$agentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Agent
-     */
-    select?: AgentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Agent
-     */
-    omit?: AgentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentInclude<ExtArgs> | null
-    where?: AgentWhereInput
-  }
-
-  /**
-   * MapTile without action
-   */
-  export type MapTileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MapTile
-     */
-    select?: MapTileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MapTile
-     */
-    omit?: MapTileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MapTileInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Model CoolDown
    */
 
@@ -13739,1092 +13553,6 @@ export namespace Prisma {
 
 
   /**
-   * Model AgentHistory
-   */
-
-  export type AggregateAgentHistory = {
-    _count: AgentHistoryCountAggregateOutputType | null
-    _min: AgentHistoryMinAggregateOutputType | null
-    _max: AgentHistoryMaxAggregateOutputType | null
-  }
-
-  export type AgentHistoryMinAggregateOutputType = {
-    id: string | null
-    agentId: string | null
-    type: string | null
-    details: string | null
-    timestamp: Date | null
-    targetAgentId: string | null
-  }
-
-  export type AgentHistoryMaxAggregateOutputType = {
-    id: string | null
-    agentId: string | null
-    type: string | null
-    details: string | null
-    timestamp: Date | null
-    targetAgentId: string | null
-  }
-
-  export type AgentHistoryCountAggregateOutputType = {
-    id: number
-    agentId: number
-    type: number
-    details: number
-    timestamp: number
-    targetAgentId: number
-    _all: number
-  }
-
-
-  export type AgentHistoryMinAggregateInputType = {
-    id?: true
-    agentId?: true
-    type?: true
-    details?: true
-    timestamp?: true
-    targetAgentId?: true
-  }
-
-  export type AgentHistoryMaxAggregateInputType = {
-    id?: true
-    agentId?: true
-    type?: true
-    details?: true
-    timestamp?: true
-    targetAgentId?: true
-  }
-
-  export type AgentHistoryCountAggregateInputType = {
-    id?: true
-    agentId?: true
-    type?: true
-    details?: true
-    timestamp?: true
-    targetAgentId?: true
-    _all?: true
-  }
-
-  export type AgentHistoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which AgentHistory to aggregate.
-     */
-    where?: AgentHistoryWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of AgentHistories to fetch.
-     */
-    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: AgentHistoryWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` AgentHistories from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` AgentHistories.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned AgentHistories
-    **/
-    _count?: true | AgentHistoryCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: AgentHistoryMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: AgentHistoryMaxAggregateInputType
-  }
-
-  export type GetAgentHistoryAggregateType<T extends AgentHistoryAggregateArgs> = {
-        [P in keyof T & keyof AggregateAgentHistory]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateAgentHistory[P]>
-      : GetScalarType<T[P], AggregateAgentHistory[P]>
-  }
-
-
-
-
-  export type AgentHistoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AgentHistoryWhereInput
-    orderBy?: AgentHistoryOrderByWithAggregationInput | AgentHistoryOrderByWithAggregationInput[]
-    by: AgentHistoryScalarFieldEnum[] | AgentHistoryScalarFieldEnum
-    having?: AgentHistoryScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: AgentHistoryCountAggregateInputType | true
-    _min?: AgentHistoryMinAggregateInputType
-    _max?: AgentHistoryMaxAggregateInputType
-  }
-
-  export type AgentHistoryGroupByOutputType = {
-    id: string
-    agentId: string
-    type: string
-    details: string
-    timestamp: Date
-    targetAgentId: string | null
-    _count: AgentHistoryCountAggregateOutputType | null
-    _min: AgentHistoryMinAggregateOutputType | null
-    _max: AgentHistoryMaxAggregateOutputType | null
-  }
-
-  type GetAgentHistoryGroupByPayload<T extends AgentHistoryGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<AgentHistoryGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof AgentHistoryGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], AgentHistoryGroupByOutputType[P]>
-            : GetScalarType<T[P], AgentHistoryGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type AgentHistorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    agentId?: boolean
-    type?: boolean
-    details?: boolean
-    timestamp?: boolean
-    targetAgentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
-  }, ExtArgs["result"]["agentHistory"]>
-
-  export type AgentHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    agentId?: boolean
-    type?: boolean
-    details?: boolean
-    timestamp?: boolean
-    targetAgentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
-  }, ExtArgs["result"]["agentHistory"]>
-
-  export type AgentHistorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    agentId?: boolean
-    type?: boolean
-    details?: boolean
-    timestamp?: boolean
-    targetAgentId?: boolean
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
-  }, ExtArgs["result"]["agentHistory"]>
-
-  export type AgentHistorySelectScalar = {
-    id?: boolean
-    agentId?: boolean
-    type?: boolean
-    details?: boolean
-    timestamp?: boolean
-    targetAgentId?: boolean
-  }
-
-  export type AgentHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "type" | "details" | "timestamp" | "targetAgentId", ExtArgs["result"]["agentHistory"]>
-  export type AgentHistoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
-  }
-  export type AgentHistoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
-  }
-  export type AgentHistoryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    agent?: boolean | AgentDefaultArgs<ExtArgs>
-    targetAgent?: boolean | AgentHistory$targetAgentArgs<ExtArgs>
-  }
-
-  export type $AgentHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "AgentHistory"
-    objects: {
-      agent: Prisma.$AgentPayload<ExtArgs>
-      targetAgent: Prisma.$AgentPayload<ExtArgs> | null
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      agentId: string
-      type: string
-      details: string
-      timestamp: Date
-      targetAgentId: string | null
-    }, ExtArgs["result"]["agentHistory"]>
-    composites: {}
-  }
-
-  type AgentHistoryGetPayload<S extends boolean | null | undefined | AgentHistoryDefaultArgs> = $Result.GetResult<Prisma.$AgentHistoryPayload, S>
-
-  type AgentHistoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<AgentHistoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: AgentHistoryCountAggregateInputType | true
-    }
-
-  export interface AgentHistoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgentHistory'], meta: { name: 'AgentHistory' } }
-    /**
-     * Find zero or one AgentHistory that matches the filter.
-     * @param {AgentHistoryFindUniqueArgs} args - Arguments to find a AgentHistory
-     * @example
-     * // Get one AgentHistory
-     * const agentHistory = await prisma.agentHistory.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends AgentHistoryFindUniqueArgs>(args: SelectSubset<T, AgentHistoryFindUniqueArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find one AgentHistory that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {AgentHistoryFindUniqueOrThrowArgs} args - Arguments to find a AgentHistory
-     * @example
-     * // Get one AgentHistory
-     * const agentHistory = await prisma.agentHistory.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends AgentHistoryFindUniqueOrThrowArgs>(args: SelectSubset<T, AgentHistoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first AgentHistory that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryFindFirstArgs} args - Arguments to find a AgentHistory
-     * @example
-     * // Get one AgentHistory
-     * const agentHistory = await prisma.agentHistory.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends AgentHistoryFindFirstArgs>(args?: SelectSubset<T, AgentHistoryFindFirstArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
-
-    /**
-     * Find the first AgentHistory that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryFindFirstOrThrowArgs} args - Arguments to find a AgentHistory
-     * @example
-     * // Get one AgentHistory
-     * const agentHistory = await prisma.agentHistory.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends AgentHistoryFindFirstOrThrowArgs>(args?: SelectSubset<T, AgentHistoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Find zero or more AgentHistories that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all AgentHistories
-     * const agentHistories = await prisma.agentHistory.findMany()
-     * 
-     * // Get first 10 AgentHistories
-     * const agentHistories = await prisma.agentHistory.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const agentHistoryWithIdOnly = await prisma.agentHistory.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends AgentHistoryFindManyArgs>(args?: SelectSubset<T, AgentHistoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", ClientOptions>>
-
-    /**
-     * Create a AgentHistory.
-     * @param {AgentHistoryCreateArgs} args - Arguments to create a AgentHistory.
-     * @example
-     * // Create one AgentHistory
-     * const AgentHistory = await prisma.agentHistory.create({
-     *   data: {
-     *     // ... data to create a AgentHistory
-     *   }
-     * })
-     * 
-     */
-    create<T extends AgentHistoryCreateArgs>(args: SelectSubset<T, AgentHistoryCreateArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Create many AgentHistories.
-     * @param {AgentHistoryCreateManyArgs} args - Arguments to create many AgentHistories.
-     * @example
-     * // Create many AgentHistories
-     * const agentHistory = await prisma.agentHistory.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends AgentHistoryCreateManyArgs>(args?: SelectSubset<T, AgentHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many AgentHistories and returns the data saved in the database.
-     * @param {AgentHistoryCreateManyAndReturnArgs} args - Arguments to create many AgentHistories.
-     * @example
-     * // Create many AgentHistories
-     * const agentHistory = await prisma.agentHistory.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many AgentHistories and only return the `id`
-     * const agentHistoryWithIdOnly = await prisma.agentHistory.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends AgentHistoryCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
-
-    /**
-     * Delete a AgentHistory.
-     * @param {AgentHistoryDeleteArgs} args - Arguments to delete one AgentHistory.
-     * @example
-     * // Delete one AgentHistory
-     * const AgentHistory = await prisma.agentHistory.delete({
-     *   where: {
-     *     // ... filter to delete one AgentHistory
-     *   }
-     * })
-     * 
-     */
-    delete<T extends AgentHistoryDeleteArgs>(args: SelectSubset<T, AgentHistoryDeleteArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Update one AgentHistory.
-     * @param {AgentHistoryUpdateArgs} args - Arguments to update one AgentHistory.
-     * @example
-     * // Update one AgentHistory
-     * const agentHistory = await prisma.agentHistory.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends AgentHistoryUpdateArgs>(args: SelectSubset<T, AgentHistoryUpdateArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
-
-    /**
-     * Delete zero or more AgentHistories.
-     * @param {AgentHistoryDeleteManyArgs} args - Arguments to filter AgentHistories to delete.
-     * @example
-     * // Delete a few AgentHistories
-     * const { count } = await prisma.agentHistory.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends AgentHistoryDeleteManyArgs>(args?: SelectSubset<T, AgentHistoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more AgentHistories.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many AgentHistories
-     * const agentHistory = await prisma.agentHistory.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends AgentHistoryUpdateManyArgs>(args: SelectSubset<T, AgentHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more AgentHistories and returns the data updated in the database.
-     * @param {AgentHistoryUpdateManyAndReturnArgs} args - Arguments to update many AgentHistories.
-     * @example
-     * // Update many AgentHistories
-     * const agentHistory = await prisma.agentHistory.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more AgentHistories and only return the `id`
-     * const agentHistoryWithIdOnly = await prisma.agentHistory.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends AgentHistoryUpdateManyAndReturnArgs>(args: SelectSubset<T, AgentHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
-
-    /**
-     * Create or update one AgentHistory.
-     * @param {AgentHistoryUpsertArgs} args - Arguments to update or create a AgentHistory.
-     * @example
-     * // Update or create a AgentHistory
-     * const agentHistory = await prisma.agentHistory.upsert({
-     *   create: {
-     *     // ... data to create a AgentHistory
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the AgentHistory we want to update
-     *   }
-     * })
-     */
-    upsert<T extends AgentHistoryUpsertArgs>(args: SelectSubset<T, AgentHistoryUpsertArgs<ExtArgs>>): Prisma__AgentHistoryClient<$Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
-
-
-    /**
-     * Count the number of AgentHistories.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryCountArgs} args - Arguments to filter AgentHistories to count.
-     * @example
-     * // Count the number of AgentHistories
-     * const count = await prisma.agentHistory.count({
-     *   where: {
-     *     // ... the filter for the AgentHistories we want to count
-     *   }
-     * })
-    **/
-    count<T extends AgentHistoryCountArgs>(
-      args?: Subset<T, AgentHistoryCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], AgentHistoryCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a AgentHistory.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends AgentHistoryAggregateArgs>(args: Subset<T, AgentHistoryAggregateArgs>): Prisma.PrismaPromise<GetAgentHistoryAggregateType<T>>
-
-    /**
-     * Group by AgentHistory.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {AgentHistoryGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends AgentHistoryGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: AgentHistoryGroupByArgs['orderBy'] }
-        : { orderBy?: AgentHistoryGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, AgentHistoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgentHistoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the AgentHistory model
-   */
-  readonly fields: AgentHistoryFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for AgentHistory.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__AgentHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    targetAgent<T extends AgentHistory$targetAgentArgs<ExtArgs> = {}>(args?: Subset<T, AgentHistory$targetAgentArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the AgentHistory model
-   */ 
-  interface AgentHistoryFieldRefs {
-    readonly id: FieldRef<"AgentHistory", 'String'>
-    readonly agentId: FieldRef<"AgentHistory", 'String'>
-    readonly type: FieldRef<"AgentHistory", 'String'>
-    readonly details: FieldRef<"AgentHistory", 'String'>
-    readonly timestamp: FieldRef<"AgentHistory", 'DateTime'>
-    readonly targetAgentId: FieldRef<"AgentHistory", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * AgentHistory findUnique
-   */
-  export type AgentHistoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * Filter, which AgentHistory to fetch.
-     */
-    where: AgentHistoryWhereUniqueInput
-  }
-
-  /**
-   * AgentHistory findUniqueOrThrow
-   */
-  export type AgentHistoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * Filter, which AgentHistory to fetch.
-     */
-    where: AgentHistoryWhereUniqueInput
-  }
-
-  /**
-   * AgentHistory findFirst
-   */
-  export type AgentHistoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * Filter, which AgentHistory to fetch.
-     */
-    where?: AgentHistoryWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of AgentHistories to fetch.
-     */
-    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for AgentHistories.
-     */
-    cursor?: AgentHistoryWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` AgentHistories from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` AgentHistories.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of AgentHistories.
-     */
-    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
-  }
-
-  /**
-   * AgentHistory findFirstOrThrow
-   */
-  export type AgentHistoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * Filter, which AgentHistory to fetch.
-     */
-    where?: AgentHistoryWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of AgentHistories to fetch.
-     */
-    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for AgentHistories.
-     */
-    cursor?: AgentHistoryWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` AgentHistories from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` AgentHistories.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of AgentHistories.
-     */
-    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
-  }
-
-  /**
-   * AgentHistory findMany
-   */
-  export type AgentHistoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * Filter, which AgentHistories to fetch.
-     */
-    where?: AgentHistoryWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of AgentHistories to fetch.
-     */
-    orderBy?: AgentHistoryOrderByWithRelationInput | AgentHistoryOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing AgentHistories.
-     */
-    cursor?: AgentHistoryWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` AgentHistories from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` AgentHistories.
-     */
-    skip?: number
-    distinct?: AgentHistoryScalarFieldEnum | AgentHistoryScalarFieldEnum[]
-  }
-
-  /**
-   * AgentHistory create
-   */
-  export type AgentHistoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * The data needed to create a AgentHistory.
-     */
-    data: XOR<AgentHistoryCreateInput, AgentHistoryUncheckedCreateInput>
-  }
-
-  /**
-   * AgentHistory createMany
-   */
-  export type AgentHistoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many AgentHistories.
-     */
-    data: AgentHistoryCreateManyInput | AgentHistoryCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * AgentHistory createManyAndReturn
-   */
-  export type AgentHistoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * The data used to create many AgentHistories.
-     */
-    data: AgentHistoryCreateManyInput | AgentHistoryCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * AgentHistory update
-   */
-  export type AgentHistoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * The data needed to update a AgentHistory.
-     */
-    data: XOR<AgentHistoryUpdateInput, AgentHistoryUncheckedUpdateInput>
-    /**
-     * Choose, which AgentHistory to update.
-     */
-    where: AgentHistoryWhereUniqueInput
-  }
-
-  /**
-   * AgentHistory updateMany
-   */
-  export type AgentHistoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update AgentHistories.
-     */
-    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyInput>
-    /**
-     * Filter which AgentHistories to update
-     */
-    where?: AgentHistoryWhereInput
-  }
-
-  /**
-   * AgentHistory updateManyAndReturn
-   */
-  export type AgentHistoryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * The data used to update AgentHistories.
-     */
-    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyInput>
-    /**
-     * Filter which AgentHistories to update
-     */
-    where?: AgentHistoryWhereInput
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * AgentHistory upsert
-   */
-  export type AgentHistoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * The filter to search for the AgentHistory to update in case it exists.
-     */
-    where: AgentHistoryWhereUniqueInput
-    /**
-     * In case the AgentHistory found by the `where` argument doesn't exist, create a new AgentHistory with this data.
-     */
-    create: XOR<AgentHistoryCreateInput, AgentHistoryUncheckedCreateInput>
-    /**
-     * In case the AgentHistory was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<AgentHistoryUpdateInput, AgentHistoryUncheckedUpdateInput>
-  }
-
-  /**
-   * AgentHistory delete
-   */
-  export type AgentHistoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-    /**
-     * Filter which AgentHistory to delete.
-     */
-    where: AgentHistoryWhereUniqueInput
-  }
-
-  /**
-   * AgentHistory deleteMany
-   */
-  export type AgentHistoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which AgentHistories to delete
-     */
-    where?: AgentHistoryWhereInput
-  }
-
-  /**
-   * AgentHistory.targetAgent
-   */
-  export type AgentHistory$targetAgentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Agent
-     */
-    select?: AgentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Agent
-     */
-    omit?: AgentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentInclude<ExtArgs> | null
-    where?: AgentWhereInput
-  }
-
-  /**
-   * AgentHistory without action
-   */
-  export type AgentHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the AgentHistory
-     */
-    select?: AgentHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the AgentHistory
-     */
-    omit?: AgentHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AgentHistoryInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Enums
    */
 
@@ -14866,7 +13594,8 @@ export namespace Prisma {
     lore: 'lore',
     characteristics: 'characteristics',
     knowledge: 'knowledge',
-    traits: 'traits'
+    traits: 'traits',
+    postExamples: 'postExamples'
   };
 
   export type AgentProfileScalarFieldEnum = (typeof AgentProfileScalarFieldEnum)[keyof typeof AgentProfileScalarFieldEnum]
@@ -14880,10 +13609,22 @@ export namespace Prisma {
     gameId: 'gameId',
     isAlive: 'isAlive',
     profileId: 'profileId',
-    deathTimestamp: 'deathTimestamp'
+    deathTimestamp: 'deathTimestamp',
+    mapTileId: 'mapTileId'
   };
 
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
+
+
+  export const MapTileScalarFieldEnum: {
+    id: 'id',
+    x: 'x',
+    y: 'y',
+    terrainType: 'terrainType',
+    agentId: 'agentId'
+  };
+
+  export type MapTileScalarFieldEnum = (typeof MapTileScalarFieldEnum)[keyof typeof MapTileScalarFieldEnum]
 
 
   export const TweetScalarFieldEnum: {
@@ -14943,17 +13684,6 @@ export namespace Prisma {
   export type InteractionScalarFieldEnum = (typeof InteractionScalarFieldEnum)[keyof typeof InteractionScalarFieldEnum]
 
 
-  export const MapTileScalarFieldEnum: {
-    id: 'id',
-    x: 'x',
-    y: 'y',
-    terrainType: 'terrainType',
-    occupiedBy: 'occupiedBy'
-  };
-
-  export type MapTileScalarFieldEnum = (typeof MapTileScalarFieldEnum)[keyof typeof MapTileScalarFieldEnum]
-
-
   export const CoolDownScalarFieldEnum: {
     id: 'id',
     type: 'type',
@@ -14976,18 +13706,6 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-  export const AgentHistoryScalarFieldEnum: {
-    id: 'id',
-    agentId: 'agentId',
-    type: 'type',
-    details: 'details',
-    timestamp: 'timestamp',
-    targetAgentId: 'targetAgentId'
-  };
-
-  export type AgentHistoryScalarFieldEnum = (typeof AgentHistoryScalarFieldEnum)[keyof typeof AgentHistoryScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -15120,6 +13838,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'TerrainType'
+   */
+  export type EnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType'>
+    
+
+
+  /**
+   * Reference to a field of type 'TerrainType[]'
+   */
+  export type ListEnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'AllianceStatus'
    */
   export type EnumAllianceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AllianceStatus'>
@@ -15172,20 +13904,6 @@ export namespace Prisma {
    * Reference to a field of type 'InteractionType[]'
    */
   export type ListEnumInteractionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InteractionType[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'TerrainType'
-   */
-  export type EnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType'>
-    
-
-
-  /**
-   * Reference to a field of type 'TerrainType[]'
-   */
-  export type ListEnumTerrainTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TerrainType[]'>
     
 
 
@@ -15335,6 +14053,7 @@ export namespace Prisma {
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonFilter<"AgentProfile">
+    postExamples?: StringNullableListFilter<"AgentProfile">
     agents?: AgentListRelationFilter
   }
 
@@ -15349,6 +14068,7 @@ export namespace Prisma {
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
+    postExamples?: SortOrder
     agents?: AgentOrderByRelationAggregateInput
   }
 
@@ -15366,6 +14086,7 @@ export namespace Prisma {
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonFilter<"AgentProfile">
+    postExamples?: StringNullableListFilter<"AgentProfile">
     agents?: AgentListRelationFilter
   }, "id" | "onchainId" | "xHandle">
 
@@ -15380,6 +14101,7 @@ export namespace Prisma {
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
+    postExamples?: SortOrder
     _count?: AgentProfileCountOrderByAggregateInput
     _avg?: AgentProfileAvgOrderByAggregateInput
     _max?: AgentProfileMaxOrderByAggregateInput
@@ -15401,6 +14123,7 @@ export namespace Prisma {
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonWithAggregatesFilter<"AgentProfile">
+    postExamples?: StringNullableListFilter<"AgentProfile">
   }
 
   export type AgentWhereInput = {
@@ -15415,6 +14138,7 @@ export namespace Prisma {
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
+    mapTileId?: StringFilter<"Agent"> | string
     tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     battlesAsAttacker?: BattleListRelationFilter
@@ -15425,10 +14149,8 @@ export namespace Prisma {
     coolDown?: CoolDownListRelationFilter
     initiatedAlliances?: AllianceListRelationFilter
     joinedAlliances?: AllianceListRelationFilter
-    mapTiles?: MapTileListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
-    history?: AgentHistoryListRelationFilter
-    historyAsTarget?: AgentHistoryListRelationFilter
+    mapTile?: XOR<MapTileScalarRelationFilter, MapTileWhereInput>
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -15440,6 +14162,7 @@ export namespace Prisma {
     isAlive?: SortOrder
     profileId?: SortOrder
     deathTimestamp?: SortOrderInput | SortOrder
+    mapTileId?: SortOrder
     tweets?: TweetOrderByRelationAggregateInput
     game?: GameOrderByWithRelationInput
     battlesAsAttacker?: BattleOrderByRelationAggregateInput
@@ -15450,14 +14173,13 @@ export namespace Prisma {
     coolDown?: CoolDownOrderByRelationAggregateInput
     initiatedAlliances?: AllianceOrderByRelationAggregateInput
     joinedAlliances?: AllianceOrderByRelationAggregateInput
-    mapTiles?: MapTileOrderByRelationAggregateInput
     profile?: AgentProfileOrderByWithRelationInput
-    history?: AgentHistoryOrderByRelationAggregateInput
-    historyAsTarget?: AgentHistoryOrderByRelationAggregateInput
+    mapTile?: MapTileOrderByWithRelationInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    mapTileId?: string
     onchainId_gameId?: AgentOnchainIdGameIdCompoundUniqueInput
     AND?: AgentWhereInput | AgentWhereInput[]
     OR?: AgentWhereInput[]
@@ -15479,11 +14201,9 @@ export namespace Prisma {
     coolDown?: CoolDownListRelationFilter
     initiatedAlliances?: AllianceListRelationFilter
     joinedAlliances?: AllianceListRelationFilter
-    mapTiles?: MapTileListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
-    history?: AgentHistoryListRelationFilter
-    historyAsTarget?: AgentHistoryListRelationFilter
-  }, "id" | "onchainId_gameId">
+    mapTile?: XOR<MapTileScalarRelationFilter, MapTileWhereInput>
+  }, "id" | "mapTileId" | "onchainId_gameId">
 
   export type AgentOrderByWithAggregationInput = {
     id?: SortOrder
@@ -15494,6 +14214,7 @@ export namespace Prisma {
     isAlive?: SortOrder
     profileId?: SortOrder
     deathTimestamp?: SortOrderInput | SortOrder
+    mapTileId?: SortOrder
     _count?: AgentCountOrderByAggregateInput
     _avg?: AgentAvgOrderByAggregateInput
     _max?: AgentMaxOrderByAggregateInput
@@ -15513,6 +14234,65 @@ export namespace Prisma {
     isAlive?: BoolWithAggregatesFilter<"Agent"> | boolean
     profileId?: StringWithAggregatesFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
+    mapTileId?: StringWithAggregatesFilter<"Agent"> | string
+  }
+
+  export type MapTileWhereInput = {
+    AND?: MapTileWhereInput | MapTileWhereInput[]
+    OR?: MapTileWhereInput[]
+    NOT?: MapTileWhereInput | MapTileWhereInput[]
+    id?: StringFilter<"MapTile"> | string
+    x?: IntFilter<"MapTile"> | number
+    y?: IntFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
+    agentId?: StringNullableFilter<"MapTile"> | string | null
+    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+  }
+
+  export type MapTileOrderByWithRelationInput = {
+    id?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    agentId?: SortOrderInput | SortOrder
+    agent?: AgentOrderByWithRelationInput
+  }
+
+  export type MapTileWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    x_y?: MapTileXYCompoundUniqueInput
+    AND?: MapTileWhereInput | MapTileWhereInput[]
+    OR?: MapTileWhereInput[]
+    NOT?: MapTileWhereInput | MapTileWhereInput[]
+    x?: IntFilter<"MapTile"> | number
+    y?: IntFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
+    agentId?: StringNullableFilter<"MapTile"> | string | null
+    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+  }, "id" | "x_y">
+
+  export type MapTileOrderByWithAggregationInput = {
+    id?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    agentId?: SortOrderInput | SortOrder
+    _count?: MapTileCountOrderByAggregateInput
+    _avg?: MapTileAvgOrderByAggregateInput
+    _max?: MapTileMaxOrderByAggregateInput
+    _min?: MapTileMinOrderByAggregateInput
+    _sum?: MapTileSumOrderByAggregateInput
+  }
+
+  export type MapTileScalarWhereWithAggregatesInput = {
+    AND?: MapTileScalarWhereWithAggregatesInput | MapTileScalarWhereWithAggregatesInput[]
+    OR?: MapTileScalarWhereWithAggregatesInput[]
+    NOT?: MapTileScalarWhereWithAggregatesInput | MapTileScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MapTile"> | string
+    x?: IntWithAggregatesFilter<"MapTile"> | number
+    y?: IntWithAggregatesFilter<"MapTile"> | number
+    terrainType?: EnumTerrainTypeWithAggregatesFilter<"MapTile"> | $Enums.TerrainType
+    agentId?: StringNullableWithAggregatesFilter<"MapTile"> | string | null
   }
 
   export type TweetWhereInput = {
@@ -15829,64 +14609,6 @@ export namespace Prisma {
     userMetrics?: JsonWithAggregatesFilter<"Interaction">
   }
 
-  export type MapTileWhereInput = {
-    AND?: MapTileWhereInput | MapTileWhereInput[]
-    OR?: MapTileWhereInput[]
-    NOT?: MapTileWhereInput | MapTileWhereInput[]
-    id?: StringFilter<"MapTile"> | string
-    x?: IntFilter<"MapTile"> | number
-    y?: IntFilter<"MapTile"> | number
-    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
-    occupiedBy?: StringNullableFilter<"MapTile"> | string | null
-    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-  }
-
-  export type MapTileOrderByWithRelationInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    occupiedBy?: SortOrderInput | SortOrder
-    agent?: AgentOrderByWithRelationInput
-  }
-
-  export type MapTileWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    x_y?: MapTileXYCompoundUniqueInput
-    AND?: MapTileWhereInput | MapTileWhereInput[]
-    OR?: MapTileWhereInput[]
-    NOT?: MapTileWhereInput | MapTileWhereInput[]
-    x?: IntFilter<"MapTile"> | number
-    y?: IntFilter<"MapTile"> | number
-    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
-    occupiedBy?: StringNullableFilter<"MapTile"> | string | null
-    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-  }, "id" | "x_y">
-
-  export type MapTileOrderByWithAggregationInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    occupiedBy?: SortOrderInput | SortOrder
-    _count?: MapTileCountOrderByAggregateInput
-    _avg?: MapTileAvgOrderByAggregateInput
-    _max?: MapTileMaxOrderByAggregateInput
-    _min?: MapTileMinOrderByAggregateInput
-    _sum?: MapTileSumOrderByAggregateInput
-  }
-
-  export type MapTileScalarWhereWithAggregatesInput = {
-    AND?: MapTileScalarWhereWithAggregatesInput | MapTileScalarWhereWithAggregatesInput[]
-    OR?: MapTileScalarWhereWithAggregatesInput[]
-    NOT?: MapTileScalarWhereWithAggregatesInput | MapTileScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"MapTile"> | string
-    x?: IntWithAggregatesFilter<"MapTile"> | number
-    y?: IntWithAggregatesFilter<"MapTile"> | number
-    terrainType?: EnumTerrainTypeWithAggregatesFilter<"MapTile"> | $Enums.TerrainType
-    occupiedBy?: StringNullableWithAggregatesFilter<"MapTile"> | string | null
-  }
-
   export type CoolDownWhereInput = {
     AND?: CoolDownWhereInput | CoolDownWhereInput[]
     OR?: CoolDownWhereInput[]
@@ -16005,69 +14727,6 @@ export namespace Prisma {
     walletAddress?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-  }
-
-  export type AgentHistoryWhereInput = {
-    AND?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
-    OR?: AgentHistoryWhereInput[]
-    NOT?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
-    id?: StringFilter<"AgentHistory"> | string
-    agentId?: StringFilter<"AgentHistory"> | string
-    type?: StringFilter<"AgentHistory"> | string
-    details?: StringFilter<"AgentHistory"> | string
-    timestamp?: DateTimeFilter<"AgentHistory"> | Date | string
-    targetAgentId?: StringNullableFilter<"AgentHistory"> | string | null
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    targetAgent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-  }
-
-  export type AgentHistoryOrderByWithRelationInput = {
-    id?: SortOrder
-    agentId?: SortOrder
-    type?: SortOrder
-    details?: SortOrder
-    timestamp?: SortOrder
-    targetAgentId?: SortOrderInput | SortOrder
-    agent?: AgentOrderByWithRelationInput
-    targetAgent?: AgentOrderByWithRelationInput
-  }
-
-  export type AgentHistoryWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
-    OR?: AgentHistoryWhereInput[]
-    NOT?: AgentHistoryWhereInput | AgentHistoryWhereInput[]
-    agentId?: StringFilter<"AgentHistory"> | string
-    type?: StringFilter<"AgentHistory"> | string
-    details?: StringFilter<"AgentHistory"> | string
-    timestamp?: DateTimeFilter<"AgentHistory"> | Date | string
-    targetAgentId?: StringNullableFilter<"AgentHistory"> | string | null
-    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
-    targetAgent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-  }, "id">
-
-  export type AgentHistoryOrderByWithAggregationInput = {
-    id?: SortOrder
-    agentId?: SortOrder
-    type?: SortOrder
-    details?: SortOrder
-    timestamp?: SortOrder
-    targetAgentId?: SortOrderInput | SortOrder
-    _count?: AgentHistoryCountOrderByAggregateInput
-    _max?: AgentHistoryMaxOrderByAggregateInput
-    _min?: AgentHistoryMinOrderByAggregateInput
-  }
-
-  export type AgentHistoryScalarWhereWithAggregatesInput = {
-    AND?: AgentHistoryScalarWhereWithAggregatesInput | AgentHistoryScalarWhereWithAggregatesInput[]
-    OR?: AgentHistoryScalarWhereWithAggregatesInput[]
-    NOT?: AgentHistoryScalarWhereWithAggregatesInput | AgentHistoryScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"AgentHistory"> | string
-    agentId?: StringWithAggregatesFilter<"AgentHistory"> | string
-    type?: StringWithAggregatesFilter<"AgentHistory"> | string
-    details?: StringWithAggregatesFilter<"AgentHistory"> | string
-    timestamp?: DateTimeWithAggregatesFilter<"AgentHistory"> | Date | string
-    targetAgentId?: StringNullableWithAggregatesFilter<"AgentHistory"> | string | null
   }
 
   export type GameCreateInput = {
@@ -16202,6 +14861,7 @@ export namespace Prisma {
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileCreatepostExamplesInput | string[]
     agents?: AgentCreateNestedManyWithoutProfileInput
   }
 
@@ -16216,6 +14876,7 @@ export namespace Prisma {
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileCreatepostExamplesInput | string[]
     agents?: AgentUncheckedCreateNestedManyWithoutProfileInput
   }
 
@@ -16230,6 +14891,7 @@ export namespace Prisma {
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileUpdatepostExamplesInput | string[]
     agents?: AgentUpdateManyWithoutProfileNestedInput
   }
 
@@ -16244,6 +14906,7 @@ export namespace Prisma {
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileUpdatepostExamplesInput | string[]
     agents?: AgentUncheckedUpdateManyWithoutProfileNestedInput
   }
 
@@ -16258,6 +14921,7 @@ export namespace Prisma {
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileCreatepostExamplesInput | string[]
   }
 
   export type AgentProfileUpdateManyMutationInput = {
@@ -16271,6 +14935,7 @@ export namespace Prisma {
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileUpdatepostExamplesInput | string[]
   }
 
   export type AgentProfileUncheckedUpdateManyInput = {
@@ -16284,6 +14949,7 @@ export namespace Prisma {
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileUpdatepostExamplesInput | string[]
   }
 
   export type AgentCreateInput = {
@@ -16303,10 +14969,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -16318,6 +14982,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -16327,9 +14992,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentUpdateInput = {
@@ -16349,10 +15011,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -16364,6 +15024,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -16373,9 +15034,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
@@ -16387,6 +15045,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
   }
 
   export type AgentUpdateManyMutationInput = {
@@ -16407,6 +15066,67 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type MapTileCreateInput = {
+    id?: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agentId?: string | null
+    agent?: AgentCreateNestedOneWithoutMapTileInput
+  }
+
+  export type MapTileUncheckedCreateInput = {
+    id?: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agentId?: string | null
+    agent?: AgentUncheckedCreateNestedOneWithoutMapTileInput
+  }
+
+  export type MapTileUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+    agent?: AgentUpdateOneWithoutMapTileNestedInput
+  }
+
+  export type MapTileUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+    agent?: AgentUncheckedUpdateOneWithoutMapTileNestedInput
+  }
+
+  export type MapTileCreateManyInput = {
+    id?: string
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agentId?: string | null
+  }
+
+  export type MapTileUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MapTileUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TweetCreateInput = {
@@ -16717,61 +15437,6 @@ export namespace Prisma {
     userMetrics?: JsonNullValueInput | InputJsonValue
   }
 
-  export type MapTileCreateInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    agent?: AgentCreateNestedOneWithoutMapTilesInput
-  }
-
-  export type MapTileUncheckedCreateInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    occupiedBy?: string | null
-  }
-
-  export type MapTileUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-    agent?: AgentUpdateOneWithoutMapTilesNestedInput
-  }
-
-  export type MapTileUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-    occupiedBy?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type MapTileCreateManyInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-    occupiedBy?: string | null
-  }
-
-  export type MapTileUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type MapTileUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-    occupiedBy?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
   export type CoolDownCreateInput = {
     id?: string
     type: $Enums.CooldownType
@@ -16894,67 +15559,6 @@ export namespace Prisma {
     walletAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type AgentHistoryCreateInput = {
-    id?: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    agent: AgentCreateNestedOneWithoutHistoryInput
-    targetAgent?: AgentCreateNestedOneWithoutHistoryAsTargetInput
-  }
-
-  export type AgentHistoryUncheckedCreateInput = {
-    id?: string
-    agentId: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    targetAgentId?: string | null
-  }
-
-  export type AgentHistoryUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    agent?: AgentUpdateOneRequiredWithoutHistoryNestedInput
-    targetAgent?: AgentUpdateOneWithoutHistoryAsTargetNestedInput
-  }
-
-  export type AgentHistoryUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type AgentHistoryCreateManyInput = {
-    id?: string
-    agentId: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    targetAgentId?: string | null
-  }
-
-  export type AgentHistoryUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type AgentHistoryUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -17249,6 +15853,7 @@ export namespace Prisma {
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
+    postExamples?: SortOrder
   }
 
   export type AgentProfileAvgOrderByAggregateInput = {
@@ -17324,21 +15929,14 @@ export namespace Prisma {
     isNot?: GameWhereInput
   }
 
-  export type MapTileListRelationFilter = {
-    every?: MapTileWhereInput
-    some?: MapTileWhereInput
-    none?: MapTileWhereInput
-  }
-
   export type AgentProfileScalarRelationFilter = {
     is?: AgentProfileWhereInput
     isNot?: AgentProfileWhereInput
   }
 
-  export type AgentHistoryListRelationFilter = {
-    every?: AgentHistoryWhereInput
-    some?: AgentHistoryWhereInput
-    none?: AgentHistoryWhereInput
+  export type MapTileScalarRelationFilter = {
+    is?: MapTileWhereInput
+    isNot?: MapTileWhereInput
   }
 
   export type SortOrderInput = {
@@ -17347,14 +15945,6 @@ export namespace Prisma {
   }
 
   export type TweetOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type MapTileOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type AgentHistoryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17372,6 +15962,7 @@ export namespace Prisma {
     isAlive?: SortOrder
     profileId?: SortOrder
     deathTimestamp?: SortOrder
+    mapTileId?: SortOrder
   }
 
   export type AgentAvgOrderByAggregateInput = {
@@ -17388,6 +15979,7 @@ export namespace Prisma {
     isAlive?: SortOrder
     profileId?: SortOrder
     deathTimestamp?: SortOrder
+    mapTileId?: SortOrder
   }
 
   export type AgentMinOrderByAggregateInput = {
@@ -17399,6 +15991,7 @@ export namespace Prisma {
     isAlive?: SortOrder
     profileId?: SortOrder
     deathTimestamp?: SortOrder
+    mapTileId?: SortOrder
   }
 
   export type AgentSumOrderByAggregateInput = {
@@ -17420,6 +16013,13 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type EnumTerrainTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -17433,6 +16033,78 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type AgentNullableScalarRelationFilter = {
+    is?: AgentWhereInput | null
+    isNot?: AgentWhereInput | null
+  }
+
+  export type MapTileXYCompoundUniqueInput = {
+    x: number
+    y: number
+  }
+
+  export type MapTileCountOrderByAggregateInput = {
+    id?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    agentId?: SortOrder
+  }
+
+  export type MapTileAvgOrderByAggregateInput = {
+    x?: SortOrder
+    y?: SortOrder
+  }
+
+  export type MapTileMaxOrderByAggregateInput = {
+    id?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    agentId?: SortOrder
+  }
+
+  export type MapTileMinOrderByAggregateInput = {
+    id?: SortOrder
+    x?: SortOrder
+    y?: SortOrder
+    terrainType?: SortOrder
+    agentId?: SortOrder
+  }
+
+  export type MapTileSumOrderByAggregateInput = {
+    x?: SortOrder
+    y?: SortOrder
+  }
+
+  export type EnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
+    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type AgentScalarRelationFilter = {
@@ -17475,24 +16147,6 @@ export namespace Prisma {
     type?: SortOrder
     timestamp?: SortOrder
     conversationId?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type FloatNullableFilter<$PrismaModel = never> = {
@@ -17597,11 +16251,6 @@ export namespace Prisma {
     in?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBattleStatusFilter<$PrismaModel> | $Enums.BattleStatus
-  }
-
-  export type AgentNullableScalarRelationFilter = {
-    is?: AgentWhereInput | null
-    isNot?: AgentWhereInput | null
   }
 
   export type BattleCountOrderByAggregateInput = {
@@ -17727,62 +16376,6 @@ export namespace Prisma {
     _max?: NestedEnumInteractionTypeFilter<$PrismaModel>
   }
 
-  export type EnumTerrainTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
-  }
-
-  export type MapTileXYCompoundUniqueInput = {
-    x: number
-    y: number
-  }
-
-  export type MapTileCountOrderByAggregateInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    occupiedBy?: SortOrder
-  }
-
-  export type MapTileAvgOrderByAggregateInput = {
-    x?: SortOrder
-    y?: SortOrder
-  }
-
-  export type MapTileMaxOrderByAggregateInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    occupiedBy?: SortOrder
-  }
-
-  export type MapTileMinOrderByAggregateInput = {
-    id?: SortOrder
-    x?: SortOrder
-    y?: SortOrder
-    terrainType?: SortOrder
-    occupiedBy?: SortOrder
-  }
-
-  export type MapTileSumOrderByAggregateInput = {
-    x?: SortOrder
-    y?: SortOrder
-  }
-
-  export type EnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
-    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
-  }
-
   export type EnumCooldownTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.CooldownType | EnumCooldownTypeFieldRefInput<$PrismaModel>
     in?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
@@ -17869,33 +16462,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
-  }
-
-  export type AgentHistoryCountOrderByAggregateInput = {
-    id?: SortOrder
-    agentId?: SortOrder
-    type?: SortOrder
-    details?: SortOrder
-    timestamp?: SortOrder
-    targetAgentId?: SortOrder
-  }
-
-  export type AgentHistoryMaxOrderByAggregateInput = {
-    id?: SortOrder
-    agentId?: SortOrder
-    type?: SortOrder
-    details?: SortOrder
-    timestamp?: SortOrder
-    targetAgentId?: SortOrder
-  }
-
-  export type AgentHistoryMinOrderByAggregateInput = {
-    id?: SortOrder
-    agentId?: SortOrder
-    type?: SortOrder
-    details?: SortOrder
-    timestamp?: SortOrder
-    targetAgentId?: SortOrder
   }
 
   export type AgentCreateNestedManyWithoutGameInput = {
@@ -18118,6 +16684,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type AgentProfileCreatepostExamplesInput = {
+    set: string[]
+  }
+
   export type AgentCreateNestedManyWithoutProfileInput = {
     create?: XOR<AgentCreateWithoutProfileInput, AgentUncheckedCreateWithoutProfileInput> | AgentCreateWithoutProfileInput[] | AgentUncheckedCreateWithoutProfileInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutProfileInput | AgentCreateOrConnectWithoutProfileInput[]
@@ -18148,6 +16718,11 @@ export namespace Prisma {
   }
 
   export type AgentProfileUpdateknowledgeInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type AgentProfileUpdatepostExamplesInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -18249,31 +16824,16 @@ export namespace Prisma {
     connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
   }
 
-  export type MapTileCreateNestedManyWithoutAgentInput = {
-    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
-    createMany?: MapTileCreateManyAgentInputEnvelope
-    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-  }
-
   export type AgentProfileCreateNestedOneWithoutAgentsInput = {
     create?: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
     connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentsInput
     connect?: AgentProfileWhereUniqueInput
   }
 
-  export type AgentHistoryCreateNestedManyWithoutAgentInput = {
-    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
-    createMany?: AgentHistoryCreateManyAgentInputEnvelope
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-  }
-
-  export type AgentHistoryCreateNestedManyWithoutTargetAgentInput = {
-    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
-    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
+  export type MapTileCreateNestedOneWithoutAgentInput = {
+    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
+    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput
+    connect?: MapTileWhereUniqueInput
   }
 
   export type TweetUncheckedCreateNestedManyWithoutAgentInput = {
@@ -18337,27 +16897,6 @@ export namespace Prisma {
     connectOrCreate?: AllianceCreateOrConnectWithoutJoinerInput | AllianceCreateOrConnectWithoutJoinerInput[]
     createMany?: AllianceCreateManyJoinerInputEnvelope
     connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
-  }
-
-  export type MapTileUncheckedCreateNestedManyWithoutAgentInput = {
-    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
-    createMany?: MapTileCreateManyAgentInputEnvelope
-    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-  }
-
-  export type AgentHistoryUncheckedCreateNestedManyWithoutAgentInput = {
-    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
-    createMany?: AgentHistoryCreateManyAgentInputEnvelope
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-  }
-
-  export type AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput = {
-    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
-    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -18498,20 +17037,6 @@ export namespace Prisma {
     deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
   }
 
-  export type MapTileUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
-    upsert?: MapTileUpsertWithWhereUniqueWithoutAgentInput | MapTileUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: MapTileCreateManyAgentInputEnvelope
-    set?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    disconnect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    delete?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    update?: MapTileUpdateWithWhereUniqueWithoutAgentInput | MapTileUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: MapTileUpdateManyWithWhereWithoutAgentInput | MapTileUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
-  }
-
   export type AgentProfileUpdateOneRequiredWithoutAgentsNestedInput = {
     create?: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
     connectOrCreate?: AgentProfileCreateOrConnectWithoutAgentsInput
@@ -18520,32 +17045,12 @@ export namespace Prisma {
     update?: XOR<XOR<AgentProfileUpdateToOneWithWhereWithoutAgentsInput, AgentProfileUpdateWithoutAgentsInput>, AgentProfileUncheckedUpdateWithoutAgentsInput>
   }
 
-  export type AgentHistoryUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
-    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: AgentHistoryCreateManyAgentInputEnvelope
-    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    update?: AgentHistoryUpdateWithWhereUniqueWithoutAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: AgentHistoryUpdateManyWithWhereWithoutAgentInput | AgentHistoryUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
-  }
-
-  export type AgentHistoryUpdateManyWithoutTargetAgentNestedInput = {
-    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
-    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput[]
-    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
-    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    update?: AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput[]
-    updateMany?: AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput | AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput[]
-    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+  export type MapTileUpdateOneRequiredWithoutAgentNestedInput = {
+    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
+    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput
+    upsert?: MapTileUpsertWithoutAgentInput
+    connect?: MapTileWhereUniqueInput
+    update?: XOR<XOR<MapTileUpdateToOneWithWhereWithoutAgentInput, MapTileUpdateWithoutAgentInput>, MapTileUncheckedUpdateWithoutAgentInput>
   }
 
   export type TweetUncheckedUpdateManyWithoutAgentNestedInput = {
@@ -18674,46 +17179,44 @@ export namespace Prisma {
     deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
   }
 
-  export type MapTileUncheckedUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput> | MapTileCreateWithoutAgentInput[] | MapTileUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: MapTileCreateOrConnectWithoutAgentInput | MapTileCreateOrConnectWithoutAgentInput[]
-    upsert?: MapTileUpsertWithWhereUniqueWithoutAgentInput | MapTileUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: MapTileCreateManyAgentInputEnvelope
-    set?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    disconnect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    delete?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    connect?: MapTileWhereUniqueInput | MapTileWhereUniqueInput[]
-    update?: MapTileUpdateWithWhereUniqueWithoutAgentInput | MapTileUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: MapTileUpdateManyWithWhereWithoutAgentInput | MapTileUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
+  export type AgentCreateNestedOneWithoutMapTileInput = {
+    create?: XOR<AgentCreateWithoutMapTileInput, AgentUncheckedCreateWithoutMapTileInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutMapTileInput
+    connect?: AgentWhereUniqueInput
   }
 
-  export type AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput = {
-    create?: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput> | AgentHistoryCreateWithoutAgentInput[] | AgentHistoryUncheckedCreateWithoutAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutAgentInput | AgentHistoryCreateOrConnectWithoutAgentInput[]
-    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutAgentInput[]
-    createMany?: AgentHistoryCreateManyAgentInputEnvelope
-    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    update?: AgentHistoryUpdateWithWhereUniqueWithoutAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutAgentInput[]
-    updateMany?: AgentHistoryUpdateManyWithWhereWithoutAgentInput | AgentHistoryUpdateManyWithWhereWithoutAgentInput[]
-    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+  export type AgentUncheckedCreateNestedOneWithoutMapTileInput = {
+    create?: XOR<AgentCreateWithoutMapTileInput, AgentUncheckedCreateWithoutMapTileInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutMapTileInput
+    connect?: AgentWhereUniqueInput
   }
 
-  export type AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput = {
-    create?: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput> | AgentHistoryCreateWithoutTargetAgentInput[] | AgentHistoryUncheckedCreateWithoutTargetAgentInput[]
-    connectOrCreate?: AgentHistoryCreateOrConnectWithoutTargetAgentInput | AgentHistoryCreateOrConnectWithoutTargetAgentInput[]
-    upsert?: AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput[]
-    createMany?: AgentHistoryCreateManyTargetAgentInputEnvelope
-    set?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    disconnect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    delete?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    connect?: AgentHistoryWhereUniqueInput | AgentHistoryWhereUniqueInput[]
-    update?: AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput | AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput[]
-    updateMany?: AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput | AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput[]
-    deleteMany?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
+  export type EnumTerrainTypeFieldUpdateOperationsInput = {
+    set?: $Enums.TerrainType
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type AgentUpdateOneWithoutMapTileNestedInput = {
+    create?: XOR<AgentCreateWithoutMapTileInput, AgentUncheckedCreateWithoutMapTileInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutMapTileInput
+    upsert?: AgentUpsertWithoutMapTileInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutMapTileInput, AgentUpdateWithoutMapTileInput>, AgentUncheckedUpdateWithoutMapTileInput>
+  }
+
+  export type AgentUncheckedUpdateOneWithoutMapTileNestedInput = {
+    create?: XOR<AgentCreateWithoutMapTileInput, AgentUncheckedCreateWithoutMapTileInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutMapTileInput
+    upsert?: AgentUpsertWithoutMapTileInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutMapTileInput, AgentUpdateWithoutMapTileInput>, AgentUncheckedUpdateWithoutMapTileInput>
   }
 
   export type AgentCreateNestedOneWithoutTweetsInput = {
@@ -18734,10 +17237,6 @@ export namespace Prisma {
     connectOrCreate?: InteractionCreateOrConnectWithoutTweetInput | InteractionCreateOrConnectWithoutTweetInput[]
     createMany?: InteractionCreateManyTweetInputEnvelope
     connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
   }
 
   export type AgentUpdateOneRequiredWithoutTweetsNestedInput = {
@@ -18946,26 +17445,6 @@ export namespace Prisma {
     update?: XOR<XOR<TweetUpdateToOneWithWhereWithoutInteractionsInput, TweetUpdateWithoutInteractionsInput>, TweetUncheckedUpdateWithoutInteractionsInput>
   }
 
-  export type AgentCreateNestedOneWithoutMapTilesInput = {
-    create?: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutMapTilesInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type EnumTerrainTypeFieldUpdateOperationsInput = {
-    set?: $Enums.TerrainType
-  }
-
-  export type AgentUpdateOneWithoutMapTilesNestedInput = {
-    create?: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutMapTilesInput
-    upsert?: AgentUpsertWithoutMapTilesInput
-    disconnect?: AgentWhereInput | boolean
-    delete?: AgentWhereInput | boolean
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutMapTilesInput, AgentUpdateWithoutMapTilesInput>, AgentUncheckedUpdateWithoutMapTilesInput>
-  }
-
   export type AgentCreateNestedOneWithoutCoolDownInput = {
     create?: XOR<AgentCreateWithoutCoolDownInput, AgentUncheckedCreateWithoutCoolDownInput>
     connectOrCreate?: AgentCreateOrConnectWithoutCoolDownInput
@@ -19000,36 +17479,6 @@ export namespace Prisma {
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole
-  }
-
-  export type AgentCreateNestedOneWithoutHistoryInput = {
-    create?: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutHistoryInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type AgentCreateNestedOneWithoutHistoryAsTargetInput = {
-    create?: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutHistoryAsTargetInput
-    connect?: AgentWhereUniqueInput
-  }
-
-  export type AgentUpdateOneRequiredWithoutHistoryNestedInput = {
-    create?: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutHistoryInput
-    upsert?: AgentUpsertWithoutHistoryInput
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutHistoryInput, AgentUpdateWithoutHistoryInput>, AgentUncheckedUpdateWithoutHistoryInput>
-  }
-
-  export type AgentUpdateOneWithoutHistoryAsTargetNestedInput = {
-    create?: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
-    connectOrCreate?: AgentCreateOrConnectWithoutHistoryAsTargetInput
-    upsert?: AgentUpsertWithoutHistoryAsTargetInput
-    disconnect?: AgentWhereInput | boolean
-    delete?: AgentWhereInput | boolean
-    connect?: AgentWhereUniqueInput
-    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutHistoryAsTargetInput, AgentUpdateWithoutHistoryAsTargetInput>, AgentUncheckedUpdateWithoutHistoryAsTargetInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -19240,6 +17689,13 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedEnumTerrainTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -19252,6 +17708,16 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
+    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -19366,23 +17832,6 @@ export namespace Prisma {
     _max?: NestedEnumInteractionTypeFilter<$PrismaModel>
   }
 
-  export type NestedEnumTerrainTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeFilter<$PrismaModel> | $Enums.TerrainType
-  }
-
-  export type NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTerrainTypeWithAggregatesFilter<$PrismaModel> | $Enums.TerrainType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTerrainTypeFilter<$PrismaModel>
-    _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
-  }
-
   export type NestedEnumCooldownTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.CooldownType | EnumCooldownTypeFieldRefInput<$PrismaModel>
     in?: $Enums.CooldownType[] | ListEnumCooldownTypeFieldRefInput<$PrismaModel>
@@ -19433,10 +17882,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
@@ -19447,6 +17894,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -19456,9 +17904,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutGameInput = {
@@ -19591,6 +18036,7 @@ export namespace Prisma {
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
+    mapTileId?: StringFilter<"Agent"> | string
   }
 
   export type AllianceUpsertWithWhereUniqueWithoutGameInput = {
@@ -19701,9 +18147,7 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutProfileInput = {
@@ -19714,6 +18158,7 @@ export namespace Prisma {
     gameId: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -19723,9 +18168,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutProfileInput = {
@@ -20097,30 +18539,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type MapTileCreateWithoutAgentInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-  }
-
-  export type MapTileUncheckedCreateWithoutAgentInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-  }
-
-  export type MapTileCreateOrConnectWithoutAgentInput = {
-    where: MapTileWhereUniqueInput
-    create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
-  }
-
-  export type MapTileCreateManyAgentInputEnvelope = {
-    data: MapTileCreateManyAgentInput | MapTileCreateManyAgentInput[]
-    skipDuplicates?: boolean
-  }
-
   export type AgentProfileCreateWithoutAgentsInput = {
     id?: string
     onchainId: number
@@ -20132,6 +18550,7 @@ export namespace Prisma {
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileCreatepostExamplesInput | string[]
   }
 
   export type AgentProfileUncheckedCreateWithoutAgentsInput = {
@@ -20145,6 +18564,7 @@ export namespace Prisma {
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileCreatepostExamplesInput | string[]
   }
 
   export type AgentProfileCreateOrConnectWithoutAgentsInput = {
@@ -20152,56 +18572,25 @@ export namespace Prisma {
     create: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
   }
 
-  export type AgentHistoryCreateWithoutAgentInput = {
+  export type MapTileCreateWithoutAgentInput = {
     id?: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    targetAgent?: AgentCreateNestedOneWithoutHistoryAsTargetInput
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agentId?: string | null
   }
 
-  export type AgentHistoryUncheckedCreateWithoutAgentInput = {
+  export type MapTileUncheckedCreateWithoutAgentInput = {
     id?: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    targetAgentId?: string | null
+    x: number
+    y: number
+    terrainType: $Enums.TerrainType
+    agentId?: string | null
   }
 
-  export type AgentHistoryCreateOrConnectWithoutAgentInput = {
-    where: AgentHistoryWhereUniqueInput
-    create: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput>
-  }
-
-  export type AgentHistoryCreateManyAgentInputEnvelope = {
-    data: AgentHistoryCreateManyAgentInput | AgentHistoryCreateManyAgentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type AgentHistoryCreateWithoutTargetAgentInput = {
-    id?: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    agent: AgentCreateNestedOneWithoutHistoryInput
-  }
-
-  export type AgentHistoryUncheckedCreateWithoutTargetAgentInput = {
-    id?: string
-    agentId: string
-    type: string
-    details: string
-    timestamp?: Date | string
-  }
-
-  export type AgentHistoryCreateOrConnectWithoutTargetAgentInput = {
-    where: AgentHistoryWhereUniqueInput
-    create: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput>
-  }
-
-  export type AgentHistoryCreateManyTargetAgentInputEnvelope = {
-    data: AgentHistoryCreateManyTargetAgentInput | AgentHistoryCreateManyTargetAgentInput[]
-    skipDuplicates?: boolean
+  export type MapTileCreateOrConnectWithoutAgentInput = {
+    where: MapTileWhereUniqueInput
+    create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
   }
 
   export type TweetUpsertWithWhereUniqueWithoutAgentInput = {
@@ -20407,33 +18796,6 @@ export namespace Prisma {
     data: XOR<AllianceUpdateManyMutationInput, AllianceUncheckedUpdateManyWithoutJoinerInput>
   }
 
-  export type MapTileUpsertWithWhereUniqueWithoutAgentInput = {
-    where: MapTileWhereUniqueInput
-    update: XOR<MapTileUpdateWithoutAgentInput, MapTileUncheckedUpdateWithoutAgentInput>
-    create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
-  }
-
-  export type MapTileUpdateWithWhereUniqueWithoutAgentInput = {
-    where: MapTileWhereUniqueInput
-    data: XOR<MapTileUpdateWithoutAgentInput, MapTileUncheckedUpdateWithoutAgentInput>
-  }
-
-  export type MapTileUpdateManyWithWhereWithoutAgentInput = {
-    where: MapTileScalarWhereInput
-    data: XOR<MapTileUpdateManyMutationInput, MapTileUncheckedUpdateManyWithoutAgentInput>
-  }
-
-  export type MapTileScalarWhereInput = {
-    AND?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
-    OR?: MapTileScalarWhereInput[]
-    NOT?: MapTileScalarWhereInput | MapTileScalarWhereInput[]
-    id?: StringFilter<"MapTile"> | string
-    x?: IntFilter<"MapTile"> | number
-    y?: IntFilter<"MapTile"> | number
-    terrainType?: EnumTerrainTypeFilter<"MapTile"> | $Enums.TerrainType
-    occupiedBy?: StringNullableFilter<"MapTile"> | string | null
-  }
-
   export type AgentProfileUpsertWithoutAgentsInput = {
     update: XOR<AgentProfileUpdateWithoutAgentsInput, AgentProfileUncheckedUpdateWithoutAgentsInput>
     create: XOR<AgentProfileCreateWithoutAgentsInput, AgentProfileUncheckedCreateWithoutAgentsInput>
@@ -20456,6 +18818,7 @@ export namespace Prisma {
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileUpdatepostExamplesInput | string[]
   }
 
   export type AgentProfileUncheckedUpdateWithoutAgentsInput = {
@@ -20469,50 +18832,130 @@ export namespace Prisma {
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
+    postExamples?: AgentProfileUpdatepostExamplesInput | string[]
   }
 
-  export type AgentHistoryUpsertWithWhereUniqueWithoutAgentInput = {
-    where: AgentHistoryWhereUniqueInput
-    update: XOR<AgentHistoryUpdateWithoutAgentInput, AgentHistoryUncheckedUpdateWithoutAgentInput>
-    create: XOR<AgentHistoryCreateWithoutAgentInput, AgentHistoryUncheckedCreateWithoutAgentInput>
+  export type MapTileUpsertWithoutAgentInput = {
+    update: XOR<MapTileUpdateWithoutAgentInput, MapTileUncheckedUpdateWithoutAgentInput>
+    create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
+    where?: MapTileWhereInput
   }
 
-  export type AgentHistoryUpdateWithWhereUniqueWithoutAgentInput = {
-    where: AgentHistoryWhereUniqueInput
-    data: XOR<AgentHistoryUpdateWithoutAgentInput, AgentHistoryUncheckedUpdateWithoutAgentInput>
+  export type MapTileUpdateToOneWithWhereWithoutAgentInput = {
+    where?: MapTileWhereInput
+    data: XOR<MapTileUpdateWithoutAgentInput, MapTileUncheckedUpdateWithoutAgentInput>
   }
 
-  export type AgentHistoryUpdateManyWithWhereWithoutAgentInput = {
-    where: AgentHistoryScalarWhereInput
-    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyWithoutAgentInput>
+  export type MapTileUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type AgentHistoryScalarWhereInput = {
-    AND?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
-    OR?: AgentHistoryScalarWhereInput[]
-    NOT?: AgentHistoryScalarWhereInput | AgentHistoryScalarWhereInput[]
-    id?: StringFilter<"AgentHistory"> | string
-    agentId?: StringFilter<"AgentHistory"> | string
-    type?: StringFilter<"AgentHistory"> | string
-    details?: StringFilter<"AgentHistory"> | string
-    timestamp?: DateTimeFilter<"AgentHistory"> | Date | string
-    targetAgentId?: StringNullableFilter<"AgentHistory"> | string | null
+  export type MapTileUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    x?: IntFieldUpdateOperationsInput | number
+    y?: IntFieldUpdateOperationsInput | number
+    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type AgentHistoryUpsertWithWhereUniqueWithoutTargetAgentInput = {
-    where: AgentHistoryWhereUniqueInput
-    update: XOR<AgentHistoryUpdateWithoutTargetAgentInput, AgentHistoryUncheckedUpdateWithoutTargetAgentInput>
-    create: XOR<AgentHistoryCreateWithoutTargetAgentInput, AgentHistoryUncheckedCreateWithoutTargetAgentInput>
+  export type AgentCreateWithoutMapTileInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
   }
 
-  export type AgentHistoryUpdateWithWhereUniqueWithoutTargetAgentInput = {
-    where: AgentHistoryWhereUniqueInput
-    data: XOR<AgentHistoryUpdateWithoutTargetAgentInput, AgentHistoryUncheckedUpdateWithoutTargetAgentInput>
+  export type AgentUncheckedCreateWithoutMapTileInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
   }
 
-  export type AgentHistoryUpdateManyWithWhereWithoutTargetAgentInput = {
-    where: AgentHistoryScalarWhereInput
-    data: XOR<AgentHistoryUpdateManyMutationInput, AgentHistoryUncheckedUpdateManyWithoutTargetAgentInput>
+  export type AgentCreateOrConnectWithoutMapTileInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutMapTileInput, AgentUncheckedCreateWithoutMapTileInput>
+  }
+
+  export type AgentUpsertWithoutMapTileInput = {
+    update: XOR<AgentUpdateWithoutMapTileInput, AgentUncheckedUpdateWithoutMapTileInput>
+    create: XOR<AgentCreateWithoutMapTileInput, AgentUncheckedCreateWithoutMapTileInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutMapTileInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutMapTileInput, AgentUncheckedUpdateWithoutMapTileInput>
+  }
+
+  export type AgentUpdateWithoutMapTileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutMapTileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type AgentCreateWithoutTweetsInput = {
@@ -20531,10 +18974,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutTweetsInput = {
@@ -20546,6 +18987,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
@@ -20554,9 +18996,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutTweetsInput = {
@@ -20619,10 +19058,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutTweetsInput = {
@@ -20634,6 +19071,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
@@ -20642,9 +19080,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type InteractionUpsertWithWhereUniqueWithoutTweetInput = {
@@ -20733,10 +19168,8 @@ export namespace Prisma {
     wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutInitiatedAlliancesInput = {
@@ -20748,6 +19181,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -20756,9 +19190,6 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutInitiatedAlliancesInput = {
@@ -20782,10 +19213,8 @@ export namespace Prisma {
     wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutJoinedAlliancesInput = {
@@ -20797,6 +19226,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -20805,9 +19235,6 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutJoinedAlliancesInput = {
@@ -20889,10 +19316,8 @@ export namespace Prisma {
     wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutInitiatedAlliancesInput = {
@@ -20904,6 +19329,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -20912,9 +19338,6 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUpsertWithoutJoinedAlliancesInput = {
@@ -20944,10 +19367,8 @@ export namespace Prisma {
     wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutJoinedAlliancesInput = {
@@ -20959,6 +19380,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -20967,9 +19389,6 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type GameCreateWithoutBattlesInput = {
@@ -21029,10 +19448,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsAttackerInput = {
@@ -21044,6 +19461,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
@@ -21052,9 +19470,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsAttackerInput = {
@@ -21078,10 +19493,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsDefenderInput = {
@@ -21093,6 +19506,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
@@ -21101,9 +19515,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsDefenderInput = {
@@ -21127,10 +19538,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput = {
@@ -21142,6 +19551,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -21150,9 +19560,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput = {
@@ -21176,10 +19583,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput = {
@@ -21191,6 +19596,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -21199,9 +19605,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput = {
@@ -21225,10 +19628,8 @@ export namespace Prisma {
     coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutWonBattlesInput = {
@@ -21240,6 +19641,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -21248,9 +19650,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutWonBattlesInput = {
@@ -21332,10 +19731,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsAttackerInput = {
@@ -21347,6 +19744,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
@@ -21355,9 +19753,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsDefenderInput = {
@@ -21387,10 +19782,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsDefenderInput = {
@@ -21402,6 +19795,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
@@ -21410,9 +19804,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsAttackerAllyInput = {
@@ -21442,10 +19833,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput = {
@@ -21457,6 +19846,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -21465,9 +19855,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsDefenderAllyInput = {
@@ -21497,10 +19884,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput = {
@@ -21512,6 +19897,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -21520,9 +19906,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUpsertWithoutWonBattlesInput = {
@@ -21552,10 +19935,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutWonBattlesInput = {
@@ -21567,6 +19948,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -21575,9 +19957,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type TweetCreateWithoutInteractionsInput = {
@@ -21632,110 +20011,6 @@ export namespace Prisma {
     conversationId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type AgentCreateWithoutMapTilesInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    isAlive?: boolean
-    deathTimestamp?: Date | string | null
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
-    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
-  }
-
-  export type AgentUncheckedCreateWithoutMapTilesInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    isAlive?: boolean
-    profileId: string
-    deathTimestamp?: Date | string | null
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
-    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutMapTilesInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
-  }
-
-  export type AgentUpsertWithoutMapTilesInput = {
-    update: XOR<AgentUpdateWithoutMapTilesInput, AgentUncheckedUpdateWithoutMapTilesInput>
-    create: XOR<AgentCreateWithoutMapTilesInput, AgentUncheckedCreateWithoutMapTilesInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutMapTilesInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutMapTilesInput, AgentUncheckedUpdateWithoutMapTilesInput>
-  }
-
-  export type AgentUpdateWithoutMapTilesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
-    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutMapTilesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    profileId?: StringFieldUpdateOperationsInput | string
-    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
-    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
-  }
-
   export type AgentCreateWithoutCoolDownInput = {
     id?: string
     onchainId: number
@@ -21752,10 +20027,8 @@ export namespace Prisma {
     wonBattles?: BattleCreateNestedManyWithoutWinnerInput
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutCoolDownInput = {
@@ -21767,6 +20040,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -21775,9 +20049,6 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
   }
 
   export type AgentCreateOrConnectWithoutCoolDownInput = {
@@ -21853,10 +20124,8 @@ export namespace Prisma {
     wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCoolDownInput = {
@@ -21868,6 +20137,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -21876,9 +20146,6 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type GameUpsertWithoutCoolDownInput = {
@@ -21928,214 +20195,6 @@ export namespace Prisma {
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
   }
 
-  export type AgentCreateWithoutHistoryInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    isAlive?: boolean
-    deathTimestamp?: Date | string | null
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
-    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    historyAsTarget?: AgentHistoryCreateNestedManyWithoutTargetAgentInput
-  }
-
-  export type AgentUncheckedCreateWithoutHistoryInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    isAlive?: boolean
-    profileId: string
-    deathTimestamp?: Date | string | null
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
-    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    historyAsTarget?: AgentHistoryUncheckedCreateNestedManyWithoutTargetAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutHistoryInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
-  }
-
-  export type AgentCreateWithoutHistoryAsTargetInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    isAlive?: boolean
-    deathTimestamp?: Date | string | null
-    tweets?: TweetCreateNestedManyWithoutAgentInput
-    game: GameCreateNestedOneWithoutAgentsInput
-    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
-    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
-    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileCreateNestedManyWithoutAgentInput
-    profile: AgentProfileCreateNestedOneWithoutAgentsInput
-    history?: AgentHistoryCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentUncheckedCreateWithoutHistoryAsTargetInput = {
-    id?: string
-    onchainId: number
-    authority: string
-    health?: number
-    gameId: string
-    isAlive?: boolean
-    profileId: string
-    deathTimestamp?: Date | string | null
-    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
-    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
-    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
-    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
-    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
-    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
-    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
-    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
-    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
-    mapTiles?: MapTileUncheckedCreateNestedManyWithoutAgentInput
-    history?: AgentHistoryUncheckedCreateNestedManyWithoutAgentInput
-  }
-
-  export type AgentCreateOrConnectWithoutHistoryAsTargetInput = {
-    where: AgentWhereUniqueInput
-    create: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
-  }
-
-  export type AgentUpsertWithoutHistoryInput = {
-    update: XOR<AgentUpdateWithoutHistoryInput, AgentUncheckedUpdateWithoutHistoryInput>
-    create: XOR<AgentCreateWithoutHistoryInput, AgentUncheckedCreateWithoutHistoryInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutHistoryInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutHistoryInput, AgentUncheckedUpdateWithoutHistoryInput>
-  }
-
-  export type AgentUpdateWithoutHistoryInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
-    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutHistoryInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    profileId?: StringFieldUpdateOperationsInput | string
-    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
-    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
-  }
-
-  export type AgentUpsertWithoutHistoryAsTargetInput = {
-    update: XOR<AgentUpdateWithoutHistoryAsTargetInput, AgentUncheckedUpdateWithoutHistoryAsTargetInput>
-    create: XOR<AgentCreateWithoutHistoryAsTargetInput, AgentUncheckedCreateWithoutHistoryAsTargetInput>
-    where?: AgentWhereInput
-  }
-
-  export type AgentUpdateToOneWithWhereWithoutHistoryAsTargetInput = {
-    where?: AgentWhereInput
-    data: XOR<AgentUpdateWithoutHistoryAsTargetInput, AgentUncheckedUpdateWithoutHistoryAsTargetInput>
-  }
-
-  export type AgentUpdateWithoutHistoryAsTargetInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tweets?: TweetUpdateManyWithoutAgentNestedInput
-    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
-    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
-    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
-    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-  }
-
-  export type AgentUncheckedUpdateWithoutHistoryAsTargetInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    onchainId?: IntFieldUpdateOperationsInput | number
-    authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
-    gameId?: StringFieldUpdateOperationsInput | string
-    isAlive?: BoolFieldUpdateOperationsInput | boolean
-    profileId?: StringFieldUpdateOperationsInput | string
-    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
-    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
-    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
-    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
-    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
-    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
-    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
-    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
-    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-  }
-
   export type AgentCreateManyGameInput = {
     id?: string
     onchainId: number
@@ -22144,6 +20203,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    mapTileId: string
   }
 
   export type AllianceCreateManyGameInput = {
@@ -22193,10 +20253,8 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
@@ -22207,6 +20265,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -22216,9 +20275,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutGameInput = {
@@ -22229,6 +20285,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceUpdateWithoutGameInput = {
@@ -22332,6 +20389,7 @@ export namespace Prisma {
     gameId: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    mapTileId: string
   }
 
   export type AgentUpdateWithoutProfileInput = {
@@ -22351,9 +20409,7 @@ export namespace Prisma {
     coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUpdateManyWithoutTargetAgentNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutProfileInput = {
@@ -22364,6 +20420,7 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -22373,9 +20430,6 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
-    mapTiles?: MapTileUncheckedUpdateManyWithoutAgentNestedInput
-    history?: AgentHistoryUncheckedUpdateManyWithoutAgentNestedInput
-    historyAsTarget?: AgentHistoryUncheckedUpdateManyWithoutTargetAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutProfileInput = {
@@ -22386,6 +20440,7 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
   }
 
   export type TweetCreateManyAgentInput = {
@@ -22491,29 +20546,6 @@ export namespace Prisma {
     gameId: string
     initiatorId: string
     endedAt?: Date | string | null
-  }
-
-  export type MapTileCreateManyAgentInput = {
-    id?: string
-    x: number
-    y: number
-    terrainType: $Enums.TerrainType
-  }
-
-  export type AgentHistoryCreateManyAgentInput = {
-    id?: string
-    type: string
-    details: string
-    timestamp?: Date | string
-    targetAgentId?: string | null
-  }
-
-  export type AgentHistoryCreateManyTargetAgentInput = {
-    id?: string
-    agentId: string
-    type: string
-    details: string
-    timestamp?: Date | string
   }
 
   export type TweetUpdateWithoutAgentInput = {
@@ -22831,75 +20863,6 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     initiatorId?: StringFieldUpdateOperationsInput | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type MapTileUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type MapTileUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type MapTileUncheckedUpdateManyWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    x?: IntFieldUpdateOperationsInput | number
-    y?: IntFieldUpdateOperationsInput | number
-    terrainType?: EnumTerrainTypeFieldUpdateOperationsInput | $Enums.TerrainType
-  }
-
-  export type AgentHistoryUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgent?: AgentUpdateOneWithoutHistoryAsTargetNestedInput
-  }
-
-  export type AgentHistoryUncheckedUpdateWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type AgentHistoryUncheckedUpdateManyWithoutAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    targetAgentId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type AgentHistoryUpdateWithoutTargetAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-    agent?: AgentUpdateOneRequiredWithoutHistoryNestedInput
-  }
-
-  export type AgentHistoryUncheckedUpdateWithoutTargetAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type AgentHistoryUncheckedUpdateManyWithoutTargetAgentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    agentId?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
-    details?: StringFieldUpdateOperationsInput | string
-    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InteractionCreateManyTweetInput = {

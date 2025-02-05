@@ -12,9 +12,16 @@ import { BattleResolver } from "./BattleResolver";
 import { stringToUuid } from "@/utils/uuid";
 import { TweetV2 } from "twitter-api-v2";
 import { ActionContext, GameAction } from "@/types";
-import { OrchestratorError, OrchestratorErrorType } from "@/utils/error";
+import {
+  InitializationError,
+  AgentError,
+  RecoveryError,
+  MearthError,
+  ShutdownError,
+} from "@/utils/error";
 import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./ActionManager";
+import { gameConfig } from "@/config/env";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -25,17 +32,15 @@ export class GameOrchestrator {
     ? parseInt(process.env.UPDATE_INTERVAL)
     : 3600000; // 1 hour
 
-  private readonly agentProcessingDelay = process.env.AGENT_PROCESSING_DELAY
-    ? parseInt(process.env.AGENT_PROCESSING_DELAY)
-    : 120000; // Default 2 minutes delay between agents
+  private readonly agentProcessingDelay = 120000; // Default 2 minutes delay between agents
 
-  private readonly cleanupInterval = 3600000; // 1 hour
+  private readonly cleanupInterval = gameConfig.cleanupInterval;
   private isRunning: boolean = false;
   private readonly maxRetries: number = 3;
   private readonly retryDelay: number = 5000; // 5 seconds
 
   constructor(
-    private readonly currentGameOnchainId: number,
+    private readonly currentGameOnchainId: BN,
     private readonly gameId: string,
     private readonly actionManager: ActionManager,
     private readonly twitter: TwitterManager,
@@ -70,14 +75,16 @@ export class GameOrchestrator {
         gameId: this.currentGameOnchainId,
         timestamp: new Date().toISOString(),
       });
-    } catch (error) {
-      const orchestratorError = new OrchestratorError(
-        OrchestratorErrorType.INITIALIZATION,
-        "Failed to start Game Orchestrator",
-        { error: String(error) }
+    } catch (err) {
+      const initError = new InitializationError(
+        "Failed to initialize game orchestrator",
+        {
+          gameId: this.gameId,
+          error: err instanceof Error ? err.message : String(err),
+        }
       );
-      this.handleError(orchestratorError);
-      throw orchestratorError;
+      await this.handleError(initError);
+      throw initError;
     }
   }
 
@@ -95,21 +102,17 @@ export class GameOrchestrator {
           await new Promise((resolve) =>
             setTimeout(resolve, this.updateInterval)
           );
-        } catch (error) {
+        } catch (err) {
           retries++;
-          logger.error("Update loop iteration failed", {
-            gameId: this.currentGameOnchainId,
-            retryAttempt: retries,
-            error: String(error),
-          });
-
           if (retries >= this.maxRetries) {
-            const orchestratorError = new OrchestratorError(
-              OrchestratorErrorType.AGENT_PROCESSING,
+            const processError = new AgentError(
               "Max retries exceeded in update loop",
-              { retries, lastError: error }
+              {
+                retries,
+                lastError: err instanceof Error ? err.message : String(err),
+              }
             );
-            this.handleError(orchestratorError);
+            await this.handleError(processError);
             break;
           }
 
@@ -142,21 +145,17 @@ export class GameOrchestrator {
           await new Promise((resolve) =>
             setTimeout(resolve, this.cleanupInterval)
           );
-        } catch (error) {
+        } catch (err) {
           retries++;
-          logger.error("Cleanup loop iteration failed", {
-            gameId: this.currentGameOnchainId,
-            retryAttempt: retries,
-            error: error instanceof Error ? error.message : String(error),
-          });
-
           if (retries >= this.maxRetries) {
-            const orchestratorError = new OrchestratorError(
-              OrchestratorErrorType.CLEANUP,
+            const cleanupError = new ShutdownError(
               "Max retries exceeded in cleanup loop",
-              { retries, lastError: error }
+              {
+                retries,
+                lastError: err instanceof Error ? err.message : String(err),
+              }
             );
-            this.handleError(orchestratorError);
+            await this.handleError(cleanupError);
             break;
           }
 
@@ -182,6 +181,10 @@ export class GameOrchestrator {
 
     this.eventEmitter.on("newAction", this.handleNewAction.bind(this));
     this.eventEmitter.on("error", this.handleError.bind(this));
+    this.eventEmitter.on(
+      "actionExecutionFailure",
+      this.handleActionExecutionFailure.bind(this)
+    );
 
     // Add handler for uncaught promise rejections
     process.on("unhandledRejection", (reason, promise) => {
@@ -225,109 +228,128 @@ export class GameOrchestrator {
         actionType: data.action.type,
       });
 
-      // const result = await this.actionManager.executeAction(
-      //   data.actionContext,
-      //   data.action
-      // );
+      const result = await this.actionManager.executeAction(
+        data.actionContext,
+        data.action
+      );
+      const cacheKey = `action:${data.actionContext.agentId}:${data.action.type}`;
+      await this.cache.cacheAction(cacheKey, result);
 
-      // if action is successful, post a tweet
-      if (true) {
-        await this.twitter.postTweet(
-          data.actionContext.agentOnchainId.toString() as AgentId,
-          data.action.tweet
-        );
+      // // if action is successful, post a tweet
+      // if (result.success && result.feedback?.isValid) {
+      //   await this.twitter.postTweet(
+      //     data.actionContext.agentOnchainId.toString() as AgentId,
+      //     `${getTwitterUserNameByAgentId(
+      //       data.actionContext.agentOnchainId.toString() as AgentId
+      //     )} => ${data.action.tweet}`
+      //   );
+      // }
+
+      // TODO: remove this after testing
+      function getTwitterUserNameByAgentId(agentId: AgentId): string {
+        switch (agentId) {
+          case "1":
+            return "PurrlockPawsAI";
+          case "2":
+            return "Scootles";
+          case "3":
+            return "Sir Gullihop";
+
+          case "4":
+            return "Wanderleaf";
+
+          default:
+            throw new Error("Invalid agent ID");
+        }
       }
+
+      // this.engine.handleActionResult(data.actionContext, result);
 
       logger.info("✅ Action successfully processed", {
         gameId: this.currentGameOnchainId,
         agentId: data.actionContext.agentId,
         actionType: data.action.type,
       });
-    } catch (error) {
-      const orchestratorError = new OrchestratorError(
-        OrchestratorErrorType.ACTION_EXECUTION,
-        "Failed to handle new action",
-        {
-          agentId: data.actionContext.agentId,
-          actionType: data.action.type,
-          error: String(error),
-        }
-      );
-      this.handleError(orchestratorError);
+    } catch (err) {
+      const actionError = new AgentError("Failed to handle new action", {
+        agentId: data.actionContext.agentId,
+        actionType: data.action.type,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      await this.handleError(actionError);
     }
   }
 
-  private async handleError(error: Error | OrchestratorError): Promise<void> {
-    const errorDetails =
-      error instanceof OrchestratorError
-        ? { type: error.type, metadata: error.metadata }
-        : { type: "UNKNOWN_ERROR" };
+  private async handleError(error: Error | MearthError): Promise<void> {
+    const errorDetails = error instanceof MearthError ? error.details : {};
 
-    logger.error("⚠️ System error occurred", {
-      gameId: this.currentGameOnchainId,
-      ...errorDetails,
-      error: error.message,
-      stack: error.stack,
-    });
+    // Log error with appropriate level based on severity
+    if (error instanceof MearthError) {
+      if (error.status >= 500) {
+        logger.error("Critical error in orchestrator:", error.toJSON());
+      } else {
+        logger.warn("Non-critical error in orchestrator:", error.toJSON());
+      }
+    } else {
+      logger.error("Unknown error in orchestrator:", {
+        error: error.message,
+        stack: error.stack,
+      });
+    }
 
+    // Attempt recovery based on error type
     await this.attemptRecovery(error);
+
+    // Check if we need to shutdown
+    if (this.shouldShutdown(error)) {
+      await this.shutdown();
+    }
   }
 
-  private async attemptRecovery(
-    error: Error | OrchestratorError
-  ): Promise<void> {
-    logger.info("🔄 Attempting system recovery...", {
-      gameId: this.currentGameOnchainId,
-    });
-
+  private async attemptRecovery(error: Error | MearthError): Promise<void> {
     try {
-      // Invalidate cache as first recovery step
-      await this.cache.invalidateCache("*");
-
-      // If it's an orchestrator error, handle specific recovery logic
-      if (error instanceof OrchestratorError) {
-        switch (error.type) {
-          case OrchestratorErrorType.AGENT_PROCESSING:
+      if (error instanceof MearthError) {
+        switch (error.code) {
+          case "AGENT_ERROR":
             await this.engine.resetAgentState();
             break;
-          case OrchestratorErrorType.TWEET_PROCESSING:
+          case "TWITTER_ERROR":
             await this.twitter.reconnect();
             break;
-          case OrchestratorErrorType.CACHE:
+          case "CACHE_ERROR":
             await this.cache.reset();
             break;
+          default:
+            // For unknown errors, log and continue
+            logger.warn("No recovery strategy for error type:", error.code);
         }
       }
 
-      logger.info("✅ Recovery attempt completed successfully", {
-        gameId: this.currentGameOnchainId,
-        errorType:
-          error instanceof OrchestratorError ? error.type : "UNKNOWN_ERROR",
+      logger.info("Recovery attempt completed for error:", {
+        type: error instanceof MearthError ? error.code : "UNKNOWN_ERROR",
+        message: error.message,
       });
-    } catch (recoveryError) {
-      logger.error("❌ Recovery attempt failed", {
-        gameId: this.currentGameOnchainId,
-        error:
-          recoveryError instanceof Error
-            ? recoveryError.message
-            : String(recoveryError),
-        originalError: error.message,
+    } catch (recoveryErr) {
+      const recoveryError = new RecoveryError("Failed to recover from error", {
+        originalError:
+          error instanceof MearthError ? error.toJSON() : error.message,
+        recoveryError:
+          recoveryErr instanceof Error
+            ? recoveryErr.message
+            : String(recoveryErr),
       });
-
-      // If recovery fails, we might need to shutdown
-      if (this.shouldShutdown(error)) {
-        await this.shutdown();
-      }
+      logger.error("Recovery failed:", recoveryError.toJSON());
+      throw recoveryError;
     }
   }
 
-  private shouldShutdown(error: Error | OrchestratorError): boolean {
-    if (error instanceof OrchestratorError) {
-      // explanation: we want to shutdown if the error is related to initialization or recovery
+  private shouldShutdown(error: Error | MearthError): boolean {
+    if (error instanceof MearthError) {
       return [
-        OrchestratorErrorType.INITIALIZATION,
-        OrchestratorErrorType.RECOVERY,
-      ].includes(error.type);
+        "INITIALIZATION_ERROR",
+        "RECOVERY_ERROR",
+        "SHUTDOWN_ERROR",
+      ].includes(error.code);
     }
     return false;
   }
@@ -371,7 +393,6 @@ export class GameOrchestrator {
           },
         },
       },
-      take: 1,
     });
 
     // Process agents sequentially with delay
@@ -454,6 +475,10 @@ export class GameOrchestrator {
     // Process scores through decision engine
     await this.engine.processInfluenceScores(actionContext, scores);
     logger.info(`✅ Processed ${scores.length} interactions`);
+  }
+
+  private async handleActionExecutionFailure(error: Error): Promise<void> {
+    logger.error("Action execution failed", { error });
   }
 
   private async cleanup(): Promise<void> {

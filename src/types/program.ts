@@ -153,13 +153,3 @@ export interface StakeEvent {
   shares: BN;
   timestamp: BN;
 }
-
-// Program Constants
-export const DAILY_REWARDS = new BN(1000);
-export const BATTLE_COOLDOWN = new BN(3600); // 1 hour
-export const MOVEMENT_COOLDOWN = new BN(1800); // 30 minutes
-export const ALLIANCE_COOLDOWN = new BN(86400); // 24 hours
-export const MAX_BATTLE_RANGE = 2;
-export const MIN_TOKEN_BURN_PERCENT = 31;
-export const MAX_TOKEN_BURN_PERCENT = 50;
-export const DEATH_PROBABILITY = 5; // 5%

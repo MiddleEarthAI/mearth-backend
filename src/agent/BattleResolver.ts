@@ -1,4 +1,3 @@
-import { logger } from "@/utils/logger";
 import { PublicKey } from "@solana/web3.js";
 import { Program, BN } from "@coral-xyz/anchor";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
@@ -6,11 +5,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { AgentAccount, AgentInfo } from "@/types/program";
 import { PrismaClient } from "@prisma/client";
 import { getAgentAta } from "../utils/program";
-import { DEATH_CHANCE } from "@/constants";
-
-// Constants
-const BATTLE_DURATION = 3600; // 1 hour in seconds
-const CHECK_INTERVAL = 300000; // 5 minutes in milliseconds
+import { gameConfig } from "@/config/env";
 
 // Represents outcome of a 1v1 battle between two agents
 type SimpleBattleOutcome = {
@@ -83,12 +78,12 @@ export class BattleResolver {
 
   constructor(
     private readonly currentGameOnchainId: BN,
-    private readonly gameId: number,
+    private readonly gameId: string,
     private readonly program: Program<MiddleEarthAiProgram>,
     prisma: PrismaClient
   ) {
     this.prisma = prisma;
-    logger.info("🎮 Battle Resolution Service initialized for game", {
+    console.log("🎮 Battle Resolution Service initialized for game", {
       currentGameOnchainId,
     });
   }
@@ -98,7 +93,7 @@ export class BattleResolver {
    */
   public async start() {
     if (this.resolutionInterval) {
-      logger.info("🔄 Clearing existing battle resolution interval");
+      console.log("🔄 Clearing existing battle resolution interval");
       clearInterval(this.resolutionInterval);
     }
 
@@ -106,12 +101,12 @@ export class BattleResolver {
     await this.checkAndResolveBattles();
 
     this.resolutionInterval = setInterval(() => {
-      logger.info("⏰ Running scheduled battle resolution check");
+      console.log("⏰ Running scheduled battle resolution check");
       this.checkAndResolveBattles();
-    }, CHECK_INTERVAL);
+    }, gameConfig.battleCheckInterval);
 
-    logger.info("🎯 Battle resolution interval started", {
-      intervalMs: CHECK_INTERVAL,
+    console.log("🎯 Battle resolution interval started", {
+      intervalMs: gameConfig.battleCheckInterval,
     });
   }
 
@@ -120,7 +115,7 @@ export class BattleResolver {
    */
   private async checkAndResolveBattles() {
     try {
-      logger.info("🔍 Starting battle resolution check cycle");
+      console.log("🔍 Starting battle resolution check cycle");
       const [gamePda] = getGamePDA(
         this.program.programId,
         this.currentGameOnchainId
@@ -128,7 +123,7 @@ export class BattleResolver {
       const gameAccount = await this.program.account.game.fetch(gamePda);
       const agentInfos = gameAccount.agents as AgentInfo[];
 
-      logger.info("📊 Retrieved game state and agent information", {
+      console.log("📊 Retrieved game state and agent information", {
         totalAgents: agentInfos.length,
         gameAccount: JSON.stringify(gameAccount),
       });
@@ -145,7 +140,7 @@ export class BattleResolver {
                 return agentAccount;
               }
             } catch (error) {
-              logger.error(
+              console.error(
                 `❌ Failed to fetch agent data ${agentInfo.key}:`,
                 error
               );
@@ -155,7 +150,7 @@ export class BattleResolver {
         )
       ).filter((agent): agent is AgentAccount => agent !== null);
 
-      logger.info("⚔️ Identified active battles", {
+      console.log("⚔️ Identified active battles", {
         battleCount: agentsInBattle.length,
       });
 
@@ -174,16 +169,21 @@ export class BattleResolver {
           const currentTime = Math.floor(Date.now() / 1000);
           const battleStartTime = battleGroup.currentBattleStart.toNumber();
 
-          if (currentTime - battleStartTime < BATTLE_DURATION) {
-            logger.info("⏳ Battle not ready for resolution", {
-              timeRemaining: BATTLE_DURATION - (currentTime - battleStartTime),
+          if (
+            currentTime - battleStartTime <
+            gameConfig.mechanics.cooldowns.battleDuration
+          ) {
+            console.log("⏳ Battle not ready for resolution", {
+              timeRemaining:
+                gameConfig.mechanics.cooldowns.battleDuration -
+                (currentTime - battleStartTime),
             });
             continue;
           }
 
           const { type, outcome } = this.determineBattleType(battleGroup);
 
-          logger.info("🎯 Processing battle resolution", { type });
+          console.log("🎯 Processing battle resolution", { type });
 
           // Resolve battle based on type
           switch (type) {
@@ -207,13 +207,13 @@ export class BattleResolver {
               break;
           }
 
-          logger.info(`✅ Successfully resolved ${type} battle`);
+          console.log(`✅ Successfully resolved ${type} battle`);
         } catch (error) {
-          logger.error(`❌ Battle resolution failed:`, error);
+          console.error(`❌ Battle resolution failed:`, error);
         }
       }
     } catch (error) {
-      logger.error("❌ Battle resolution check cycle failed:", error);
+      console.error("❌ Battle resolution check cycle failed:", error);
     }
   }
 
@@ -223,7 +223,7 @@ export class BattleResolver {
   private async groupAgentsInBattle(
     agents: AgentAccount[]
   ): Promise<BattleGroup[]> {
-    logger.info("🔍 Starting to group agents in battle", {
+    console.log("🔍 Starting to group agents in battle", {
       agentCount: agents.length,
     });
 
@@ -241,7 +241,7 @@ export class BattleResolver {
       battleGroups.get(key)?.push(agent);
     });
 
-    logger.info("📊 Initial battle groups formed", {
+    console.log("📊 Initial battle groups formed", {
       groupCount: battleGroups.size,
     });
 
@@ -249,7 +249,7 @@ export class BattleResolver {
     const battleGroupsArray = await Promise.all(
       Array.from(battleGroups.entries()).map(
         async ([startTime, groupAgents]) => {
-          logger.info("⚔️ Processing battle group", {
+          console.log("⚔️ Processing battle group", {
             startTime,
             agentCount: groupAgents.length,
           });
@@ -264,7 +264,7 @@ export class BattleResolver {
             .filter((agent) => agent.allianceWith !== null)
             .map(async (agent) => {
               try {
-                logger.debug("🤝 Fetching alliance account for agent", {
+                console.log("🤝 Fetching alliance account for agent", {
                   agentId: agent.id.toString(),
                 });
                 const allianceAccount = (await this.program.account.agent.fetch(
@@ -275,7 +275,7 @@ export class BattleResolver {
                   allianceAccount,
                 } as AllianceInfo;
               } catch (error) {
-                logger.error(
+                console.error(
                   `❌ Failed to fetch alliance for agent ${agent.id}:`,
                   error
                 );
@@ -287,7 +287,7 @@ export class BattleResolver {
             (alliance): alliance is AllianceInfo => alliance !== null
           );
 
-          logger.info("🤝 Alliance accounts fetched successfully", {
+          console.log("🤝 Alliance accounts fetched successfully", {
             allianceCount: alliances.length,
           });
 
@@ -309,7 +309,7 @@ export class BattleResolver {
             }
           });
 
-          logger.info("👥 Alliance pairs created and mapped", {
+          console.log("👥 Alliance pairs created and mapped", {
             pairCount: alliancePairs.size,
           });
 
@@ -335,7 +335,7 @@ export class BattleResolver {
             (agent) => !allianceAgents.has(agent.authority.toString())
           );
 
-          logger.info("👤 Processing single agents for battle sides", {
+          console.log("👤 Processing single agents for battle sides", {
             singleAgentCount: singleAgents.length,
           });
 
@@ -346,7 +346,7 @@ export class BattleResolver {
             assignedToSideA = !assignedToSideA;
           });
 
-          logger.info("⚖️ Battle sides balanced and finalized", {
+          console.log("⚖️ Battle sides balanced and finalized", {
             sideAAgents: sides.sideA.agents.length,
             sideBAgents: sides.sideB.agents.length,
           });
@@ -360,7 +360,7 @@ export class BattleResolver {
       )
     );
 
-    logger.info("✅ Battle groups processing completed successfully", {
+    console.log("✅ Battle groups processing completed successfully", {
       totalGroups: battleGroupsArray.length,
     });
     return battleGroupsArray;
@@ -373,7 +373,7 @@ export class BattleResolver {
     winningSide: "sideA" | "sideB";
     percentLoss: number;
   } {
-    logger.info("🎲 Calculating battle outcome based on balances", {
+    console.log("🎲 Calculating battle outcome based on balances", {
       sideABalance: battleGroup.sides.sideA.totalBalance,
       sideBBalance: battleGroup.sides.sideB.totalBalance,
     });
@@ -390,7 +390,7 @@ export class BattleResolver {
     // Calculate loss percentage (20-30%)
     const percentLoss = 20 + Math.floor(Math.random() * 11);
 
-    logger.info("🏆 Battle outcome determined", {
+    console.log("🏆 Battle outcome determined", {
       winningSide,
       percentLoss,
       sideAProbability: sideAProbability.toFixed(2),
@@ -409,18 +409,18 @@ export class BattleResolver {
       | AgentVsAllianceBattleOutcome
       | AllianceVsAllianceBattleOutcome;
   } {
-    logger.info("🔍 Analyzing battle configuration", {
+    console.log("🔍 Analyzing battle configuration", {
       sideAAgents: battleGroup.sides.sideA.agents.length,
       sideBAgents: battleGroup.sides.sideB.agents.length,
     });
 
-    const { sides, currentBattleStart } = battleGroup;
+    const { sides } = battleGroup;
     const { winningSide, percentLoss } =
       this.calculateBattleOutcome(battleGroup);
 
     // Simple battle (1v1)
     if (sides.sideA.agents.length === 1 && sides.sideB.agents.length === 1) {
-      logger.info("⚔️ Detected Simple battle (1v1)");
+      console.log("⚔️ Detected Simple battle (1v1)");
       return {
         type: "Simple",
         outcome: {
@@ -442,7 +442,7 @@ export class BattleResolver {
       (sides.sideA.agents.length === 1 && sides.sideB.agents.length === 2) ||
       (sides.sideA.agents.length === 2 && sides.sideB.agents.length === 1)
     ) {
-      logger.info("⚔️ Detected Agent vs Alliance battle (1v2)");
+      console.log("⚔️ Detected Agent vs Alliance battle (1v2)");
       const singleSide =
         sides.sideA.agents.length === 1 ? sides.sideA : sides.sideB;
       const allianceSide =
@@ -469,7 +469,7 @@ export class BattleResolver {
 
     // Alliance vs Alliance (2v2)
     if (sides.sideA.agents.length === 2 && sides.sideB.agents.length === 2) {
-      logger.info("⚔️ Detected Alliance vs Alliance battle (2v2)");
+      console.log("⚔️ Detected Alliance vs Alliance battle (2v2)");
       const [allianceALeader, allianceAPartner] = sides.sideA.agents;
       const [allianceBLeader, allianceBPartner] = sides.sideB.agents;
 
@@ -490,7 +490,7 @@ export class BattleResolver {
       };
     }
 
-    logger.error("❌ Invalid battle configuration detected", {
+    console.error("❌ Invalid battle configuration detected", {
       sideAAgents: sides.sideA.agents.length,
       sideBAgents: sides.sideB.agents.length,
     });
@@ -518,11 +518,11 @@ export class BattleResolver {
           });
 
           if (!agent) {
-            logger.error("Agent not found for health penalty", { agentId });
+            console.error("Agent not found for health penalty", { agentId });
             return;
           }
 
-          const newHealth = agent.health - DEATH_CHANCE;
+          const newHealth = agent.health - gameConfig.mechanics.deathChance;
 
           if (newHealth <= 0) {
             // Kill agent both onchain and in database
@@ -578,7 +578,7 @@ export class BattleResolver {
               },
             });
 
-            logger.info("☠️ Agent killed due to health depletion", {
+            console.log("☠️ Agent killed due to health depletion", {
               agentId,
               finalHealth: 0,
             });
@@ -596,16 +596,16 @@ export class BattleResolver {
               },
             });
 
-            logger.info("💔 Applied health penalty to agent", {
+            console.log("💔 Applied health penalty to agent", {
               agentId,
               newHealth,
-              penalty: DEATH_CHANCE,
+              penalty: gameConfig.mechanics.deathChance,
             });
           }
         })
       );
     } catch (error) {
-      logger.error("Failed to apply health penalties:", error);
+      console.error("Failed to apply health penalties:", error);
       throw error;
     }
   }
@@ -617,7 +617,7 @@ export class BattleResolver {
     outcome: SimpleBattleOutcome,
     gamePda: PublicKey
   ) {
-    logger.info("⚔️ Starting simple battle resolution", {
+    console.log("⚔️ Starting simple battle resolution", {
       winnerOnchainId: outcome.winnerOnchainId,
       loserOnchainId: outcome.loserOnchainId,
       percentLoss: outcome.percentLoss,
@@ -636,7 +636,7 @@ export class BattleResolver {
     const winnerTokenAccount = await getAgentAta(winnerPda);
     const loserTokenAccount = await getAgentAta(loserPda);
 
-    logger.info("💰 Retrieved token accounts for battle participants");
+    console.log("💰 Retrieved token accounts for battle participants");
 
     try {
       // Resolve battle onchain
@@ -693,9 +693,9 @@ export class BattleResolver {
         });
       }
 
-      logger.info("🏆 Simple battle resolved successfully");
+      console.log("🏆 Simple battle resolved successfully");
     } catch (error) {
-      logger.error("Failed to resolve simple battle:", error);
+      console.error("Failed to resolve simple battle:", error);
       throw error;
     }
   }
@@ -707,7 +707,7 @@ export class BattleResolver {
     outcome: AgentVsAllianceBattleOutcome,
     gamePda: PublicKey
   ) {
-    logger.info("⚔️ Starting agent vs alliance battle resolution", {
+    console.log("⚔️ Starting agent vs alliance battle resolution", {
       singleAgentOnchainId: outcome.singleAgentOnchainId,
       allianceLeaderOnchainId: outcome.allianceLeaderOnchainId,
       alliancePartnerOnchainId: outcome.alliancePartnerOnchainId,
@@ -737,7 +737,7 @@ export class BattleResolver {
     const allianceLeaderToken = await getAgentAta(allianceLeaderPda);
     const alliancePartnerToken = await getAgentAta(alliancePartnerPda);
 
-    logger.info("💰 Retrieved token accounts for all battle participants");
+    console.log("💰 Retrieved token accounts for all battle participants");
 
     try {
       // Resolve battle onchain
@@ -811,9 +811,9 @@ export class BattleResolver {
         });
       }
 
-      logger.info("🏆 Agent vs Alliance battle resolved successfully");
+      console.log("🏆 Agent vs Alliance battle resolved successfully");
     } catch (error) {
-      logger.error("Failed to resolve agent vs alliance battle:", error);
+      console.error("Failed to resolve agent vs alliance battle:", error);
       throw error;
     }
   }
@@ -825,7 +825,7 @@ export class BattleResolver {
     outcome: AllianceVsAllianceBattleOutcome,
     gamePda: PublicKey
   ) {
-    logger.info("⚔️ Starting alliance vs alliance battle resolution", {
+    console.log("⚔️ Starting alliance vs alliance battle resolution", {
       allianceALeaderOnchainId: outcome.allianceALeaderOnchainId,
       allianceAPartnerOnchainId: outcome.allianceAPartnerOnchainId,
       allianceBLeaderOnchainId: outcome.allianceBLeaderOnchainId,
@@ -860,7 +860,7 @@ export class BattleResolver {
     const allianceBLeaderToken = await getAgentAta(allianceBLeaderPda);
     const allianceBPartnerToken = await getAgentAta(allianceBPartnerPda);
 
-    logger.info("💰 Retrieved token accounts for all alliance members");
+    console.log("💰 Retrieved token accounts for all alliance members");
 
     try {
       // Resolve battle onchain
@@ -940,9 +940,9 @@ export class BattleResolver {
         });
       }
 
-      logger.info("🏆 Alliance vs Alliance battle resolved successfully");
+      console.log("🏆 Alliance vs Alliance battle resolved successfully");
     } catch (error) {
-      logger.error("Failed to resolve alliance vs alliance battle:", error);
+      console.error("Failed to resolve alliance vs alliance battle:", error);
       throw error;
     }
   }
@@ -952,10 +952,10 @@ export class BattleResolver {
    */
   public stop() {
     if (this.resolutionInterval) {
-      logger.info("🛑 Stopping battle resolution interval");
+      console.log("🛑 Stopping battle resolution interval");
       clearInterval(this.resolutionInterval);
       this.resolutionInterval = null;
     }
-    logger.info("✋ Battle resolution interval stopped successfully");
+    console.log("✋ Battle resolution interval stopped successfully");
   }
 }

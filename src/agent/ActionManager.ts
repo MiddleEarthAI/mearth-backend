@@ -1,19 +1,13 @@
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { MearthProgram } from "@/types";
+import { IgnoreAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { logger } from "@/utils/logger";
-import {
-  AgentAccount,
-  GameAccount,
-  MOVEMENT_COOLDOWN,
-  ALLIANCE_COOLDOWN,
-} from "@/types/program";
-import { PrismaClient } from "@prisma/client";
-import { INTERACTION_DISTANCE } from "@/constants";
+import { AgentAccount, GameAccount } from "@/types/program";
+import { PrismaClient, TerrainType } from "@prisma/client";
 import { ValidationFeedback, ActionResult } from "@/types";
 import { ActionContext } from "@/types";
 import { MoveAction, BattleAction, AllianceAction, GameAction } from "@/types";
+import { gameConfig } from "@/config/env";
 
 const CURRENT_TIMESTAMP = () => new BN(Math.floor(Date.now() / 1000)); // 1 second precision
 
@@ -26,14 +20,14 @@ export class ActionManager {
     this.program = program;
     this.gameOnchainId = gameOnchainId;
     this.prisma = prisma;
-    logger.info("🎮 Action Manager initialized", { gameOnchainId });
+    console.log("🎮 Action Manager initialized", { gameOnchainId });
   }
 
   /**
    * Fetch and validate game state
    */
   private async validateGameState(): Promise<GameAccount> {
-    logger.info("🔍 Validating game state...");
+    console.log("🔍 Validating game state...");
     const [gamePda] = getGamePDA(
       this.program.programId,
       new BN(this.gameOnchainId)
@@ -41,49 +35,12 @@ export class ActionManager {
     const gameAccount = await this.program.account.game.fetch(gamePda);
 
     if (!gameAccount.isActive) {
-      logger.error("❌ Game validation failed - Game is not active");
+      console.error("❌ Game validation failed - Game is not active");
       throw new Error("Game is not active");
     }
 
-    logger.info("✅ Game state validated successfully");
+    console.log("✅ Game state validated successfully");
     return gameAccount;
-  }
-
-  /**
-   * Fetch and validate agent state
-   */
-  private async validateAgentState(
-    agentPda: PublicKey,
-    context: string
-  ): Promise<AgentAccount> {
-    logger.info("🔍 Validating agent state");
-    logger.info(`🔍 Validating agent state for ${context}...`);
-    try {
-      // const [gamePda] = getGamePDA(this.program.programId, this.gameOnchainId);
-      // const [agentPda] = getAgentPDA(this.program.programId, gamePda, agentId);
-
-      const agentAccount = await this.program.account.agent.fetch(agentPda);
-
-      if (!agentAccount.isAlive) {
-        logger.error(
-          `❌ Agent validation failed - ${context}: Agent is not alive`
-        );
-        throw new Error(`${context}: Agent is not alive`);
-      }
-
-      if (agentAccount.currentBattleStart !== null) {
-        logger.error(
-          `❌ Agent validation failed - ${context}: Agent is in battle`
-        );
-        throw new Error(`${context}: Agent is currently in battle`);
-      }
-
-      logger.info(`✅ Agent state validated successfully for ${context}`);
-      return agentAccount;
-    } catch (error) {
-      logger.error(`❌ Failed to validate agent state: ${error}`);
-      throw error;
-    }
   }
 
   /**
@@ -93,7 +50,7 @@ export class ActionManager {
     ctx: ActionContext,
     action: GameAction
   ): Promise<ActionResult> {
-    logger.info("🎯 Executing game action", {
+    console.log("🎯 Executing game action", {
       agentId: ctx.agentId,
       agentOnchainId: ctx.agentOnchainId,
       actionType: action.type,
@@ -107,7 +64,7 @@ export class ActionManager {
 
       switch (action.type) {
         case "MOVE":
-          logger.info("🚶 Processing movement action");
+          console.log("🚶 Processing movement action");
           result = await this.handleMove(ctx, action);
           break;
         case "BATTLE":
@@ -116,12 +73,15 @@ export class ActionManager {
         case "ALLY":
           result = await this.handleAlliance(ctx, action);
           break;
+        case "IGNORE":
+          result = await this.handleIgnore(ctx, action);
+          break;
         default:
           throw new Error("Invalid action type");
       }
 
       if (!result.success && result.feedback) {
-        logger.info("🔄 Action validation failed, providing feedback", {
+        console.log("🔄 Action validation failed, providing feedback", {
           feedback: result.feedback,
           actionType: action.type,
         });
@@ -129,7 +89,7 @@ export class ActionManager {
 
       return result;
     } catch (error) {
-      logger.error("💥 Failed to execute action", {
+      console.error("💥 Failed to execute action", {
         agentId: ctx.agentId,
         action,
         error,
@@ -153,6 +113,24 @@ export class ActionManager {
   }
 
   /**
+   * Handle ignore action
+   */
+  private async handleIgnore(
+    ctx: ActionContext,
+    action: IgnoreAction
+  ): Promise<ActionResult> {
+    console.log("🚫 Ignoring action", {
+      agentId: ctx.agentId,
+      actionType: action.type,
+    });
+
+    return {
+      success: true,
+      feedback: { isValid: true },
+    };
+  }
+
+  /**
    * Handle agent movement with enhanced validation
    */
   private async handleMove(
@@ -161,7 +139,7 @@ export class ActionManager {
   ): Promise<ActionResult> {
     const currentTime = CURRENT_TIMESTAMP();
 
-    logger.info("🚶 Processing movement request", {
+    console.log("🚶 Processing movement request", {
       agentId: ctx.agentId,
       agentOnchainId: ctx.agentOnchainId,
       x: action.x,
@@ -178,49 +156,42 @@ export class ActionManager {
       );
 
       // Fetch and validate agent state
-      logger.info("🔍 Validating agent state for movement");
-      const agentAccount = await this.validateAgentState(agentPda, "Move");
+      console.log("Getting agent account......");
+      const agentAccount = await this.program.account.agent.fetch(agentPda);
+      console.log("🔍 Agent account", JSON.stringify(agentAccount, null, 2));
 
       // Validate movement cooldown onchain
       if (agentAccount.nextMoveTime.gt(currentTime)) {
-        logger.error("⏳ Movement rejected - Agent on cooldown");
+        console.error("⏳ Movement rejected - Agent on cooldown");
         throw new Error("Agent is on movement cooldown onchain");
       }
 
       // Validate coordinates against game map
-      logger.info("🗺️ Validating movement coordinates");
+      console.log("🗺️ Validating movement coordinates");
       const gameAccount = await this.program.account.game.fetch(gamePda);
-
-      if (
-        action.x < 0 ||
-        action.y < 0 ||
-        action.x >= gameAccount.mapDiameter ||
-        action.y >= gameAccount.mapDiameter
-      ) {
-        logger.error("🚫 Movement rejected - Invalid coordinates");
-        throw new Error("Invalid coordinates: Out of map bounds");
-      }
+      console.log("🗺️ Game account", JSON.stringify(gameAccount, null, 2));
 
       // Additional offchain validations
-      logger.info("🔍 Performing additional movement validations");
+      console.log("🔍 Performing additional movement validations");
       const moveValidationResult = await this.validateMove(ctx, action);
 
       // Execute onchain movement
-      logger.info("🎯 Executing onchain movement");
+      console.log("🎯 Executing onchain movement");
       await this.program.methods
-        .moveAgent(new BN(action.x), new BN(action.y))
-        .accounts({
+        .moveAgent(action.x, action.y, { river: {} })
+        .accountsStrict({
           agent: agentPda,
+          game: gamePda,
           authority: this.program.provider.publicKey,
         })
         .rpc();
 
       // Update database if prisma is available
 
-      logger.info("💾 Updating movement in database");
-      await this.updateMoveInDatabase(ctx, action, ctx.agentId);
+      console.log("💾 Updating movement in database");
+      await this.updateMoveInDatabase(ctx, action);
 
-      logger.info("✨ Agent movement completed successfully", {
+      console.log("✨ Agent movement completed successfully", {
         agentId: ctx.agentId,
         x: action.x,
         y: action.y,
@@ -231,11 +202,12 @@ export class ActionManager {
         feedback: moveValidationResult,
       };
     } catch (error) {
-      logger.error("💥 Movement failed", {
+      console.error("💥 Movement failed", {
         error,
         agentId: ctx.agentId,
         action,
       });
+      console.log("Error", error);
       throw error;
     }
   }
@@ -252,13 +224,13 @@ export class ActionManager {
     const targetAccount = await this.getAgentAccount(action.targetId);
 
     if (!targetAccount) {
-      logger.error(
+      console.error(
         "❌ Battle validation failed - Target agent not found onchain"
       );
       throw new Error("Target agent not found onchain");
     }
 
-    logger.info("⚔️ Processing battle request", {
+    console.log("⚔️ Processing battle request", {
       attackerId: agentId,
       defenderId: action.targetId,
     });
@@ -276,32 +248,32 @@ export class ActionManager {
       const defenderPda = targetAccount.agentPda;
 
       // Fetch and validate both agents' states
-      logger.info("🔍 Validating combatants' states");
+      console.log("🔍 Validating combatants' states");
       const [attackerAccount, defenderAccount] = await Promise.all([
-        this.validateAgentState(attackerPda, "Battle-Attacker"),
-        this.validateAgentState(defenderPda, "Battle-Defender"),
+        this.program.account.agent.fetch(attackerPda),
+        this.program.account.agent.fetch(defenderPda),
       ]);
 
       // Validate battle cooldowns onchain
       if (attackerAccount.lastBattle.gt(currentTime)) {
-        logger.error("⏳ Battle rejected - Attacker on cooldown");
+        console.error("⏳ Battle rejected - Attacker on cooldown");
         throw new Error("Attacker is on battle cooldown onchain");
       }
       if (defenderAccount.lastBattle.gt(currentTime)) {
-        logger.error("⏳ Battle rejected - Defender on cooldown");
+        console.error("⏳ Battle rejected - Defender on cooldown");
         throw new Error("Defender is on battle cooldown onchain");
       }
 
       // Additional offchain validations
-      logger.info("🔍 Performing additional battle validations");
+      console.log("🔍 Performing additional battle validations");
       const battleValidationResult = await this.validateBattle(context, action);
 
       let tx: string;
 
       // Handle different battle types based on alliance status
-      logger.info("⚔️ Determining battle type");
+      console.log("⚔️ Determining battle type");
       if (attackerAccount.allianceWith && defenderAccount.allianceWith) {
-        logger.info("🤝 Initiating Alliance vs Alliance battle");
+        console.log("🤝 Initiating Alliance vs Alliance battle");
         tx = await this.handleAllianceVsAllianceBattle(
           gamePda,
           attackerPda,
@@ -310,7 +282,7 @@ export class ActionManager {
           defenderAccount
         );
       } else if (attackerAccount.allianceWith || defenderAccount.allianceWith) {
-        logger.info("⚔️ Initiating Agent vs Alliance battle");
+        console.log("⚔️ Initiating Agent vs Alliance battle");
         tx = await this.handleAgentVsAllianceBattle(
           gamePda,
           attackerPda,
@@ -319,13 +291,13 @@ export class ActionManager {
           defenderAccount
         );
       } else {
-        logger.info("⚔️ Initiating Simple battle");
+        console.log("⚔️ Initiating Simple battle");
         tx = await this.handleSimpleBattle(attackerPda, defenderPda);
       }
 
       // Update database if prisma is available
 
-      // logger.info("💾 Updating battle in database");
+      // console.log("💾 Updating battle in database");
       // await this.updateBattleInDatabase(
       //   context,
       //   action,
@@ -333,7 +305,7 @@ export class ActionManager {
       //   defenderAccount
       // );
 
-      logger.info("✨ Battle initiated successfully", {
+      console.log("✨ Battle initiated successfully", {
         attackerId: agentId,
         defenderId: action.targetId,
         battleType: this.determineBattleType(attackerAccount, defenderAccount),
@@ -345,7 +317,7 @@ export class ActionManager {
         feedback: battleValidationResult,
       };
     } catch (error) {
-      logger.error("💥 Battle initiation failed", { error, agentId, action });
+      console.error("💥 Battle initiation failed", { error, agentId, action });
       throw error;
     }
   }
@@ -358,7 +330,7 @@ export class ActionManager {
     action: AllianceAction
   ): Promise<ActionResult> {
     const { gameOnchainId, agentId } = context;
-    logger.info("🤝 Processing alliance request", {
+    console.log("🤝 Processing alliance request", {
       initiatorId: agentId,
       joinerId: action.targetId,
     });
@@ -381,31 +353,31 @@ export class ActionManager {
       );
 
       // Fetch and validate both agents' states
-      logger.info("🔍 Validating alliance participants");
+      console.log("🔍 Validating alliance participants");
       const [initiatorAccount, joinerAccount] = await Promise.all([
-        this.validateAgentState(initiatorPda, "Alliance-Initiator"),
-        this.validateAgentState(joinerPda, "Alliance-Joiner"),
+        this.program.account.agent.fetch(initiatorPda),
+        this.program.account.agent.fetch(joinerPda),
       ]);
 
       // Validate alliance status onchain
       if (initiatorAccount.allianceWith !== null) {
-        logger.error("🚫 Alliance rejected - Initiator already allied");
+        console.error("🚫 Alliance rejected - Initiator already allied");
         throw new Error("Initiator already has an alliance");
       }
       if (joinerAccount.allianceWith !== null) {
-        logger.error("🚫 Alliance rejected - Joiner already allied");
+        console.error("🚫 Alliance rejected - Joiner already allied");
         throw new Error("Joiner already has an alliance");
       }
 
       // Additional offchain validations
-      logger.info("🔍 Performing additional alliance validations");
+      console.log("🔍 Performing additional alliance validations");
       const allianceValidationResult = await this.validateAlliance(
         context,
         action
       );
 
       // Execute onchain alliance
-      logger.info("🎯 Executing onchain alliance formation");
+      console.log("🎯 Executing onchain alliance formation");
       await this.program.methods
         .formAlliance()
         .accounts({
@@ -414,10 +386,10 @@ export class ActionManager {
         })
         .rpc();
 
-      logger.info("💾 Updating alliance in database");
+      console.log("💾 Updating alliance in database");
       await this.updateAllianceInDatabase(context, action);
 
-      logger.info("✨ Alliance formed successfully", {
+      console.log("✨ Alliance formed successfully", {
         initiatorId: agentId,
         joinerId: action.targetId,
       });
@@ -427,7 +399,7 @@ export class ActionManager {
         feedback: allianceValidationResult,
       };
     } catch (error) {
-      logger.error("💥 Alliance formation failed", { error, agentId, action });
+      console.error("💥 Alliance formation failed", { error, agentId, action });
       throw error;
     }
   }
@@ -440,7 +412,7 @@ export class ActionManager {
     attackerAccount: AgentAccount,
     defenderAccount: AgentAccount
   ): Promise<string> {
-    logger.info("⚔️ Setting up Alliance vs Alliance battle");
+    console.log("⚔️ Setting up Alliance vs Alliance battle");
 
     if (!attackerAccount.allianceWith || !defenderAccount.allianceWith) {
       throw new Error(
@@ -475,7 +447,7 @@ export class ActionManager {
     attackerAccount: AgentAccount,
     defenderAccount: AgentAccount
   ): Promise<string> {
-    logger.info("⚔️ Setting up Agent vs Alliance battle");
+    console.log("⚔️ Setting up Agent vs Alliance battle");
     const allianceLeaderPda = attackerAccount.allianceWith
       ? attackerPda
       : defenderPda;
@@ -503,7 +475,7 @@ export class ActionManager {
     attackerPda: PublicKey,
     defenderPda: PublicKey
   ): Promise<string> {
-    logger.info("⚔️ Setting up Simple battle");
+    console.log("⚔️ Setting up Simple battle");
     return this.program.methods
       .startBattleSimple()
       .accounts({
@@ -517,32 +489,24 @@ export class ActionManager {
   // Helper methods for database updates
   private async updateMoveInDatabase(
     context: ActionContext,
-    action: MoveAction,
-    agentId: string
+    action: MoveAction
   ): Promise<void> {
-    logger.info("💾 Updating movement data in database", { agentId });
-    await this.prisma.agent.update({
-      where: { id: agentId },
-      data: {
-        mapTiles: {
-          connect: {
-            x_y: {
-              x: action.x,
-              y: action.y,
-            },
-          },
+    try {
+      await this.prisma.mapTile.update({
+        where: { x_y: { x: action.x, y: action.y } },
+        data: {
+          agentId: context.agentId,
         },
-      },
-    });
-
-    await this.prisma.coolDown.create({
-      data: {
-        type: "Move",
-        endsAt: new Date(Date.now() + MOVEMENT_COOLDOWN),
-        cooledAgentId: context.agentId,
-        gameId: context.gameId,
-      },
-    });
+      });
+      console.log("✅ Updated agent position in database", {
+        agentId: context.agentId,
+        x: action.x,
+        y: action.y,
+      });
+    } catch (error) {
+      console.error("❌ Failed to update agent position in database:", error);
+      throw error;
+    }
   }
 
   /**
@@ -552,61 +516,86 @@ export class ActionManager {
     context: ActionContext,
     action: MoveAction
   ): Promise<ValidationFeedback> {
-    logger.info("🔍 Validating movement constraints");
-
-    // Check if tile is occupied
-    const occupiedTile = await this.prisma.mapTile.findFirst({
-      where: {
-        x: action.x,
-        y: action.y,
-        occupiedBy: {
-          not: null,
-        },
-      },
-    });
-
-    if (occupiedTile) {
-      return {
-        isValid: false,
-        error: {
-          type: "MOVE",
-          message: "Tile is already occupied",
-          context: {
-            currentState: { occupiedTile },
-            attemptedAction: action,
-            suggestedFix: "Choose an unoccupied adjacent tile",
+    try {
+      // Check if position is already occupied
+      const existingTile = await this.prisma.mapTile.findFirst({
+        where: {
+          x: action.x,
+          y: action.y,
+          agent: {
+            isNot: null,
           },
         },
-      };
-    }
+      });
 
-    // Check if agent is on cooldown
-    const activeCooldown = await this.prisma.coolDown.findFirst({
-      where: {
-        cooledAgentId: context.agentId,
-        type: "Move",
-        endsAt: {
-          gt: new Date(),
-        },
-      },
-    });
-
-    if (activeCooldown) {
-      return {
-        isValid: false,
-        error: {
-          type: "MOVE",
-          message: "Agent is on movement cooldown",
-          context: {
-            currentState: { cooldownEndsAt: activeCooldown.endsAt },
-            attemptedAction: action,
-            suggestedFix: `Wait until ${activeCooldown.endsAt} before moving again`,
+      if (existingTile) {
+        return {
+          isValid: false,
+          error: {
+            type: "MOVE",
+            message: "Position is already occupied by another agent",
+            context: {
+              currentState: { existingTile },
+              attemptedAction: action,
+              suggestedFix: "Choose an unoccupied position",
+            },
           },
-        },
-      };
-    }
+        };
+      }
 
-    return { isValid: true };
+      // Get agent's current position
+      const agent = await this.prisma.agent.findUnique({
+        where: { id: context.agentId },
+        include: {
+          mapTile: true,
+        },
+      });
+
+      if (!agent?.mapTile) {
+        return {
+          isValid: false,
+          error: {
+            type: "MOVE",
+            message: "Agent has no current position",
+            context: {
+              currentState: { agent },
+              attemptedAction: action,
+              suggestedFix: "Agent must have a valid position before moving",
+            },
+          },
+        };
+      }
+
+      // Calculate distance
+      const distance = Math.sqrt(
+        Math.pow(action.x - agent.mapTile.x, 2) +
+          Math.pow(action.y - agent.mapTile.y, 2)
+      );
+
+      // Check if move is within allowed distance
+      if (distance > gameConfig.mechanics.movement.speed) {
+        return {
+          isValid: false,
+          error: {
+            type: "MOVE",
+            message: "Move distance exceeds allowed limit",
+            context: {
+              currentState: {
+                distance,
+                maxAllowed: gameConfig.mechanics.movement.speed,
+              },
+              attemptedAction: action,
+              suggestedFix: "Choose a position within movement range",
+            },
+          },
+        };
+      }
+
+      return { isValid: true };
+    } catch (error) {
+      console.error("❌ Move validation failed:", error);
+      throw error;
+    }
   }
 
   /**
@@ -617,18 +606,15 @@ export class ActionManager {
     context: ActionContext,
     action: BattleAction
   ): Promise<ValidationFeedback> {
-    logger.info("🔍 Validating battle constraints");
-    if (this.prisma) {
-      // Check if agents are in range
+    try {
       const [attacker, defender] = await Promise.all([
         this.prisma.agent.findUnique({
           where: {
-            onchainId_gameId: {
-              onchainId: context.agentOnchainId,
-              gameId: context.gameId,
-            },
+            id: context.agentId,
           },
-          include: { mapTiles: true },
+          include: {
+            mapTile: true,
+          },
         }),
         this.prisma.agent.findUnique({
           where: {
@@ -637,58 +623,50 @@ export class ActionManager {
               gameId: context.gameId,
             },
           },
-          include: { mapTiles: true },
+          include: {
+            mapTile: true,
+          },
         }),
       ]);
 
       if (!attacker || !defender) {
-        logger.error("❌ Battle validation failed - Agents not found");
-        throw new Error("One or both agents not found in database");
+        console.error("❌ Battle validation failed - Agent not found");
+        throw new Error("One or both agents not found");
       }
 
-      if (!attacker.mapTiles[0] || !defender.mapTiles[0]) {
-        logger.error("❌ Battle validation failed - Missing positions");
+      if (!attacker.mapTile || !defender.mapTile) {
+        console.error("❌ Battle validation failed - Missing positions");
         throw new Error("One or both agents have no map position");
       }
 
       const distance = Math.sqrt(
-        Math.pow(attacker.mapTiles[0].x - defender.mapTiles[0].x, 2) +
-          Math.pow(attacker.mapTiles[0].y - defender.mapTiles[0].y, 2)
+        Math.pow(attacker.mapTile.x - defender.mapTile.x, 2) +
+          Math.pow(attacker.mapTile.y - defender.mapTile.y, 2)
       );
 
-      if (distance > INTERACTION_DISTANCE) {
-        logger.error("🎯 Battle rejected - Target out of range");
-        throw new Error(
-          `Target is out of range. Maximum range is ${INTERACTION_DISTANCE}`
-        );
+      if (distance > gameConfig.mechanics.movement.interactionDistance) {
+        return {
+          isValid: false,
+          error: {
+            type: "BATTLE",
+            message: "Target is out of battle range",
+            context: {
+              currentState: {
+                distance,
+                maxRange: gameConfig.mechanics.movement.interactionDistance,
+              },
+              attemptedAction: action,
+              suggestedFix: "Move closer to target before initiating battle",
+            },
+          },
+        };
       }
 
-      // Check if any involved agent is on cooldown
-      const involvedAgents = [context.agentId, action.targetId];
-
-      // if (action.allyId) {
-      //   involvedAgents.push(action.allyId);
-      // }
-
-      const activeCooldown = await this.prisma.coolDown.findFirst({
-        where: {
-          cooledAgent: {
-            onchainId: { in: [context.agentOnchainId, action.targetId] },
-          },
-          type: "Battle",
-          endsAt: {
-            gt: new Date(),
-          },
-        },
-      });
-
-      if (activeCooldown) {
-        logger.error("⏳ Battle rejected - Agent on cooldown");
-        throw new Error("One of the agents is on battle cooldown");
-      }
+      return { isValid: true };
+    } catch (error) {
+      console.error("❌ Battle validation failed:", error);
+      throw error;
     }
-
-    return { isValid: true };
   }
 
   /**
@@ -699,7 +677,7 @@ export class ActionManager {
     context: ActionContext,
     action: AllianceAction
   ): Promise<ValidationFeedback> {
-    logger.info("🔍 Validating alliance constraints");
+    console.log("🔍 Validating alliance constraints");
 
     // Check if agents already have an alliance
     const existingAlliance = await this.prisma.alliance.findFirst({
@@ -725,7 +703,7 @@ export class ActionManager {
     });
 
     if (existingAlliance) {
-      logger.error("🤝 Alliance rejected - Already exists");
+      console.error("🤝 Alliance rejected - Already exists");
       throw new Error("Alliance already exists between these agents");
     }
 
@@ -743,7 +721,7 @@ export class ActionManager {
     });
 
     if (activeCooldown) {
-      logger.error("⏳ Alliance rejected - Agent on cooldown");
+      console.error("⏳ Alliance rejected - Agent on cooldown");
       throw new Error("One of the agents is on alliance cooldown");
     }
 
@@ -756,61 +734,64 @@ export class ActionManager {
     attackerAccount: AgentAccount,
     defenderAccount: AgentAccount
   ): Promise<void> {
-    logger.info("💾 Updating battle data in database");
-    const game = await this.prisma.game.findUnique({
-      where: { onchainId: context.gameOnchainId },
-    });
+    try {
+      const attacker = await this.prisma.agent.findUnique({
+        where: { id: context.agentId },
+        include: {
+          mapTile: true,
+        },
+      });
 
-    if (!game) {
-      logger.error("❌ Game not found in database");
-      throw new Error("Game not found in database");
+      const defender = await this.prisma.agent.findUnique({
+        where: {
+          onchainId_gameId: {
+            onchainId: action.targetId,
+            gameId: context.gameId,
+          },
+        },
+        include: {
+          mapTile: true,
+        },
+      });
+
+      if (!attacker || !defender) {
+        throw new Error("Failed to find battle participants");
+      }
+
+      // Create battle record
+      await this.prisma.battle.create({
+        data: {
+          type: "Simple",
+          status: "Active",
+          tokensStaked: 0,
+          startTime: new Date(),
+          game: {
+            connect: { id: context.gameId },
+          },
+          attacker: {
+            connect: { id: attacker.id },
+          },
+          defender: {
+            connect: { id: defender.id },
+          },
+        },
+      });
+
+      console.log("✅ Created battle record in database", {
+        attackerId: attacker.id,
+        defenderId: defender.id,
+      });
+    } catch (error) {
+      console.error("❌ Failed to update battle in database:", error);
+      throw error;
     }
-
-    const battleType = this.determineBattleType(
-      attackerAccount,
-      defenderAccount
-    );
-
-    // await this.prisma.battle.create({
-    //   data: {
-    //     attackerId: context.agentId,
-    //     defenderId: action.targetId,
-    //     attackerAllyId: attackerAccount.allianceWith,
-    //     defenderAllyId: defenderAccount.allianceWith,
-    //     tokensStaked: action.tokensToStake,
-    //     type: battleType,
-    //     gameId: game.id,
-    //     status: "Active",
-    //     startTime: new Date(),
-    //   },
-    // });
-
-    // const involvedAgents = [
-    //   context.agentId,
-    //   action.targetId,
-    //   attackerAccount.allianceWith,
-    //   defenderAccount.allianceWith,
-    // ].filter(Boolean) as string[];
-
-    // await Promise.all(
-    //   involvedAgents.map((id) =>
-    //     this.prisma.coolDown.create({
-    //       data: {
-    //         type: "Battle",
-    //         endsAt: new Date(Date.now() + BATTLE_COOLDOWN),
-    //         cooledAgentId: id,
-    //         gameId: game.id,
-    //       },
-    //     })
-    //   )
-    // );
   }
 
   private async updateAllianceInDatabase(
     context: ActionContext,
     action: AllianceAction
   ): Promise<void> {
-    logger.info("💾 Updating alliance data in database");
+    console.log("💾 Updating alliance data in database");
     const game = await this.prisma.game.findUnique({
       where: { onchainId: context.gameOnchainId },
       include: {
@@ -825,7 +806,7 @@ export class ActionManager {
     });
 
     if (!game) {
-      logger.error("❌ Game not found in database");
+      console.error("❌ Game not found in database");
       throw new Error("Game not found in database");
     }
     const joiner = await this.prisma.agent.findUnique({
@@ -841,7 +822,7 @@ export class ActionManager {
     });
 
     if (!joiner) {
-      logger.error("❌ Joiner not found in database");
+      console.error("❌ Joiner not found in database");
       throw new Error("Joiner not found in database");
     }
 
@@ -860,7 +841,9 @@ export class ActionManager {
       this.prisma.coolDown.create({
         data: {
           type: "Alliance",
-          endsAt: new Date(Date.now() + ALLIANCE_COOLDOWN),
+          endsAt: new Date(
+            Date.now() + gameConfig.mechanics.cooldowns.newAlliance
+          ),
           cooledAgentId: context.agentId,
           gameId: game.id,
         },
@@ -868,7 +851,9 @@ export class ActionManager {
       this.prisma.coolDown.create({
         data: {
           type: "Alliance",
-          endsAt: new Date(Date.now() + ALLIANCE_COOLDOWN),
+          endsAt: new Date(
+            Date.now() + gameConfig.mechanics.cooldowns.newAlliance
+          ),
           cooledAgentId: joiner.id,
           gameId: game.id,
         },
@@ -895,7 +880,7 @@ export class ActionManager {
     account: AgentAccount;
     agentPda: PublicKey;
   } | null> {
-    logger.info("🔍 Fetching agent account", { agentId });
+    console.log("🔍 Fetching agent account", { agentId });
     const [gamePda] = getGamePDA(
       this.program.programId,
       new BN(this.gameOnchainId)
@@ -904,10 +889,10 @@ export class ActionManager {
 
     try {
       const account = await this.program.account.agent.fetch(agentPda);
-      logger.info("✅ Agent account fetched successfully");
+      console.log("✅ Agent account fetched successfully");
       return { account, agentPda };
     } catch (error) {
-      logger.error("❌ Failed to fetch agent account", { error, agentId });
+      console.error("❌ Failed to fetch agent account", { error, agentId });
       return null;
     }
   }
@@ -918,15 +903,15 @@ export class ActionManager {
   async getGameState(
     gameOnchainId: number = this.gameOnchainId
   ): Promise<GameAccount> {
-    logger.info("🔍 Fetching game state");
+    console.log("🔍 Fetching game state");
     const [gamePda] = getGamePDA(this.program.programId, new BN(gameOnchainId));
 
     try {
       const state = await this.program.account.game.fetch(gamePda);
-      logger.info("✅ Game state fetched successfully");
+      console.log("✅ Game state fetched successfully");
       return state;
     } catch (error) {
-      logger.error("❌ Failed to fetch game state", { error });
+      console.error("❌ Failed to fetch game state", { error });
       throw error;
     }
   }

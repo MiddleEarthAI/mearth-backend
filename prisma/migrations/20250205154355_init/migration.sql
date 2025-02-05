@@ -49,6 +49,7 @@ CREATE TABLE "AgentProfile" (
     "characteristics" TEXT[],
     "knowledge" TEXT[],
     "traits" JSONB NOT NULL,
+    "postExamples" TEXT[],
 
     CONSTRAINT "AgentProfile_pkey" PRIMARY KEY ("id")
 );
@@ -63,8 +64,20 @@ CREATE TABLE "Agent" (
     "isAlive" BOOLEAN NOT NULL DEFAULT true,
     "profileId" TEXT NOT NULL,
     "deathTimestamp" TIMESTAMP(3),
+    "mapTileId" TEXT NOT NULL,
 
     CONSTRAINT "Agent_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MapTile" (
+    "id" TEXT NOT NULL,
+    "x" INTEGER NOT NULL,
+    "y" INTEGER NOT NULL,
+    "terrainType" "TerrainType" NOT NULL,
+    "agentId" TEXT,
+
+    CONSTRAINT "MapTile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -125,17 +138,6 @@ CREATE TABLE "Interaction" (
 );
 
 -- CreateTable
-CREATE TABLE "MapTile" (
-    "id" TEXT NOT NULL,
-    "x" INTEGER NOT NULL,
-    "y" INTEGER NOT NULL,
-    "terrainType" "TerrainType" NOT NULL,
-    "occupiedBy" TEXT,
-
-    CONSTRAINT "MapTile_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "CoolDown" (
     "id" TEXT NOT NULL,
     "type" "CooldownType" NOT NULL,
@@ -169,10 +171,16 @@ CREATE UNIQUE INDEX "AgentProfile_onchainId_key" ON "AgentProfile"("onchainId");
 CREATE UNIQUE INDEX "AgentProfile_xHandle_key" ON "AgentProfile"("xHandle");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Alliance_initiatorId_joinerId_key" ON "Alliance"("initiatorId", "joinerId");
+CREATE UNIQUE INDEX "Agent_mapTileId_key" ON "Agent"("mapTileId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Agent_onchainId_gameId_key" ON "Agent"("onchainId", "gameId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "MapTile_x_y_key" ON "MapTile"("x", "y");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Alliance_initiatorId_joinerId_key" ON "Alliance"("initiatorId", "joinerId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_privyUserId_key" ON "User"("privyUserId");
@@ -185,6 +193,9 @@ ALTER TABLE "Agent" ADD CONSTRAINT "Agent_gameId_fkey" FOREIGN KEY ("gameId") RE
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "AgentProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Agent" ADD CONSTRAINT "Agent_mapTileId_fkey" FOREIGN KEY ("mapTileId") REFERENCES "MapTile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Tweet" ADD CONSTRAINT "Tweet_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -218,9 +229,6 @@ ALTER TABLE "Battle" ADD CONSTRAINT "Battle_winnerId_fkey" FOREIGN KEY ("winnerI
 
 -- AddForeignKey
 ALTER TABLE "Interaction" ADD CONSTRAINT "Interaction_tweetId_fkey" FOREIGN KEY ("tweetId") REFERENCES "Tweet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "MapTile" ADD CONSTRAINT "MapTile_occupiedBy_fkey" FOREIGN KEY ("occupiedBy") REFERENCES "Agent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CoolDown" ADD CONSTRAINT "CoolDown_cooledAgentId_fkey" FOREIGN KEY ("cooledAgentId") REFERENCES "Agent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

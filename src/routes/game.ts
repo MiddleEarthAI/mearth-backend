@@ -6,7 +6,6 @@ import { getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 
-import { createNextGame } from "@/config/setup";
 import { GameOrchestrator } from "@/agent/GameOrchestrator";
 import { prisma } from "@/config/prisma";
 import { checkDatabaseConnection } from "@/utils";
@@ -20,6 +19,7 @@ import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import { HealthMonitor } from "@/agent/HealthMonitor";
 import { ActionManager } from "@/agent/ActionManager";
+import { GameManager } from "@/agent/GameManager";
 
 const router = Router();
 
@@ -34,44 +34,12 @@ router.post(
     try {
       await checkDatabaseConnection();
 
-      const { tx, gameAccount, agents } = await createNextGame();
       const program = await getProgramWithWallet();
       const prisma = new PrismaClient();
+      const gameManager = new GameManager(program, prisma);
+      const { agents, gameAccount } = await gameManager.createNewGame();
 
-      const agentTwitterClients = agents.map((agent) => {
-        const apiKey = process.env.TWITTER_API_KEY;
-        const apiSecret = process.env.TWITTER_API_SECRET;
-
-        if (!apiKey || !apiSecret) {
-          throw new Error("Twitter API keys are not set");
-        }
-
-        const agentId = new BN(agent.account.id).toNumber().toString();
-
-        const twitterAccessToken =
-          process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
-        const twitterAccessSecret =
-          process.env[`TWITTER_ACCESS_TOKEN_SECRET_${agentId}`];
-        if (!twitterAccessToken || !twitterAccessSecret) {
-          throw new Error("Twitter API keys are not set");
-        }
-        return [
-          agentId,
-          new TwitterApi({
-            appKey: apiKey,
-            appSecret: apiSecret,
-            accessToken: twitterAccessToken,
-            accessSecret: twitterAccessSecret,
-          }),
-        ];
-      });
-
-      const _twitterClients = new Map<AgentId, TwitterApi>();
-      agentTwitterClients.forEach(([agentId, twitterClient]) => {
-        _twitterClients.set(agentId, twitterClient);
-      });
-
-      const twitter = new TwitterManager(_twitterClients);
+      const twitter = new TwitterManager(agents);
       const cache = new CacheManager();
       const calculator = new InfluenceCalculator();
       const eventEmitter = new EventEmitter();
@@ -80,15 +48,11 @@ router.post(
         gameAccount.gameId,
         prisma
       );
-      const engine = new DecisionEngine(
-        prisma,
-        eventEmitter,
-        program,
-        actionManager
-      );
+      const engine = new DecisionEngine(prisma, eventEmitter, program);
 
       const battleResolver = new BattleResolver(
         gameAccount.gameId,
+        agents[0].agent.gameId,
         program,
         prisma
       );
@@ -119,7 +83,6 @@ router.post(
       logger.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
       res.json({
         success: true,
-        transaction: tx,
         data: {
           gameId: gameAccount.gameId,
           gameAccount,

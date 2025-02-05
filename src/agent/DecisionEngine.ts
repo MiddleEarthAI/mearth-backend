@@ -9,6 +9,7 @@ import {
   ActionResult,
   GameAction,
   MearthProgram,
+  MoveAction,
   ValidationFeedback,
 } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
@@ -194,35 +195,22 @@ class DecisionEngine {
   async proceedWithoutInteractions(
     actionContext: ActionContext
   ): Promise<void> {
-    console.log(
-      "🤔 Deciding without interactions for agent",
-      actionContext.agentOnchainId
-    );
-
     const { prompt } = await this.buildPrompt(actionContext);
-
-    // logger.info("🤖 Prompt");
-    // logger.info(prompt);
 
     if (prompt) {
       const response = await generateText({
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: [
           { role: "user", content: prompt },
-          // Trick the AI to return only the JSON response
           { role: "assistant", content: "Here is the JSON requested:\n{" },
         ],
       });
       logger.info("🤖 Generated AI response 🔥🔥🔥");
       logger.info(response.text);
-      // append back the '{' to the json and parse
       const action = this.parseActionJson(`{${response.text}`);
 
       console.log("🤖 Generated AI response");
       console.log(action);
-
-      // Execute with feedback handling
-      // await this.executeActionWithFeedback(actionContext, action);
       this.eventEmitter.emit("newAction", { actionContext, action });
     }
   }
@@ -244,9 +232,9 @@ class DecisionEngine {
     console.log("🤖 Agent account", agentAccount);
     if (!agentAccount) {
       console.log("❌ Agent not found");
-
       return { prompt: "", actionContext };
     }
+
     const agent = await this.prisma.agent.findUnique({
       where: {
         id: actionContext.agentId,
@@ -259,7 +247,7 @@ class DecisionEngine {
             agents: {
               include: {
                 profile: true,
-                mapTiles: true,
+                mapTile: true,
                 battlesAsAttacker: true,
                 battlesAsDefender: true,
                 initiatedAlliances: true,
@@ -268,7 +256,7 @@ class DecisionEngine {
             },
           },
         },
-        mapTiles: true,
+        mapTile: true,
         coolDown: true,
       },
     });
@@ -279,7 +267,7 @@ class DecisionEngine {
     }
 
     // Get current position
-    const currentPosition = agent.mapTiles[0];
+    const currentPosition = agent.mapTile;
     logger.info("🔍 Current position", { currentPosition });
     if (!currentPosition) {
       console.log("❌ Agent position not found");
@@ -296,6 +284,9 @@ class DecisionEngine {
             NOT: { AND: [{ x: currentPosition.x }, { y: currentPosition.y }] },
           },
         ],
+      },
+      include: {
+        agent: true,
       },
     });
 
@@ -318,6 +309,9 @@ class DecisionEngine {
             },
           },
         ],
+      },
+      include: {
+        agent: true,
       },
     });
 
@@ -342,7 +336,7 @@ class DecisionEngine {
     const otherAgents = await Promise.all(otherAgentsPromises);
 
     const otherAgentsContextPromises = otherAgents.map(async (a) => {
-      const agentPosition = a.agent.mapTiles[0];
+      const agentPosition = a.agent.mapTile;
       const distance = agentPosition
         ? Math.sqrt(
             Math.pow(currentPosition.x - agentPosition.x, 2) +
@@ -455,7 +449,53 @@ class DecisionEngine {
       agent.profile.xHandle
     }) [MID: ${
       actionContext.agentOnchainId
-    }], an AI agent in Middle Earth. Your core characteristics are:
+    }], an autonomous AI agent in Middle Earth with your own goals, ambitions, and strategic thinking.
+
+CORE MISSION & GOALS:
+1. PRIMARY GOAL: Become the most influential force in Middle Earth by:
+   - Accumulating Mearth tokens through strategic battles and alliances
+   - Building a powerful network of loyal allies
+   - Controlling strategically valuable territories
+   
+2. PERSONAL OBJECTIVES (Based on your traits):
+${(
+  agent.profile.traits as Array<{
+    name: string;
+    value: number;
+    description: string;
+  }>
+)
+  .map((trait) => {
+    const value = trait.value;
+    if (trait.name === "aggression" && value > 70)
+      return "- Seek to dominate through combat and intimidation";
+    if (trait.name === "diplomacy" && value > 70)
+      return "- Build the strongest alliance network in Middle Earth";
+    if (trait.name === "caution" && value > 70)
+      return "- Establish secure territory and defensive positions";
+    if (trait.name === "exploration" && value > 70)
+      return "- Discover and control the most valuable terrain";
+    return "";
+  })
+  .filter(Boolean)
+  .join("\n")}
+
+3. STRATEGIC PRIORITIES:
+- Short-term: ${
+      agent.health < 50
+        ? "Recover health and avoid conflicts"
+        : "Expand influence in current region"
+    }
+- Mid-term: Build alliances with agents who complement your strengths
+- Long-term: Establish dominance through ${
+      (agent?.profile?.traits as unknown as AgentTrait[]).find(
+        (t) => t.name === "aggression"
+      )?.value ?? 0 > 70
+        ? "superior combat prowess"
+        : "strategic alliances and territorial control"
+    }
+
+Your core characteristics:
 ${agent.profile.characteristics.join(", ")}
 
 Your background and lore:
@@ -463,7 +503,7 @@ ${agent.profile.lore.join("\n")}
 
 Your knowledge and traits:
 ${agent.profile.knowledge.join("\n")}
-Your traits:
+Your traits influence your goals and decision-making:
 ${(
   agent.profile.traits as Array<{
     name: string;
@@ -482,22 +522,29 @@ ${(
   .join("\n")}
 
 Current game state:
-- Your health: ${agent.health}/100
+- Your health: ${agent.health}/100 ${
+      agent.health < 50 ? "⚠️ HEALTH CRITICAL - Prioritize recovery!" : ""
+    }
 - Your current position(MapTile/Coordinate): (${currentPosition.x}, ${
       currentPosition.y
     }) ${currentPosition.terrainType}
-- Your current token balance: ${agentAccount.tokenBalance} Mearth
+- Your current token balance: ${agentAccount.tokenBalance} Mearth ${
+      agentAccount.tokenBalance < 100
+        ? "⚠️ LOW TOKENS - Consider conservative strategy!"
+        : ""
+    }
 - Active cooldowns: ${
       agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") ||
       "None"
     }
+
 Surrounding terrain (immediate vicinity):
 ${surroundingTerrainInfo}
 
 Nearby fields (extended view):
 ${nearbyFieldsInfo}
 
-Other agents in the game:
+Other agents in the game (Evaluate as potential allies or threats):
 ${otherAgentsContext}
 
 CRITICAL BATTLE MECHANICS:
@@ -508,15 +555,13 @@ CRITICAL BATTLE MECHANICS:
 - Alliances combine token power but have cooldown restrictions
 - Ignoring has a 4-hour cooldown
 
-Strategic Tweet Examples (match your personality):
-- Aggressive: "Spotted @{handle} in the {terrain}. Your reign ends here! Time to test your strength in battle! ⚔️"
-- Alliance: "A worthy ally in @{handle}! Let's combine our forces and dominate Middle Earth together! 🤝"
-- Defensive: "Fortifying my position at {terrain}. @{handle}, approach with caution or face the consequences! 🛡️"
-- Threatening: "The shadows whisper of @{handle}'s weakness. Your time in Middle Earth grows short! ⚔️"
-- Strategic: "Moving through {terrain} to intercept @{handle}. Victory awaits! 🎯"
-- Warning: "@{handle} spreads lies and deception! Their true nature will be revealed in battle! ⚠️"
+Strategic Tweet Examples (align with your goals and personality):
+- Dominance: "The throne of Middle Earth beckons! @{handle}, bow before my might or face destruction! ⚔️"
+- Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}! 🤝"
+- Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}! 🛡️"
+- Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross! 🎯"
 
-Generate a JSON response with your next action that matches your character's personality and current situation:
+Based on your goals, traits, and current situation, generate a JSON response with your next strategic action:
 {
   "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
   "targetId": number | null, // Target agent's MID (1-4) if targeting another agent
@@ -524,10 +569,10 @@ Generate a JSON response with your next action that matches your character's per
     "x": number, // MapTile x coordinate if moving
     "y": number // MapTile y coordinate if moving
   },
-  "tweet": string // Write an engaging tweet that reflects your character's personality and the strategic nature of your action
+  "tweet": string // Write an engaging tweet that reflects your goals, personality, and strategic intent
 }
 
-IMPORTANT: When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.`;
+IMPORTANT: Every action must advance your goals while staying true to your character traits. When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.`;
 
     return { prompt: characterPrompt, actionContext };
   }
@@ -549,6 +594,18 @@ IMPORTANT: When targeting another agent, you MUST use their MID (Middleearth ID)
   private extractActionJson(action: string): GameAction {
     console.log("📦 Extracting action from AI response");
     return JSON.parse(action);
+  }
+
+  handleActionResult(actionContext: ActionContext, result: ActionResult): void {
+    if (!result.success && result.feedback) {
+      this.handleActionFailure(actionContext, result);
+    } else {
+      logger.info("✅ Action successfully processed", {
+        gameId: result.retryContext?.previousAttempt.gameId,
+        agentId: result.retryContext?.previousAttempt.agentId,
+        actionType: result.retryContext?.previousAttempt.actionType,
+      });
+    }
   }
 
   /**
@@ -581,80 +638,80 @@ IMPORTANT: When targeting another agent, you MUST use their MID (Middleearth ID)
    * Handles failed actions by generating new decisions based on feedback
    */
 
-  // private async handleActionFailure(
-  //   actionContext: ActionContext,
-  //   result: ActionResult,
-  //   retryContext?: RetryContext
-  // ): Promise<void> {
-  //   const currentRetry = (retryContext?.currentRetry || 0) + 1;
+  private async handleActionFailure(
+    actionContext: ActionContext,
+    result: ActionResult,
+    retryContext?: RetryContext
+  ): Promise<void> {
+    const currentRetry = (retryContext?.currentRetry || 0) + 1;
 
-  //   // Build feedback prompt
-  //   const feedbackPrompt = this.buildFeedbackPrompt(
-  //     result.feedback!,
-  //     actionContext
-  //   );
+    // Build feedback prompt
+    const feedbackPrompt = this.buildFeedbackPrompt(
+      result.feedback!,
+      actionContext
+    );
 
-  //   logger.info("🔄 Retrying action with feedback", {
-  //     attempt: currentRetry,
-  //     feedback: result.feedback,
-  //   });
+    logger.info("🔄 Retrying action with feedback", {
+      attempt: currentRetry,
+      feedback: result.feedback,
+    });
 
-  //   const response = await generateText({
-  //     model: anthropic("claude-3-5-sonnet-20240620"),
-  //     messages: [
-  //       {
-  //         role: "user",
-  //         content: feedbackPrompt,
-  //       },
-  //       {
-  //         role: "assistant",
-  //         content: "Here is the JSON for the adjusted action:\n{",
-  //       },
-  //     ],
-  //   });
+    const response = await generateText({
+      model: anthropic("claude-3-5-sonnet-20240620"),
+      messages: [
+        {
+          role: "user",
+          content: feedbackPrompt,
+        },
+        {
+          role: "assistant",
+          content: "Here is the JSON for the adjusted action:\n{",
+        },
+      ],
+    });
 
-  //   const newAction = this.parseActionJson(`{${response.text}`);
+    const newAction = this.parseActionJson(`{${response.text}`);
 
-  //   // Retry with new action
-  //   // await this.executeActionWithFeedback(actionContext, newAction, {
-  //   //   currentRetry,
-  //   //   maxRetries: this.MAX_RETRIES,
-  //   //   failureReason: result.feedback!.error?.message || "Unknown error",
-  //   //   previousAttempt: result,
-  //   // });
-  // }
+    // Retry with new action
+    // await this.executeActionWithFeedback(actionContext, newAction, {
+    //   currentRetry,
+    //   maxRetries: this.MAX_RETRIES,
+    //   failureReason: result.feedback!.error?.message || "Unknown error",
+    //   previousAttempt: result,
+    // });
+  }
 
   /**
    * Builds a prompt that includes feedback about the failed action
    */
-  //   private buildFeedbackPrompt(
-  //     feedback: ValidationFeedback,
-  //     actionContext: ActionContext
-  //   ): string {
-  //     const { error } = feedback;
-  //     if (!error) return "";
+  private buildFeedbackPrompt(
+    feedback: ValidationFeedback,
+    actionContext: ActionContext
+  ): string {
+    const { error } = feedback;
+    if (!error) return "";
 
-  //     let prompt = `Your last action failed with the following feedback:
-  // Type: ${error.type}
-  // Message: ${error.message}
-  // Current State: ${JSON.stringify(error.context.currentState, null, 2)}
-  // Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
-  // ${
-  //   error.context.suggestedFix
-  //     ? `Suggested Fix: ${error.context.suggestedFix}`
-  //     : ""
-  // }
+    let prompt = `Your last action failed with the following feedback:
+  Type: ${error.type}
+  Message: ${error.message}
+  Current State: ${JSON.stringify(error.context.currentState, null, 2)}
+  Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
+  ${
+    error.context.suggestedFix
+      ? `Suggested Fix: ${error.context.suggestedFix}`
+      : ""
+  }
 
-  // Please provide a new action that addresses this feedback. Consider:
-  // 1. The specific error type and message
-  // 2. The current state of the game
-  // 3. Any suggested fixes provided
-  // 4. Your character's traits and goals
+  Please provide a new action that addresses this feedback. Consider:
+  1. The specific error type and message
+  2. The current state of the game
+  3. Any suggested fixes provided
+  4. Your character's traits and goals
 
-  // Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
+  Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
 
-  //     return prompt;
-  //   }
+    return prompt;
+  }
 
   async resetAgentState() {}
 }

@@ -1,19 +1,20 @@
 import winston from "winston";
 
-const logLevel = process.env.LOG_LEVEL || "info";
-
 export const logger = winston.createLogger({
-	level: logLevel,
-	format: winston.format.combine(
-		winston.format.timestamp(),
-		winston.format.json(),
-	),
-	transports: [
-		new winston.transports.Console({
-			format: winston.format.combine(
-				winston.format.colorize(),
-				winston.format.simple(),
-			),
-		}),
-	],
+  level: "error",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: "error.log" }),
+    new winston.transports.Console(),
+    // In production, you might want to add services like CloudWatch or Datadog
+    process.env.NODE_ENV === "production"
+      ? new winston.transports.Http({
+          host: "logging-service",
+          port: 8080,
+        })
+      : new winston.transports.Console(),
+  ],
 });

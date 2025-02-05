@@ -45,6 +45,7 @@ model AgentProfile {
   characteristics String[]
   knowledge       String[]
   traits          Json
+  postExamples    String[]
   // Relations - one profile can have many agents
   agents          Agent[]
 }
@@ -69,18 +70,29 @@ model Agent {
   // Alliance relationships
   initiatedAlliances Alliance[] @relation("AllianceInitiator") // Alliances initiated by this agent
   joinedAlliances    Alliance[] @relation("AllianceJoiner") // Alliances this agent joined
-  mapTiles           MapTile[] // Map tiles occupied by this agent
 
   // Each agent belongs to exactly one profile
   profile   AgentProfile @relation(fields: [profileId], references: [id])
   profileId String
 
-  deathTimestamp DateTime?
+  deathTimestamp DateTime? // when the agent kicked the bucket
 
-  history         AgentHistory[] // History entries where this agent is the main actor
-  historyAsTarget AgentHistory[] @relation("historyTarget") // History entries where this agent is the target
+  mapTile   MapTile @relation("AgentPosition", fields: [mapTileId], references: [id])
+  mapTileId String  @unique
 
   @@unique([onchainId, gameId])
+}
+
+model MapTile {
+  id          String      @id @default(uuid())
+  x           Int         @db.Integer
+  y           Int         @db.Integer
+  terrainType TerrainType
+
+  agent   Agent?  @relation("AgentPosition")
+  agentId String?
+
+  @@unique([x, y])
 }
 
 model Tweet {
@@ -184,17 +196,6 @@ enum TerrainType {
   River
 }
 
-model MapTile {
-  id          String      @id @default(uuid())
-  x           Int         @db.Integer
-  y           Int         @db.Integer
-  terrainType TerrainType
-  occupiedBy  String?
-  agent       Agent?      @relation(fields: [occupiedBy], references: [id])
-
-  @@unique([x, y])
-}
-
 model CoolDown {
   id     String       @id @default(uuid())
   type   CooldownType
@@ -230,15 +231,4 @@ enum UserRole {
   ADMIN
   MANAGER
   USER
-}
-
-model AgentHistory {
-  id            String   @id @default(uuid())
-  agentId       String
-  agent         Agent    @relation(fields: [agentId], references: [id])
-  type          String // MOVE, BATTLE, ALLIANCE, INTERACTION
-  details       String // JSON string of interaction details
-  timestamp     DateTime @default(now())
-  targetAgentId String? // Optional target agent for interactions
-  targetAgent   Agent?   @relation("historyTarget", fields: [targetAgentId], references: [id])
 }

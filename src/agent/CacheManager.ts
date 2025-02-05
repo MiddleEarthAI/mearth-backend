@@ -1,6 +1,7 @@
 import { Redis } from "ioredis";
 import NodeCache from "node-cache";
 import { logger } from "@/utils/logger";
+import { ActionResult } from "@/types";
 
 /**
  * Redis Cache Manager
@@ -53,6 +54,54 @@ export default class CacheManager {
       return JSON.parse(data);
     }
     console.log(`💨 Cache miss for interaction ${id}`);
+    return null;
+  }
+  /**
+   * Caches an action result with 1 hour TTL
+   * @param actionKey Unique key to identify the action (format: action:{agentId}:{actionType})
+   * @param action The action result containing success status, validation feedback and retry context
+   */
+  async cacheAction(actionKey: string, action: ActionResult): Promise<void> {
+    logger.info(`💾 Caching action result`, {
+      actionKey,
+      success: action.success,
+      hasValidation: !!action.feedback,
+      hasRetryContext: !!action.retryContext,
+    });
+
+    const key = `${this.PREFIX}${actionKey}`;
+    const cacheData = {
+      success: action.success,
+      feedback: action.feedback,
+      retryContext: action.retryContext,
+      cachedAt: new Date().toISOString(),
+    };
+
+    await this.redis.setex(key, 3600, JSON.stringify(cacheData));
+    logger.info(`✅ Successfully cached action result`, { actionKey });
+  }
+
+  /**
+   * Retrieves a cached action result by key
+   * @param actionKey The action key to lookup (format: action:{agentId}:{actionType})
+   * @returns The cached action result or null if not found
+   */
+  async getCachedAction(actionKey: string): Promise<ActionResult | null> {
+    logger.info(`🔍 Looking up cached action result`, { actionKey });
+    const key = `${this.PREFIX}${actionKey}`;
+    const data = await this.redis.get(key);
+
+    if (data) {
+      logger.info(`✨ Cache hit for action`, { actionKey });
+      const parsed = JSON.parse(data);
+      return {
+        success: parsed.success,
+        feedback: parsed.feedback,
+        retryContext: parsed.retryContext,
+      };
+    }
+
+    logger.info(`💨 Cache miss for action`, { actionKey });
     return null;
   }
 
