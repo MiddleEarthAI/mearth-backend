@@ -5,7 +5,6 @@ import helmet from "helmet";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
 import { HealthMonitor } from "./agent/HealthMonitor";
-import { AgentId } from "./agent/TwitterManager";
 import { GameOrchestrator } from "./agent/GameOrchestrator";
 import { BattleResolver } from "./agent/BattleResolver";
 import EventEmitter from "events";
@@ -17,9 +16,9 @@ import { DecisionEngine } from "./agent/DecisionEngine";
 import { checkDatabaseConnection } from "./utils";
 import { getProgramWithWallet } from "./utils/program";
 import { PrismaClient } from "@prisma/client";
-import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./agent/ActionManager";
 import { GameManager } from "./agent/GameManager";
+import { serverConfig } from "./config/env";
 
 const app = express();
 
@@ -83,7 +82,7 @@ app.use(
     res: express.Response,
     _next: express.NextFunction
   ) => {
-    logger.error("Unhandled error:", {
+    console.error("Unhandled error:", {
       error: err.message,
       stack: err.stack,
     });
@@ -96,33 +95,40 @@ app.use(
   }
 );
 
-const PORT = process.env.PORT || 3001;
-
 export async function startServer() {
   await checkDatabaseConnection();
 
   const program = await getProgramWithWallet();
   const prisma = new PrismaClient();
   const gameManager = new GameManager(program, prisma);
-  const { gameAccount, agents } = await gameManager.createNewGame();
+  const gameInfo = await gameManager.getActiveGame();
 
-  const twitter = new TwitterManager(agents);
+  if (!gameInfo) {
+    console.error("No active game found");
+    process.exit(1);
+  }
+
+  const twitter = new TwitterManager(gameInfo.agents);
   const cache = new CacheManager();
   const calculator = new InfluenceCalculator();
   const eventEmitter = new EventEmitter();
 
   const battleResolver = new BattleResolver(
-    gameAccount.gameId,
-    agents[0].agent.gameId,
+    gameInfo.gameAccount.gameId,
+    gameInfo.agents[0].agent.gameId,
     program,
     prisma
   );
-  const actionManager = new ActionManager(program, gameAccount.gameId, prisma);
+  const actionManager = new ActionManager(
+    program,
+    gameInfo.gameAccount.gameId,
+    prisma
+  );
   const engine = new DecisionEngine(prisma, eventEmitter, program);
 
   const orchestrator = new GameOrchestrator(
-    gameAccount.gameId,
-    agents[0].agent.gameId,
+    gameInfo.gameAccount.gameId,
+    gameInfo.agents[0].agent.gameId,
     actionManager,
     twitter,
     cache,
@@ -137,39 +143,38 @@ export async function startServer() {
   try {
     await orchestrator.start();
     await healthMonitor.startMonitoring();
-
-    logger.info("System started successfully");
   } catch (error) {
-    logger.error("Failed to start system", { error });
+    console.error("Failed to start system", { error });
     process.exit(1);
   }
 
   try {
-    const server = app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT} in development mode`);
-      logger.info(`API available at /api`);
+    const server = app.listen(serverConfig.port, () => {
+      console.info(
+        `Server running on port ${serverConfig.port} in development mode`
+      );
     });
 
     // Graceful shutdown
     const shutdown = async () => {
-      logger.info("Shutting down server...");
+      console.info("Shutting down server...");
 
       server.close(async () => {
-        logger.info("HTTP server closed");
+        console.info("HTTP server closed");
 
         try {
           await prisma.$disconnect();
-          logger.info("Database connection closed");
+          console.info("Database connection closed");
           process.exit(0);
         } catch (error) {
-          logger.error("Error during shutdown:", error);
+          console.error("Error during shutdown:", error);
           process.exit(1);
         }
       });
 
       // Force shutdown after 10s
       setTimeout(() => {
-        logger.error(
+        console.error(
           "Could not close connections in time, forcefully shutting down"
         );
         process.exit(1);
@@ -179,7 +184,7 @@ export async function startServer() {
     process.on("SIGTERM", shutdown);
     process.on("SIGINT", shutdown);
   } catch (error) {
-    logger.error("Failed to start server:", error);
+    console.error("Failed to start server:", error);
     process.exit(1);
   }
 }

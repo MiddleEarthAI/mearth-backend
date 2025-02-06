@@ -1,6 +1,5 @@
 import { Redis } from "ioredis";
 import NodeCache from "node-cache";
-import { logger } from "@/utils/logger";
 import { ActionResult } from "@/types";
 
 /**
@@ -62,7 +61,7 @@ export default class CacheManager {
    * @param action The action result containing success status, validation feedback and retry context
    */
   async cacheAction(actionKey: string, action: ActionResult): Promise<void> {
-    logger.info(`💾 Caching action result`, {
+    console.info(`💾 Caching action result`, {
       actionKey,
       success: action.success,
       hasValidation: !!action.feedback,
@@ -78,7 +77,7 @@ export default class CacheManager {
     };
 
     await this.redis.setex(key, 3600, JSON.stringify(cacheData));
-    logger.info(`✅ Successfully cached action result`, { actionKey });
+    console.info(`✅ Successfully cached action result`, { actionKey });
   }
 
   /**
@@ -87,12 +86,12 @@ export default class CacheManager {
    * @returns The cached action result or null if not found
    */
   async getCachedAction(actionKey: string): Promise<ActionResult | null> {
-    logger.info(`🔍 Looking up cached action result`, { actionKey });
+    console.info(`🔍 Looking up cached action result`, { actionKey });
     const key = `${this.PREFIX}${actionKey}`;
     const data = await this.redis.get(key);
 
     if (data) {
-      logger.info(`✨ Cache hit for action`, { actionKey });
+      console.info(`✨ Cache hit for action`, { actionKey });
       const parsed = JSON.parse(data);
       return {
         success: parsed.success,
@@ -101,7 +100,7 @@ export default class CacheManager {
       };
     }
 
-    logger.info(`💨 Cache miss for action`, { actionKey });
+    console.info(`💨 Cache miss for action`, { actionKey });
     return null;
   }
 
@@ -127,9 +126,9 @@ export default class CacheManager {
   async reset(): Promise<void> {
     try {
       this.cache.flushAll();
-      logger.info("Successfully reset cache");
+      console.info("Successfully reset cache");
     } catch (error) {
-      logger.error("Failed to reset cache", { error });
+      console.error("Failed to reset cache", { error });
       throw error;
     }
   }
@@ -141,9 +140,9 @@ export default class CacheManager {
   async close(): Promise<void> {
     try {
       this.cache.close();
-      logger.info("Successfully closed cache");
+      console.info("Successfully closed cache");
     } catch (error) {
-      logger.error("Failed to close cache", { error });
+      console.error("Failed to close cache", { error });
       throw error;
     }
   }

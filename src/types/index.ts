@@ -38,8 +38,7 @@ export interface ActionResult {
 
 export interface MoveAction {
   type: "MOVE";
-  x: number;
-  y: number;
+  position: { x: number; y: number };
   terrain: { [key: string]: {} };
   tweet: string;
 }

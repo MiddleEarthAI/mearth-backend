@@ -11,7 +11,7 @@ CREATE TYPE "BattleType" AS ENUM ('Simple', 'AgentVsAlliance', 'AllianceVsAllian
 CREATE TYPE "InteractionType" AS ENUM ('Comment', 'Quote', 'Mention');
 
 -- CreateEnum
-CREATE TYPE "TerrainType" AS ENUM ('Plain', 'Mountain', 'River');
+CREATE TYPE "TerrainType" AS ENUM ('plain', 'mountain', 'river');
 
 -- CreateEnum
 CREATE TYPE "CooldownType" AS ENUM ('Alliance', 'Battle', 'Ignore', 'Tweet', 'Move');

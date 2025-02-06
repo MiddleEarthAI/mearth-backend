@@ -25,7 +25,6 @@ export interface ActionSuggestion {
   target?: string; // agentId
   position?: Position;
   content?: string;
-  tweet?: string;
 }
 
 export interface TweetData {

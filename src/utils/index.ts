@@ -1,16 +1,9 @@
-import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
-import { mearthIdl } from "@/constants/middle_earth_ai_program_idl";
-import { logger } from "@/utils/logger";
-import { Program } from "@coral-xyz/anchor";
-import type { AnchorProvider } from "@coral-xyz/anchor";
 import { mountains, rivers } from "@/constants";
 import { TerrainType } from "@prisma/client";
 import { plains } from "@/constants";
 import { prisma } from "@/config/prisma";
 
 export function getAgentConfigById(id: number) {
-  logger.info(`Getting agent config for id ${id}`);
-
   const config = {
     username: process.env[`${id}_USERNAME`] ?? "",
     password: process.env[`${id}_PASSWORD`] ?? "",
@@ -59,11 +52,11 @@ export function isValidGameId(gameId: number): boolean {
 
 export function getTerrain(x: number, y: number): TerrainType | null {
   if (mountains.coordinates.has(`${x},${y}`)) {
-    return TerrainType.Mountain;
+    return TerrainType.mountain;
   } else if (plains.coordinates.has(`${x},${y}`)) {
-    return TerrainType.Plain;
+    return TerrainType.plain;
   } else if (rivers.coordinates.has(`${x},${y}`)) {
-    return TerrainType.River;
+    return TerrainType.river;
   }
 
   return null;
@@ -73,7 +66,6 @@ export async function checkDatabaseConnection() {
   try {
     await prisma.$queryRaw`SELECT 1`;
   } catch (dbError) {
-    logger.error("💥 Database connection check failed:", dbError);
     throw dbError;
   }
 }

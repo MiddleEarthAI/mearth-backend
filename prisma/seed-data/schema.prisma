@@ -190,10 +190,11 @@ enum InteractionType {
   Mention
 }
 
+// Must be lowercase
 enum TerrainType {
-  Plain
-  Mountain
-  River
+  plain
+  mountain
+  river
 }
 
 model CoolDown {

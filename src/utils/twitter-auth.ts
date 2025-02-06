@@ -1,5 +1,4 @@
 import { TwitterApi } from "twitter-api-v2";
-import { logger } from "./logger";
 
 /**
  * Utility to generate Twitter OAuth URLs and handle token generation
@@ -35,7 +34,7 @@ export class TwitterAuthHelper {
         }
       );
 
-      logger.info(`Generated auth URL for ${agentName}`, {
+      console.info(`Generated auth URL for ${agentName}`, {
         oauth_token: authLink.oauth_token,
         url: authLink.url,
       });
@@ -46,7 +45,7 @@ export class TwitterAuthHelper {
         oauth_secret: authLink.oauth_token_secret,
       };
     } catch (error) {
-      logger.error(`Failed to generate auth URL for ${agentName}:`, error);
+      console.error(`Failed to generate auth URL for ${agentName}:`, error);
       throw error;
     }
   }
@@ -69,13 +68,13 @@ export class TwitterAuthHelper {
 
       const { accessToken, accessSecret } = await client.login(oauthVerifier);
 
-      logger.info("Successfully generated access tokens", {
+      console.info("Successfully generated access tokens", {
         accessToken: `${accessToken.substring(0, 10)}...`,
       });
 
       return { accessToken, accessSecret };
     } catch (error) {
-      logger.error("Failed to get access token:", error);
+      console.error("Failed to get access token:", error);
       throw error;
     }
   }

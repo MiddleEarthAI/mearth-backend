@@ -1,5 +1,5 @@
 import { TwitterAuthHelper } from "../utils/twitter-auth";
-import { logger } from "../utils/logger";
+
 import dotenv from "dotenv";
 
 // Load environment variables
@@ -30,7 +30,7 @@ async function generateAuthUrls() {
       );
     }
   } catch (error) {
-    logger.error("Failed to generate auth URLs:", error);
+    console.error("Failed to generate auth URLs:", error);
   }
 }
 
@@ -54,7 +54,7 @@ async function getAccessTokens(
     console.log(`Access Secret: ${accessSecret}`);
     console.log("\nAdd these to your .env file for the agent!");
   } catch (error) {
-    logger.error("Failed to get access tokens:", error);
+    console.error("Failed to get access tokens:", error);
   }
 }
 //

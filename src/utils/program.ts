@@ -1,5 +1,4 @@
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { logger } from "./logger";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import * as anchor from "@coral-xyz/anchor";
 import { mearthIdl } from "@/constants/middle_earth_ai_program_idl";

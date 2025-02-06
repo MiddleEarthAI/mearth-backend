@@ -1,5 +1,3 @@
-import { logger } from "@/utils/logger";
-
 import { prisma } from "@/config/prisma";
 import { PrismaClient } from "@prisma/client";
 
@@ -22,21 +20,20 @@ import {
 import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./ActionManager";
 import { gameConfig } from "@/config/env";
+import { InfluenceScore } from "@/types/twitter";
 
 /**
  * Service for managing AI agentData behavior and decision making
  * Handles game orchestration, agent updates, and event processing
  */
 export class GameOrchestrator {
-  private readonly updateInterval = process.env.UPDATE_INTERVAL
-    ? parseInt(process.env.UPDATE_INTERVAL)
-    : 3600000; // 1 hour
+  private readonly actionInterval = gameConfig.actionInterval;
 
-  private readonly agentProcessingDelay = 120000; // Default 2 minutes delay between agents
+  private readonly agentInitGapDelay = 600000; // Default 15 minutes delay between agents
 
   private readonly cleanupInterval = gameConfig.cleanupInterval;
   private isRunning: boolean = false;
-  private readonly maxRetries: number = 3;
+  private readonly maxRetries: number = gameConfig.maxRetries;
   private readonly retryDelay: number = 5000; // 5 seconds
 
   constructor(
@@ -60,18 +57,18 @@ export class GameOrchestrator {
    */
   async start(): Promise<void> {
     try {
-      logger.info("🎮 Game Orchestrator starting up...", {
+      console.info("🎮 Game Orchestrator starting up...", {
         gameId: this.currentGameOnchainId,
-        updateInterval: this.updateInterval,
+        actionInterval: this.actionInterval,
         cleanupInterval: this.cleanupInterval,
       });
-
       this.isRunning = true;
       this.startCleanupLoop();
-      this.startUpdateLoop();
+      this.startAgentActions_mainLoop();
+
       await this.battleResolver.start();
 
-      logger.info("🚀 Game Orchestrator successfully started", {
+      console.info("🚀 Game Orchestrator successfully started", {
         gameId: this.currentGameOnchainId,
         timestamp: new Date().toISOString(),
       });
@@ -88,8 +85,8 @@ export class GameOrchestrator {
     }
   }
 
-  private async startUpdateLoop(): Promise<void> {
-    logger.info("⏰ Starting update loop", {
+  private async startAgentActions_mainLoop(): Promise<void> {
+    console.info("⏰ Starting update loop", {
       gameId: this.currentGameOnchainId,
     });
 
@@ -100,13 +97,13 @@ export class GameOrchestrator {
           await this.processAllAgents();
           retries = 0; // Reset retries on success
           await new Promise((resolve) =>
-            setTimeout(resolve, this.updateInterval)
+            setTimeout(resolve, this.actionInterval)
           );
         } catch (err) {
           retries++;
           if (retries >= this.maxRetries) {
             const processError = new AgentError(
-              "Max retries exceeded in update loop",
+              "Max retries exceeded in action loop",
               {
                 retries,
                 lastError: err instanceof Error ? err.message : String(err),
@@ -122,7 +119,7 @@ export class GameOrchestrator {
     };
 
     processWithRetry().catch((error) => {
-      logger.error("Fatal error in update loop", {
+      console.error("Fatal error in update loop", {
         gameId: this.currentGameOnchainId,
         error: String(error),
       });
@@ -132,7 +129,7 @@ export class GameOrchestrator {
   }
 
   private async startCleanupLoop(): Promise<void> {
-    logger.info("🧹 Starting cleanup loop", {
+    console.info("🧹 Starting cleanup loop", {
       gameId: this.currentGameOnchainId,
     });
 
@@ -165,7 +162,7 @@ export class GameOrchestrator {
     };
 
     cleanupWithRetry().catch((error) => {
-      logger.error("Fatal error in cleanup loop", {
+      console.error("Fatal error in cleanup loop", {
         gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
       });
@@ -175,7 +172,7 @@ export class GameOrchestrator {
   }
 
   private setupEventHandlers(): void {
-    logger.info("🎯 Setting up event handlers", {
+    console.info("🎯 Setting up event handlers", {
       gameId: this.currentGameOnchainId,
     });
 
@@ -188,7 +185,7 @@ export class GameOrchestrator {
 
     // Add handler for uncaught promise rejections
     process.on("unhandledRejection", (reason, promise) => {
-      logger.error("Unhandled Promise Rejection", {
+      console.error("Unhandled Promise Rejection", {
         gameId: this.currentGameOnchainId,
         reason: String(reason),
       });
@@ -197,7 +194,7 @@ export class GameOrchestrator {
 
   private setupErrorBoundary(): void {
     process.on("uncaughtException", (error) => {
-      logger.error("Uncaught Exception", {
+      console.error("Uncaught Exception", {
         gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
@@ -205,7 +202,7 @@ export class GameOrchestrator {
 
       // Attempt graceful shutdown
       this.shutdown().catch((shutdownError) => {
-        logger.error("Failed to shutdown gracefully", {
+        console.error("Failed to shutdown gracefully", {
           gameId: this.currentGameOnchainId,
           error:
             shutdownError instanceof Error
@@ -222,7 +219,7 @@ export class GameOrchestrator {
     action: GameAction;
   }): Promise<void> {
     try {
-      logger.info("🎲 Processing new action", {
+      console.info("🎲 Processing new action", {
         gameId: this.currentGameOnchainId,
         agentId: data.actionContext.agentId,
         actionType: data.action.type,
@@ -235,15 +232,20 @@ export class GameOrchestrator {
       const cacheKey = `action:${data.actionContext.agentId}:${data.action.type}`;
       await this.cache.cacheAction(cacheKey, result);
 
-      // // if action is successful, post a tweet
-      // if (result.success && result.feedback?.isValid) {
-      //   await this.twitter.postTweet(
-      //     data.actionContext.agentOnchainId.toString() as AgentId,
-      //     `${getTwitterUserNameByAgentId(
-      //       data.actionContext.agentOnchainId.toString() as AgentId
-      //     )} => ${data.action.tweet}`
-      //   );
-      // }
+      // if action is successful, post a tweet
+      if (result.success && result.feedback?.isValid) {
+        await this.twitter.postTweet(
+          data.actionContext.agentOnchainId.toString() as AgentId,
+          `${getTwitterUserNameByAgentId(
+            data.actionContext.agentOnchainId.toString() as AgentId
+          )} => ${data.action.tweet}`
+        );
+        console.info("✅ Action successfully processed", {
+          gameId: this.currentGameOnchainId,
+          agentId: data.actionContext.agentId,
+          actionType: data.action.type,
+        });
+      }
 
       // TODO: remove this after testing
       function getTwitterUserNameByAgentId(agentId: AgentId): string {
@@ -264,12 +266,6 @@ export class GameOrchestrator {
       }
 
       // this.engine.handleActionResult(data.actionContext, result);
-
-      logger.info("✅ Action successfully processed", {
-        gameId: this.currentGameOnchainId,
-        agentId: data.actionContext.agentId,
-        actionType: data.action.type,
-      });
     } catch (err) {
       const actionError = new AgentError("Failed to handle new action", {
         agentId: data.actionContext.agentId,
@@ -286,12 +282,12 @@ export class GameOrchestrator {
     // Log error with appropriate level based on severity
     if (error instanceof MearthError) {
       if (error.status >= 500) {
-        logger.error("Critical error in orchestrator:", error.toJSON());
+        console.error("Critical error in orchestrator:", error.toJSON());
       } else {
-        logger.warn("Non-critical error in orchestrator:", error.toJSON());
+        console.warn("Non-critical error in orchestrator:", error.toJSON());
       }
     } else {
-      logger.error("Unknown error in orchestrator:", {
+      console.error("Unknown error in orchestrator:", {
         error: error.message,
         stack: error.stack,
       });
@@ -321,11 +317,11 @@ export class GameOrchestrator {
             break;
           default:
             // For unknown errors, log and continue
-            logger.warn("No recovery strategy for error type:", error.code);
+            console.warn("No recovery strategy for error type:", error.code);
         }
       }
 
-      logger.info("Recovery attempt completed for error:", {
+      console.info("Recovery attempt completed for error:", {
         type: error instanceof MearthError ? error.code : "UNKNOWN_ERROR",
         message: error.message,
       });
@@ -338,7 +334,7 @@ export class GameOrchestrator {
             ? recoveryErr.message
             : String(recoveryErr),
       });
-      logger.error("Recovery failed:", recoveryError.toJSON());
+      console.error("Recovery failed:", recoveryError.toJSON());
       throw recoveryError;
     }
   }
@@ -355,7 +351,7 @@ export class GameOrchestrator {
   }
 
   private async shutdown(): Promise<void> {
-    logger.info("🛑 Initiating graceful shutdown", {
+    console.info("🛑 Initiating graceful shutdown", {
       gameId: this.currentGameOnchainId,
     });
 
@@ -369,11 +365,11 @@ export class GameOrchestrator {
         this.prisma.$disconnect(),
       ]);
 
-      logger.info("👋 Graceful shutdown completed", {
+      console.info("👋 Graceful shutdown completed", {
         gameId: this.currentGameOnchainId,
       });
     } catch (error) {
-      logger.error("💥 Error during shutdown", {
+      console.error("💥 Error during shutdown", {
         gameId: this.currentGameOnchainId,
         error: error instanceof Error ? error.message : String(error),
       });
@@ -382,9 +378,15 @@ export class GameOrchestrator {
   }
 
   private async processAllAgents(): Promise<void> {
-    logger.info("👥 Processing all active agents");
-    const agents = await prisma.agent.findMany({
-      where: { game: { isActive: true }, health: { gt: 0 } },
+    console.info("👥 Processing all active agents");
+    const aliveAgents = await prisma.agent.findMany({
+      where: {
+        game: {
+          isActive: true,
+          onchainId: this.currentGameOnchainId.toNumber(),
+        },
+        health: { gt: 0 },
+      },
       include: {
         game: {
           select: {
@@ -395,59 +397,73 @@ export class GameOrchestrator {
       },
     });
 
-    // Process agents sequentially with delay
-    for (const agent of agents) {
+    // Process aliveAgents sequentially with delay
+    for (const agent of aliveAgents) {
       await this.processAgent({
         agentId: agent.id,
         agentOnchainId: agent.onchainId,
         gameId: agent.game.id,
-        gameOnchainId: new BN(agent.game.onchainId),
+        gameOnchainId: agent.game.onchainId,
       });
 
-      // Add delay between processing agents
-      if (agents.indexOf(agent) < agents.length - 1) {
-        logger.info(
-          `⏳ Waiting ${this.agentProcessingDelay}ms before processing next agent`
+      // Add delay between processing aliveAgents
+      if (aliveAgents.indexOf(agent) < aliveAgents.length - 1) {
+        console.info(
+          `⏳ Waiting ${this.agentInitGapDelay}ms before processing next agent`
         );
         await new Promise((resolve) =>
-          setTimeout(resolve, this.agentProcessingDelay)
+          setTimeout(resolve, this.agentInitGapDelay)
         );
       }
     }
 
-    logger.info(`✅ Processed ${agents.length} agents sequentially`);
+    console.info(`✅ Processed ${aliveAgents.length} agents sequentially`);
   }
 
   private async processAgent(actionContext: ActionContext): Promise<void> {
-    logger.info(`🤖 Processing agent ${actionContext.agentId}`);
-
+    console.info(`🤖 Processing agent ${actionContext.agentId}`);
+    let scores: InfluenceScore[] = [];
     try {
-      throw "testing ";
-
-      const recentTweets = await this.twitter.fetchRecentTweets(
-        actionContext.agentOnchainId.toString() as AgentId,
-        5
-      );
-      for (const tweet of recentTweets) {
-        await this.processTweetInteractions(actionContext, tweet);
+      try {
+        const agentTweetTweets = await this.twitter.fetchTweetsFromPastHour(
+          actionContext.agentOnchainId.toString() as AgentId,
+          5
+        );
+        console.log(agentTweetTweets);
+        scores = await this.processTweetInteractions(
+          actionContext,
+          agentTweetTweets ? agentTweetTweets[0] : null
+        );
+        console.log(scores);
+      } catch (error) {
+        console.error("Error fetching tweets continuing...", {
+          agentId: actionContext.agentId,
+          error,
+        });
       }
-    } catch (error) {
-      logger.error(
-        "Error processing community interactions, continue anyway...",
-        { agentId: actionContext.agentId, error }
-      );
-    }
 
-    this.engine.proceedWithoutInteractions(actionContext);
+      await this.engine.decideNextAction(actionContext, scores);
+    } catch (error) {
+      console.error("Error processing community interactions", {
+        agentId: actionContext.agentId,
+        error,
+      });
+    }
   }
 
   private async processTweetInteractions(
     actionContext: ActionContext,
-    tweet: TweetV2
-  ): Promise<void> {
-    logger.info(
+    tweet: TweetV2 | null
+  ): Promise<InfluenceScore[]> {
+    console.info(
       `📱 Processing tweet interactions for agent ${actionContext.agentId}`
     );
+    if (!tweet) {
+      console.error("No tweet found for agent in the past hour", {
+        agentId: actionContext.agentId,
+      });
+      return [];
+    }
     // Get new interactions from Twitter
     const newInteractions = await this.twitter.fetchTweetInteractions(tweet.id);
     // Process each interaction
@@ -472,17 +488,15 @@ export class GameOrchestrator {
         return score;
       })
     );
-    // Process scores through decision engine
-    await this.engine.processInfluenceScores(actionContext, scores);
-    logger.info(`✅ Processed ${scores.length} interactions`);
+    return scores;
   }
 
   private async handleActionExecutionFailure(error: Error): Promise<void> {
-    logger.error("Action execution failed", { error });
+    console.error("Action execution failed", { error });
   }
 
   private async cleanup(): Promise<void> {
-    logger.info("🧹 Starting cleanup process");
+    console.info("🧹 Starting cleanup process");
     // Clean up old data
     const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days
 
@@ -504,6 +518,6 @@ export class GameOrchestrator {
       this.cache.invalidateCache("interaction:*"),
     ]);
 
-    logger.info("✨ Cleanup completed successfully");
+    console.info("✨ Cleanup completed successfully");
   }
 }

@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { GameOrchestrator } from "./GameOrchestrator";
-import { logger } from "@/utils/logger";
 import CacheManager from "./CacheManager";
 
 /**
@@ -16,18 +15,18 @@ class HealthMonitor {
     private prisma: PrismaClient,
     private cache: CacheManager
   ) {
-    logger.info("🚀 Health Monitor initialized");
+    console.info("🚀 Health Monitor initialized");
   }
 
   async startMonitoring(): Promise<void> {
-    logger.info("🔄 Starting health monitoring service");
+    console.info("🔄 Starting health monitoring service");
     setInterval(async () => {
       await this.performHealthCheck();
     }, this.checkInterval);
   }
 
   private async performHealthCheck(): Promise<void> {
-    logger.info("🔍 Starting health check cycle");
+    console.info("🔍 Starting health check cycle");
     try {
       await Promise.all([
         this.checkDatabase(),
@@ -35,45 +34,45 @@ class HealthMonitor {
         this.checkTwitterAPI(),
       ]);
 
-      logger.info("✅ Health check completed successfully");
+      console.info("✅ Health check completed successfully");
     } catch (error) {
-      logger.error("❌ Health check failed", { error });
+      console.error("❌ Health check failed", { error });
       await this.handleHealthCheckFailure(error as Error);
     }
   }
 
   private async checkDatabase(): Promise<void> {
-    logger.info("💾 Checking database connection");
+    console.info("💾 Checking database connection");
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-      logger.info("✅ Database check passed");
+      console.info("✅ Database check passed");
     } catch (error) {
-      logger.error("❌ Database check failed", { error });
+      console.error("❌ Database check failed", { error });
       throw new Error("Database health check failed");
     }
   }
 
   private async checkCache(): Promise<void> {
-    logger.info("📦 Checking cache service");
+    console.info("📦 Checking cache service");
     try {
       await this.cache.getCachedInteraction("health-check");
-      logger.info("✅ Cache check passed");
+      console.info("✅ Cache check passed");
     } catch (error) {
-      logger.error("❌ Cache check failed", { error });
+      console.error("❌ Cache check failed", { error });
       throw new Error("Cache health check failed");
     }
   }
 
   private async checkTwitterAPI(): Promise<void> {
-    logger.info("🐦 Checking Twitter API connection");
+    console.info("🐦 Checking Twitter API connection");
     // TODO: Implement Twitter API health check
-    logger.info("⚠️ Twitter API check not implemented");
+    console.info("⚠️ Twitter API check not implemented");
   }
 
   private async handleHealthCheckFailure(error: Error): Promise<void> {
-    logger.error("🚨 Handling health check failure", { error });
+    console.error("🚨 Handling health check failure", { error });
     // TODO: Implement failure handling (notifications, recovery attempts, etc.)
-    logger.info("⚠️ Health check failure handling not implemented");
+    console.info("⚠️ Health check failure handling not implemented");
   }
 }
 

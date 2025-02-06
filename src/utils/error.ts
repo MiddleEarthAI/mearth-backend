@@ -175,43 +175,16 @@ export class ShutdownError extends MearthError {
   }
 }
 
-// Example usage:
-/*
-try {
-  // Game operation
-  if (!agent.isAlive) {
-    throw new AgentStateError('Agent is not alive', {
-      agentId: agent.id,
-      health: agent.health,
-      lastAction: agent.lastAction
-    });
-  }
-
-  // Twitter operation
-  if (twitterRateLimit.exceeded) {
-    throw new TwitterRateLimitError('Twitter rate limit exceeded', {
-      reset: twitterRateLimit.reset,
-      limit: twitterRateLimit.limit,
-      remaining: twitterRateLimit.remaining
-    });
-  }
-
-} catch (error) {
-  if (error instanceof MearthError) {
-    // Handle known error types
-    logger.error(error.toJSON());
-    // Send error response
-    res.status(error.status).json(error.toJSON());
-  } else {
-    // Handle unknown errors
-    const internalError = new MearthError(
-      'An unexpected error occurred',
-      500,
-      'INTERNAL_ERROR',
-      { originalError: error.message }
-    );
-    logger.error(internalError.toJSON());
-    res.status(500).json(internalError.toJSON());
+export class ActionValidationError extends Error {
+  constructor(message: string, public details: unknown) {
+    super(message);
+    this.name = "ActionValidationError";
   }
 }
-*/
+
+export class AIResponseError extends Error {
+  constructor(message: string, public response: unknown) {
+    super(message);
+    this.name = "AIResponseError";
+  }
+}

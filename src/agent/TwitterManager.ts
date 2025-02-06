@@ -1,6 +1,10 @@
-import { logger } from "@/utils/logger";
 import { TweetData, TwitterInteraction } from "@/types/twitter";
-import { TwitterApi, UserV2 } from "twitter-api-v2";
+import {
+  QuotedTweetsTimelineV2Paginator,
+  TweetUserMentionTimelineV2Paginator,
+  TwitterApi,
+  UserV2,
+} from "twitter-api-v2";
 import { twitterConfig } from "@/config/env";
 
 export type AgentId = "1" | "2" | "3" | "4";
@@ -18,7 +22,6 @@ class TwitterManager {
   /**
    * Initializes Twitter Manager with API clients for each agent
    * @param agents Array of agent accounts
-   * @param twitterConfig Twitter API configuration containing keys and tokens
    * @throws Error if API credentials are missing or invalid
    */
   constructor(agents: Array<{ account: { id: number } }>) {
@@ -113,34 +116,35 @@ class TwitterManager {
       this.requestCount++;
 
       // Fetch quotes
-      // const quotes = await this.fetchTweetQuotes(tweetId);
-      // for (const quote of quotes) {
-      //   const user = await this.fetchUserInfo(this.client, quote.author_id!);
-      //   interactions.push({
-      //     type: "quote",
-      //     userId: user.id,
-      //     username: user.username,
-      //     tweetId: quote.id,
-      //     content: quote.text,
-      //     timestamp: new Date(quote.created_at!),
-      //     userMetrics: {
-      //       followerCount: user.public_metrics?.followers_count || 0,
-      //       averageEngagement: await this.calculateAverageEngagementScore(
-      //         quote
-      //       ),
-      //       accountAge: 0,
-      //       verificationStatus: user.verified || false,
-      //       reputationScore: 0,
-      //     },
-      //   });
-      // }
+      const quotes = await this.fetchTweetQuotes(tweetId);
+
+      for (const quote of quotes) {
+        const user = await this.fetchUserInfo(this.client, quote.author_id!);
+        interactions.push({
+          type: "quote",
+          userId: user.id,
+          username: user.username,
+          tweetId: quote.id,
+          content: quote.text,
+          timestamp: new Date(quote.created_at!),
+          userMetrics: {
+            followerCount: user.public_metrics?.followers_count || 0,
+            averageEngagement: await this.calculateAverageEngagementScore(
+              quote
+            ),
+            accountAge: 0,
+            verificationStatus: user.verified || false,
+            reputationScore: 0,
+          },
+        });
+      }
 
       // // Check rate limiting between requests
-      // if (this.shouldThrottle()) {
-      //   const backoffTime = this.calculateBackoff();
-      //   await this.wait(backoffTime);
-      // }
-      // this.requestCount++;
+      if (this.shouldThrottle()) {
+        const backoffTime = this.calculateBackoff();
+        await this.wait(backoffTime);
+      }
+      this.requestCount++;
 
       // // Fetch mentions
       // const mentions = await this.fetchUserMentions(username);
@@ -170,7 +174,7 @@ class TwitterManager {
 
       return interactions;
     } catch (error) {
-      logger.error("Error fetching tweet interactions:", error);
+      console.error("Error fetching tweet interactions:", error);
       throw error;
     }
   }
@@ -201,7 +205,13 @@ class TwitterManager {
       });
   }
 
-  async fetchRecentTweets(agentId: AgentId, count: number) {
+  /**
+   * Fetches tweets from the past hour for a specific agent
+   * @param agentId - The ID of the agent whose tweets we want to fetch
+   * @param count - Maximum number of tweets to return (default: 100)
+   * @returns A paginated timeline of tweets from the past hour
+   */
+  async fetchTweetsFromPastHour(agentId: AgentId, count: number = 100) {
     // Check rate limiting before fetching
     if (this.shouldThrottle()) {
       const backoffTime = this.calculateBackoff();
@@ -214,28 +224,53 @@ class TwitterManager {
       console.error("❌ Error: Client not found for agentId", agentId);
       throw new Error(`Client for agent Id ${agentId} not found`);
     }
-    const me = await agentClient.v2.me();
-    console.log("🔍 Fetching tweets for agent", me);
 
-    return await agentClient?.v2.userTimeline(me.data.id, {
-      max_results: count,
-      "tweet.fields": [
-        "created_at",
-        "public_metrics",
-        "text",
-        "conversation_id",
-        "in_reply_to_user_id",
-      ],
-      "user.fields": ["name", "username", "verified", "profile_image_url"],
-      expansions: [
-        "author_id",
-        "referenced_tweets.id",
-        "in_reply_to_user_id",
-        "attachments.media_keys",
-      ],
-    });
+    try {
+      console.log("🔍 Fetching tweets from the past hour...");
+      const me = await agentClient.v2.me();
+
+      // Calculate timestamps
+      const endTime = new Date();
+      const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000); // 1 day ago
+
+      const timeline = await agentClient.v2.userTimeline(me.data.id, {
+        max_results: Math.min(count, 100), // Twitter API v2 has a max limit of 100
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+        "tweet.fields": [
+          "created_at",
+          "public_metrics",
+          "text",
+          "conversation_id",
+          "in_reply_to_user_id",
+          "referenced_tweets",
+        ],
+        "user.fields": [
+          "name",
+          "username",
+          "verified",
+          "profile_image_url",
+          "public_metrics", // Added this to get follower counts etc.
+        ],
+        expansions: [
+          "author_id",
+          "referenced_tweets.id",
+          "in_reply_to_user_id",
+          "attachments.media_keys",
+        ],
+      });
+      return timeline.data.data || null;
+    } catch (error) {
+      console.error("❌ Error fetching tweets from past hour:", error);
+      throw error;
+    }
   }
 
+  /**
+   * Fetches replies to a specific tweet
+   * @param tweetId - The ID of the tweet to fetch replies for
+   * @returns Promise<TweetData[]> Array of reply tweets
+   */
   async fetchTweetReplies(tweetId: string): Promise<TweetData[]> {
     // Check rate limiting before fetching
     if (this.shouldThrottle()) {
@@ -245,8 +280,19 @@ class TwitterManager {
     this.requestCount++;
 
     try {
+      // First get the tweet to ensure we have the conversation ID
+      const tweet = await this.client.v2.singleTweet(tweetId, {
+        "tweet.fields": ["conversation_id"],
+      });
+
+      if (!tweet.data) {
+        throw new Error(`Tweet ${tweetId} not found`);
+      }
+
+      // Then get all replies in the conversation
       const replies = await this.client.v2.search(
-        `conversation_id:${tweetId} is:reply`,
+        `conversation_id:${tweet.data.conversation_id} 
+             in_reply_to_tweet_id:${tweetId}`, // This ensures we only get direct replies
         {
           "tweet.fields": [
             "created_at",
@@ -257,18 +303,31 @@ class TwitterManager {
             "referenced_tweets",
           ],
           "user.fields": ["name", "username", "verified", "public_metrics"],
-          expansions: ["author_id", "referenced_tweets.id"],
+          expansions: [
+            "author_id",
+            "referenced_tweets.id",
+            "in_reply_to_user_id",
+          ],
         }
       );
 
       return replies.data.data || [];
     } catch (error) {
-      logger.error("Error fetching replies:", error);
+      console.error("Error fetching replies:", error);
       throw error;
     }
   }
 
-  async fetchTweetQuotes(tweetId: string): Promise<TweetData[]> {
+  /**
+   * Fetches quotes (retweets with comments) of a specific tweet
+   * @param tweetId - The ID of the tweet to fetch quotes for
+   * @param usePagination - Whether to return a paginator for handling large numbers of quotes
+   * @returns Promise<TweetData[]> Array of quote tweets or a paginator
+   */
+  async fetchTweetQuotes(
+    tweetId: string,
+    usePagination: boolean = false
+  ): Promise<TweetData[] | QuotedTweetsTimelineV2Paginator> {
     // Check rate limiting before fetching
     if (this.shouldThrottle()) {
       const backoffTime = this.calculateBackoff();
@@ -291,17 +350,31 @@ class TwitterManager {
         expansions: ["author_id", "referenced_tweets.id"],
       });
 
+      // Return paginator if requested
+      if (usePagination) {
+        return quotes;
+      }
+
+      // Otherwise return just the data array
       return quotes.data.data || [];
     } catch (error) {
-      logger.error("Error fetching quotes:", error);
+      console.error("Error fetching quotes:", error);
       throw error;
     }
   }
 
+  /**
+   * Fetches tweets that mention a specific user
+   * @param userId - The ID of the user to fetch mentions for
+   * @param count - Maximum number of mentions to return (default: 100)
+   * @param usePagination - Whether to return a paginator for handling large numbers of mentions
+   * @returns Promise<TweetData[] | TweetUserMentionTimelineV2Paginator>
+   */
   async fetchUserMentions(
-    username: string,
-    count: number = 100
-  ): Promise<TweetData[]> {
+    userId: string,
+    count: number = 100,
+    usePagination: boolean = false
+  ): Promise<TweetData[] | TweetUserMentionTimelineV2Paginator> {
     // Check rate limiting before fetching
     if (this.shouldThrottle()) {
       const backoffTime = this.calculateBackoff();
@@ -310,8 +383,8 @@ class TwitterManager {
     this.requestCount++;
 
     try {
-      const mentions = await this.client.v2.search(`@${username}`, {
-        max_results: count,
+      const mentions = await this.client.v2.userMentionTimeline(userId, {
+        max_results: Math.min(count, 100), // Ensure we don't exceed Twitter's limit
         "tweet.fields": [
           "created_at",
           "public_metrics",
@@ -321,17 +394,38 @@ class TwitterManager {
           "referenced_tweets",
           "author_id",
         ],
-        "user.fields": ["name", "username", "verified", "public_metrics"],
-        expansions: ["author_id", "referenced_tweets.id"],
+        "user.fields": [
+          "name",
+          "username",
+          "verified",
+          "public_metrics",
+          "profile_image_url", // Added this for user avatars
+        ],
+        expansions: [
+          "author_id",
+          "referenced_tweets.id",
+          "in_reply_to_user_id", // Added this to track reply chains
+        ],
       });
 
+      // Return paginator if requested
+      if (usePagination) {
+        return mentions;
+      }
+
+      // Otherwise return just the data array
       return mentions.data.data || [];
     } catch (error) {
-      logger.error("Error fetching mentions:", error);
+      console.error("❌ Error fetching user mentions:", error);
       throw error;
     }
   }
 
+  /**
+   * Fetches a single tweet by its ID
+   * @param tweetId - The ID of the tweet to fetch
+   * @returns Promise<TweetData> The tweet data
+   */
   async fetchTweetById(tweetId: string): Promise<TweetData> {
     // Check rate limiting before fetching
     if (this.shouldThrottle()) {
@@ -349,6 +443,22 @@ class TwitterManager {
           "conversation_id",
           "in_reply_to_user_id",
           "referenced_tweets",
+          "author_id", // Added to know who wrote the tweet
+          "attachments", // Added for media attachments
+          "context_annotations", // Added for tweet context
+        ],
+        "user.fields": [
+          // Added user fields
+          "name",
+          "username",
+          "verified",
+          "profile_image_url",
+        ],
+        expansions: [
+          // Added expansions
+          "author_id",
+          "referenced_tweets.id",
+          "attachments.media_keys",
         ],
       });
 
@@ -358,11 +468,17 @@ class TwitterManager {
 
       return tweet.data;
     } catch (error) {
-      logger.error("Error fetching tweet:", error);
+      console.error("❌ Error fetching tweet:", error);
       throw error;
     }
   }
 
+  /**
+   * Fetches user information by username
+   * @param client - TwitterApi client instance
+   * @param username - The username to fetch info for
+   * @returns Promise<UserV2> The user data
+   */
   async fetchUserInfo(client: TwitterApi, username: string): Promise<UserV2> {
     try {
       const user = await client.v2.userByUsername(username, {
@@ -372,6 +488,15 @@ class TwitterManager {
           "public_metrics",
           "verified",
           "profile_image_url",
+          "protected", // Added to know if account is private
+          "location", // Added for user location
+          "url", // Added for user's website
+          "entities", // Added for profile URL/description entities
+          "pinned_tweet_id", // Added to get pinned tweet
+        ],
+        expansions: [
+          // Added expansions
+          "pinned_tweet_id",
         ],
       });
 
@@ -381,13 +506,13 @@ class TwitterManager {
 
       return user.data;
     } catch (error) {
-      logger.error("Error fetching user info:", error);
+      console.error("❌ Error fetching user info:", error);
       throw error;
     }
   }
 
   /**
-   * Calculates engagement score for a tweet based on interactions
+   * Calculates comprehensive engagement score for a tweet based on interactions
    * @param tweet - Tweet data
    * @param interactions - Array of tweet interactions
    * @returns Engagement score between 0 and 1
@@ -396,16 +521,18 @@ class TwitterManager {
     tweet: TweetData,
     interactions: TwitterInteraction[]
   ): Promise<number> {
-    if (!tweet.public_metrics) return 0;
+    if (!tweet.public_metrics || interactions.length === 0) return 0;
 
     const metrics = tweet.public_metrics;
 
+    // Calculate total raw engagement
     const totalEngagement =
       metrics.like_count +
       metrics.retweet_count +
       metrics.reply_count +
       metrics.quote_count;
 
+    // Calculate quality metrics
     const verifiedInteractions = interactions.filter(
       (i) => i.userMetrics.verificationStatus
     ).length;
@@ -418,6 +545,7 @@ class TwitterManager {
     const verifiedWeight = 0.3;
     const followerWeight = 0.2;
 
+    // Calculate weighted scores
     const engagementScore =
       Math.min(totalEngagement / 1000, 1) * engagementWeight;
     const verifiedScore =
@@ -425,24 +553,29 @@ class TwitterManager {
     const followerScore =
       (highFollowerInteractions / interactions.length) * followerWeight;
 
+    // Return combined score
     return engagementScore + verifiedScore + followerScore;
   }
 
+  /**
+   * Calculates simple average engagement score for a tweet
+   * @param tweetData - Tweet data containing public metrics
+   * @returns Normalized engagement score between 0 and 1
+   */
   async calculateAverageEngagementScore(tweetData: TweetData): Promise<number> {
     if (!tweetData.public_metrics) return 0;
 
     const metrics = tweetData.public_metrics;
+
+    // Calculate total engagement from all metrics
     const totalEngagement =
       metrics.like_count +
       metrics.retweet_count +
       metrics.reply_count +
       metrics.quote_count;
 
-    // Calculate average engagement as percentage of total possible engagement
-    // Normalize to value between 0-1
-    const averageScore = Math.min(totalEngagement / 1000, 1);
-
-    return averageScore;
+    // Normalize to value between 0-1 (capped at 1000 interactions)
+    return Math.min(totalEngagement / 1000, 1);
   }
 
   /**
@@ -497,9 +630,9 @@ class TwitterManager {
         this._clients.set(agentId, newClient);
       }
 
-      logger.info("Successfully reconnected Twitter clients");
+      console.info("Successfully reconnected Twitter clients");
     } catch (error) {
-      logger.error("Failed to reconnect Twitter clients", { error });
+      console.error("Failed to reconnect Twitter clients", { error });
       throw error;
     }
   }
@@ -512,9 +645,9 @@ class TwitterManager {
     try {
       // Clear all clients
       this._clients.clear();
-      logger.info("Successfully disconnected Twitter clients");
+      console.info("Successfully disconnected Twitter clients");
     } catch (error) {
-      logger.error("Failed to disconnect Twitter clients", { error });
+      console.error("Failed to disconnect Twitter clients", { error });
       throw error;
     }
   }

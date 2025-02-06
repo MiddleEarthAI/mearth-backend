@@ -1,37 +1,6 @@
 import { ActionManager } from "@/agent/ActionManager";
-import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { GameManager } from "@/agent/GameManager";
-import { GameAction, MearthProgram } from "@/types";
-import { Agent, Game, PrismaClient } from "@prisma/client";
-import { getProgramWithWallet } from "@/utils/program";
-import { AgentAccount, GameAccount } from "@/types/program";
-import { PublicKey } from "@solana/web3.js";
-
-// Use actual Prisma client
-export const prisma = new PrismaClient();
-// Get actual testProgram instance
-export let testProgram: MearthProgram;
-export let activeGame: Game;
-export let gameAccount: GameAccount;
-export let agentsWithAccounts: Array<{
-  account: AgentAccount;
-  agent: Agent;
-}>;
-
-let defaultAgent: {
-  account: AgentAccount;
-  agent: Agent;
-};
-
-let targetAgent: {
-  account: AgentAccount;
-  agent: Agent;
-};
-
-export let agent1Pda: PublicKey;
-export let agent2Pda: PublicKey;
-export let agent3Pda: PublicKey;
-export let agent4Pda: PublicKey;
+import { GameAction } from "@/types";
+import { testState, createTestAlliance } from "../setup";
 
 /**
  * Alliance Integration Test Suite
@@ -39,80 +8,39 @@ export let agent4Pda: PublicKey;
  */
 describe("Alliance Integration Tests", () => {
   let actionManager: ActionManager;
-  let gameManager: GameManager;
 
-  beforeAll(async () => {
-    testProgram = await getProgramWithWallet();
-    gameManager = new GameManager(testProgram, prisma);
-    const result = await gameManager.createNewGame();
-    if (!result) {
-      throw new Error("No active game found");
-    }
-    const { dbGame, agents } = result;
-    activeGame = dbGame;
-    agentsWithAccounts = agents;
-    defaultAgent = agentsWithAccounts[0];
-    targetAgent = agentsWithAccounts[1];
-    gameAccount = result.gameAccount;
-
-    const [gamePda] = getGamePDA(testProgram.programId, dbGame.onchainId);
-    agent1Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[0].agent.onchainId
-    )[0];
-    agent2Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[1].agent.onchainId
-    )[0];
-    agent3Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[2].agent.onchainId
-    )[0];
-    agent4Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[3].agent.onchainId
-    )[0];
-
+  beforeAll(() => {
     // Initialize ActionManager with game context
     actionManager = new ActionManager(
-      testProgram,
-      activeGame.onchainId,
-      prisma
+      testState.program!,
+      testState.activeGame!.onchainId,
+      testState.prisma
     );
-  });
-
-  beforeEach(async () => {
-    // Clean up existing alliances before each test
-    await prisma.alliance.deleteMany();
   });
 
   describe("Alliance Formation", () => {
     it("should form alliance between eligible agents", async () => {
       const allianceAction: GameAction = {
         type: "ALLY",
-        targetId: targetAgent.agent.onchainId,
+        targetId: testState.agentsWithAccounts[1].agent.onchainId,
         tweet: "Proposing new alliance",
       };
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         allianceAction
       );
       expect(result.success).toBe(true);
 
-      const alliance = await prisma.alliance.findFirst({
+      const alliance = await testState.prisma.alliance.findFirst({
         where: {
-          initiatorId: defaultAgent.agent.id,
-          joinerId: targetAgent.agent.id,
+          initiatorId: testState.agentsWithAccounts[0].agent.id,
+          joinerId: testState.agentsWithAccounts[1].agent.id,
         },
       });
       expect(alliance).toBeTruthy();
@@ -121,23 +49,23 @@ describe("Alliance Integration Tests", () => {
 
     it("should prevent alliance with dead agents", async () => {
       // Kill target agent
-      await prisma.agent.update({
-        where: { id: targetAgent.agent.id },
+      await testState.prisma.agent.update({
+        where: { id: testState.agentsWithAccounts[1].agent.id },
         data: { isAlive: false },
       });
 
       const allianceAction: GameAction = {
         type: "ALLY",
-        targetId: targetAgent.agent.onchainId,
+        targetId: testState.agentsWithAccounts[1].agent.onchainId,
         tweet: "Attempting alliance with dead agent",
       };
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         allianceAction
       );
@@ -145,8 +73,8 @@ describe("Alliance Integration Tests", () => {
       expect(result.feedback?.error?.message).toContain("not alive");
 
       // Revive target agent for other tests
-      await prisma.agent.update({
-        where: { id: targetAgent.agent.id },
+      await testState.prisma.agent.update({
+        where: { id: testState.agentsWithAccounts[1].agent.id },
         data: { isAlive: true },
       });
     });
@@ -160,10 +88,10 @@ describe("Alliance Integration Tests", () => {
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         allianceAction
       );
@@ -175,28 +103,20 @@ describe("Alliance Integration Tests", () => {
   describe("Alliance Restrictions", () => {
     it("should prevent duplicate alliances", async () => {
       // Create existing alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: defaultAgent.agent.id,
-          joinerId: targetAgent.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      await createTestAlliance(0, 1);
 
       const allianceAction: GameAction = {
         type: "ALLY",
-        targetId: targetAgent.agent.onchainId,
+        targetId: testState.agentsWithAccounts[1].agent.onchainId,
         tweet: "Attempting duplicate alliance",
       };
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         allianceAction
       );
@@ -206,27 +126,27 @@ describe("Alliance Integration Tests", () => {
 
     it("should prevent alliance during cooldown period", async () => {
       // Create alliance cooldown
-      await prisma.coolDown.create({
+      await testState.prisma.coolDown.create({
         data: {
           type: "Alliance",
           endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-          cooledAgentId: defaultAgent.agent.id,
-          gameId: activeGame.id,
+          cooledAgentId: testState.agentsWithAccounts[0].agent.id,
+          gameId: testState.activeGame!.id,
         },
       });
 
       const allianceAction: GameAction = {
         type: "ALLY",
-        targetId: targetAgent.agent.onchainId,
+        targetId: testState.agentsWithAccounts[1].agent.onchainId,
         tweet: "Attempting alliance during cooldown",
       };
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         allianceAction
       );
@@ -238,11 +158,11 @@ describe("Alliance Integration Tests", () => {
   describe("Alliance Status Management", () => {
     it("should handle broken alliances correctly", async () => {
       // Create and then break alliance
-      await prisma.alliance.create({
+      await testState.prisma.alliance.create({
         data: {
-          initiatorId: defaultAgent.agent.id,
-          joinerId: targetAgent.agent.id,
-          gameId: activeGame.id,
+          initiatorId: testState.agentsWithAccounts[0].agent.id,
+          joinerId: testState.agentsWithAccounts[1].agent.id,
+          gameId: testState.activeGame!.id,
           status: "Broken",
           timestamp: new Date(),
           endedAt: new Date(),
@@ -251,16 +171,16 @@ describe("Alliance Integration Tests", () => {
 
       const newAllianceAction: GameAction = {
         type: "ALLY",
-        targetId: targetAgent.agent.onchainId,
+        targetId: testState.agentsWithAccounts[1].agent.onchainId,
         tweet: "Attempting alliance after previous break",
       };
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         newAllianceAction
       );
@@ -270,29 +190,21 @@ describe("Alliance Integration Tests", () => {
 
     it("should prevent multiple active alliances", async () => {
       // Create first alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: defaultAgent.agent.id,
-          joinerId: agentsWithAccounts[1].agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      await createTestAlliance(0, 1);
 
       // Attempt second alliance
       const secondAllianceAction: GameAction = {
         type: "ALLY",
-        targetId: agentsWithAccounts[2].agent.onchainId,
+        targetId: testState.agentsWithAccounts[2].agent.onchainId,
         tweet: "Attempting second active alliance",
       };
 
       const result = await actionManager.executeAction(
         {
-          gameId: activeGame.id,
-          gameOnchainId: activeGame.onchainId,
-          agentId: defaultAgent.agent.id,
-          agentOnchainId: defaultAgent.agent.onchainId,
+          gameId: testState.activeGame!.id,
+          gameOnchainId: testState.activeGame!.onchainId,
+          agentId: testState.agentsWithAccounts[0].agent.id,
+          agentOnchainId: testState.agentsWithAccounts[0].agent.onchainId,
         },
         secondAllianceAction
       );

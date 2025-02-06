@@ -1,5 +1,4 @@
 import { generateGameId } from "@/utils";
-import { logger } from "@/utils/logger";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { BN } from "@coral-xyz/anchor";
 import { profiles } from "../config/game-data";
@@ -97,7 +96,7 @@ export class GameManager implements IGameManager {
       where: { id: gameOnchainId },
       data: { isActive: false },
     });
-    logger.info(`🏁 Game ${gameOnchainId} ended`);
+    console.info(`🏁 Game ${gameOnchainId} ended`);
   }
 
   /**
@@ -116,14 +115,14 @@ export class GameManager implements IGameManager {
         where: { gameId },
       }),
     ]);
-    logger.info(`🔄 Game ${gameId} state reset`);
+    console.info(`🔄 Game ${gameId} state reset`);
   }
 
   /**
    * Creates a new game instance with all required components
    */
   public async createNewGame(): Promise<GameInitResult> {
-    logger.info(`🎮 Initializing new game world`);
+    console.info(`🎮 Initializing new game world`);
     try {
       return await this.prisma.$transaction(
         async (prisma) => {
@@ -176,7 +175,7 @@ export class GameManager implements IGameManager {
         }
       );
     } catch (error) {
-      logger.error(`❌ Game initialization failed:`, error);
+      console.error(`❌ Game initialization failed:`, error);
       throw error;
     }
   }
@@ -238,7 +237,7 @@ export class GameManager implements IGameManager {
           },
         });
 
-        logger.info(
+        console.info(
           `✅ Agent ${profile.onchainId} created at (${spawnTile.x}, ${spawnTile.y})`
         );
 

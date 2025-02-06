@@ -76,7 +76,7 @@ router.post(
         await healthMonitor.startMonitoring();
         logger.info("System started successfully");
       } catch (error) {
-        logger.error("Failed to start system", { error });
+        console.error("Failed to start system", { error });
         process.exit(1);
       }
 
@@ -91,7 +91,7 @@ router.post(
         },
       });
     } catch (error) {
-      logger.error(`💥 Failed to initialize game:`, error);
+      console.error(`💥 Failed to initialize game:`, error);
       res.status(500).json({
         success: false,
         error: "Failed to initialize game",
@@ -130,7 +130,7 @@ router.post(
           onchainId: gameId,
         },
         include: {
-          mapTiles: true,
+          mapTile: true,
           profile: true,
           joinedAlliances: true,
         },
@@ -155,7 +155,7 @@ router.post(
         },
       });
     } catch (error) {
-      logger.error("💥 Failed to start agent:", error);
+      console.error("💥 Failed to start agent:", error);
       res.status(500).json({
         success: false,
         error: "Failed to start agent",
@@ -214,7 +214,7 @@ router.get(
         },
       });
     } catch (error) {
-      logger.error(
+      console.error(
         `💥 Failed to fetch state for game ${req.params.gameId}:`,
         error
       );

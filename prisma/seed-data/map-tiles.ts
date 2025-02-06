@@ -792,16 +792,16 @@ function determineTerrainType(
 
   // Create mountain ranges in a circular pattern
   if (distanceFromCenter % 8 === 0 || (x + y) % 7 === 0) {
-    return TerrainType.Mountain;
+    return TerrainType.mountain;
   }
 
   // Create rivers in a meandering pattern
   if (Math.sin(x * 0.5) + Math.cos(y * 0.5) > 1.2) {
-    return TerrainType.River;
+    return TerrainType.river;
   }
 
   // Default to plains
-  return TerrainType.Plain;
+  return TerrainType.plain;
 }
 
 export async function seedMapTiles() {
@@ -819,7 +819,7 @@ export async function seedMapTiles() {
       tiles.push({
         x,
         y,
-        terrainType: TerrainType.River,
+        terrainType: TerrainType.river,
       });
     });
 
@@ -829,7 +829,7 @@ export async function seedMapTiles() {
       tiles.push({
         x,
         y,
-        terrainType: TerrainType.Mountain,
+        terrainType: TerrainType.mountain,
       });
     });
 
@@ -839,7 +839,7 @@ export async function seedMapTiles() {
       tiles.push({
         x,
         y,
-        terrainType: TerrainType.Plain,
+        terrainType: TerrainType.plain,
       });
     });
 

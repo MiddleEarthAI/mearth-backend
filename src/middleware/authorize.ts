@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "./privy-auth";
 import { prisma } from "@/config/prisma";
-import { logger } from "@/utils/logger";
+
 import { UserRole } from "@prisma/client";
 
 /**
@@ -25,12 +25,12 @@ export async function getOrCreateUser(userId: string) {
           // when user connects them through Privy
         },
       });
-      logger.info(`Created new user record for Privy user ${userId}`);
+      console.info(`Created new user record for Privy user ${userId}`);
     }
 
     return user;
   } catch (error) {
-    logger.error("Failed to get/create user:", error);
+    console.error("Failed to get/create user:", error);
     throw error;
   }
 }
@@ -64,7 +64,7 @@ export const requireAdmin = async (
     req.user = { ...req.user, ...user };
     next();
   } catch (error) {
-    logger.error("Authorization error:", error);
+    console.error("Authorization error:", error);
     res.status(500).json({
       success: false,
       error: "Authorization failed",
@@ -124,7 +124,7 @@ export const requireAdmin = async (
 //     req.user = { ...req.user, ...user };
 //     next();
 //   } catch (error) {
-//     logger.error("Game authorization error:", error);
+//     console.error("Game authorization error:", error);
 //     res.status(500).json({
 //       success: false,
 //       error: "Authorization failed",
@@ -184,7 +184,7 @@ export const requireAgentOwnership = async (
     req.user = { ...req.user, ...user };
     next();
   } catch (error) {
-    logger.error("Agent authorization error:", error);
+    console.error("Agent authorization error:", error);
     res.status(500).json({
       success: false,
       error: "Authorization failed",

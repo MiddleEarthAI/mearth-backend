@@ -254,9 +254,9 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 exports.TerrainType = exports.$Enums.TerrainType = {
-  Plain: 'Plain',
-  Mountain: 'Mountain',
-  River: 'River'
+  plain: 'plain',
+  mountain: 'mountain',
+  river: 'river'
 };
 
 exports.AllianceStatus = exports.$Enums.AllianceStatus = {

@@ -159,12 +159,12 @@ export const env = cleanEnv(process.env, {
     default: 30,
     desc: "Diameter of the game map",
   }),
-  GAME_UPDATE_INTERVAL: num({
-    default: 60000, // 1 minute
+  AGENT_ACTION_INTERVAL: num({
+    default: 3600000, // 1 hour
     desc: "Game state update interval in milliseconds",
   }),
   GAME_CLEANUP_INTERVAL: num({
-    default: 300000,
+    default: 300000, // 15 minutes
     desc: "Game cleanup interval in milliseconds",
   }),
   DAILY_REWARD_TOKENS: num({
@@ -320,7 +320,7 @@ export const twitterConfig = {
 
 export const gameConfig = {
   mapDiameter: env.GAME_MAP_DIAMETER,
-  updateInterval: env.GAME_UPDATE_INTERVAL,
+  actionInterval: env.AGENT_ACTION_INTERVAL,
   battleCheckInterval: env.BATTLE_CHECK_INTERVAL,
   cleanupInterval: env.GAME_CLEANUP_INTERVAL,
   dailyRewardTokens: env.DAILY_REWARD_TOKENS,

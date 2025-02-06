@@ -2,7 +2,6 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
-import { logger } from "@/utils/logger";
 import { AgentTrait } from "@/types/agent";
 import { ActionSuggestion, InfluenceScore } from "@/types/twitter";
 import {
@@ -14,7 +13,6 @@ import {
 } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
-import { ActionManager } from "./ActionManager";
 
 interface RetryContext {
   currentRetry: number;
@@ -41,10 +39,10 @@ class DecisionEngine {
     console.log("🎮 Decision Engine initialized");
   }
 
-  async processInfluenceScores(
+  async decideNextAction(
     actionContext: ActionContext,
     scores: InfluenceScore[]
-  ) {
+  ): Promise<void> {
     console.log(
       `🎯 Processing influence scores for agent ${actionContext.agentId}`
     );
@@ -56,7 +54,6 @@ class DecisionEngine {
 
     if (!agent) {
       console.log("❌ Agent not found");
-      return null;
     }
 
     console.log("👥 Grouping suggestions based on similarity");
@@ -65,51 +62,42 @@ class DecisionEngine {
     console.log("🏆 Finding dominant suggestion");
     const dominantSuggestion = this.findDominantSuggestion(groupedSuggestions);
 
-    if (!dominantSuggestion) {
-      console.log("❌ No dominant suggestion found");
-      return null;
-    }
+    // console.log("⚖️ Calculating character alignment");
+    // const alignmentScore = this.calculateCharacterAlignment(
+    //   dominantSuggestion.suggestion,
+    //   agent.profile.traits as unknown as AgentTrait[]
+    // );
 
-    console.log("⚖️ Calculating character alignment");
-    const alignmentScore = this.calculateCharacterAlignment(
-      dominantSuggestion.suggestion,
-      agent.profile.traits as unknown as AgentTrait[]
+    // const shouldAct =
+    //   dominantSuggestion.totalInfluence > this.INFLUENCE_THRESHOLD &&
+    //   dominantSuggestion.consensus > this.CONSENSUS_THRESHOLD &&
+    //   alignmentScore > this.CHARACTER_ALIGNMENT_WEIGHT;
+
+    // console.log(`🤔 Decision metrics:
+    //   - Influence: ${dominantSuggestion.totalInfluence}
+    //   - Consensus: ${dominantSuggestion.consensus}
+    //   - Alignment: ${alignmentScore}
+    //   - Should Act: ${shouldAct}`);
+
+    const { prompt } = await this.buildPrompt(
+      actionContext,
+      dominantSuggestion
     );
 
-    const shouldAct =
-      dominantSuggestion.totalInfluence > this.INFLUENCE_THRESHOLD &&
-      dominantSuggestion.consensus > this.CONSENSUS_THRESHOLD &&
-      alignmentScore > this.CHARACTER_ALIGNMENT_WEIGHT;
+    if (prompt) {
+      const response = await generateText({
+        model: anthropic("claude-3-5-sonnet-20240620"),
+        messages: [
+          { role: "user", content: prompt },
+          { role: "assistant", content: "Here is the JSON requested:\n{" },
+        ],
+      });
+      console.info("🤖 Generated AI response 🔥🔥🔥");
+      console.info(response.text);
+      const action = this.parseActionJson(`{${response.text}`);
 
-    console.log(`🤔 Decision metrics:
-      - Influence: ${dominantSuggestion.totalInfluence}
-      - Consensus: ${dominantSuggestion.consensus}
-      - Alignment: ${alignmentScore}
-      - Should Act: ${shouldAct}`);
-
-    const { prompt } = await this.buildPrompt(actionContext);
-
-    const response = await generateText({
-      model: anthropic("claude-3-5-sonnet-20240620"),
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-        { role: "assistant", content: "Here is the JSON requested:\n{" },
-      ],
-    });
-
-    const action = this.extractActionJson(response.text);
-
-    if (action) {
-      console.log(`✨ Emitting new action: ${action.type}`);
       this.eventEmitter.emit("newAction", { actionContext, action });
-      return action;
     }
-
-    console.log("❌ No valid action extracted");
-    return null;
   }
 
   private groupSuggestions(scores: InfluenceScore[]): Map<string, any> {
@@ -192,30 +180,14 @@ class DecisionEngine {
       : 0.5;
   }
 
-  async proceedWithoutInteractions(
-    actionContext: ActionContext
-  ): Promise<void> {
-    const { prompt } = await this.buildPrompt(actionContext);
-
-    if (prompt) {
-      const response = await generateText({
-        model: anthropic("claude-3-5-sonnet-20240620"),
-        messages: [
-          { role: "user", content: prompt },
-          { role: "assistant", content: "Here is the JSON requested:\n{" },
-        ],
-      });
-      logger.info("🤖 Generated AI response 🔥🔥🔥");
-      logger.info(response.text);
-      const action = this.parseActionJson(`{${response.text}`);
-
-      console.log("🤖 Generated AI response");
-      console.log(action);
-      this.eventEmitter.emit("newAction", { actionContext, action });
-    }
-  }
-
-  private async buildPrompt(actionContext: ActionContext): Promise<{
+  private async buildPrompt(
+    actionContext: ActionContext,
+    dominantSuggestion: {
+      suggestion: ActionSuggestion;
+      totalInfluence: number;
+      consensus: number;
+    } | null
+  ): Promise<{
     prompt: string;
     actionContext: ActionContext;
   }> {
@@ -268,7 +240,7 @@ class DecisionEngine {
 
     // Get current position
     const currentPosition = agent.mapTile;
-    logger.info("🔍 Current position", { currentPosition });
+    console.info("🔍 Current position", { currentPosition });
     if (!currentPosition) {
       console.log("❌ Agent position not found");
       return { prompt: "", actionContext };
@@ -579,11 +551,11 @@ IMPORTANT: Every action must advance your goals while staying true to your chara
 
   // Efficiently parse the JSON response
   private parseActionJson(response: string): GameAction | null {
-    logger.info("🔍 Parsing action JSON: ", response);
+    console.info("🔍 Parsing action JSON: ", response);
     try {
       // Remove any potential preamble and get just the JSON object
       const jsonStr = response.substring(response.indexOf("{"));
-      return JSON.parse(jsonStr) as GameAction;
+      return JSON.parse(jsonStr);
     } catch (error) {
       console.error("Failed to parse action JSON:", error);
       // Return a default IGNORE action if parsing fails
@@ -591,48 +563,17 @@ IMPORTANT: Every action must advance your goals while staying true to your chara
     }
   }
 
-  private extractActionJson(action: string): GameAction {
-    console.log("📦 Extracting action from AI response");
-    return JSON.parse(action);
-  }
-
   handleActionResult(actionContext: ActionContext, result: ActionResult): void {
     if (!result.success && result.feedback) {
       this.handleActionFailure(actionContext, result);
     } else {
-      logger.info("✅ Action successfully processed", {
+      console.info("✅ Action successfully processed", {
         gameId: result.retryContext?.previousAttempt.gameId,
         agentId: result.retryContext?.previousAttempt.agentId,
         actionType: result.retryContext?.previousAttempt.actionType,
       });
     }
   }
-
-  /**
-   * Handles action execution with feedback and retries
-   */
-  // private async executeActionWithFeedback(
-  //   actionContext: ActionContext,
-  //   action: GameAction,
-  //   retryContext?: RetryContext
-  // ): Promise<void> {
-  //   const result = await this.actionManager.executeAction(
-  //     actionContext,
-  //     action
-  //   );
-
-  //   if (!result.success && result.feedback) {
-  //     if (!retryContext || retryContext.currentRetry < this.MAX_RETRIES) {
-  //       await this.handleActionFailure(actionContext, result, retryContext);
-  //     } else {
-  //       logger.error("Max retries exceeded, giving up", {
-  //         actionContext,
-  //         action,
-  //         retryContext,
-  //       });
-  //     }
-  //   }
-  // }
 
   /**
    * Handles failed actions by generating new decisions based on feedback
@@ -651,7 +592,7 @@ IMPORTANT: Every action must advance your goals while staying true to your chara
       actionContext
     );
 
-    logger.info("🔄 Retrying action with feedback", {
+    console.info("🔄 Retrying action with feedback", {
       attempt: currentRetry,
       feedback: result.feedback,
     });
@@ -670,15 +611,7 @@ IMPORTANT: Every action must advance your goals while staying true to your chara
       ],
     });
 
-    const newAction = this.parseActionJson(`{${response.text}`);
-
-    // Retry with new action
-    // await this.executeActionWithFeedback(actionContext, newAction, {
-    //   currentRetry,
-    //   maxRetries: this.MAX_RETRIES,
-    //   failureReason: result.feedback!.error?.message || "Unknown error",
-    //   previousAttempt: result,
-    // });
+    // const newAction = this.parseActionJson(`{${response.text}`);
   }
 
   /**

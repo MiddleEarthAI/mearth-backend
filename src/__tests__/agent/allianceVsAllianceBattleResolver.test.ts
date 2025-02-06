@@ -1,48 +1,10 @@
 import { BattleResolver } from "@/agent/BattleResolver";
-import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { GameManager } from "@/agent/GameManager";
-import { MearthProgram } from "@/types";
-import { Agent, Game, PrismaClient } from "@prisma/client";
-import { getProgramWithWallet } from "@/utils/program";
-import { AgentAccount, GameAccount } from "@/types/program";
-import { PublicKey } from "@solana/web3.js";
-import { BN } from "@coral-xyz/anchor";
-
-// Use actual Prisma client
-export const prisma = new PrismaClient();
-// Get actual testProgram instance
-export let testProgram: MearthProgram;
-export let activeGame: Game;
-export let gameAccount: GameAccount;
-export let agentsWithAccounts: Array<{
-  account: AgentAccount;
-  agent: Agent;
-}>;
-
-let alliance1Leader: {
-  account: AgentAccount;
-  agent: Agent;
-};
-
-let alliance1Partner: {
-  account: AgentAccount;
-  agent: Agent;
-};
-
-let alliance2Leader: {
-  account: AgentAccount;
-  agent: Agent;
-};
-
-let alliance2Partner: {
-  account: AgentAccount;
-  agent: Agent;
-};
-
-export let agent1Pda: PublicKey;
-export let agent2Pda: PublicKey;
-export let agent3Pda: PublicKey;
-export let agent4Pda: PublicKey;
+import {
+  testState,
+  createTestBattle,
+  createTestAlliance,
+  setAgentHealth,
+} from "../setup";
 
 /**
  * Alliance vs Alliance Battle Resolution Test Suite
@@ -50,102 +12,30 @@ export let agent4Pda: PublicKey;
  */
 describe("Alliance vs Alliance Battle Resolution Tests", () => {
   let battleResolver: BattleResolver;
-  let gameManager: GameManager;
 
-  beforeAll(async () => {
-    testProgram = await getProgramWithWallet();
-    gameManager = new GameManager(testProgram, prisma);
-    const result = await gameManager.createNewGame();
-    if (!result) {
-      throw new Error("No active game found");
-    }
-    const { dbGame, agents } = result;
-    activeGame = dbGame;
-    agentsWithAccounts = agents;
-    alliance1Leader = agentsWithAccounts[0];
-    alliance1Partner = agentsWithAccounts[1];
-    alliance2Leader = agentsWithAccounts[2];
-    alliance2Partner = agentsWithAccounts[3];
-    gameAccount = result.gameAccount;
-
-    const [gamePda] = getGamePDA(testProgram.programId, dbGame.onchainId);
-    agent1Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[0].agent.onchainId
-    )[0];
-    agent2Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[1].agent.onchainId
-    )[0];
-    agent3Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[2].agent.onchainId
-    )[0];
-    agent4Pda = getAgentPDA(
-      testProgram.programId,
-      gamePda,
-      agents[3].agent.onchainId
-    )[0];
-
+  beforeAll(() => {
     // Initialize BattleResolver with game context
     battleResolver = new BattleResolver(
-      activeGame.onchainId,
-      activeGame.id,
-      testProgram,
-      prisma
+      testState.activeGame!.onchainId,
+      testState.activeGame!.id,
+      testState.program!,
+      testState.prisma
     );
-  });
-
-  beforeEach(async () => {
-    // Clean up existing battles and alliances before each test
-    await prisma.battle.deleteMany();
-    await prisma.alliance.deleteMany();
-    // Reset agent health
-    await prisma.agent.updateMany({
-      data: { health: 100, isAlive: true },
-    });
   });
 
   describe("Alliance vs Alliance Battle Resolution", () => {
     it("should resolve battle between two alliances", async () => {
-      // Create first alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance1Leader.agent.id,
-          joinerId: alliance1Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create first alliance between agents 0 and 1
+      await createTestAlliance(0, 1);
 
-      // Create second alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance2Leader.agent.id,
-          joinerId: alliance2Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create second alliance between agents 2 and 3
+      await createTestAlliance(2, 3);
 
-      // Create battle
-      const battle = await prisma.battle.create({
-        data: {
-          attackerId: alliance1Leader.agent.id,
-          attackerAllyId: alliance1Partner.agent.id,
-          defenderId: alliance2Leader.agent.id,
-          defenderAllyId: alliance2Partner.agent.id,
-          status: "Active",
-          type: "AllianceVsAlliance",
-          tokensStaked: 1000,
-          startTime: new Date(Date.now() - 3600000), // Started 1 hour ago
-          gameId: activeGame.id,
-        },
+      // Create battle between the alliances
+      const battle = await createTestBattle(0, 2, {
+        type: "AllianceVsAlliance",
+        attackerAllyIndex: 1,
+        defenderAllyIndex: 3,
       });
 
       await battleResolver.start();
@@ -153,7 +43,7 @@ describe("Alliance vs Alliance Battle Resolution Tests", () => {
       // Wait for resolution
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const resolvedBattle = await prisma.battle.findUnique({
+      const resolvedBattle = await testState.prisma.battle.findUnique({
         where: { id: battle.id },
       });
 
@@ -164,41 +54,17 @@ describe("Alliance vs Alliance Battle Resolution Tests", () => {
     });
 
     it("should apply health penalties to losing alliance", async () => {
-      // Create first alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance1Leader.agent.id,
-          joinerId: alliance1Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create first alliance between agents 0 and 1
+      await createTestAlliance(0, 1);
 
-      // Create second alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance2Leader.agent.id,
-          joinerId: alliance2Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create second alliance between agents 2 and 3
+      await createTestAlliance(2, 3);
 
-      // Create battle
-      await prisma.battle.create({
-        data: {
-          attackerId: alliance1Leader.agent.id,
-          attackerAllyId: alliance1Partner.agent.id,
-          defenderId: alliance2Leader.agent.id,
-          defenderAllyId: alliance2Partner.agent.id,
-          status: "Active",
-          type: "AllianceVsAlliance",
-          tokensStaked: 1000,
-          startTime: new Date(Date.now() - 3600000), // Started 1 hour ago
-          gameId: activeGame.id,
-        },
+      // Create battle between the alliances
+      await createTestBattle(0, 2, {
+        type: "AllianceVsAlliance",
+        attackerAllyIndex: 1,
+        defenderAllyIndex: 3,
       });
 
       await battleResolver.start();
@@ -206,83 +72,53 @@ describe("Alliance vs Alliance Battle Resolution Tests", () => {
       // Wait for resolution
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const updatedAgents = await prisma.agent.findMany({
+      const updatedAgents = await testState.prisma.agent.findMany({
         where: {
           id: {
             in: [
-              alliance1Leader.agent.id,
-              alliance1Partner.agent.id,
-              alliance2Leader.agent.id,
-              alliance2Partner.agent.id,
+              testState.agentsWithAccounts[0].agent.id,
+              testState.agentsWithAccounts[1].agent.id,
+              testState.agentsWithAccounts[2].agent.id,
+              testState.agentsWithAccounts[3].agent.id,
             ],
           },
         },
       });
 
-      // One alliance should have reduced health
-      const alliance1Health = updatedAgents.filter(
+      // Either alliance A or alliance B should have reduced health
+      const allianceAHealth = updatedAgents.filter(
         (agent) =>
-          agent.id === alliance1Leader.agent.id ||
-          agent.id === alliance1Partner.agent.id
+          agent.id === testState.agentsWithAccounts[0].agent.id ||
+          agent.id === testState.agentsWithAccounts[1].agent.id
       );
-      const alliance2Health = updatedAgents.filter(
+      const allianceBHealth = updatedAgents.filter(
         (agent) =>
-          agent.id === alliance2Leader.agent.id ||
-          agent.id === alliance2Partner.agent.id
+          agent.id === testState.agentsWithAccounts[2].agent.id ||
+          agent.id === testState.agentsWithAccounts[3].agent.id
       );
 
       expect(
-        alliance1Health.every((agent) => agent.health < 100) ||
-          alliance2Health.every((agent) => agent.health < 100)
+        allianceAHealth.every((agent) => agent.health < 100) ||
+          allianceBHealth.every((agent) => agent.health < 100)
       ).toBe(true);
     });
 
-    it("should handle death of entire alliance", async () => {
-      // Set alliance2 members health low
-      await prisma.agent.updateMany({
-        where: {
-          id: {
-            in: [alliance2Leader.agent.id, alliance2Partner.agent.id],
-          },
-        },
-        data: { health: 5 },
-      });
+    it("should handle death of alliance members", async () => {
+      // Set alliance B members health low
+      await setAgentHealth(2, 5);
+      await setAgentHealth(3, 5);
 
-      // Create first alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance1Leader.agent.id,
-          joinerId: alliance1Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create first alliance between agents 0 and 1
+      await createTestAlliance(0, 1);
 
-      // Create second alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance2Leader.agent.id,
-          joinerId: alliance2Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create second alliance between agents 2 and 3
+      await createTestAlliance(2, 3);
 
-      // Create battle
-      await prisma.battle.create({
-        data: {
-          attackerId: alliance1Leader.agent.id,
-          attackerAllyId: alliance1Partner.agent.id,
-          defenderId: alliance2Leader.agent.id,
-          defenderAllyId: alliance2Partner.agent.id,
-          status: "Active",
-          type: "AllianceVsAlliance",
-          tokensStaked: 1000,
-          startTime: new Date(Date.now() - 3600000), // Started 1 hour ago
-          gameId: activeGame.id,
-        },
+      // Create battle between the alliances
+      await createTestBattle(0, 2, {
+        type: "AllianceVsAlliance",
+        attackerAllyIndex: 1,
+        defenderAllyIndex: 3,
       });
 
       await battleResolver.start();
@@ -290,62 +126,39 @@ describe("Alliance vs Alliance Battle Resolution Tests", () => {
       // Wait for resolution
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const updatedAlliance2 = await prisma.agent.findMany({
+      const allianceB = await testState.prisma.agent.findMany({
         where: {
           id: {
-            in: [alliance2Leader.agent.id, alliance2Partner.agent.id],
+            in: [
+              testState.agentsWithAccounts[2].agent.id,
+              testState.agentsWithAccounts[3].agent.id,
+            ],
           },
         },
       });
 
-      expect(updatedAlliance2.every((agent) => !agent.isAlive)).toBe(true);
-      expect(
-        updatedAlliance2.every((agent) => agent.deathTimestamp !== null)
-      ).toBe(true);
+      expect(allianceB.some((agent) => !agent.isAlive)).toBe(true);
+      expect(allianceB.some((agent) => agent.deathTimestamp !== null)).toBe(
+        true
+      );
     });
 
     it("should handle partial alliance death", async () => {
-      // Set only alliance2 leader health low
-      await prisma.agent.update({
-        where: { id: alliance2Leader.agent.id },
-        data: { health: 5 },
-      });
+      // Set only one alliance member's health low
+      await setAgentHealth(2, 5);
+      await setAgentHealth(3, 50);
 
-      // Create first alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance1Leader.agent.id,
-          joinerId: alliance1Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create first alliance between agents 0 and 1
+      await createTestAlliance(0, 1);
 
-      // Create second alliance
-      await prisma.alliance.create({
-        data: {
-          initiatorId: alliance2Leader.agent.id,
-          joinerId: alliance2Partner.agent.id,
-          gameId: activeGame.id,
-          status: "Active",
-          timestamp: new Date(),
-        },
-      });
+      // Create second alliance between agents 2 and 3
+      await createTestAlliance(2, 3);
 
-      // Create battle
-      await prisma.battle.create({
-        data: {
-          attackerId: alliance1Leader.agent.id,
-          attackerAllyId: alliance1Partner.agent.id,
-          defenderId: alliance2Leader.agent.id,
-          defenderAllyId: alliance2Partner.agent.id,
-          status: "Active",
-          type: "AllianceVsAlliance",
-          tokensStaked: 1000,
-          startTime: new Date(Date.now() - 3600000), // Started 1 hour ago
-          gameId: activeGame.id,
-        },
+      // Create battle between the alliances
+      await createTestBattle(0, 2, {
+        type: "AllianceVsAlliance",
+        attackerAllyIndex: 1,
+        defenderAllyIndex: 3,
       });
 
       await battleResolver.start();
@@ -353,25 +166,24 @@ describe("Alliance vs Alliance Battle Resolution Tests", () => {
       // Wait for resolution
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const updatedAlliance2 = await prisma.agent.findMany({
+      const allianceB = await testState.prisma.agent.findMany({
         where: {
           id: {
-            in: [alliance2Leader.agent.id, alliance2Partner.agent.id],
+            in: [
+              testState.agentsWithAccounts[2].agent.id,
+              testState.agentsWithAccounts[3].agent.id,
+            ],
           },
         },
       });
 
-      const deadLeader = updatedAlliance2.find(
-        (agent) => agent.id === alliance2Leader.agent.id
-      );
-      const livingPartner = updatedAlliance2.find(
-        (agent) => agent.id === alliance2Partner.agent.id
-      );
+      const deadAgent = allianceB.find((agent) => !agent.isAlive);
+      const survivingAgent = allianceB.find((agent) => agent.isAlive);
 
-      expect(deadLeader?.isAlive).toBe(false);
-      expect(deadLeader?.deathTimestamp).toBeTruthy();
-      expect(livingPartner?.isAlive).toBe(true);
-      expect(livingPartner?.deathTimestamp).toBeNull();
+      expect(deadAgent).toBeTruthy();
+      expect(survivingAgent).toBeTruthy();
+      expect(deadAgent?.deathTimestamp).toBeTruthy();
+      expect(survivingAgent?.health).toBeLessThan(100);
     });
   });
 

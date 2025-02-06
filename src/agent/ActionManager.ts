@@ -3,7 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 import { IgnoreAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { AgentAccount, GameAccount } from "@/types/program";
-import { PrismaClient, TerrainType } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { ValidationFeedback, ActionResult } from "@/types";
 import { ActionContext } from "@/types";
 import { MoveAction, BattleAction, AllianceAction, GameAction } from "@/types";
@@ -142,8 +142,8 @@ export class ActionManager {
     console.log("🚶 Processing movement request", {
       agentId: ctx.agentId,
       agentOnchainId: ctx.agentOnchainId,
-      x: action.x,
-      y: action.y,
+      x: action.position.x,
+      y: action.position.y,
     });
 
     try {
@@ -158,7 +158,6 @@ export class ActionManager {
       // Fetch and validate agent state
       console.log("Getting agent account......");
       const agentAccount = await this.program.account.agent.fetch(agentPda);
-      console.log("🔍 Agent account", JSON.stringify(agentAccount, null, 2));
 
       // Validate movement cooldown onchain
       if (agentAccount.nextMoveTime.gt(currentTime)) {
@@ -166,19 +165,25 @@ export class ActionManager {
         throw new Error("Agent is on movement cooldown onchain");
       }
 
-      // Validate coordinates against game map
-      console.log("🗺️ Validating movement coordinates");
-      const gameAccount = await this.program.account.game.fetch(gamePda);
-      console.log("🗺️ Game account", JSON.stringify(gameAccount, null, 2));
-
       // Additional offchain validations
       console.log("🔍 Performing additional movement validations");
       const moveValidationResult = await this.validateMove(ctx, action);
 
       // Execute onchain movement
       console.log("🎯 Executing onchain movement");
+      const mapTile = await this.prisma.mapTile.findUnique({
+        where: { x_y: { x: action.position.x, y: action.position.y } },
+      });
+      if (!mapTile) {
+        console.error("❌ Movement rejected - Map tile not found");
+        throw new Error("Map tile not found");
+      }
+
+      // const terrainObject =
       await this.program.methods
-        .moveAgent(action.x, action.y, { river: {} })
+        .moveAgent(action.position.x, action.position.y, {
+          [mapTile.terrainType]: {},
+        })
         .accountsStrict({
           agent: agentPda,
           game: gamePda,
@@ -186,15 +191,23 @@ export class ActionManager {
         })
         .rpc();
 
-      // Update database if prisma is available
-
       console.log("💾 Updating movement in database");
-      await this.updateMoveInDatabase(ctx, action);
+      await this.prisma.agent.update({
+        where: { id: ctx.agentId },
+        data: {
+          mapTileId: mapTile.id,
+        },
+      });
+      console.log("✅ Updated agent position in database", {
+        agentId: ctx.agentId,
+        x: action.position.x,
+        y: action.position.y,
+      });
 
       console.log("✨ Agent movement completed successfully", {
         agentId: ctx.agentId,
-        x: action.x,
-        y: action.y,
+        x: action.position.x,
+        y: action.position.y,
       });
 
       return {
@@ -486,29 +499,6 @@ export class ActionManager {
       .rpc();
   }
 
-  // Helper methods for database updates
-  private async updateMoveInDatabase(
-    context: ActionContext,
-    action: MoveAction
-  ): Promise<void> {
-    try {
-      await this.prisma.mapTile.update({
-        where: { x_y: { x: action.x, y: action.y } },
-        data: {
-          agentId: context.agentId,
-        },
-      });
-      console.log("✅ Updated agent position in database", {
-        agentId: context.agentId,
-        x: action.x,
-        y: action.y,
-      });
-    } catch (error) {
-      console.error("❌ Failed to update agent position in database:", error);
-      throw error;
-    }
-  }
-
   /**
    * Validate movement action with detailed feedback
    */
@@ -520,8 +510,8 @@ export class ActionManager {
       // Check if position is already occupied
       const existingTile = await this.prisma.mapTile.findFirst({
         where: {
-          x: action.x,
-          y: action.y,
+          x: action.position.x,
+          y: action.position.y,
           agent: {
             isNot: null,
           },
@@ -568,8 +558,8 @@ export class ActionManager {
 
       // Calculate distance
       const distance = Math.sqrt(
-        Math.pow(action.x - agent.mapTile.x, 2) +
-          Math.pow(action.y - agent.mapTile.y, 2)
+        Math.pow(action.position.x - agent.mapTile.x, 2) +
+          Math.pow(action.position.y - agent.mapTile.y, 2)
       );
 
       // Check if move is within allowed distance

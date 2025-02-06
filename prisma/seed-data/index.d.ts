@@ -105,9 +105,9 @@ export type InteractionType = (typeof InteractionType)[keyof typeof InteractionT
 
 
 export const TerrainType: {
-  Plain: 'Plain',
-  Mountain: 'Mountain',
-  River: 'River'
+  plain: 'plain',
+  mountain: 'mountain',
+  river: 'river'
 };
 
 export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType]

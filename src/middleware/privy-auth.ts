@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { PrivyClient, AuthTokenClaims } from "@privy-io/server-auth";
-import { logger } from "@/utils/logger";
 
 // Initialize Privy client
 // const privyClient = new PrivyClient(
@@ -65,7 +64,7 @@ export const privyAuth = async (
       expiration: 123,
     };
 
-    logger.debug("Authenticated Privy user:", {
+    console.debug("Authenticated Privy user:", {
       userId: req.user.id,
       appId: req.user.appId,
       sessionId: req.user.sessionId,
@@ -73,7 +72,7 @@ export const privyAuth = async (
 
     next();
   } catch (error) {
-    logger.error("Privy authentication error:", error);
+    console.error("Privy authentication error:", error);
     return res.status(401).json({
       success: false,
       error: "Authentication failed",

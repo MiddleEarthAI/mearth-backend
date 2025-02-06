@@ -1,5 +1,4 @@
 import { ActionSuggestion, InfluenceScore, UserMetrics } from "@/types/twitter";
-import { logger } from "@/utils/logger";
 
 /**
  * InfluenceCalculator - Calculates influence scores for user interactions
@@ -20,27 +19,27 @@ class InfluenceCalculator {
   constructor(private nlpManager: NLPManager = new NLPManager()) {}
 
   async calculateScore(interaction: any): Promise<InfluenceScore> {
-    logger.info("🎯 Starting influence score calculation", {
+    console.info("🎯 Starting influence score calculation", {
       interactionId: interaction.id,
     });
 
     const baseScore = this.calculateBaseScore(interaction.userMetrics);
-    logger.info("📊 Calculated base score", { baseScore });
+    console.info("📊 Calculated base score", { baseScore });
 
     const sentiment = await this.nlpManager.analyzeSentiment(
       interaction.content
     );
-    logger.info("😊 Analyzed sentiment", { sentiment });
+    console.info("😊 Analyzed sentiment", { sentiment });
 
     const suggestion = await this.nlpManager.extractIntent(interaction.content);
-    logger.info("💡 Extracted action suggestion", { suggestion });
+    console.info("💡 Extracted action suggestion", { suggestion });
 
     const finalScore =
       baseScore *
       (1 + sentiment) *
       this.calculateTimeDecay(interaction.timestamp);
 
-    logger.info("🏆 Completed influence calculation", {
+    console.info("🏆 Completed influence calculation", {
       interactionId: interaction.id,
       finalScore,
     });
@@ -57,7 +56,7 @@ class InfluenceCalculator {
    * Normalizes and weights different factors
    */
   private calculateBaseScore(metrics: UserMetrics): number {
-    logger.debug("📈 Calculating base score from metrics", { metrics });
+    console.debug("📈 Calculating base score from metrics", { metrics });
 
     const normalizedFollowers = Math.log10(metrics.followerCount + 1) / 7;
     const normalizedEngagement = metrics.averageEngagement / 100;
@@ -70,7 +69,7 @@ class InfluenceCalculator {
       (metrics.verificationStatus ? 1 : 0) * this.WEIGHTS.VERIFICATION +
       (metrics.reputationScore || 0.5) * 0.2;
 
-    logger.debug("✨ Base score calculated", { score });
+    console.debug("✨ Base score calculated", { score });
     return score;
   }
 
@@ -81,7 +80,7 @@ class InfluenceCalculator {
   private calculateTimeDecay(timestamp: number): number {
     const age = Date.now() - timestamp;
     const decay = Math.exp(-age / (24 * 60 * 60 * 1000));
-    logger.debug("⏳ Applied time decay", { age, decay });
+    console.debug("⏳ Applied time decay", { age, decay });
     return decay;
   }
 }
@@ -95,26 +94,26 @@ class NLPManager {
   // private openai: OpenAI | null = null;
 
   constructor() {
-    logger.info("🤖 Initializing NLP Manager");
+    console.info("🤖 Initializing NLP Manager");
     // this.openai = new OpenAI({ apiKey: config.openai.apiKey });
   }
 
   async analyzeSentiment(content: string): Promise<number> {
     try {
-      logger.info("🔍 Analyzing sentiment", { contentLength: content.length });
+      console.info("🔍 Analyzing sentiment", { contentLength: content.length });
       // OpenAI implementation commented out
       const sentiment = Math.random() * 2 - 1;
-      logger.info("✅ Sentiment analysis complete", { sentiment });
+      console.info("✅ Sentiment analysis complete", { sentiment });
       return sentiment;
     } catch (error) {
-      logger.error("❌ Failed to analyze sentiment", { content, error });
+      console.error("❌ Failed to analyze sentiment", { content, error });
       return 0;
     }
   }
 
   async extractIntent(content: string): Promise<ActionSuggestion> {
     try {
-      logger.info("🎯 Extracting intent from content", {
+      console.info("🎯 Extracting intent from content", {
         contentLength: content.length,
       });
       // OpenAI implementation commented out
@@ -124,10 +123,10 @@ class NLPManager {
         ] as ActionSuggestion["type"],
         content: content,
       };
-      logger.info("✅ Intent extraction complete", { suggestion });
+      console.info("✅ Intent extraction complete", { suggestion });
       return suggestion;
     } catch (error) {
-      logger.error("❌ Failed to extract intent", { content, error });
+      console.error("❌ Failed to extract intent", { content, error });
       return {
         type: "STRATEGY",
         content: content,
