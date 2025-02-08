@@ -1,7 +1,6 @@
 import { Router, Response } from "express";
 import { privyAuth, AuthenticatedRequest } from "@/middleware/privy-auth";
 // import { requireAdmin, requireGameAccess } from "@/middleware/authorize";
-import { logger } from "@/utils/logger";
 import { getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
@@ -17,7 +16,6 @@ import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import CacheManager from "@/agent/CacheManager";
 import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
 import { DecisionEngine } from "@/agent/DecisionEngine";
-import { HealthMonitor } from "@/agent/HealthMonitor";
 import { ActionManager } from "@/agent/ActionManager";
 import { GameManager } from "@/agent/GameManager";
 
@@ -51,8 +49,10 @@ router.post(
       const engine = new DecisionEngine(prisma, eventEmitter, program);
 
       const battleResolver = new BattleResolver(
-        gameAccount.gameId,
-        agents[0].agent.gameId,
+        {
+          gameOnchainId: gameAccount.gameId,
+          gameId: gameAccount.gameId,
+        },
         program,
         prisma
       );
@@ -70,17 +70,15 @@ router.post(
         battleResolver
       );
 
-      const healthMonitor = new HealthMonitor(orchestrator, prisma, cache);
       try {
         await orchestrator.start();
-        await healthMonitor.startMonitoring();
-        logger.info("System started successfully");
+        console.info("System started successfully");
       } catch (error) {
         console.error("Failed to start system", { error });
         process.exit(1);
       }
 
-      logger.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
+      console.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
       res.json({
         success: true,
         data: {
@@ -115,7 +113,7 @@ router.post(
       const response = req.query;
       const gameId = Number(response.gameId as string);
       if (!gameId) {
-        logger.warn("🚫 Missing parameters for starting agents");
+        console.warn("🚫 Missing parameters for starting agents");
         return res.status(400).json({
           success: false,
           error: "Missing required parameters",
@@ -137,7 +135,7 @@ router.post(
       });
 
       if (agents.length === 0) {
-        logger.warn(`🚫 No agents found for game ${gameId}`);
+        console.warn(`🚫 No agents found for game ${gameId}`);
         return res.status(404).json({
           success: false,
           error: "No agents found",
@@ -176,7 +174,7 @@ router.get(
     try {
       const { gameId } = req.params;
       if (!gameId) {
-        logger.warn("🚫 Missing gameId in state request");
+        console.warn("🚫 Missing gameId in state request");
         return res.status(400).json({
           success: false,
           error: "Missing required parameter",
@@ -186,13 +184,13 @@ router.get(
         });
       }
 
-      logger.info(`🔍 Fetching state for game ${gameId}`);
+      console.info(`🔍 Fetching state for game ${gameId}`);
       const program = await getProgramWithWallet();
       const [gamePda] = getGamePDA(program.programId, new BN(gameId));
       const game = await program.account.game.fetch(gamePda);
 
       if (!game) {
-        logger.warn(`⚠️ Game ${gameId} not found`);
+        console.warn(`⚠️ Game ${gameId} not found`);
         return res.status(404).json({
           success: false,
           error: "Game not found",
@@ -203,7 +201,7 @@ router.get(
         });
       }
 
-      logger.info(`📊 Successfully retrieved state for game ${gameId}`);
+      console.info(`📊 Successfully retrieved state for game ${gameId}`);
       res.json({
         success: true,
         data: {

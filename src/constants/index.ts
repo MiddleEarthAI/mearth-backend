@@ -1,7 +1,7 @@
-import { TerrainType } from "@/types/program";
+import { TerrainType } from "@prisma/client";
 
 export const rivers = {
-  type: TerrainType.Rivers,
+  type: TerrainType.river,
   coordinates: new Set([
     "27,7",
     "27,8",
@@ -109,7 +109,7 @@ export const rivers = {
 };
 
 export const mountains = {
-  type: TerrainType.Mountains,
+  type: TerrainType.mountain,
   coordinates: new Set([
     "6,12",
     "6,13",
@@ -191,7 +191,7 @@ export const mountains = {
 };
 
 export const plains = {
-  type: TerrainType.Plains,
+  type: TerrainType.plain,
   coordinates: new Set([
     "15,21",
     "26,21",

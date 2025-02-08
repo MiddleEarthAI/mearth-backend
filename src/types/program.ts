@@ -2,9 +2,9 @@ import { BN } from "@coral-xyz/anchor";
 import type { PublicKey } from "@solana/web3.js";
 
 export enum TerrainType {
-  Plains = 0,
-  Mountains = 1,
-  Rivers = 2,
+  Plain = 0,
+  Mountain = 1,
+  River = 2,
 }
 
 export enum BattleResult {
@@ -32,26 +32,6 @@ export interface AgentInfo {
   name: string;
   bump: number;
 }
-
-// {
-//   "gameId": "01",
-//   "authority": "7Le482fsTXfSHbZtuDTGhUNcaFuYvHEFuNR5YKMPMbsP",
-//   "tokenMint": "11111111111111111111111111111111",
-//   "rewardsVault": "11111111111111111111111111111111",
-//   "mapDiameter": 0,
-//   "isActive": true,
-//   "lastUpdate": "6797a77b",
-//   "reentrancyGuard": false,
-//   "bump": 0,
-//   "alliances": [],
-//   "agents": [
-//     {
-//       "key": "GSihU7Mxz5KWGCVxbA4Tm8edoKNZmZa6xnvTsaFGQKAX",
-//       "name": "Scootles"
-//     }
-//   ],
-//   "totalStakeAccounts": []
-// }
 
 export interface AgentAccount {
   game: PublicKey;
@@ -111,7 +91,6 @@ export interface ProgramError {
   msg: string;
 }
 
-// Program Events
 export interface AgentMovedEvent {
   agentId: BN;
   oldX: BN;

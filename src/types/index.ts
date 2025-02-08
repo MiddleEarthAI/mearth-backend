@@ -1,13 +1,13 @@
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 
 import type * as anchor from "@coral-xyz/anchor";
-import { TerrainType } from "@prisma/client";
+
 export interface Position {
   x: number;
   y: number;
 }
 
-export type ActionType = "MOVE" | "BATTLE" | "ALLY" | "IGNORE";
+export type ActionType = "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE";
 
 export type MearthProgram = anchor.Program<MiddleEarthAiProgram>;
 
@@ -50,7 +50,7 @@ export interface BattleAction {
 }
 
 export interface AllianceAction {
-  type: "ALLY";
+  type: "ALLIANCE";
   targetId: number;
   tweet: string;
 }

@@ -1,10 +1,8 @@
-import { logger } from "@/utils/logger";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import router from "./routes";
-import { HealthMonitor } from "./agent/HealthMonitor";
 import { GameOrchestrator } from "./agent/GameOrchestrator";
 import { BattleResolver } from "./agent/BattleResolver";
 import EventEmitter from "events";
@@ -114,8 +112,10 @@ export async function startServer() {
   const eventEmitter = new EventEmitter();
 
   const battleResolver = new BattleResolver(
-    gameInfo.gameAccount.gameId,
-    gameInfo.agents[0].agent.gameId,
+    {
+      gameId: gameInfo.dbGame.id,
+      gameOnchainId: gameInfo.gameAccount.gameId,
+    },
     program,
     prisma
   );
@@ -139,10 +139,8 @@ export async function startServer() {
     battleResolver
   );
 
-  const healthMonitor = new HealthMonitor(orchestrator, prisma, cache);
   try {
     await orchestrator.start();
-    await healthMonitor.startMonitoring();
   } catch (error) {
     console.error("Failed to start system", { error });
     process.exit(1);

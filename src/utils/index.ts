@@ -19,8 +19,9 @@ export function getAgentConfigById(id: number) {
 }
 
 /**
- * Generates a unique game ID that fits within u16 constraints
+ * Generates a unique game ID that fits within u16 constraints (0-65535)
  * Uses a combination of timestamp and random number to ensure uniqueness
+ * Note: u16 range (0-65535) fits safely within JavaScript Number
  * @returns {number} A unique game ID as a number (u16 compatible)
  */
 export async function generateGameId(): Promise<number> {
@@ -31,14 +32,14 @@ export async function generateGameId(): Promise<number> {
   const random = Math.floor(Math.random() * 0xff);
 
   // Combine timestamp (8 bits) and random (8 bits)
-  // This ensures we stay within u16 (16-bit unsigned integer) bounds
+  // This ensures we stay within u16 (16-bit unsigned integer) bounds (0-65535)
   const gameId = (timestamp << 8) | random;
 
-  return gameId >>> 0; // Ensure unsigned integer
+  return gameId; // Safe since u16 (max 65535) fits within JavaScript Number
 }
 
 /**
- * Utility function to validate if a game ID is within u16 bounds
+ * Utility function to validate if a game ID is within u16 bounds (0-65535)
  * @param {number} gameId - The game ID to validate
  * @returns {boolean} Whether the game ID is valid
  */
@@ -46,7 +47,7 @@ export function isValidGameId(gameId: number): boolean {
   if (typeof gameId !== "number") return false;
   if (!Number.isInteger(gameId)) return false;
   if (gameId < 0) return false;
-  if (gameId >= 2 ** 16) return false;
+  if (gameId >= 2 ** 16) return false; // 65536
   return true;
 }
 

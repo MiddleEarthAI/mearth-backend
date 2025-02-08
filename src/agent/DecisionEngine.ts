@@ -2,8 +2,8 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
-import { AgentTrait } from "@/types/agent";
-import { ActionSuggestion, InfluenceScore } from "@/types/twitter";
+
+import { ActionSuggestion, AgentTrait, InfluenceScore } from "@/types/twitter";
 import {
   ActionResult,
   GameAction,
@@ -156,29 +156,29 @@ class DecisionEngine {
     };
   }
 
-  private calculateCharacterAlignment(
-    suggestion: ActionSuggestion,
-    traits: AgentTrait[]
-  ): number {
-    console.log("🎭 Calculating character trait alignment");
-    const traitMapping = {
-      BATTLE: ["aggression", "bravery"],
-      ALLIANCE: ["trust", "cooperation"],
-      MOVE: ["caution", "exploration"],
-      STRATEGY: ["intelligence", "planning"],
-      IGNORE: ["caution", "exploration"],
-    };
+  // private calculateCharacterAlignment(
+  //   suggestion: ActionSuggestion,
+  //   traits: AgentTrait[]
+  // ): number {
+  //   console.log("🎭 Calculating character trait alignment");
+  //   const traitMapping = {
+  //     BATTLE: ["aggression", "bravery"],
+  //     ALLIANCE: ["trust", "cooperation"],
+  //     MOVE: ["caution", "exploration"],
+  //     STRATEGY: ["intelligence", "planning"],
+  //     IGNORE: ["caution", "exploration"],
+  //   };
 
-    const relevantTraits = traitMapping[suggestion.type] || [];
+  //   const relevantTraits = traitMapping[suggestion.type] || [];
 
-    const traitScores = traits
-      .filter((t) => relevantTraits.includes(t.name))
-      .map((t) => t.value);
+  //   const traitScores = traits
+  //     .filter((t) => relevantTraits.includes(t.name))
+  //     .map((t) => t.value);
 
-    return traitScores.length > 0
-      ? traitScores.reduce((a, b) => a + b, 0) / traitScores.length
-      : 0.5;
-  }
+  //   return traitScores.length > 0
+  //     ? traitScores.reduce((a, b) => a + b, 0) / traitScores.length
+  //     : 0.5;
+  // }
 
   private async buildPrompt(
     actionContext: ActionContext,
@@ -417,6 +417,23 @@ class DecisionEngine {
       .map((field) => `${field.terrainType} at (${field.x}, ${field.y})`)
       .join("\n");
 
+    // Build community sentiment context
+    const communityContext = dominantSuggestion
+      ? `\nCOMMUNITY SENTIMENT:
+- Dominant Action: ${dominantSuggestion.suggestion.type}${
+          dominantSuggestion.suggestion.target
+            ? ` targeting MID: ${dominantSuggestion.suggestion.target}`
+            : ""
+        }
+- Community Influence: ${Math.round(dominantSuggestion.totalInfluence * 100)}%
+- Consensus Level: ${Math.round(dominantSuggestion.consensus * 100)}%
+${
+  dominantSuggestion.suggestion.content
+    ? `- Strategic Context: ${dominantSuggestion.suggestion.content}`
+    : ""
+}`
+      : "";
+
     const characterPrompt = `You are ${agent.profile.name} (@${
       agent.profile.xHandle
     }) [MID: ${
@@ -427,7 +444,7 @@ CORE MISSION & GOALS:
 1. PRIMARY GOAL: Become the most influential force in Middle Earth by:
    - Accumulating Mearth tokens through strategic battles and alliances
    - Building a powerful network of loyal allies
-   - Controlling strategically valuable territories
+   - Controlling strategically valuable territories${communityContext}
    
 2. PERSONAL OBJECTIVES (Based on your traits):
 ${(

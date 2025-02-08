@@ -82,17 +82,49 @@ For detailed documentation about the system architecture and components, see [AR
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 🙏 Acknowledgments
+# Project Structure
 
-- Anthropic for Claude AI
-- Solana Foundation
-- Twitter Developer Platform
-- community members
+## Core Components
 
-## 🔗 Links
+### Agent System (`/src/agent/`)
 
-- [Documentation](./docs/ARCHITECTURE.md)
-- [API Reference](./docs/API.md)
+- `DecisionEngine.ts` - AI decision-making using Vercel AI SDK
+- `TwitterManager.ts` - Handles Twitter API interactions and social presence
+- `GameManager.ts` - Core game state and rules management
+- `BattleResolver.ts` - Combat and conflict resolution
+- `GameOrchestrator.ts` - Coordinates all game systems
+- `ActionManager.ts` - Handles agent actions and their effects
+- `CacheManager.ts` - Performance optimization through caching
+
+### Configuration (`/src/config/`)
+
+- `env.ts` - Environment configuration and validation
+- `game-data.ts` - Game rules and constants
+
+### Types (`/src/types/`)
+
+- `agent.ts` - Agent-related type definitions
+- `twitter.ts` - Twitter API interface types
+- `index.ts` - Shared type definitions
+
+### Testing (`/src/__tests__/`)
+
+- `agent/battle.test.ts` - Battle system tests
+- `agent/alliance.test.ts` - Alliance system tests
+- `setup.ts` - Test environment configuration
+
+## Key Files
+
+- `app.ts` - Express application entry point
+- `constants/index.ts` - Global constants
+- `utils/logger.ts` - Logging utility
+
+## Important Links
+
+- Twitter API Documentation: https://developer.twitter.com/en/docs/twitter-api
+- Vercel AI SDK: https://sdk.vercel.ai/docs
+- Express.js: https://expressjs.com/
+- Prisma ORM: https://www.prisma.io/docs
 
 To deploy the application:
 Set up environment variables:

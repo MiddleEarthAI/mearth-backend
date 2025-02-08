@@ -16,7 +16,7 @@ datasource db {
 
 model Game {
   id                String   @id @default(uuid())
-  onchainId         BigInt   @unique
+  onchainId         Int      @unique
   authority         String
   tokenMint         String
   rewardsVault      String

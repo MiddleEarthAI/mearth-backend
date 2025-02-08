@@ -1,11 +1,12 @@
 import { PublicKey } from "@solana/web3.js";
-import { Program, BN } from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { AgentAccount, AgentInfo } from "@/types/program";
 import { PrismaClient } from "@prisma/client";
 import { getAgentAta } from "../utils/program";
 import { gameConfig } from "@/config/env";
+import { BN } from "@coral-xyz/anchor";
 
 // Represents outcome of a 1v1 battle between two agents
 type SimpleBattleOutcome = {
@@ -68,6 +69,11 @@ type AllianceInfo = {
   allianceAccount: AgentAccount;
 };
 
+type GameContext = {
+  gameOnchainId: number;
+  gameId: string;
+};
+
 /**
  * Service for handling battle resolutions via interval
  * Monitors active battles and resolves them after the 1 hour duration
@@ -77,14 +83,13 @@ export class BattleResolver {
   private readonly prisma: PrismaClient;
 
   constructor(
-    private readonly currentGameOnchainId: BN,
-    private readonly gameId: string,
+    private readonly ctx: GameContext,
     private readonly program: Program<MiddleEarthAiProgram>,
     prisma: PrismaClient
   ) {
     this.prisma = prisma;
     console.log("🎮 Battle Resolution Service initialized for game", {
-      currentGameOnchainId,
+      gameOnchainId: this.ctx.gameOnchainId,
     });
   }
 
@@ -118,7 +123,7 @@ export class BattleResolver {
       console.log("🔍 Starting battle resolution check cycle");
       const [gamePda] = getGamePDA(
         this.program.programId,
-        this.currentGameOnchainId
+        this.ctx.gameOnchainId
       );
       const gameAccount = await this.program.account.game.fetch(gamePda);
       const agentInfos = gameAccount.agents as AgentInfo[];
@@ -133,9 +138,9 @@ export class BattleResolver {
         await Promise.all(
           agentInfos.map(async (agentInfo) => {
             try {
-              const agentAccount = (await this.program.account.agent.fetch(
+              const agentAccount = await this.program.account.agent.fetch(
                 agentInfo.key
-              )) as AgentAccount;
+              );
               if (agentAccount.isAlive && agentAccount.currentBattleStart) {
                 return agentAccount;
               }
@@ -148,7 +153,7 @@ export class BattleResolver {
             return null;
           })
         )
-      ).filter((agent): agent is AgentAccount => agent !== null);
+      ).filter((agent) => agent !== null);
 
       console.log("⚔️ Identified active battles", {
         battleCount: agentsInBattle.length,
@@ -512,7 +517,7 @@ export class BattleResolver {
             where: {
               onchainId_gameId: {
                 onchainId: agentId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
           });
@@ -528,7 +533,7 @@ export class BattleResolver {
             // Kill agent both onchain and in database
             const [gamePda] = getGamePDA(
               this.program.programId,
-              this.currentGameOnchainId
+              this.ctx.gameOnchainId
             );
             const [agentPda] = getAgentPDA(
               this.program.programId,
@@ -617,21 +622,15 @@ export class BattleResolver {
     outcome: SimpleBattleOutcome,
     gamePda: PublicKey
   ) {
-    console.log("⚔️ Starting simple battle resolution", {
-      winnerOnchainId: outcome.winnerOnchainId,
-      loserOnchainId: outcome.loserOnchainId,
-      percentLoss: outcome.percentLoss,
-    });
-
     const [winnerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.winnerOnchainId)
+      outcome.winnerOnchainId
     );
     const [loserPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.loserOnchainId)
+      outcome.loserOnchainId
     );
     const winnerTokenAccount = await getAgentAta(winnerPda);
     const loserTokenAccount = await getAgentAta(loserPda);
@@ -661,13 +660,13 @@ export class BattleResolver {
             {
               attacker: {
                 onchainId: outcome.winnerOnchainId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
             {
               defender: {
                 onchainId: outcome.winnerOnchainId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
           ],
@@ -684,7 +683,7 @@ export class BattleResolver {
               connect: {
                 onchainId_gameId: {
                   onchainId: outcome.winnerOnchainId,
-                  gameId: this.currentGameOnchainId,
+                  gameId: this.ctx.gameId,
                 },
               },
             },
@@ -707,17 +706,10 @@ export class BattleResolver {
     outcome: AgentVsAllianceBattleOutcome,
     gamePda: PublicKey
   ) {
-    console.log("⚔️ Starting agent vs alliance battle resolution", {
-      singleAgentOnchainId: outcome.singleAgentOnchainId,
-      allianceLeaderOnchainId: outcome.allianceLeaderOnchainId,
-      alliancePartnerOnchainId: outcome.alliancePartnerOnchainId,
-      percentLoss: outcome.percentLoss,
-    });
-
     const [singleAgentPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.singleAgentOnchainId)
+      outcome.singleAgentOnchainId
     );
 
     const [allianceLeaderPda] = getAgentPDA(
@@ -756,7 +748,6 @@ export class BattleResolver {
           singleAgentAuthority: outcome.singleAgentAuthority,
           allianceLeaderAuthority: outcome.allianceLeaderAuthority,
           alliancePartnerAuthority: outcome.alliancePartnerAuthority,
-          authority: this.program.provider.publicKey,
         })
         .rpc();
 
@@ -777,13 +768,13 @@ export class BattleResolver {
             {
               attacker: {
                 onchainId: outcome.singleAgentOnchainId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
             {
               defender: {
                 onchainId: outcome.singleAgentOnchainId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
           ],
@@ -802,7 +793,7 @@ export class BattleResolver {
                   onchainId: outcome.agentIsWinner
                     ? outcome.singleAgentOnchainId
                     : outcome.allianceLeaderOnchainId,
-                  gameId: this.currentGameOnchainId,
+                  gameId: this.ctx.gameId,
                 },
               },
             },
@@ -825,33 +816,26 @@ export class BattleResolver {
     outcome: AllianceVsAllianceBattleOutcome,
     gamePda: PublicKey
   ) {
-    console.log("⚔️ Starting alliance vs alliance battle resolution", {
-      allianceALeaderOnchainId: outcome.allianceALeaderOnchainId,
-      allianceAPartnerOnchainId: outcome.allianceAPartnerOnchainId,
-      allianceBLeaderOnchainId: outcome.allianceBLeaderOnchainId,
-      allianceBPartnerOnchainId: outcome.allianceBPartnerOnchainId,
-      percentLoss: outcome.percentLoss,
-    });
-
     const [allianceALeaderPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.allianceALeaderOnchainId)
+      outcome.allianceALeaderOnchainId
     );
     const [allianceAPartnerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.allianceAPartnerOnchainId)
+      outcome.allianceAPartnerOnchainId
     );
     const [allianceBLeaderPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.allianceBLeaderOnchainId)
+      outcome.allianceBLeaderOnchainId
     );
     const [allianceBPartnerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.allianceBPartnerOnchainId)
+
+      outcome.allianceBPartnerOnchainId
     );
 
     // Get token accounts
@@ -860,13 +844,11 @@ export class BattleResolver {
     const allianceBLeaderToken = await getAgentAta(allianceBLeaderPda);
     const allianceBPartnerToken = await getAgentAta(allianceBPartnerPda);
 
-    console.log("💰 Retrieved token accounts for all alliance members");
-
     try {
       // Resolve battle onchain
       await this.program.methods
         .resolveBattleAllianceVsAlliance(
-          new BN(outcome.percentLoss),
+          outcome.percentLoss,
           outcome.allianceAWins
         )
         .accounts({
@@ -906,13 +888,13 @@ export class BattleResolver {
             {
               attacker: {
                 onchainId: outcome.allianceALeaderOnchainId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
             {
               defender: {
                 onchainId: outcome.allianceALeaderOnchainId,
-                gameId: this.currentGameOnchainId,
+                gameId: this.ctx.gameId,
               },
             },
           ],
@@ -931,7 +913,7 @@ export class BattleResolver {
                   onchainId: outcome.allianceAWins
                     ? outcome.allianceALeaderOnchainId
                     : outcome.allianceBLeaderOnchainId,
-                  gameId: this.currentGameOnchainId,
+                  gameId: this.ctx.gameId,
                 },
               },
             },

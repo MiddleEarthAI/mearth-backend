@@ -2025,7 +2025,7 @@ export namespace Prisma {
   }
 
   export type GameSumAggregateOutputType = {
-    onchainId: bigint | null
+    onchainId: number | null
     mapDiameter: number | null
     bump: number | null
     dailyRewardTokens: number | null
@@ -2033,7 +2033,7 @@ export namespace Prisma {
 
   export type GameMinAggregateOutputType = {
     id: string | null
-    onchainId: bigint | null
+    onchainId: number | null
     authority: string | null
     tokenMint: string | null
     rewardsVault: string | null
@@ -2048,7 +2048,7 @@ export namespace Prisma {
 
   export type GameMaxAggregateOutputType = {
     id: string | null
-    onchainId: bigint | null
+    onchainId: number | null
     authority: string | null
     tokenMint: string | null
     rewardsVault: string | null
@@ -2226,7 +2226,7 @@ export namespace Prisma {
 
   export type GameGroupByOutputType = {
     id: string
-    onchainId: bigint
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -2344,7 +2344,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      onchainId: bigint
+      onchainId: number
       authority: string
       tokenMint: string
       rewardsVault: string
@@ -2783,7 +2783,7 @@ export namespace Prisma {
    */ 
   interface GameFieldRefs {
     readonly id: FieldRef<"Game", 'String'>
-    readonly onchainId: FieldRef<"Game", 'BigInt'>
+    readonly onchainId: FieldRef<"Game", 'Int'>
     readonly authority: FieldRef<"Game", 'String'>
     readonly tokenMint: FieldRef<"Game", 'String'>
     readonly rewardsVault: FieldRef<"Game", 'String'>
@@ -13768,20 +13768,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'BigInt'
-   */
-  export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
-    
-
-
-  /**
-   * Reference to a field of type 'BigInt[]'
-   */
-  export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -13943,7 +13929,7 @@ export namespace Prisma {
     OR?: GameWhereInput[]
     NOT?: GameWhereInput | GameWhereInput[]
     id?: StringFilter<"Game"> | string
-    onchainId?: BigIntFilter<"Game"> | bigint | number
+    onchainId?: IntFilter<"Game"> | number
     authority?: StringFilter<"Game"> | string
     tokenMint?: StringFilter<"Game"> | string
     rewardsVault?: StringFilter<"Game"> | string
@@ -13981,7 +13967,7 @@ export namespace Prisma {
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    onchainId?: bigint | number
+    onchainId?: number
     AND?: GameWhereInput | GameWhereInput[]
     OR?: GameWhereInput[]
     NOT?: GameWhereInput | GameWhereInput[]
@@ -14026,7 +14012,7 @@ export namespace Prisma {
     OR?: GameScalarWhereWithAggregatesInput[]
     NOT?: GameScalarWhereWithAggregatesInput | GameScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Game"> | string
-    onchainId?: BigIntWithAggregatesFilter<"Game"> | bigint | number
+    onchainId?: IntWithAggregatesFilter<"Game"> | number
     authority?: StringWithAggregatesFilter<"Game"> | string
     tokenMint?: StringWithAggregatesFilter<"Game"> | string
     rewardsVault?: StringWithAggregatesFilter<"Game"> | string
@@ -14731,7 +14717,7 @@ export namespace Prisma {
 
   export type GameCreateInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -14750,7 +14736,7 @@ export namespace Prisma {
 
   export type GameUncheckedCreateInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -14769,7 +14755,7 @@ export namespace Prisma {
 
   export type GameUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -14788,7 +14774,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -14807,7 +14793,7 @@ export namespace Prisma {
 
   export type GameCreateManyInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -14822,7 +14808,7 @@ export namespace Prisma {
 
   export type GameUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -14837,7 +14823,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -15576,17 +15562,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type BigIntFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
-  }
-
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -15740,22 +15715,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedBigIntFilter<$PrismaModel>
-    _min?: NestedBigIntFilter<$PrismaModel>
-    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -16522,14 +16481,6 @@ export namespace Prisma {
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
-  }
-
-  export type BigIntFieldUpdateOperationsInput = {
-    set?: bigint | number
-    increment?: bigint | number
-    decrement?: bigint | number
-    multiply?: bigint | number
-    divide?: bigint | number
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -17495,17 +17446,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedBigIntFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
-  }
-
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -17559,22 +17499,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedBigIntFilter<$PrismaModel>
-    _min?: NestedBigIntFilter<$PrismaModel>
-    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -18226,7 +18150,7 @@ export namespace Prisma {
 
   export type GameCreateWithoutAgentsInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -18244,7 +18168,7 @@ export namespace Prisma {
 
   export type GameUncheckedCreateWithoutAgentsInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -18634,7 +18558,7 @@ export namespace Prisma {
 
   export type GameUpdateWithoutAgentsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -18652,7 +18576,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateWithoutAgentsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -19113,7 +19037,7 @@ export namespace Prisma {
 
   export type GameCreateWithoutAlliancesInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -19131,7 +19055,7 @@ export namespace Prisma {
 
   export type GameUncheckedCreateWithoutAlliancesInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -19255,7 +19179,7 @@ export namespace Prisma {
 
   export type GameUpdateWithoutAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -19273,7 +19197,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateWithoutAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -19393,7 +19317,7 @@ export namespace Prisma {
 
   export type GameCreateWithoutBattlesInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -19411,7 +19335,7 @@ export namespace Prisma {
 
   export type GameUncheckedCreateWithoutBattlesInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -19670,7 +19594,7 @@ export namespace Prisma {
 
   export type GameUpdateWithoutBattlesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -19688,7 +19612,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateWithoutBattlesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -20058,7 +19982,7 @@ export namespace Prisma {
 
   export type GameCreateWithoutCoolDownInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -20076,7 +20000,7 @@ export namespace Prisma {
 
   export type GameUncheckedCreateWithoutCoolDownInput = {
     id?: string
-    onchainId: bigint | number
+    onchainId: number
     authority: string
     tokenMint: string
     rewardsVault: string
@@ -20161,7 +20085,7 @@ export namespace Prisma {
 
   export type GameUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
@@ -20179,7 +20103,7 @@ export namespace Prisma {
 
   export type GameUncheckedUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
-    onchainId?: BigIntFieldUpdateOperationsInput | bigint | number
+    onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
     tokenMint?: StringFieldUpdateOperationsInput | string
     rewardsVault?: StringFieldUpdateOperationsInput | string
