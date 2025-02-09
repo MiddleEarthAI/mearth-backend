@@ -236,7 +236,11 @@ export class GameManager implements IGameManager {
           });
 
           console.info("👥 Initializing game agents...");
-          const agents = await this.initializeAgents(gamePda, dbGame);
+          const agents = await this.initializeAgents(
+            gamePda,
+            nextGameId,
+            dbGame
+          );
           console.info(`✅ Successfully initialized ${agents.length} agents`);
 
           return {
@@ -258,7 +262,11 @@ export class GameManager implements IGameManager {
     }
   }
 
-  private async initializeAgents(gamePda: PublicKey, dbGame: Game) {
+  private async initializeAgents(
+    gamePda: PublicKey,
+    nextGameId: number,
+    dbGame: Game
+  ) {
     console.info("🎭 Starting agent initialization process...");
     return Promise.all(
       profiles.map(async (profile) => {
@@ -293,7 +301,7 @@ export class GameManager implements IGameManager {
         console.info(`🔗 Registering agent on-chain...`);
         await this.program.methods
           .registerAgent(
-            new BN(profile.onchainId),
+            new BN(profile.onchainId + nextGameId),
             new BN(spawnTile.x),
             new BN(spawnTile.y),
             profile.name
