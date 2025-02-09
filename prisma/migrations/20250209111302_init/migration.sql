@@ -14,7 +14,7 @@ CREATE TYPE "InteractionType" AS ENUM ('Comment', 'Quote', 'Mention');
 CREATE TYPE "TerrainType" AS ENUM ('plain', 'mountain', 'river');
 
 -- CreateEnum
-CREATE TYPE "CooldownType" AS ENUM ('Alliance', 'Battle', 'Ignore', 'Tweet', 'Move');
+CREATE TYPE "CooldownType" AS ENUM ('Alliance', 'Battle', 'Ignore', 'Move');
 
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'MANAGER', 'USER');
@@ -22,7 +22,7 @@ CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'MANAGER', 'USER');
 -- CreateTable
 CREATE TABLE "Game" (
     "id" TEXT NOT NULL,
-    "onchainId" BIGINT NOT NULL,
+    "onchainId" INTEGER NOT NULL,
     "authority" TEXT NOT NULL,
     "tokenMint" TEXT NOT NULL,
     "rewardsVault" TEXT NOT NULL,
@@ -67,6 +67,18 @@ CREATE TABLE "Agent" (
     "mapTileId" TEXT NOT NULL,
 
     CONSTRAINT "Agent_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Ignore" (
+    "id" TEXT NOT NULL,
+    "agentId" TEXT NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "duration" INTEGER NOT NULL DEFAULT 14400,
+    "gameId" TEXT NOT NULL,
+    "ignoredAgentId" TEXT NOT NULL,
+
+    CONSTRAINT "Ignore_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -177,6 +189,9 @@ CREATE UNIQUE INDEX "Agent_mapTileId_key" ON "Agent"("mapTileId");
 CREATE UNIQUE INDEX "Agent_onchainId_gameId_key" ON "Agent"("onchainId", "gameId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Ignore_agentId_ignoredAgentId_key" ON "Ignore"("agentId", "ignoredAgentId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "MapTile_x_y_key" ON "MapTile"("x", "y");
 
 -- CreateIndex
@@ -196,6 +211,15 @@ ALTER TABLE "Agent" ADD CONSTRAINT "Agent_profileId_fkey" FOREIGN KEY ("profileI
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_mapTileId_fkey" FOREIGN KEY ("mapTileId") REFERENCES "MapTile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ignore" ADD CONSTRAINT "Ignore_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ignore" ADD CONSTRAINT "Ignore_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ignore" ADD CONSTRAINT "Ignore_ignoredAgentId_fkey" FOREIGN KEY ("ignoredAgentId") REFERENCES "Agent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Tweet" ADD CONSTRAINT "Tweet_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

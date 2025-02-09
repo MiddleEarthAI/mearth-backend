@@ -30,6 +30,7 @@ interface GameResult {
 interface IGameManager {
   createNewGame(): Promise<GameInitResult>;
   endGame(gameId: string): Promise<void>;
+  getOrCreateActiveGame(): Promise<GameResult>;
   getActiveGame(): Promise<GameResult>;
   resetGameState(gameId: string): Promise<void>;
 }
@@ -42,7 +43,7 @@ export class GameManager implements IGameManager {
   /**
    * Gets the currently active game or creates a new one if none exists
    */
-  public async getActiveGame(): Promise<GameResult> {
+  public async getOrCreateActiveGame(): Promise<GameResult> {
     console.info("🔍 Searching for active game...");
     const dbGame = await this.prisma.game.findFirst({
       where: { isActive: true },
@@ -63,6 +64,57 @@ export class GameManager implements IGameManager {
         gameAccount: newGame.gameAccount,
         agents: newGame.agents,
       };
+    }
+
+    console.info(`✅ Found active game with ID: ${dbGame.onchainId}`);
+    console.info("🔄 Fetching game and agent data...");
+
+    const [gamePda] = getGamePDA(
+      this.program.programId,
+      new BN(dbGame.onchainId)
+    );
+    const gameAccount = await this.program.account.game.fetch(gamePda);
+
+    const agents = await Promise.all(
+      dbGame.agents.map(async (agent) => {
+        const [agentPda] = getAgentPDA(
+          this.program.programId,
+          gamePda,
+          new BN(agent.onchainId)
+        );
+        const agentAccount = await this.program.account.agent.fetch(agentPda);
+        return {
+          account: agentAccount,
+          agent,
+        };
+      })
+    );
+
+    console.info(`📊 Loaded ${agents.length} agents for active game`);
+    return {
+      dbGame,
+      gameAccount,
+      agents,
+    };
+  }
+
+  /**
+   * Gets the currently active game. Throws error if no active game exists.
+   * @throws Error when no active game is found
+   */
+  public async getActiveGame(): Promise<GameResult> {
+    console.info("🔍 Searching for active game...");
+    const dbGame = await this.prisma.game.findFirst({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+      include: {
+        agents: true,
+      },
+    });
+
+    if (!dbGame) {
+      console.error("❌ No active game found");
+      throw new Error("No active game exists");
     }
 
     console.info(`✅ Found active game with ID: ${dbGame.onchainId}`);

@@ -111,14 +111,7 @@ export async function startServer() {
   const calculator = new InfluenceCalculator();
   const eventEmitter = new EventEmitter();
 
-  const battleResolver = new BattleResolver(
-    {
-      gameId: gameInfo.dbGame.id,
-      gameOnchainId: gameInfo.gameAccount.gameId,
-    },
-    program,
-    prisma
-  );
+  const battleResolver = new BattleResolver(program, gameManager, prisma);
   const actionManager = new ActionManager(
     program,
     gameInfo.gameAccount.gameId,

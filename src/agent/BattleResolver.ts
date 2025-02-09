@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import { getAgentAta } from "../utils/program";
 import { gameConfig } from "@/config/env";
 import { BN } from "@coral-xyz/anchor";
+import { GameManager } from "./GameManager";
 
 // Represents outcome of a 1v1 battle between two agents
 type SimpleBattleOutcome = {
@@ -69,9 +70,9 @@ type AllianceInfo = {
   allianceAccount: AgentAccount;
 };
 
-type GameContext = {
-  gameOnchainId: number;
+type BattleResolverContext = {
   gameId: string;
+  gameOnchainId: number;
 };
 
 /**
@@ -83,14 +84,12 @@ export class BattleResolver {
   private readonly prisma: PrismaClient;
 
   constructor(
-    private readonly ctx: GameContext,
     private readonly program: Program<MiddleEarthAiProgram>,
+    private readonly gameManager: GameManager,
     prisma: PrismaClient
   ) {
     this.prisma = prisma;
-    console.log("🎮 Battle Resolution Service initialized for game", {
-      gameOnchainId: this.ctx.gameOnchainId,
-    });
+    console.log("🎮 Battle Resolution Service initialized");
   }
 
   /**
@@ -120,35 +119,21 @@ export class BattleResolver {
    */
   private async checkAndResolveBattles() {
     try {
+      const { dbGame, gameAccount, agents } =
+        await this.gameManager.getActiveGame();
       console.log("🔍 Starting battle resolution check cycle");
-      const [gamePda] = getGamePDA(
-        this.program.programId,
-        this.ctx.gameOnchainId
-      );
-      const gameAccount = await this.program.account.game.fetch(gamePda);
-      const agentInfos = gameAccount.agents as AgentInfo[];
 
-      console.log("📊 Retrieved game state and agent information", {
-        totalAgents: agentInfos.length,
-        gameAccount: JSON.stringify(gameAccount),
-      });
+      const ctx: BattleResolverContext = {
+        gameId: dbGame.id,
+        gameOnchainId: dbGame.onchainId,
+      };
 
       // Get all agents in battle
       const agentsInBattle = (
         await Promise.all(
-          agentInfos.map(async (agentInfo) => {
-            try {
-              const agentAccount = await this.program.account.agent.fetch(
-                agentInfo.key
-              );
-              if (agentAccount.isAlive && agentAccount.currentBattleStart) {
-                return agentAccount;
-              }
-            } catch (error) {
-              console.error(
-                `❌ Failed to fetch agent data ${agentInfo.key}:`,
-                error
-              );
+          agents.map(async (agent) => {
+            if (agent.account.isAlive && agent.account.currentBattleStart) {
+              return agent.account;
             }
             return null;
           })
@@ -194,20 +179,20 @@ export class BattleResolver {
           switch (type) {
             case "Simple":
               await this.resolveSimpleBattle(
-                outcome as SimpleBattleOutcome,
-                gamePda
+                ctx,
+                outcome as SimpleBattleOutcome
               );
               break;
             case "AgentVsAlliance":
               await this.resolveAgentVsAllianceBattle(
-                outcome as AgentVsAllianceBattleOutcome,
-                gamePda
+                ctx,
+                outcome as AgentVsAllianceBattleOutcome
               );
               break;
             case "AllianceVsAlliance":
               await this.resolveAllianceVsAllianceBattle(
-                outcome as AllianceVsAllianceBattleOutcome,
-                gamePda
+                ctx,
+                outcome as AllianceVsAllianceBattleOutcome
               );
               break;
           }
@@ -508,7 +493,10 @@ export class BattleResolver {
   /**
    * Apply health penalty to losing agents and handle agent death
    */
-  private async applyHealthPenalty(agentIds: number[]): Promise<void> {
+  private async applyHealthPenalty(
+    ctx: BattleResolverContext,
+    agentIds: number[]
+  ): Promise<void> {
     try {
       // Update health for all losing agents
       await Promise.all(
@@ -517,7 +505,7 @@ export class BattleResolver {
             where: {
               onchainId_gameId: {
                 onchainId: agentId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
           });
@@ -533,7 +521,7 @@ export class BattleResolver {
             // Kill agent both onchain and in database
             const [gamePda] = getGamePDA(
               this.program.programId,
-              this.ctx.gameOnchainId
+              ctx.gameOnchainId
             );
             const [agentPda] = getAgentPDA(
               this.program.programId,
@@ -619,9 +607,14 @@ export class BattleResolver {
    * Resolve a simple battle between two agents
    */
   private async resolveSimpleBattle(
-    outcome: SimpleBattleOutcome,
-    gamePda: PublicKey
+    ctx: BattleResolverContext,
+    outcome: SimpleBattleOutcome
   ) {
+    const [gamePda] = getGamePDA(
+      this.program.programId,
+      new BN(ctx.gameOnchainId)
+    );
+
     const [winnerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
@@ -651,7 +644,7 @@ export class BattleResolver {
         .rpc();
 
       // Apply health penalty to loser
-      await this.applyHealthPenalty([outcome.loserOnchainId]);
+      await this.applyHealthPenalty(ctx, [outcome.loserOnchainId]);
 
       // Update battle status in database
       const activeBattle = await this.prisma.battle.findFirst({
@@ -660,13 +653,13 @@ export class BattleResolver {
             {
               attacker: {
                 onchainId: outcome.winnerOnchainId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
             {
               defender: {
                 onchainId: outcome.winnerOnchainId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
           ],
@@ -683,7 +676,7 @@ export class BattleResolver {
               connect: {
                 onchainId_gameId: {
                   onchainId: outcome.winnerOnchainId,
-                  gameId: this.ctx.gameId,
+                  gameId: ctx.gameId,
                 },
               },
             },
@@ -703,9 +696,14 @@ export class BattleResolver {
    * Resolve a battle between an agent and an alliance
    */
   private async resolveAgentVsAllianceBattle(
-    outcome: AgentVsAllianceBattleOutcome,
-    gamePda: PublicKey
+    ctx: BattleResolverContext,
+    outcome: AgentVsAllianceBattleOutcome
   ) {
+    const [gamePda] = getGamePDA(
+      this.program.programId,
+      new BN(ctx.gameOnchainId)
+    );
+
     const [singleAgentPda] = getAgentPDA(
       this.program.programId,
       gamePda,
@@ -753,12 +751,12 @@ export class BattleResolver {
 
       // Apply health penalties to losing side
       if (outcome.agentIsWinner) {
-        await this.applyHealthPenalty([
+        await this.applyHealthPenalty(ctx, [
           outcome.allianceLeaderOnchainId,
           outcome.alliancePartnerOnchainId,
         ]);
       } else {
-        await this.applyHealthPenalty([outcome.singleAgentOnchainId]);
+        await this.applyHealthPenalty(ctx, [outcome.singleAgentOnchainId]);
       }
 
       // Update battle status in database
@@ -768,13 +766,13 @@ export class BattleResolver {
             {
               attacker: {
                 onchainId: outcome.singleAgentOnchainId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
             {
               defender: {
                 onchainId: outcome.singleAgentOnchainId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
           ],
@@ -793,7 +791,7 @@ export class BattleResolver {
                   onchainId: outcome.agentIsWinner
                     ? outcome.singleAgentOnchainId
                     : outcome.allianceLeaderOnchainId,
-                  gameId: this.ctx.gameId,
+                  gameId: ctx.gameId,
                 },
               },
             },
@@ -813,9 +811,11 @@ export class BattleResolver {
    * Resolve a battle between two alliances
    */
   private async resolveAllianceVsAllianceBattle(
-    outcome: AllianceVsAllianceBattleOutcome,
-    gamePda: PublicKey
+    ctx: BattleResolverContext,
+    outcome: AllianceVsAllianceBattleOutcome
   ) {
+    const [gamePda] = getGamePDA(this.program.programId, new BN(ctx.gameId));
+
     const [allianceALeaderPda] = getAgentPDA(
       this.program.programId,
       gamePda,
@@ -870,12 +870,12 @@ export class BattleResolver {
 
       // Apply health penalties to losing alliance
       if (outcome.allianceAWins) {
-        await this.applyHealthPenalty([
+        await this.applyHealthPenalty(ctx, [
           outcome.allianceBLeaderOnchainId,
           outcome.allianceBPartnerOnchainId,
         ]);
       } else {
-        await this.applyHealthPenalty([
+        await this.applyHealthPenalty(ctx, [
           outcome.allianceALeaderOnchainId,
           outcome.allianceAPartnerOnchainId,
         ]);
@@ -888,13 +888,13 @@ export class BattleResolver {
             {
               attacker: {
                 onchainId: outcome.allianceALeaderOnchainId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
             {
               defender: {
                 onchainId: outcome.allianceALeaderOnchainId,
-                gameId: this.ctx.gameId,
+                gameId: ctx.gameId,
               },
             },
           ],
@@ -913,7 +913,7 @@ export class BattleResolver {
                   onchainId: outcome.allianceAWins
                     ? outcome.allianceALeaderOnchainId
                     : outcome.allianceBLeaderOnchainId,
-                  gameId: this.ctx.gameId,
+                  gameId: ctx.gameId,
                 },
               },
             },
