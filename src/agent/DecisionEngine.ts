@@ -553,10 +553,10 @@ Strategic Tweet Examples (align with your goals and personality):
 - Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}! 🤝"
 - Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}! 🛡️"
 - Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross! 🎯"
-
+- Break Alliance: "Your alliance is a weak link. I will break it. @{handle}, prepare to face the consequences! 🤝"
 Based on your goals, traits, and current situation, generate a JSON response with your next strategic action:
 {
-  "type": "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE",
+  "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null, // Target agent's MID (1-4) if targeting another agent
   "position": {
     "x": number, // MapTile x coordinate if moving

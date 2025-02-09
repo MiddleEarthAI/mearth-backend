@@ -158,6 +158,15 @@ exports.Prisma.AgentScalarFieldEnum = {
   mapTileId: 'mapTileId'
 };
 
+exports.Prisma.IgnoreScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  timestamp: 'timestamp',
+  duration: 'duration',
+  gameId: 'gameId',
+  ignoredAgentId: 'ignoredAgentId'
+};
+
 exports.Prisma.MapTileScalarFieldEnum = {
   id: 'id',
   x: 'x',
@@ -300,6 +309,7 @@ exports.Prisma.ModelName = {
   Game: 'Game',
   AgentProfile: 'AgentProfile',
   Agent: 'Agent',
+  Ignore: 'Ignore',
   MapTile: 'MapTile',
   Tweet: 'Tweet',
   Alliance: 'Alliance',

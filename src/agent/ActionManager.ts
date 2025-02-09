@@ -63,11 +63,11 @@ export class ActionManager {
           console.log("🦋 Processing battle action");
           result = await this.handleBattle(ctx, action);
           break;
-        case "FormAlliance":
+        case "FORM_ALLIANCE":
           console.log("🤝 Processing ally action");
           result = await this.handleFormAlliance(ctx, action);
           break;
-        case "BreakAlliance":
+        case "BREAK_ALLIANCE":
           console.log("🤝 Processing break alliance action");
           result = await this.handleBreakAlliance(ctx, action);
           break;
@@ -112,21 +112,78 @@ export class ActionManager {
   }
 
   /**
-   * Handle ignore action
+   * Handle ignore action to temporarily block interactions between agents
+   * @param ctx - Action context containing agent and game info
+   * @param action - The ignore action with target agent details
+   * @returns ActionResult indicating success/failure with feedback
    */
   private async handleIgnore(
     ctx: ActionContext,
     action: IgnoreAction
   ): Promise<ActionResult> {
-    console.log("🚫 Ignoring action", {
+    console.log("🚫 Processing ignore action", {
       agentId: ctx.agentId,
-      actionType: action.type,
+      targetAgentId: action.targetId,
     });
 
-    return {
-      success: true,
-      feedback: { isValid: true },
-    };
+    try {
+      // Get the agent doing the ignoring
+      const agent = await this.prisma.agent.findUnique({
+        where: { id: ctx.agentId },
+      });
+      const targetAgent = await this.prisma.agent.findUnique({
+        where: {
+          onchainId_gameId: {
+            onchainId: action.targetId,
+            gameId: ctx.gameId,
+          },
+        },
+      });
+
+      if (!agent || !targetAgent) {
+        throw new Error("Agent not found");
+      }
+
+      // Check if ignore relationship already exists
+      const existingIgnore = await this.prisma.ignore.findUnique({
+        where: {
+          agentId_ignoredAgentId: {
+            agentId: ctx.agentId,
+            ignoredAgentId: targetAgent.id,
+          },
+        },
+      });
+
+      if (existingIgnore) {
+        throw new Error("Already ignoring this agent");
+      }
+
+      // Create new ignore relationship
+      await this.prisma.ignore.create({
+        data: {
+          agentId: ctx.agentId,
+          ignoredAgentId: targetAgent.id,
+          gameId: ctx.gameId,
+          timestamp: new Date(),
+          duration: 14400, // 4 hours in seconds
+        },
+      });
+
+      return {
+        success: true,
+        feedback: {
+          isValid: true,
+        },
+      };
+    } catch (error) {
+      console.error("Failed to process ignore action", error);
+      return {
+        success: false,
+        feedback: {
+          isValid: false,
+        },
+      };
+    }
   }
 
   /**
@@ -242,36 +299,23 @@ export class ActionManager {
     action: BattleAction
   ): Promise<ActionResult> {
     const { gameOnchainId, agentId, agentOnchainId } = context;
-    const currentTime = Math.floor(Date.now() / 1000);
+    const currentTime = Date.now();
     const [gamePda] = getGamePDA(this.program.programId, gameOnchainId);
     const [defenderPda] = getAgentPDA(
       this.program.programId,
       gamePda,
       action.targetId
     );
-    const defenderAccount = await this.program.account.agent.fetch(defenderPda);
-
-    if (!defenderAccount) {
-      console.error(
-        "❌ Battle validation failed - Target agent not found onchain"
-      );
-      throw new Error("Target agent not found onchain");
-    }
-
-    console.log("⚔️ Processing battle request", {
-      attackerId: agentId,
-      defenderId: action.targetId,
-    });
+    const [attackerPda] = getAgentPDA(
+      this.program.programId,
+      gamePda,
+      agentOnchainId
+    );
     try {
-      // Get PDAs
-      const [gamePda] = getGamePDA(this.program.programId, gameOnchainId);
-
-      const [attackerPda] = getAgentPDA(
-        this.program.programId,
-        gamePda,
-        agentOnchainId
-      );
-
+      console.log("⚔️ Processing battle request", {
+        attackerId: agentId,
+        defenderId: action.targetId,
+      });
       // Fetch and validate both agents' states
       console.log("🔍 Validating combatants' states");
       const [attackerAccount, defenderAccount] = await Promise.all([
@@ -295,7 +339,7 @@ export class ActionManager {
       if (attackerAccount.allianceWith && defenderAccount.allianceWith) {
         console.log("🤝 Initiating Alliance vs Alliance battle");
         tx = await this.handleAllianceVsAllianceBattle(
-          gamePda,
+          context,
           attackerPda,
           defenderPda,
           attackerAccount,
@@ -303,27 +347,47 @@ export class ActionManager {
         );
       } else if (attackerAccount.allianceWith || defenderAccount.allianceWith) {
         if (attackerAccount.allianceWith && !defenderAccount.allianceWith) {
+          const singleAgentAccount = defenderAccount;
+          const agentInAllianceAccount = attackerAccount;
+          const allyAccount = await this.program.account.agent.fetch(
+            attackerAccount.allianceWith
+          );
           tx = await this.handleAgentVsAllianceBattle(
-            gamePda,
+            context,
             defenderPda,
             attackerPda,
-            attackerAccount.allianceWith
+            singleAgentAccount,
+            agentInAllianceAccount,
+            allyAccount
           );
         } else if (
           !attackerAccount.allianceWith &&
           defenderAccount.allianceWith
         ) {
+          const singleAgentAccount = attackerAccount;
+          const agentInAllianceAccount = defenderAccount;
+          const allyAccount = await this.program.account.agent.fetch(
+            defenderAccount.allianceWith
+          );
           tx = await this.handleAgentVsAllianceBattle(
-            gamePda,
+            context,
             defenderPda,
             attackerPda,
-            defenderAccount.allianceWith
+            singleAgentAccount,
+            agentInAllianceAccount,
+            allyAccount
           );
         }
         tx = "No matching arm";
       } else {
         console.log("⚔️ Initiating Simple battle");
-        tx = await this.handleSimpleBattle(attackerPda, defenderPda);
+        tx = await this.handleSimpleBattle(
+          context,
+          attackerPda,
+          defenderPda,
+          attackerAccount,
+          defenderAccount
+        );
       }
 
       console.log("✨ Battle initiated successfully", {
@@ -342,64 +406,271 @@ export class ActionManager {
     }
   }
 
-  // Helper methods for battle handling
+  /**
+   * Handle battle between two alliances, including database updates
+   * @param gamePda - Game public key
+   * @param attackerPda - Attacker's public key
+   * @param defenderPda - Defender's public key
+   * @param attackerAccount - Attacker's account data
+   * @param defenderAccount - Defender's account data
+   * @returns Transaction hash
+   */
   private async handleAllianceVsAllianceBattle(
-    gamePda: PublicKey,
+    context: ActionContext,
     attackerPda: PublicKey,
     defenderPda: PublicKey,
     attackerAccount: AgentAccount,
     defenderAccount: AgentAccount
   ): Promise<string> {
+    const currentTime = Date.now();
     console.log("⚔️ Setting up Alliance vs Alliance battle");
 
     const attackerAllyPda = attackerAccount.allianceWith;
-
     const defenderAllyPda = defenderAccount.allianceWith;
-    if (!attackerAllyPda || !defenderAllyPda) {
-      throw new Error("Invalid game");
-    }
 
-    return this.program.methods
-      .startBattleAlliances()
-      .accounts({
-        leaderA: attackerPda,
-        partnerA: attackerAllyPda,
-        leaderB: defenderPda,
-        partnerB: defenderAllyPda,
-      })
-      .rpc();
+    try {
+      if (!attackerAllyPda || !defenderAllyPda) {
+        throw new Error("Two entities are not in alliances");
+      }
+      const attackerAllyAccount = await this.program.account.agent.fetch(
+        attackerAllyPda
+      );
+      const defenderAllyAccount = await this.program.account.agent.fetch(
+        defenderAllyPda
+      );
+
+      if (attackerAccount.lastBattle.gt(currentTime)) {
+        throw new Error("Attacker is on cooldown");
+      }
+
+      if (defenderAccount.lastBattle.gt(currentTime)) {
+        throw new Error("Defender is on cooldown");
+      }
+
+      if (attackerAllyAccount.lastBattle.gt(currentTime)) {
+        throw new Error("Attacker's ally is on cooldown");
+      }
+
+      if (defenderAllyAccount.lastBattle.gt(currentTime)) {
+        throw new Error("Defender's ally is on cooldown");
+      }
+      const [
+        attackerAgent,
+        defenderAgent,
+        attackerAllyAgent,
+        defenderAllyAgent,
+      ] = await Promise.all([
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: attackerAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: defenderAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: attackerAllyAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: defenderAllyAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+      ]);
+      if (
+        !attackerAgent ||
+        !defenderAgent ||
+        !attackerAllyAgent ||
+        !defenderAllyAgent
+      ) {
+        throw new Error(
+          "One or more agents involved in the battle are not found"
+        );
+      }
+      // Create battle record in database
+      await this.prisma.battle.create({
+        data: {
+          type: "AllianceVsAlliance",
+          status: "Active",
+          tokensStaked:
+            attackerAccount.tokenBalance
+              ?.add(defenderAccount.tokenBalance)
+              .add(attackerAllyAccount.tokenBalance)
+              .add(defenderAllyAccount.tokenBalance)
+              .toNumber() || 0,
+          gameId: context.gameId,
+          attackerId: attackerAgent.id,
+          defenderId: defenderAgent.id,
+          attackerAllyId: attackerAllyAgent.id,
+          defenderAllyId: defenderAllyAgent.id,
+        },
+      });
+
+      // Execute onchain transaction
+      const tx = await this.program.methods
+        .startBattleAlliances()
+        .accounts({
+          leaderA: attackerPda,
+          partnerA: attackerAllyPda,
+          leaderB: defenderPda,
+          partnerB: defenderAllyPda,
+        })
+        .rpc();
+
+      return tx;
+    } catch (error) {
+      console.error("💥 Battle initiation failed", { error });
+      throw error;
+    }
   }
 
   private async handleAgentVsAllianceBattle(
-    gamePda: PublicKey,
+    context: ActionContext,
     singleAgentPda: PublicKey,
-    allyLeaderPda: PublicKey,
-    allyPartnerPda: PublicKey
+    agentInAlliancePda: PublicKey,
+    singleAgentAccount: AgentAccount,
+    agentInAllianceAccount: AgentAccount,
+    allyAccount: AgentAccount
   ): Promise<string> {
-    if (!allyLeaderPda) throw Error("Alliance partner is null");
+    if (!agentInAllianceAccount) throw Error("Alliance partner is null");
 
-    return this.program.methods
-      .startBattleAgentVsAlliance()
-      .accounts({
-        attacker: singleAgentPda,
-        allianceLeader: allyLeaderPda,
-        alliancePartner: allyPartnerPda,
-      })
-      .rpc();
+    try {
+      // Fetch all agent accounts from database
+      const [singleAgent, allyLeader, allyPartner] = await Promise.all([
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: singleAgentAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: agentInAllianceAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: allyAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+      ]);
+
+      if (!singleAgent || !allyLeader || !allyPartner) {
+        throw new Error("One or more agents not found");
+      }
+
+      // Create battle record in database
+      await this.prisma.battle.create({
+        data: {
+          type: "AgentVsAlliance",
+          status: "Active",
+          tokensStaked:
+            singleAgentAccount.tokenBalance
+              ?.add(allyAccount.tokenBalance)
+              ?.toNumber() || 0,
+          gameId: context.gameId,
+          attackerId: singleAgent.id,
+          defenderId: allyLeader.id,
+          defenderAllyId: allyPartner.id,
+        },
+      });
+
+      // Execute onchain transaction
+      return this.program.methods
+        .startBattleAgentVsAlliance()
+        .accounts({
+          attacker: singleAgentPda,
+          allianceLeader: agentInAlliancePda,
+          alliancePartner: allyAccount.allianceWith!,
+        })
+        .rpc();
+    } catch (error) {
+      console.error("💥 Battle initiation failed", { error });
+      throw error;
+    }
   }
-
   private async handleSimpleBattle(
+    context: ActionContext,
     attackerPda: PublicKey,
-    defenderPda: PublicKey
+    defenderPda: PublicKey,
+    attackerAccount: AgentAccount,
+    defenderAccount: AgentAccount
   ): Promise<string> {
     console.log("⚔️ Setting up Simple battle");
-    return this.program.methods
-      .startBattleSimple()
-      .accounts({
-        winner: attackerPda,
-        loser: defenderPda,
-      })
-      .rpc();
+
+    try {
+      // Get the database records for both agents
+      const [attacker, defender] = await Promise.all([
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: attackerAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: defenderAccount.id,
+              gameId: context.gameId,
+            },
+          },
+        }),
+      ]);
+
+      if (!attacker || !defender) {
+        throw new Error("One or more agents not found in database");
+      }
+
+      // Create battle record
+      await this.prisma.battle.create({
+        data: {
+          type: "Simple",
+          status: "Active",
+          tokensStaked: 0, // Set appropriate token amount if needed
+          gameId: context.gameId,
+          attackerId: attacker.id,
+          defenderId: defender.id,
+        },
+      });
+
+      // Execute onchain transaction
+      return this.program.methods
+        .startBattleSimple()
+        .accounts({
+          winner: attackerPda,
+          loser: defenderPda,
+        })
+        .rpc();
+    } catch (error) {
+      console.error("💥 Simple battle initiation failed", { error });
+      throw error;
+    }
   }
 
   /**

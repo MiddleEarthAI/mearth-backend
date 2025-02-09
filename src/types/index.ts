@@ -10,8 +10,8 @@ export interface Position {
 export type ActionType =
   | "MOVE"
   | "BATTLE"
-  | "FormAlliance"
-  | "BreakAlliance"
+  | "FORM_ALLIANCE"
+  | "BREAK_ALLIANCE"
   | "IGNORE";
 
 export type MearthProgram = anchor.Program<MiddleEarthAiProgram>;
@@ -55,13 +55,13 @@ export interface BattleAction {
 }
 
 export interface FormAllianceAction {
-  type: "FormAlliance";
+  type: "FORM_ALLIANCE";
   targetId: number;
   tweet: string;
 }
 
 export interface BreakAllianceAction {
-  type: "BreakAlliance";
+  type: "BREAK_ALLIANCE";
   targetId: number;
   tweet: string;
 }

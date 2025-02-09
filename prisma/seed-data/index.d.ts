@@ -29,6 +29,11 @@ export type AgentProfile = $Result.DefaultSelection<Prisma.$AgentProfilePayload>
  */
 export type Agent = $Result.DefaultSelection<Prisma.$AgentPayload>
 /**
+ * Model Ignore
+ * 
+ */
+export type Ignore = $Result.DefaultSelection<Prisma.$IgnorePayload>
+/**
  * Model MapTile
  * 
  */
@@ -315,6 +320,16 @@ export class PrismaClient<
     * ```
     */
   get agent(): Prisma.AgentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.ignore`: Exposes CRUD operations for the **Ignore** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Ignores
+    * const ignores = await prisma.ignore.findMany()
+    * ```
+    */
+  get ignore(): Prisma.IgnoreDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.mapTile`: Exposes CRUD operations for the **MapTile** model.
@@ -828,6 +843,7 @@ export namespace Prisma {
     Game: 'Game',
     AgentProfile: 'AgentProfile',
     Agent: 'Agent',
+    Ignore: 'Ignore',
     MapTile: 'MapTile',
     Tweet: 'Tweet',
     Alliance: 'Alliance',
@@ -850,7 +866,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "game" | "agentProfile" | "agent" | "mapTile" | "tweet" | "alliance" | "battle" | "interaction" | "coolDown" | "user"
+      modelProps: "game" | "agentProfile" | "agent" | "ignore" | "mapTile" | "tweet" | "alliance" | "battle" | "interaction" | "coolDown" | "user"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1073,6 +1089,80 @@ export namespace Prisma {
           count: {
             args: Prisma.AgentCountArgs<ExtArgs>
             result: $Utils.Optional<AgentCountAggregateOutputType> | number
+          }
+        }
+      }
+      Ignore: {
+        payload: Prisma.$IgnorePayload<ExtArgs>
+        fields: Prisma.IgnoreFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.IgnoreFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.IgnoreFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>
+          }
+          findFirst: {
+            args: Prisma.IgnoreFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.IgnoreFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>
+          }
+          findMany: {
+            args: Prisma.IgnoreFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>[]
+          }
+          create: {
+            args: Prisma.IgnoreCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>
+          }
+          createMany: {
+            args: Prisma.IgnoreCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.IgnoreCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>[]
+          }
+          delete: {
+            args: Prisma.IgnoreDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>
+          }
+          update: {
+            args: Prisma.IgnoreUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>
+          }
+          deleteMany: {
+            args: Prisma.IgnoreDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.IgnoreUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.IgnoreUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>[]
+          }
+          upsert: {
+            args: Prisma.IgnoreUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IgnorePayload>
+          }
+          aggregate: {
+            args: Prisma.IgnoreAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateIgnore>
+          }
+          groupBy: {
+            args: Prisma.IgnoreGroupByArgs<ExtArgs>
+            result: $Utils.Optional<IgnoreGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.IgnoreCountArgs<ExtArgs>
+            result: $Utils.Optional<IgnoreCountAggregateOutputType> | number
           }
         }
       }
@@ -1681,6 +1771,7 @@ export namespace Prisma {
     game?: GameOmit
     agentProfile?: AgentProfileOmit
     agent?: AgentOmit
+    ignore?: IgnoreOmit
     mapTile?: MapTileOmit
     tweet?: TweetOmit
     alliance?: AllianceOmit
@@ -1786,6 +1877,7 @@ export namespace Prisma {
     alliances: number
     battles: number
     coolDown: number
+    Ignore: number
   }
 
   export type GameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1793,6 +1885,7 @@ export namespace Prisma {
     alliances?: boolean | GameCountOutputTypeCountAlliancesArgs
     battles?: boolean | GameCountOutputTypeCountBattlesArgs
     coolDown?: boolean | GameCountOutputTypeCountCoolDownArgs
+    Ignore?: boolean | GameCountOutputTypeCountIgnoreArgs
   }
 
   // Custom InputTypes
@@ -1832,6 +1925,13 @@ export namespace Prisma {
    */
   export type GameCountOutputTypeCountCoolDownArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CoolDownWhereInput
+  }
+
+  /**
+   * GameCountOutputType without action
+   */
+  export type GameCountOutputTypeCountIgnoreArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: IgnoreWhereInput
   }
 
 
@@ -1880,6 +1980,8 @@ export namespace Prisma {
     coolDown: number
     initiatedAlliances: number
     joinedAlliances: number
+    ignoredBy: number
+    ignoring: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1892,6 +1994,8 @@ export namespace Prisma {
     coolDown?: boolean | AgentCountOutputTypeCountCoolDownArgs
     initiatedAlliances?: boolean | AgentCountOutputTypeCountInitiatedAlliancesArgs
     joinedAlliances?: boolean | AgentCountOutputTypeCountJoinedAlliancesArgs
+    ignoredBy?: boolean | AgentCountOutputTypeCountIgnoredByArgs
+    ignoring?: boolean | AgentCountOutputTypeCountIgnoringArgs
   }
 
   // Custom InputTypes
@@ -1966,6 +2070,20 @@ export namespace Prisma {
    */
   export type AgentCountOutputTypeCountJoinedAlliancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AllianceWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountIgnoredByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: IgnoreWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountIgnoringArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: IgnoreWhereInput
   }
 
 
@@ -2274,6 +2392,7 @@ export namespace Prisma {
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
     coolDown?: boolean | Game$coolDownArgs<ExtArgs>
+    Ignore?: boolean | Game$IgnoreArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
@@ -2328,6 +2447,7 @@ export namespace Prisma {
     alliances?: boolean | Game$alliancesArgs<ExtArgs>
     battles?: boolean | Game$battlesArgs<ExtArgs>
     coolDown?: boolean | Game$coolDownArgs<ExtArgs>
+    Ignore?: boolean | Game$IgnoreArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2340,6 +2460,7 @@ export namespace Prisma {
       alliances: Prisma.$AlliancePayload<ExtArgs>[]
       battles: Prisma.$BattlePayload<ExtArgs>[]
       coolDown: Prisma.$CoolDownPayload<ExtArgs>[]
+      Ignore: Prisma.$IgnorePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2752,6 +2873,7 @@ export namespace Prisma {
     alliances<T extends Game$alliancesArgs<ExtArgs> = {}>(args?: Subset<T, Game$alliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     battles<T extends Game$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Game$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     coolDown<T extends Game$coolDownArgs<ExtArgs> = {}>(args?: Subset<T, Game$coolDownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    Ignore<T extends Game$IgnoreArgs<ExtArgs> = {}>(args?: Subset<T, Game$IgnoreArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3262,6 +3384,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CoolDownScalarFieldEnum | CoolDownScalarFieldEnum[]
+  }
+
+  /**
+   * Game.Ignore
+   */
+  export type Game$IgnoreArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    where?: IgnoreWhereInput
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    cursor?: IgnoreWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
   }
 
   /**
@@ -4679,6 +4825,8 @@ export namespace Prisma {
     joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
+    ignoredBy?: boolean | Agent$ignoredByArgs<ExtArgs>
+    ignoring?: boolean | Agent$ignoringArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -4738,6 +4886,8 @@ export namespace Prisma {
     joinedAlliances?: boolean | Agent$joinedAlliancesArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
+    ignoredBy?: boolean | Agent$ignoredByArgs<ExtArgs>
+    ignoring?: boolean | Agent$ignoringArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4766,6 +4916,8 @@ export namespace Prisma {
       joinedAlliances: Prisma.$AlliancePayload<ExtArgs>[]
       profile: Prisma.$AgentProfilePayload<ExtArgs>
       mapTile: Prisma.$MapTilePayload<ExtArgs>
+      ignoredBy: Prisma.$IgnorePayload<ExtArgs>[]
+      ignoring: Prisma.$IgnorePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5183,6 +5335,8 @@ export namespace Prisma {
     joinedAlliances<T extends Agent$joinedAlliancesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$joinedAlliancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlliancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     profile<T extends AgentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentProfileDefaultArgs<ExtArgs>>): Prisma__AgentProfileClient<$Result.GetResult<Prisma.$AgentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     mapTile<T extends MapTileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MapTileDefaultArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    ignoredBy<T extends Agent$ignoredByArgs<ExtArgs> = {}>(args?: Subset<T, Agent$ignoredByArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    ignoring<T extends Agent$ignoringArgs<ExtArgs> = {}>(args?: Subset<T, Agent$ignoringArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5821,6 +5975,54 @@ export namespace Prisma {
   }
 
   /**
+   * Agent.ignoredBy
+   */
+  export type Agent$ignoredByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    where?: IgnoreWhereInput
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    cursor?: IgnoreWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.ignoring
+   */
+  export type Agent$ignoringArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    where?: IgnoreWhereInput
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    cursor?: IgnoreWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
    * Agent without action
    */
   export type AgentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5836,6 +6038,1115 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: AgentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Ignore
+   */
+
+  export type AggregateIgnore = {
+    _count: IgnoreCountAggregateOutputType | null
+    _avg: IgnoreAvgAggregateOutputType | null
+    _sum: IgnoreSumAggregateOutputType | null
+    _min: IgnoreMinAggregateOutputType | null
+    _max: IgnoreMaxAggregateOutputType | null
+  }
+
+  export type IgnoreAvgAggregateOutputType = {
+    duration: number | null
+  }
+
+  export type IgnoreSumAggregateOutputType = {
+    duration: number | null
+  }
+
+  export type IgnoreMinAggregateOutputType = {
+    id: string | null
+    agentId: string | null
+    timestamp: Date | null
+    duration: number | null
+    gameId: string | null
+    ignoredAgentId: string | null
+  }
+
+  export type IgnoreMaxAggregateOutputType = {
+    id: string | null
+    agentId: string | null
+    timestamp: Date | null
+    duration: number | null
+    gameId: string | null
+    ignoredAgentId: string | null
+  }
+
+  export type IgnoreCountAggregateOutputType = {
+    id: number
+    agentId: number
+    timestamp: number
+    duration: number
+    gameId: number
+    ignoredAgentId: number
+    _all: number
+  }
+
+
+  export type IgnoreAvgAggregateInputType = {
+    duration?: true
+  }
+
+  export type IgnoreSumAggregateInputType = {
+    duration?: true
+  }
+
+  export type IgnoreMinAggregateInputType = {
+    id?: true
+    agentId?: true
+    timestamp?: true
+    duration?: true
+    gameId?: true
+    ignoredAgentId?: true
+  }
+
+  export type IgnoreMaxAggregateInputType = {
+    id?: true
+    agentId?: true
+    timestamp?: true
+    duration?: true
+    gameId?: true
+    ignoredAgentId?: true
+  }
+
+  export type IgnoreCountAggregateInputType = {
+    id?: true
+    agentId?: true
+    timestamp?: true
+    duration?: true
+    gameId?: true
+    ignoredAgentId?: true
+    _all?: true
+  }
+
+  export type IgnoreAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Ignore to aggregate.
+     */
+    where?: IgnoreWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Ignores to fetch.
+     */
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: IgnoreWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Ignores from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Ignores.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Ignores
+    **/
+    _count?: true | IgnoreCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: IgnoreAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: IgnoreSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: IgnoreMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: IgnoreMaxAggregateInputType
+  }
+
+  export type GetIgnoreAggregateType<T extends IgnoreAggregateArgs> = {
+        [P in keyof T & keyof AggregateIgnore]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateIgnore[P]>
+      : GetScalarType<T[P], AggregateIgnore[P]>
+  }
+
+
+
+
+  export type IgnoreGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: IgnoreWhereInput
+    orderBy?: IgnoreOrderByWithAggregationInput | IgnoreOrderByWithAggregationInput[]
+    by: IgnoreScalarFieldEnum[] | IgnoreScalarFieldEnum
+    having?: IgnoreScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: IgnoreCountAggregateInputType | true
+    _avg?: IgnoreAvgAggregateInputType
+    _sum?: IgnoreSumAggregateInputType
+    _min?: IgnoreMinAggregateInputType
+    _max?: IgnoreMaxAggregateInputType
+  }
+
+  export type IgnoreGroupByOutputType = {
+    id: string
+    agentId: string
+    timestamp: Date
+    duration: number
+    gameId: string
+    ignoredAgentId: string
+    _count: IgnoreCountAggregateOutputType | null
+    _avg: IgnoreAvgAggregateOutputType | null
+    _sum: IgnoreSumAggregateOutputType | null
+    _min: IgnoreMinAggregateOutputType | null
+    _max: IgnoreMaxAggregateOutputType | null
+  }
+
+  type GetIgnoreGroupByPayload<T extends IgnoreGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<IgnoreGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof IgnoreGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], IgnoreGroupByOutputType[P]>
+            : GetScalarType<T[P], IgnoreGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type IgnoreSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    timestamp?: boolean
+    duration?: boolean
+    gameId?: boolean
+    ignoredAgentId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
+    ignoredAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["ignore"]>
+
+  export type IgnoreSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    timestamp?: boolean
+    duration?: boolean
+    gameId?: boolean
+    ignoredAgentId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
+    ignoredAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["ignore"]>
+
+  export type IgnoreSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    agentId?: boolean
+    timestamp?: boolean
+    duration?: boolean
+    gameId?: boolean
+    ignoredAgentId?: boolean
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
+    ignoredAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["ignore"]>
+
+  export type IgnoreSelectScalar = {
+    id?: boolean
+    agentId?: boolean
+    timestamp?: boolean
+    duration?: boolean
+    gameId?: boolean
+    ignoredAgentId?: boolean
+  }
+
+  export type IgnoreOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "agentId" | "timestamp" | "duration" | "gameId" | "ignoredAgentId", ExtArgs["result"]["ignore"]>
+  export type IgnoreInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
+    ignoredAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type IgnoreIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
+    ignoredAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type IgnoreIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+    game?: boolean | GameDefaultArgs<ExtArgs>
+    ignoredAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+
+  export type $IgnorePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Ignore"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs>
+      game: Prisma.$GamePayload<ExtArgs>
+      ignoredAgent: Prisma.$AgentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      agentId: string
+      timestamp: Date
+      duration: number
+      gameId: string
+      ignoredAgentId: string
+    }, ExtArgs["result"]["ignore"]>
+    composites: {}
+  }
+
+  type IgnoreGetPayload<S extends boolean | null | undefined | IgnoreDefaultArgs> = $Result.GetResult<Prisma.$IgnorePayload, S>
+
+  type IgnoreCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<IgnoreFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: IgnoreCountAggregateInputType | true
+    }
+
+  export interface IgnoreDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Ignore'], meta: { name: 'Ignore' } }
+    /**
+     * Find zero or one Ignore that matches the filter.
+     * @param {IgnoreFindUniqueArgs} args - Arguments to find a Ignore
+     * @example
+     * // Get one Ignore
+     * const ignore = await prisma.ignore.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends IgnoreFindUniqueArgs>(args: SelectSubset<T, IgnoreFindUniqueArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find one Ignore that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {IgnoreFindUniqueOrThrowArgs} args - Arguments to find a Ignore
+     * @example
+     * // Get one Ignore
+     * const ignore = await prisma.ignore.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends IgnoreFindUniqueOrThrowArgs>(args: SelectSubset<T, IgnoreFindUniqueOrThrowArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first Ignore that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreFindFirstArgs} args - Arguments to find a Ignore
+     * @example
+     * // Get one Ignore
+     * const ignore = await prisma.ignore.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends IgnoreFindFirstArgs>(args?: SelectSubset<T, IgnoreFindFirstArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first Ignore that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreFindFirstOrThrowArgs} args - Arguments to find a Ignore
+     * @example
+     * // Get one Ignore
+     * const ignore = await prisma.ignore.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends IgnoreFindFirstOrThrowArgs>(args?: SelectSubset<T, IgnoreFindFirstOrThrowArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find zero or more Ignores that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Ignores
+     * const ignores = await prisma.ignore.findMany()
+     * 
+     * // Get first 10 Ignores
+     * const ignores = await prisma.ignore.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const ignoreWithIdOnly = await prisma.ignore.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends IgnoreFindManyArgs>(args?: SelectSubset<T, IgnoreFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions>>
+
+    /**
+     * Create a Ignore.
+     * @param {IgnoreCreateArgs} args - Arguments to create a Ignore.
+     * @example
+     * // Create one Ignore
+     * const Ignore = await prisma.ignore.create({
+     *   data: {
+     *     // ... data to create a Ignore
+     *   }
+     * })
+     * 
+     */
+    create<T extends IgnoreCreateArgs>(args: SelectSubset<T, IgnoreCreateArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Create many Ignores.
+     * @param {IgnoreCreateManyArgs} args - Arguments to create many Ignores.
+     * @example
+     * // Create many Ignores
+     * const ignore = await prisma.ignore.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends IgnoreCreateManyArgs>(args?: SelectSubset<T, IgnoreCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Ignores and returns the data saved in the database.
+     * @param {IgnoreCreateManyAndReturnArgs} args - Arguments to create many Ignores.
+     * @example
+     * // Create many Ignores
+     * const ignore = await prisma.ignore.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Ignores and only return the `id`
+     * const ignoreWithIdOnly = await prisma.ignore.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends IgnoreCreateManyAndReturnArgs>(args?: SelectSubset<T, IgnoreCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+
+    /**
+     * Delete a Ignore.
+     * @param {IgnoreDeleteArgs} args - Arguments to delete one Ignore.
+     * @example
+     * // Delete one Ignore
+     * const Ignore = await prisma.ignore.delete({
+     *   where: {
+     *     // ... filter to delete one Ignore
+     *   }
+     * })
+     * 
+     */
+    delete<T extends IgnoreDeleteArgs>(args: SelectSubset<T, IgnoreDeleteArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Update one Ignore.
+     * @param {IgnoreUpdateArgs} args - Arguments to update one Ignore.
+     * @example
+     * // Update one Ignore
+     * const ignore = await prisma.ignore.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends IgnoreUpdateArgs>(args: SelectSubset<T, IgnoreUpdateArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Delete zero or more Ignores.
+     * @param {IgnoreDeleteManyArgs} args - Arguments to filter Ignores to delete.
+     * @example
+     * // Delete a few Ignores
+     * const { count } = await prisma.ignore.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends IgnoreDeleteManyArgs>(args?: SelectSubset<T, IgnoreDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Ignores.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Ignores
+     * const ignore = await prisma.ignore.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends IgnoreUpdateManyArgs>(args: SelectSubset<T, IgnoreUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Ignores and returns the data updated in the database.
+     * @param {IgnoreUpdateManyAndReturnArgs} args - Arguments to update many Ignores.
+     * @example
+     * // Update many Ignores
+     * const ignore = await prisma.ignore.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Ignores and only return the `id`
+     * const ignoreWithIdOnly = await prisma.ignore.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends IgnoreUpdateManyAndReturnArgs>(args: SelectSubset<T, IgnoreUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+
+    /**
+     * Create or update one Ignore.
+     * @param {IgnoreUpsertArgs} args - Arguments to update or create a Ignore.
+     * @example
+     * // Update or create a Ignore
+     * const ignore = await prisma.ignore.upsert({
+     *   create: {
+     *     // ... data to create a Ignore
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Ignore we want to update
+     *   }
+     * })
+     */
+    upsert<T extends IgnoreUpsertArgs>(args: SelectSubset<T, IgnoreUpsertArgs<ExtArgs>>): Prisma__IgnoreClient<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+
+
+    /**
+     * Count the number of Ignores.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreCountArgs} args - Arguments to filter Ignores to count.
+     * @example
+     * // Count the number of Ignores
+     * const count = await prisma.ignore.count({
+     *   where: {
+     *     // ... the filter for the Ignores we want to count
+     *   }
+     * })
+    **/
+    count<T extends IgnoreCountArgs>(
+      args?: Subset<T, IgnoreCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], IgnoreCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Ignore.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends IgnoreAggregateArgs>(args: Subset<T, IgnoreAggregateArgs>): Prisma.PrismaPromise<GetIgnoreAggregateType<T>>
+
+    /**
+     * Group by Ignore.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IgnoreGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends IgnoreGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: IgnoreGroupByArgs['orderBy'] }
+        : { orderBy?: IgnoreGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, IgnoreGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetIgnoreGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Ignore model
+   */
+  readonly fields: IgnoreFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Ignore.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__IgnoreClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    ignoredAgent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Ignore model
+   */ 
+  interface IgnoreFieldRefs {
+    readonly id: FieldRef<"Ignore", 'String'>
+    readonly agentId: FieldRef<"Ignore", 'String'>
+    readonly timestamp: FieldRef<"Ignore", 'DateTime'>
+    readonly duration: FieldRef<"Ignore", 'Int'>
+    readonly gameId: FieldRef<"Ignore", 'String'>
+    readonly ignoredAgentId: FieldRef<"Ignore", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Ignore findUnique
+   */
+  export type IgnoreFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * Filter, which Ignore to fetch.
+     */
+    where: IgnoreWhereUniqueInput
+  }
+
+  /**
+   * Ignore findUniqueOrThrow
+   */
+  export type IgnoreFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * Filter, which Ignore to fetch.
+     */
+    where: IgnoreWhereUniqueInput
+  }
+
+  /**
+   * Ignore findFirst
+   */
+  export type IgnoreFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * Filter, which Ignore to fetch.
+     */
+    where?: IgnoreWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Ignores to fetch.
+     */
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Ignores.
+     */
+    cursor?: IgnoreWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Ignores from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Ignores.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Ignores.
+     */
+    distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
+   * Ignore findFirstOrThrow
+   */
+  export type IgnoreFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * Filter, which Ignore to fetch.
+     */
+    where?: IgnoreWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Ignores to fetch.
+     */
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Ignores.
+     */
+    cursor?: IgnoreWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Ignores from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Ignores.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Ignores.
+     */
+    distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
+   * Ignore findMany
+   */
+  export type IgnoreFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * Filter, which Ignores to fetch.
+     */
+    where?: IgnoreWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Ignores to fetch.
+     */
+    orderBy?: IgnoreOrderByWithRelationInput | IgnoreOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Ignores.
+     */
+    cursor?: IgnoreWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Ignores from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Ignores.
+     */
+    skip?: number
+    distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
+   * Ignore create
+   */
+  export type IgnoreCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Ignore.
+     */
+    data: XOR<IgnoreCreateInput, IgnoreUncheckedCreateInput>
+  }
+
+  /**
+   * Ignore createMany
+   */
+  export type IgnoreCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Ignores.
+     */
+    data: IgnoreCreateManyInput | IgnoreCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Ignore createManyAndReturn
+   */
+  export type IgnoreCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * The data used to create many Ignores.
+     */
+    data: IgnoreCreateManyInput | IgnoreCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Ignore update
+   */
+  export type IgnoreUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Ignore.
+     */
+    data: XOR<IgnoreUpdateInput, IgnoreUncheckedUpdateInput>
+    /**
+     * Choose, which Ignore to update.
+     */
+    where: IgnoreWhereUniqueInput
+  }
+
+  /**
+   * Ignore updateMany
+   */
+  export type IgnoreUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Ignores.
+     */
+    data: XOR<IgnoreUpdateManyMutationInput, IgnoreUncheckedUpdateManyInput>
+    /**
+     * Filter which Ignores to update
+     */
+    where?: IgnoreWhereInput
+  }
+
+  /**
+   * Ignore updateManyAndReturn
+   */
+  export type IgnoreUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * The data used to update Ignores.
+     */
+    data: XOR<IgnoreUpdateManyMutationInput, IgnoreUncheckedUpdateManyInput>
+    /**
+     * Filter which Ignores to update
+     */
+    where?: IgnoreWhereInput
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Ignore upsert
+   */
+  export type IgnoreUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Ignore to update in case it exists.
+     */
+    where: IgnoreWhereUniqueInput
+    /**
+     * In case the Ignore found by the `where` argument doesn't exist, create a new Ignore with this data.
+     */
+    create: XOR<IgnoreCreateInput, IgnoreUncheckedCreateInput>
+    /**
+     * In case the Ignore was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<IgnoreUpdateInput, IgnoreUncheckedUpdateInput>
+  }
+
+  /**
+   * Ignore delete
+   */
+  export type IgnoreDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
+    /**
+     * Filter which Ignore to delete.
+     */
+    where: IgnoreWhereUniqueInput
+  }
+
+  /**
+   * Ignore deleteMany
+   */
+  export type IgnoreDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Ignores to delete
+     */
+    where?: IgnoreWhereInput
+  }
+
+  /**
+   * Ignore without action
+   */
+  export type IgnoreDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ignore
+     */
+    select?: IgnoreSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ignore
+     */
+    omit?: IgnoreOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: IgnoreInclude<ExtArgs> | null
   }
 
 
@@ -13615,6 +14926,18 @@ export namespace Prisma {
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
 
 
+  export const IgnoreScalarFieldEnum: {
+    id: 'id',
+    agentId: 'agentId',
+    timestamp: 'timestamp',
+    duration: 'duration',
+    gameId: 'gameId',
+    ignoredAgentId: 'ignoredAgentId'
+  };
+
+  export type IgnoreScalarFieldEnum = (typeof IgnoreScalarFieldEnum)[keyof typeof IgnoreScalarFieldEnum]
+
+
   export const MapTileScalarFieldEnum: {
     id: 'id',
     x: 'x',
@@ -13943,6 +15266,7 @@ export namespace Prisma {
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
     coolDown?: CoolDownListRelationFilter
+    Ignore?: IgnoreListRelationFilter
   }
 
   export type GameOrderByWithRelationInput = {
@@ -13962,6 +15286,7 @@ export namespace Prisma {
     alliances?: AllianceOrderByRelationAggregateInput
     battles?: BattleOrderByRelationAggregateInput
     coolDown?: CoolDownOrderByRelationAggregateInput
+    Ignore?: IgnoreOrderByRelationAggregateInput
   }
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
@@ -13984,6 +15309,7 @@ export namespace Prisma {
     alliances?: AllianceListRelationFilter
     battles?: BattleListRelationFilter
     coolDown?: CoolDownListRelationFilter
+    Ignore?: IgnoreListRelationFilter
   }, "id" | "onchainId">
 
   export type GameOrderByWithAggregationInput = {
@@ -14136,6 +15462,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
     mapTile?: XOR<MapTileScalarRelationFilter, MapTileWhereInput>
+    ignoredBy?: IgnoreListRelationFilter
+    ignoring?: IgnoreListRelationFilter
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -14160,6 +15488,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceOrderByRelationAggregateInput
     profile?: AgentProfileOrderByWithRelationInput
     mapTile?: MapTileOrderByWithRelationInput
+    ignoredBy?: IgnoreOrderByRelationAggregateInput
+    ignoring?: IgnoreOrderByRelationAggregateInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -14188,6 +15518,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceListRelationFilter
     profile?: XOR<AgentProfileScalarRelationFilter, AgentProfileWhereInput>
     mapTile?: XOR<MapTileScalarRelationFilter, MapTileWhereInput>
+    ignoredBy?: IgnoreListRelationFilter
+    ignoring?: IgnoreListRelationFilter
   }, "id" | "mapTileId" | "onchainId_gameId">
 
   export type AgentOrderByWithAggregationInput = {
@@ -14220,6 +15552,75 @@ export namespace Prisma {
     profileId?: StringWithAggregatesFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
     mapTileId?: StringWithAggregatesFilter<"Agent"> | string
+  }
+
+  export type IgnoreWhereInput = {
+    AND?: IgnoreWhereInput | IgnoreWhereInput[]
+    OR?: IgnoreWhereInput[]
+    NOT?: IgnoreWhereInput | IgnoreWhereInput[]
+    id?: StringFilter<"Ignore"> | string
+    agentId?: StringFilter<"Ignore"> | string
+    timestamp?: DateTimeFilter<"Ignore"> | Date | string
+    duration?: IntFilter<"Ignore"> | number
+    gameId?: StringFilter<"Ignore"> | string
+    ignoredAgentId?: StringFilter<"Ignore"> | string
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    game?: XOR<GameScalarRelationFilter, GameWhereInput>
+    ignoredAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }
+
+  export type IgnoreOrderByWithRelationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    timestamp?: SortOrder
+    duration?: SortOrder
+    gameId?: SortOrder
+    ignoredAgentId?: SortOrder
+    agent?: AgentOrderByWithRelationInput
+    game?: GameOrderByWithRelationInput
+    ignoredAgent?: AgentOrderByWithRelationInput
+  }
+
+  export type IgnoreWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    agentId_ignoredAgentId?: IgnoreAgentIdIgnoredAgentIdCompoundUniqueInput
+    AND?: IgnoreWhereInput | IgnoreWhereInput[]
+    OR?: IgnoreWhereInput[]
+    NOT?: IgnoreWhereInput | IgnoreWhereInput[]
+    agentId?: StringFilter<"Ignore"> | string
+    timestamp?: DateTimeFilter<"Ignore"> | Date | string
+    duration?: IntFilter<"Ignore"> | number
+    gameId?: StringFilter<"Ignore"> | string
+    ignoredAgentId?: StringFilter<"Ignore"> | string
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    game?: XOR<GameScalarRelationFilter, GameWhereInput>
+    ignoredAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }, "id" | "agentId_ignoredAgentId">
+
+  export type IgnoreOrderByWithAggregationInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    timestamp?: SortOrder
+    duration?: SortOrder
+    gameId?: SortOrder
+    ignoredAgentId?: SortOrder
+    _count?: IgnoreCountOrderByAggregateInput
+    _avg?: IgnoreAvgOrderByAggregateInput
+    _max?: IgnoreMaxOrderByAggregateInput
+    _min?: IgnoreMinOrderByAggregateInput
+    _sum?: IgnoreSumOrderByAggregateInput
+  }
+
+  export type IgnoreScalarWhereWithAggregatesInput = {
+    AND?: IgnoreScalarWhereWithAggregatesInput | IgnoreScalarWhereWithAggregatesInput[]
+    OR?: IgnoreScalarWhereWithAggregatesInput[]
+    NOT?: IgnoreScalarWhereWithAggregatesInput | IgnoreScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Ignore"> | string
+    agentId?: StringWithAggregatesFilter<"Ignore"> | string
+    timestamp?: DateTimeWithAggregatesFilter<"Ignore"> | Date | string
+    duration?: IntWithAggregatesFilter<"Ignore"> | number
+    gameId?: StringWithAggregatesFilter<"Ignore"> | string
+    ignoredAgentId?: StringWithAggregatesFilter<"Ignore"> | string
   }
 
   export type MapTileWhereInput = {
@@ -14731,6 +16132,7 @@ export namespace Prisma {
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateInput = {
@@ -14750,6 +16152,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameUpdateInput = {
@@ -14769,6 +16172,7 @@ export namespace Prisma {
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateInput = {
@@ -14788,6 +16192,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type GameCreateManyInput = {
@@ -14956,6 +16361,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -14977,6 +16384,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUpdateInput = {
@@ -14998,6 +16407,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -15019,6 +16430,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
@@ -15052,6 +16465,66 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type IgnoreCreateInput = {
+    id?: string
+    timestamp?: Date | string
+    duration?: number
+    agent: AgentCreateNestedOneWithoutIgnoredByInput
+    game: GameCreateNestedOneWithoutIgnoreInput
+    ignoredAgent: AgentCreateNestedOneWithoutIgnoringInput
+  }
+
+  export type IgnoreUncheckedCreateInput = {
+    id?: string
+    agentId: string
+    timestamp?: Date | string
+    duration?: number
+    gameId: string
+    ignoredAgentId: string
+  }
+
+  export type IgnoreUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    agent?: AgentUpdateOneRequiredWithoutIgnoredByNestedInput
+    game?: GameUpdateOneRequiredWithoutIgnoreNestedInput
+    ignoredAgent?: AgentUpdateOneRequiredWithoutIgnoringNestedInput
+  }
+
+  export type IgnoreUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    ignoredAgentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type IgnoreCreateManyInput = {
+    id?: string
+    agentId: string
+    timestamp?: Date | string
+    duration?: number
+    gameId: string
+    ignoredAgentId: string
+  }
+
+  export type IgnoreUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type IgnoreUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    ignoredAgentId?: StringFieldUpdateOperationsInput | string
   }
 
   export type MapTileCreateInput = {
@@ -15623,6 +17096,12 @@ export namespace Prisma {
     none?: CoolDownWhereInput
   }
 
+  export type IgnoreListRelationFilter = {
+    every?: IgnoreWhereInput
+    some?: IgnoreWhereInput
+    none?: IgnoreWhereInput
+  }
+
   export type AgentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -15636,6 +17115,10 @@ export namespace Prisma {
   }
 
   export type CoolDownOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type IgnoreOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15971,6 +17454,51 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type AgentScalarRelationFilter = {
+    is?: AgentWhereInput
+    isNot?: AgentWhereInput
+  }
+
+  export type IgnoreAgentIdIgnoredAgentIdCompoundUniqueInput = {
+    agentId: string
+    ignoredAgentId: string
+  }
+
+  export type IgnoreCountOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    timestamp?: SortOrder
+    duration?: SortOrder
+    gameId?: SortOrder
+    ignoredAgentId?: SortOrder
+  }
+
+  export type IgnoreAvgOrderByAggregateInput = {
+    duration?: SortOrder
+  }
+
+  export type IgnoreMaxOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    timestamp?: SortOrder
+    duration?: SortOrder
+    gameId?: SortOrder
+    ignoredAgentId?: SortOrder
+  }
+
+  export type IgnoreMinOrderByAggregateInput = {
+    id?: SortOrder
+    agentId?: SortOrder
+    timestamp?: SortOrder
+    duration?: SortOrder
+    gameId?: SortOrder
+    ignoredAgentId?: SortOrder
+  }
+
+  export type IgnoreSumOrderByAggregateInput = {
+    duration?: SortOrder
+  }
+
   export type EnumTerrainTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.TerrainType | EnumTerrainTypeFieldRefInput<$PrismaModel>
     in?: $Enums.TerrainType[] | ListEnumTerrainTypeFieldRefInput<$PrismaModel>
@@ -16063,11 +17591,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type AgentScalarRelationFilter = {
-    is?: AgentWhereInput
-    isNot?: AgentWhereInput
   }
 
   export type InteractionListRelationFilter = {
@@ -16450,6 +17973,13 @@ export namespace Prisma {
     connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
   }
 
+  export type IgnoreCreateNestedManyWithoutGameInput = {
+    create?: XOR<IgnoreCreateWithoutGameInput, IgnoreUncheckedCreateWithoutGameInput> | IgnoreCreateWithoutGameInput[] | IgnoreUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutGameInput | IgnoreCreateOrConnectWithoutGameInput[]
+    createMany?: IgnoreCreateManyGameInputEnvelope
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+  }
+
   export type AgentUncheckedCreateNestedManyWithoutGameInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -16476,6 +18006,13 @@ export namespace Prisma {
     connectOrCreate?: CoolDownCreateOrConnectWithoutGameInput | CoolDownCreateOrConnectWithoutGameInput[]
     createMany?: CoolDownCreateManyGameInputEnvelope
     connect?: CoolDownWhereUniqueInput | CoolDownWhereUniqueInput[]
+  }
+
+  export type IgnoreUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<IgnoreCreateWithoutGameInput, IgnoreUncheckedCreateWithoutGameInput> | IgnoreCreateWithoutGameInput[] | IgnoreUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutGameInput | IgnoreCreateOrConnectWithoutGameInput[]
+    createMany?: IgnoreCreateManyGameInputEnvelope
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -16562,6 +18099,20 @@ export namespace Prisma {
     deleteMany?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
   }
 
+  export type IgnoreUpdateManyWithoutGameNestedInput = {
+    create?: XOR<IgnoreCreateWithoutGameInput, IgnoreUncheckedCreateWithoutGameInput> | IgnoreCreateWithoutGameInput[] | IgnoreUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutGameInput | IgnoreCreateOrConnectWithoutGameInput[]
+    upsert?: IgnoreUpsertWithWhereUniqueWithoutGameInput | IgnoreUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: IgnoreCreateManyGameInputEnvelope
+    set?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    disconnect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    delete?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    update?: IgnoreUpdateWithWhereUniqueWithoutGameInput | IgnoreUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: IgnoreUpdateManyWithWhereWithoutGameInput | IgnoreUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
   export type AgentUncheckedUpdateManyWithoutGameNestedInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -16616,6 +18167,20 @@ export namespace Prisma {
     update?: CoolDownUpdateWithWhereUniqueWithoutGameInput | CoolDownUpdateWithWhereUniqueWithoutGameInput[]
     updateMany?: CoolDownUpdateManyWithWhereWithoutGameInput | CoolDownUpdateManyWithWhereWithoutGameInput[]
     deleteMany?: CoolDownScalarWhereInput | CoolDownScalarWhereInput[]
+  }
+
+  export type IgnoreUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<IgnoreCreateWithoutGameInput, IgnoreUncheckedCreateWithoutGameInput> | IgnoreCreateWithoutGameInput[] | IgnoreUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutGameInput | IgnoreCreateOrConnectWithoutGameInput[]
+    upsert?: IgnoreUpsertWithWhereUniqueWithoutGameInput | IgnoreUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: IgnoreCreateManyGameInputEnvelope
+    set?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    disconnect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    delete?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    update?: IgnoreUpdateWithWhereUniqueWithoutGameInput | IgnoreUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: IgnoreUpdateManyWithWhereWithoutGameInput | IgnoreUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
   }
 
   export type AgentProfileCreatebioInput = {
@@ -16786,6 +18351,20 @@ export namespace Prisma {
     connect?: MapTileWhereUniqueInput
   }
 
+  export type IgnoreCreateNestedManyWithoutAgentInput = {
+    create?: XOR<IgnoreCreateWithoutAgentInput, IgnoreUncheckedCreateWithoutAgentInput> | IgnoreCreateWithoutAgentInput[] | IgnoreUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutAgentInput | IgnoreCreateOrConnectWithoutAgentInput[]
+    createMany?: IgnoreCreateManyAgentInputEnvelope
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+  }
+
+  export type IgnoreCreateNestedManyWithoutIgnoredAgentInput = {
+    create?: XOR<IgnoreCreateWithoutIgnoredAgentInput, IgnoreUncheckedCreateWithoutIgnoredAgentInput> | IgnoreCreateWithoutIgnoredAgentInput[] | IgnoreUncheckedCreateWithoutIgnoredAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutIgnoredAgentInput | IgnoreCreateOrConnectWithoutIgnoredAgentInput[]
+    createMany?: IgnoreCreateManyIgnoredAgentInputEnvelope
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+  }
+
   export type TweetUncheckedCreateNestedManyWithoutAgentInput = {
     create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
@@ -16847,6 +18426,20 @@ export namespace Prisma {
     connectOrCreate?: AllianceCreateOrConnectWithoutJoinerInput | AllianceCreateOrConnectWithoutJoinerInput[]
     createMany?: AllianceCreateManyJoinerInputEnvelope
     connect?: AllianceWhereUniqueInput | AllianceWhereUniqueInput[]
+  }
+
+  export type IgnoreUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<IgnoreCreateWithoutAgentInput, IgnoreUncheckedCreateWithoutAgentInput> | IgnoreCreateWithoutAgentInput[] | IgnoreUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutAgentInput | IgnoreCreateOrConnectWithoutAgentInput[]
+    createMany?: IgnoreCreateManyAgentInputEnvelope
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+  }
+
+  export type IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput = {
+    create?: XOR<IgnoreCreateWithoutIgnoredAgentInput, IgnoreUncheckedCreateWithoutIgnoredAgentInput> | IgnoreCreateWithoutIgnoredAgentInput[] | IgnoreUncheckedCreateWithoutIgnoredAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutIgnoredAgentInput | IgnoreCreateOrConnectWithoutIgnoredAgentInput[]
+    createMany?: IgnoreCreateManyIgnoredAgentInputEnvelope
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -17003,6 +18596,34 @@ export namespace Prisma {
     update?: XOR<XOR<MapTileUpdateToOneWithWhereWithoutAgentInput, MapTileUpdateWithoutAgentInput>, MapTileUncheckedUpdateWithoutAgentInput>
   }
 
+  export type IgnoreUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<IgnoreCreateWithoutAgentInput, IgnoreUncheckedCreateWithoutAgentInput> | IgnoreCreateWithoutAgentInput[] | IgnoreUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutAgentInput | IgnoreCreateOrConnectWithoutAgentInput[]
+    upsert?: IgnoreUpsertWithWhereUniqueWithoutAgentInput | IgnoreUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: IgnoreCreateManyAgentInputEnvelope
+    set?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    disconnect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    delete?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    update?: IgnoreUpdateWithWhereUniqueWithoutAgentInput | IgnoreUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: IgnoreUpdateManyWithWhereWithoutAgentInput | IgnoreUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
+  export type IgnoreUpdateManyWithoutIgnoredAgentNestedInput = {
+    create?: XOR<IgnoreCreateWithoutIgnoredAgentInput, IgnoreUncheckedCreateWithoutIgnoredAgentInput> | IgnoreCreateWithoutIgnoredAgentInput[] | IgnoreUncheckedCreateWithoutIgnoredAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutIgnoredAgentInput | IgnoreCreateOrConnectWithoutIgnoredAgentInput[]
+    upsert?: IgnoreUpsertWithWhereUniqueWithoutIgnoredAgentInput | IgnoreUpsertWithWhereUniqueWithoutIgnoredAgentInput[]
+    createMany?: IgnoreCreateManyIgnoredAgentInputEnvelope
+    set?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    disconnect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    delete?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    update?: IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput | IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput[]
+    updateMany?: IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput | IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput[]
+    deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
   export type TweetUncheckedUpdateManyWithoutAgentNestedInput = {
     create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
@@ -17127,6 +18748,76 @@ export namespace Prisma {
     update?: AllianceUpdateWithWhereUniqueWithoutJoinerInput | AllianceUpdateWithWhereUniqueWithoutJoinerInput[]
     updateMany?: AllianceUpdateManyWithWhereWithoutJoinerInput | AllianceUpdateManyWithWhereWithoutJoinerInput[]
     deleteMany?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
+  }
+
+  export type IgnoreUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<IgnoreCreateWithoutAgentInput, IgnoreUncheckedCreateWithoutAgentInput> | IgnoreCreateWithoutAgentInput[] | IgnoreUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutAgentInput | IgnoreCreateOrConnectWithoutAgentInput[]
+    upsert?: IgnoreUpsertWithWhereUniqueWithoutAgentInput | IgnoreUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: IgnoreCreateManyAgentInputEnvelope
+    set?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    disconnect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    delete?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    update?: IgnoreUpdateWithWhereUniqueWithoutAgentInput | IgnoreUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: IgnoreUpdateManyWithWhereWithoutAgentInput | IgnoreUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
+  export type IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput = {
+    create?: XOR<IgnoreCreateWithoutIgnoredAgentInput, IgnoreUncheckedCreateWithoutIgnoredAgentInput> | IgnoreCreateWithoutIgnoredAgentInput[] | IgnoreUncheckedCreateWithoutIgnoredAgentInput[]
+    connectOrCreate?: IgnoreCreateOrConnectWithoutIgnoredAgentInput | IgnoreCreateOrConnectWithoutIgnoredAgentInput[]
+    upsert?: IgnoreUpsertWithWhereUniqueWithoutIgnoredAgentInput | IgnoreUpsertWithWhereUniqueWithoutIgnoredAgentInput[]
+    createMany?: IgnoreCreateManyIgnoredAgentInputEnvelope
+    set?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    disconnect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    delete?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+    update?: IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput | IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput[]
+    updateMany?: IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput | IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput[]
+    deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
+  export type AgentCreateNestedOneWithoutIgnoredByInput = {
+    create?: XOR<AgentCreateWithoutIgnoredByInput, AgentUncheckedCreateWithoutIgnoredByInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutIgnoredByInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type GameCreateNestedOneWithoutIgnoreInput = {
+    create?: XOR<GameCreateWithoutIgnoreInput, GameUncheckedCreateWithoutIgnoreInput>
+    connectOrCreate?: GameCreateOrConnectWithoutIgnoreInput
+    connect?: GameWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutIgnoringInput = {
+    create?: XOR<AgentCreateWithoutIgnoringInput, AgentUncheckedCreateWithoutIgnoringInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutIgnoringInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type AgentUpdateOneRequiredWithoutIgnoredByNestedInput = {
+    create?: XOR<AgentCreateWithoutIgnoredByInput, AgentUncheckedCreateWithoutIgnoredByInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutIgnoredByInput
+    upsert?: AgentUpsertWithoutIgnoredByInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutIgnoredByInput, AgentUpdateWithoutIgnoredByInput>, AgentUncheckedUpdateWithoutIgnoredByInput>
+  }
+
+  export type GameUpdateOneRequiredWithoutIgnoreNestedInput = {
+    create?: XOR<GameCreateWithoutIgnoreInput, GameUncheckedCreateWithoutIgnoreInput>
+    connectOrCreate?: GameCreateOrConnectWithoutIgnoreInput
+    upsert?: GameUpsertWithoutIgnoreInput
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutIgnoreInput, GameUpdateWithoutIgnoreInput>, GameUncheckedUpdateWithoutIgnoreInput>
+  }
+
+  export type AgentUpdateOneRequiredWithoutIgnoringNestedInput = {
+    create?: XOR<AgentCreateWithoutIgnoringInput, AgentUncheckedCreateWithoutIgnoringInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutIgnoringInput
+    upsert?: AgentUpsertWithoutIgnoringInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutIgnoringInput, AgentUpdateWithoutIgnoringInput>, AgentUncheckedUpdateWithoutIgnoringInput>
   }
 
   export type AgentCreateNestedOneWithoutMapTileInput = {
@@ -17807,6 +19498,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
@@ -17827,6 +19520,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutGameInput = {
@@ -17928,6 +19623,32 @@ export namespace Prisma {
 
   export type CoolDownCreateManyGameInputEnvelope = {
     data: CoolDownCreateManyGameInput | CoolDownCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type IgnoreCreateWithoutGameInput = {
+    id?: string
+    timestamp?: Date | string
+    duration?: number
+    agent: AgentCreateNestedOneWithoutIgnoredByInput
+    ignoredAgent: AgentCreateNestedOneWithoutIgnoringInput
+  }
+
+  export type IgnoreUncheckedCreateWithoutGameInput = {
+    id?: string
+    agentId: string
+    timestamp?: Date | string
+    duration?: number
+    ignoredAgentId: string
+  }
+
+  export type IgnoreCreateOrConnectWithoutGameInput = {
+    where: IgnoreWhereUniqueInput
+    create: XOR<IgnoreCreateWithoutGameInput, IgnoreUncheckedCreateWithoutGameInput>
+  }
+
+  export type IgnoreCreateManyGameInputEnvelope = {
+    data: IgnoreCreateManyGameInput | IgnoreCreateManyGameInput[]
     skipDuplicates?: boolean
   }
 
@@ -18053,6 +19774,34 @@ export namespace Prisma {
     gameId?: StringFilter<"CoolDown"> | string
   }
 
+  export type IgnoreUpsertWithWhereUniqueWithoutGameInput = {
+    where: IgnoreWhereUniqueInput
+    update: XOR<IgnoreUpdateWithoutGameInput, IgnoreUncheckedUpdateWithoutGameInput>
+    create: XOR<IgnoreCreateWithoutGameInput, IgnoreUncheckedCreateWithoutGameInput>
+  }
+
+  export type IgnoreUpdateWithWhereUniqueWithoutGameInput = {
+    where: IgnoreWhereUniqueInput
+    data: XOR<IgnoreUpdateWithoutGameInput, IgnoreUncheckedUpdateWithoutGameInput>
+  }
+
+  export type IgnoreUpdateManyWithWhereWithoutGameInput = {
+    where: IgnoreScalarWhereInput
+    data: XOR<IgnoreUpdateManyMutationInput, IgnoreUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type IgnoreScalarWhereInput = {
+    AND?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+    OR?: IgnoreScalarWhereInput[]
+    NOT?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+    id?: StringFilter<"Ignore"> | string
+    agentId?: StringFilter<"Ignore"> | string
+    timestamp?: DateTimeFilter<"Ignore"> | Date | string
+    duration?: IntFilter<"Ignore"> | number
+    gameId?: StringFilter<"Ignore"> | string
+    ignoredAgentId?: StringFilter<"Ignore"> | string
+  }
+
   export type AgentCreateWithoutProfileInput = {
     id?: string
     onchainId: number
@@ -18071,6 +19820,8 @@ export namespace Prisma {
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutProfileInput = {
@@ -18091,6 +19842,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutProfileInput = {
@@ -18163,6 +19916,7 @@ export namespace Prisma {
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAgentsInput = {
@@ -18181,6 +19935,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAgentsInput = {
@@ -18516,6 +20271,58 @@ export namespace Prisma {
     create: XOR<MapTileCreateWithoutAgentInput, MapTileUncheckedCreateWithoutAgentInput>
   }
 
+  export type IgnoreCreateWithoutAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    duration?: number
+    game: GameCreateNestedOneWithoutIgnoreInput
+    ignoredAgent: AgentCreateNestedOneWithoutIgnoringInput
+  }
+
+  export type IgnoreUncheckedCreateWithoutAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    duration?: number
+    gameId: string
+    ignoredAgentId: string
+  }
+
+  export type IgnoreCreateOrConnectWithoutAgentInput = {
+    where: IgnoreWhereUniqueInput
+    create: XOR<IgnoreCreateWithoutAgentInput, IgnoreUncheckedCreateWithoutAgentInput>
+  }
+
+  export type IgnoreCreateManyAgentInputEnvelope = {
+    data: IgnoreCreateManyAgentInput | IgnoreCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type IgnoreCreateWithoutIgnoredAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    duration?: number
+    agent: AgentCreateNestedOneWithoutIgnoredByInput
+    game: GameCreateNestedOneWithoutIgnoreInput
+  }
+
+  export type IgnoreUncheckedCreateWithoutIgnoredAgentInput = {
+    id?: string
+    agentId: string
+    timestamp?: Date | string
+    duration?: number
+    gameId: string
+  }
+
+  export type IgnoreCreateOrConnectWithoutIgnoredAgentInput = {
+    where: IgnoreWhereUniqueInput
+    create: XOR<IgnoreCreateWithoutIgnoredAgentInput, IgnoreUncheckedCreateWithoutIgnoredAgentInput>
+  }
+
+  export type IgnoreCreateManyIgnoredAgentInputEnvelope = {
+    data: IgnoreCreateManyIgnoredAgentInput | IgnoreCreateManyIgnoredAgentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type TweetUpsertWithWhereUniqueWithoutAgentInput = {
     where: TweetWhereUniqueInput
     update: XOR<TweetUpdateWithoutAgentInput, TweetUncheckedUpdateWithoutAgentInput>
@@ -18571,6 +20378,7 @@ export namespace Prisma {
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAgentsInput = {
@@ -18589,6 +20397,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type BattleUpsertWithWhereUniqueWithoutAttackerInput = {
@@ -18785,6 +20594,338 @@ export namespace Prisma {
     agentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type IgnoreUpsertWithWhereUniqueWithoutAgentInput = {
+    where: IgnoreWhereUniqueInput
+    update: XOR<IgnoreUpdateWithoutAgentInput, IgnoreUncheckedUpdateWithoutAgentInput>
+    create: XOR<IgnoreCreateWithoutAgentInput, IgnoreUncheckedCreateWithoutAgentInput>
+  }
+
+  export type IgnoreUpdateWithWhereUniqueWithoutAgentInput = {
+    where: IgnoreWhereUniqueInput
+    data: XOR<IgnoreUpdateWithoutAgentInput, IgnoreUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type IgnoreUpdateManyWithWhereWithoutAgentInput = {
+    where: IgnoreScalarWhereInput
+    data: XOR<IgnoreUpdateManyMutationInput, IgnoreUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type IgnoreUpsertWithWhereUniqueWithoutIgnoredAgentInput = {
+    where: IgnoreWhereUniqueInput
+    update: XOR<IgnoreUpdateWithoutIgnoredAgentInput, IgnoreUncheckedUpdateWithoutIgnoredAgentInput>
+    create: XOR<IgnoreCreateWithoutIgnoredAgentInput, IgnoreUncheckedCreateWithoutIgnoredAgentInput>
+  }
+
+  export type IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput = {
+    where: IgnoreWhereUniqueInput
+    data: XOR<IgnoreUpdateWithoutIgnoredAgentInput, IgnoreUncheckedUpdateWithoutIgnoredAgentInput>
+  }
+
+  export type IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput = {
+    where: IgnoreScalarWhereInput
+    data: XOR<IgnoreUpdateManyMutationInput, IgnoreUncheckedUpdateManyWithoutIgnoredAgentInput>
+  }
+
+  export type AgentCreateWithoutIgnoredByInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutIgnoredByInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    mapTileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutIgnoredByInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutIgnoredByInput, AgentUncheckedCreateWithoutIgnoredByInput>
+  }
+
+  export type GameCreateWithoutIgnoreInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agents?: AgentCreateNestedManyWithoutGameInput
+    alliances?: AllianceCreateNestedManyWithoutGameInput
+    battles?: BattleCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownCreateNestedManyWithoutGameInput
+  }
+
+  export type GameUncheckedCreateWithoutIgnoreInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agents?: AgentUncheckedCreateNestedManyWithoutGameInput
+    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
+    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type GameCreateOrConnectWithoutIgnoreInput = {
+    where: GameWhereUniqueInput
+    create: XOR<GameCreateWithoutIgnoreInput, GameUncheckedCreateWithoutIgnoreInput>
+  }
+
+  export type AgentCreateWithoutIgnoringInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutIgnoringInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    health?: number
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    mapTileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutIgnoringInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutIgnoringInput, AgentUncheckedCreateWithoutIgnoringInput>
+  }
+
+  export type AgentUpsertWithoutIgnoredByInput = {
+    update: XOR<AgentUpdateWithoutIgnoredByInput, AgentUncheckedUpdateWithoutIgnoredByInput>
+    create: XOR<AgentCreateWithoutIgnoredByInput, AgentUncheckedCreateWithoutIgnoredByInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutIgnoredByInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutIgnoredByInput, AgentUncheckedUpdateWithoutIgnoredByInput>
+  }
+
+  export type AgentUpdateWithoutIgnoredByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutIgnoredByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+  }
+
+  export type GameUpsertWithoutIgnoreInput = {
+    update: XOR<GameUpdateWithoutIgnoreInput, GameUncheckedUpdateWithoutIgnoreInput>
+    create: XOR<GameCreateWithoutIgnoreInput, GameUncheckedCreateWithoutIgnoreInput>
+    where?: GameWhereInput
+  }
+
+  export type GameUpdateToOneWithWhereWithoutIgnoreInput = {
+    where?: GameWhereInput
+    data: XOR<GameUpdateWithoutIgnoreInput, GameUncheckedUpdateWithoutIgnoreInput>
+  }
+
+  export type GameUpdateWithoutIgnoreInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agents?: AgentUpdateManyWithoutGameNestedInput
+    alliances?: AllianceUpdateManyWithoutGameNestedInput
+    battles?: BattleUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameUncheckedUpdateWithoutIgnoreInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
+    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
+    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type AgentUpsertWithoutIgnoringInput = {
+    update: XOR<AgentUpdateWithoutIgnoringInput, AgentUncheckedUpdateWithoutIgnoringInput>
+    create: XOR<AgentCreateWithoutIgnoringInput, AgentUncheckedCreateWithoutIgnoringInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutIgnoringInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutIgnoringInput, AgentUncheckedUpdateWithoutIgnoringInput>
+  }
+
+  export type AgentUpdateWithoutIgnoringInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutIgnoringInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    health?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
   export type AgentCreateWithoutMapTileInput = {
     id?: string
     onchainId: number
@@ -18803,6 +20944,8 @@ export namespace Prisma {
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutMapTileInput = {
@@ -18823,6 +20966,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutMapTileInput = {
@@ -18859,6 +21004,8 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutMapTileInput = {
@@ -18879,6 +21026,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentCreateWithoutTweetsInput = {
@@ -18899,6 +21048,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutTweetsInput = {
@@ -18919,6 +21070,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutTweetsInput = {
@@ -18983,6 +21136,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutTweetsInput = {
@@ -19003,6 +21158,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type InteractionUpsertWithWhereUniqueWithoutTweetInput = {
@@ -19050,6 +21207,7 @@ export namespace Prisma {
     agents?: AgentCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAlliancesInput = {
@@ -19068,6 +21226,7 @@ export namespace Prisma {
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAlliancesInput = {
@@ -19093,6 +21252,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutInitiatedAlliancesInput = {
@@ -19113,6 +21274,8 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutInitiatedAlliancesInput = {
@@ -19138,6 +21301,8 @@ export namespace Prisma {
     initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutJoinedAlliancesInput = {
@@ -19158,6 +21323,8 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutJoinedAlliancesInput = {
@@ -19192,6 +21359,7 @@ export namespace Prisma {
     agents?: AgentUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAlliancesInput = {
@@ -19210,6 +21378,7 @@ export namespace Prisma {
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutInitiatedAlliancesInput = {
@@ -19241,6 +21410,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutInitiatedAlliancesInput = {
@@ -19261,6 +21432,8 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUpsertWithoutJoinedAlliancesInput = {
@@ -19292,6 +21465,8 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutJoinedAlliancesInput = {
@@ -19312,6 +21487,8 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type GameCreateWithoutBattlesInput = {
@@ -19330,6 +21507,7 @@ export namespace Prisma {
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutBattlesInput = {
@@ -19348,6 +21526,7 @@ export namespace Prisma {
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutBattlesInput = {
@@ -19373,6 +21552,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsAttackerInput = {
@@ -19393,6 +21574,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsAttackerInput = {
@@ -19418,6 +21601,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsDefenderInput = {
@@ -19438,6 +21623,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsDefenderInput = {
@@ -19463,6 +21650,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput = {
@@ -19483,6 +21672,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput = {
@@ -19508,6 +21699,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput = {
@@ -19528,6 +21721,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput = {
@@ -19553,6 +21748,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutWonBattlesInput = {
@@ -19573,6 +21770,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutWonBattlesInput = {
@@ -19607,6 +21806,7 @@ export namespace Prisma {
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutBattlesInput = {
@@ -19625,6 +21825,7 @@ export namespace Prisma {
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsAttackerInput = {
@@ -19656,6 +21857,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsAttackerInput = {
@@ -19676,6 +21879,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsDefenderInput = {
@@ -19707,6 +21912,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsDefenderInput = {
@@ -19727,6 +21934,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsAttackerAllyInput = {
@@ -19758,6 +21967,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput = {
@@ -19778,6 +21989,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsDefenderAllyInput = {
@@ -19809,6 +22022,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput = {
@@ -19829,6 +22044,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUpsertWithoutWonBattlesInput = {
@@ -19860,6 +22077,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutWonBattlesInput = {
@@ -19880,6 +22099,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type TweetCreateWithoutInteractionsInput = {
@@ -19952,6 +22173,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentUncheckedCreateWithoutCoolDownInput = {
@@ -19972,6 +22195,8 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
   }
 
   export type AgentCreateOrConnectWithoutCoolDownInput = {
@@ -19995,6 +22220,7 @@ export namespace Prisma {
     agents?: AgentCreateNestedManyWithoutGameInput
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutCoolDownInput = {
@@ -20013,6 +22239,7 @@ export namespace Prisma {
     agents?: AgentUncheckedCreateNestedManyWithoutGameInput
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutCoolDownInput = {
@@ -20049,6 +22276,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCoolDownInput = {
@@ -20069,6 +22298,8 @@ export namespace Prisma {
     wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type GameUpsertWithoutCoolDownInput = {
@@ -20098,6 +22329,7 @@ export namespace Prisma {
     agents?: AgentUpdateManyWithoutGameNestedInput
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutCoolDownInput = {
@@ -20116,6 +22348,7 @@ export namespace Prisma {
     agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentCreateManyGameInput = {
@@ -20160,6 +22393,14 @@ export namespace Prisma {
     cooledAgentId: string
   }
 
+  export type IgnoreCreateManyGameInput = {
+    id?: string
+    agentId: string
+    timestamp?: Date | string
+    duration?: number
+    ignoredAgentId: string
+  }
+
   export type AgentUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
@@ -20178,6 +22419,8 @@ export namespace Prisma {
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
@@ -20198,6 +22441,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutGameInput = {
@@ -20304,6 +22549,30 @@ export namespace Prisma {
     cooledAgentId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type IgnoreUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    agent?: AgentUpdateOneRequiredWithoutIgnoredByNestedInput
+    ignoredAgent?: AgentUpdateOneRequiredWithoutIgnoringNestedInput
+  }
+
+  export type IgnoreUncheckedUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    ignoredAgentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type IgnoreUncheckedUpdateManyWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    ignoredAgentId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type AgentCreateManyProfileInput = {
     id?: string
     onchainId: number
@@ -20333,6 +22602,8 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutProfileInput = {
@@ -20353,6 +22624,8 @@ export namespace Prisma {
     coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutProfileInput = {
@@ -20469,6 +22742,22 @@ export namespace Prisma {
     gameId: string
     initiatorId: string
     endedAt?: Date | string | null
+  }
+
+  export type IgnoreCreateManyAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    duration?: number
+    gameId: string
+    ignoredAgentId: string
+  }
+
+  export type IgnoreCreateManyIgnoredAgentInput = {
+    id?: string
+    agentId: string
+    timestamp?: Date | string
+    duration?: number
+    gameId: string
   }
 
   export type TweetUpdateWithoutAgentInput = {
@@ -20786,6 +23075,54 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     initiatorId?: StringFieldUpdateOperationsInput | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type IgnoreUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    game?: GameUpdateOneRequiredWithoutIgnoreNestedInput
+    ignoredAgent?: AgentUpdateOneRequiredWithoutIgnoringNestedInput
+  }
+
+  export type IgnoreUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    ignoredAgentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type IgnoreUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+    ignoredAgentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type IgnoreUpdateWithoutIgnoredAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    agent?: AgentUpdateOneRequiredWithoutIgnoredByNestedInput
+    game?: GameUpdateOneRequiredWithoutIgnoreNestedInput
+  }
+
+  export type IgnoreUncheckedUpdateWithoutIgnoredAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type IgnoreUncheckedUpdateManyWithoutIgnoredAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    agentId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    duration?: IntFieldUpdateOperationsInput | number
+    gameId?: StringFieldUpdateOperationsInput | string
   }
 
   export type InteractionCreateManyTweetInput = {

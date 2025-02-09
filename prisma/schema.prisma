@@ -32,6 +32,7 @@ model Game {
   alliances Alliance[]
   battles   Battle[]
   coolDown  CoolDown[]
+  Ignore    Ignore[]
 }
 
 model AgentProfile {
@@ -80,7 +81,29 @@ model Agent {
   mapTile   MapTile @relation("AgentPosition", fields: [mapTileId], references: [id])
   mapTileId String  @unique
 
+  // Ignore relationships
+  ignoredBy Ignore[] // Agents that are ignoring this agent
+  ignoring  Ignore[] @relation("ignoredAgent") // Agents that this agent is ignoring
+
   @@unique([onchainId, gameId])
+}
+
+model Ignore {
+  id        String   @id @default(uuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id])
+  timestamp DateTime @default(now())
+  duration  Int      @default(14400) // 4 hours in seconds
+
+  // Game relationship
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+
+  // The agent being ignored
+  ignoredAgent   Agent  @relation("ignoredAgent", fields: [ignoredAgentId], references: [id])
+  ignoredAgentId String
+
+  @@unique([agentId, ignoredAgentId])
 }
 
 model MapTile {
