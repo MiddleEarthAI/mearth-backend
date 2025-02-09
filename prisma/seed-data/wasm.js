@@ -287,7 +287,6 @@ exports.CooldownType = exports.$Enums.CooldownType = {
   Alliance: 'Alliance',
   Battle: 'Battle',
   Ignore: 'Ignore',
-  Tweet: 'Tweet',
   Move: 'Move'
 };
 

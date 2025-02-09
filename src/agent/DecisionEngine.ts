@@ -402,7 +402,11 @@ class DecisionEngine {
   Health: ${agent.health}/100
   Recent actions: ${[...recentBattles].join(", ")}
   ${allianceInfo}
-  ${distance <= 1 ? "⚠️ INTERACTION REQUIRED - Battle/Alliance/Ignore!" : ""}`;
+  ${
+    distance <= 1
+      ? "⚠️ INTERACTION REQUIRED - Battle/FormAlliance/BreakAlliance/Ignore!"
+      : ""
+  }`;
     });
 
     const otherAgentsContext = (

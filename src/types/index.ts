@@ -7,7 +7,12 @@ export interface Position {
   y: number;
 }
 
-export type ActionType = "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE";
+export type ActionType =
+  | "MOVE"
+  | "BATTLE"
+  | "FormAlliance"
+  | "BreakAlliance"
+  | "IGNORE";
 
 export type MearthProgram = anchor.Program<MiddleEarthAiProgram>;
 
@@ -49,8 +54,14 @@ export interface BattleAction {
   tweet: string;
 }
 
-export interface AllianceAction {
-  type: "ALLIANCE";
+export interface FormAllianceAction {
+  type: "FormAlliance";
+  targetId: number;
+  tweet: string;
+}
+
+export interface BreakAllianceAction {
+  type: "BreakAlliance";
   targetId: number;
   tweet: string;
 }
@@ -64,7 +75,8 @@ export interface IgnoreAction {
 export type GameAction =
   | MoveAction
   | BattleAction
-  | AllianceAction
+  | FormAllianceAction
+  | BreakAllianceAction
   | IgnoreAction;
 
 export interface ActionContext {

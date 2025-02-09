@@ -214,7 +214,6 @@ enum CooldownType {
   Alliance
   Battle
   Ignore
-  Tweet
   Move
 }
 

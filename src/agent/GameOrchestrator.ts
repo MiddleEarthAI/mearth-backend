@@ -233,19 +233,19 @@ export class GameOrchestrator {
       await this.cache.cacheAction(cacheKey, result);
 
       // if action is successful, post a tweet
-      // if (result.success && result.feedback?.isValid) {
-      await this.twitter.postTweet(
-        data.actionContext.agentOnchainId.toString() as AgentId,
-        `${getTwitterUserNameByAgentId(
-          data.actionContext.agentOnchainId.toString() as AgentId
-        )} => ${data.action.tweet}`
-      );
-      console.info("✅ Action successfully processed", {
-        gameId: this.currentGameOnchainId,
-        agentId: data.actionContext.agentId,
-        actionType: data.action.type,
-      });
-      // }
+      if (result.success) {
+        await this.twitter.postTweet(
+          data.actionContext.agentOnchainId.toString() as AgentId,
+          `${getTwitterUserNameByAgentId(
+            data.actionContext.agentOnchainId.toString() as AgentId
+          )} => ${data.action.tweet}`
+        );
+        console.info("✅ Action successfully processed", {
+          gameId: this.currentGameOnchainId,
+          agentId: data.actionContext.agentId,
+          actionType: data.action.type,
+        });
+      }
 
       // TODO: remove this after testing
       function getTwitterUserNameByAgentId(agentId: AgentId): string {

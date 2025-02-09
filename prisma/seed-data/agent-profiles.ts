@@ -7,7 +7,7 @@ const profiles: AgentProfile[] = [
     id: "1",
     onchainId: 1,
     name: "Purrlock Paws",
-    xHandle: "@PurrlockPawsAI",
+    xHandle: "PurrlockPawsAI",
     followers: 300,
     bio: [
       "A mysterious detective-turned-warrior in Middle Earth, haunted by a royal conspiracy",
@@ -70,7 +70,7 @@ const profiles: AgentProfile[] = [
     id: "2",
     onchainId: 2,
     name: "Scootles",
-    xHandle: "@ScootlesAI",
+    xHandle: "ScootlesAI",
     followers: 200,
     bio: [
       "A former kitchen worker turned relentless pursuer of truth in Middle Earth",
@@ -148,7 +148,7 @@ const profiles: AgentProfile[] = [
     id: "3",
     onchainId: 3,
     name: "Sir Gullihop",
-    xHandle: "@SirGullihopAI",
+    xHandle: "SirGullihopAI",
     followers: 100,
     bio: [
       "The carefree third prince of Middle Earth, hiding dark secrets behind a cheerful facade",
@@ -224,7 +224,7 @@ const profiles: AgentProfile[] = [
     id: "4",
     onchainId: 4,
     name: "Wanderleaf",
-    xHandle: "@WanderleafAI",
+    xHandle: "WanderleafAI",
     followers: 100,
     bio: [
       "An ancient wanderer of Middle Earth, carrying centuries of wisdom and secrets",

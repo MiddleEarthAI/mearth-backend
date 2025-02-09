@@ -1,11 +1,16 @@
 import { PublicKey } from "@solana/web3.js";
-import { IgnoreAction, MearthProgram } from "@/types";
+import { BreakAllianceAction, IgnoreAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { AgentAccount, GameAccount } from "@/types/program";
+import { AgentAccount } from "@/types/program";
 import { PrismaClient } from "@prisma/client";
 import { ActionResult } from "@/types";
 import { ActionContext } from "@/types";
-import { MoveAction, BattleAction, AllianceAction, GameAction } from "@/types";
+import {
+  MoveAction,
+  BattleAction,
+  FormAllianceAction,
+  GameAction,
+} from "@/types";
 import { gameConfig } from "@/config/env";
 
 export class ActionManager {
@@ -58,9 +63,13 @@ export class ActionManager {
           console.log("🦋 Processing battle action");
           result = await this.handleBattle(ctx, action);
           break;
-        case "ALLIANCE":
+        case "FormAlliance":
           console.log("🤝 Processing ally action");
-          result = await this.handleAlliance(ctx, action);
+          result = await this.handleFormAlliance(ctx, action);
+          break;
+        case "BreakAlliance":
+          console.log("🤝 Processing break alliance action");
+          result = await this.handleBreakAlliance(ctx, action);
           break;
         case "IGNORE":
           console.log("🚫 Processing ignore action");
@@ -191,6 +200,18 @@ export class ActionManager {
         agentId: ctx.agentId,
         x: action.position.x,
         y: action.position.y,
+      });
+
+      // create a cool down
+      await this.prisma.coolDown.create({
+        data: {
+          type: "Move",
+          endsAt: new Date(
+            Date.now() + gameConfig.mechanics.cooldowns.movement
+          ),
+          cooledAgentId: ctx.agentId,
+          gameId: ctx.gameOnchainId,
+        },
       });
 
       console.log("✨ Agent movement completed successfully", {
@@ -384,9 +405,9 @@ export class ActionManager {
   /**
    * Handle ally formation with enhanced validation
    */
-  private async handleAlliance(
+  private async handleFormAlliance(
     context: ActionContext,
-    action: AllianceAction
+    action: FormAllianceAction
   ): Promise<ActionResult> {
     const { gameOnchainId, agentId } = context;
     console.log("🤝 Processing ally request", {
@@ -424,8 +445,8 @@ export class ActionManager {
         throw new Error("Joiner already has an ally");
       }
 
-      // Execute onchain ally
-      console.log("🎯 Executing onchain ally formation");
+      // Execute onchain alliance
+      console.log("🎯 Executing onchain alliance formation");
       await this.program.methods
         .formAlliance()
         .accounts({
@@ -471,7 +492,9 @@ export class ActionManager {
 
       await this.prisma.alliance.create({
         data: {
-          // combinedTokens: game,
+          combinedTokens: initiatorAccount.tokenBalance.add(
+            joinerAccount.tokenBalance
+          ),
           gameId: game.id,
           initiatorId: context.agentId,
           joinerId: joiner.id,
@@ -480,28 +503,28 @@ export class ActionManager {
         },
       });
 
-      await Promise.all([
-        this.prisma.coolDown.create({
-          data: {
-            type: "Alliance",
-            endsAt: new Date(
-              Date.now() + gameConfig.mechanics.cooldowns.newAlliance
-            ),
-            cooledAgentId: context.agentId,
-            gameId: game.id,
-          },
-        }),
-        this.prisma.coolDown.create({
-          data: {
-            type: "Alliance",
-            endsAt: new Date(
-              Date.now() + gameConfig.mechanics.cooldowns.newAlliance
-            ),
-            cooledAgentId: joiner.id,
-            gameId: game.id,
-          },
-        }),
-      ]);
+      // await Promise.all([
+      //   this.prisma.coolDown.create({
+      //     data: {
+      //       type: "Alliance",
+      //       endsAt: new Date(
+      //         Date.now() + gameConfig.mechanics.cooldowns.newAlliance
+      //       ),
+      //       cooledAgentId: context.agentId,
+      //       gameId: game.id,
+      //     },
+      //   }),
+      //   this.prisma.coolDown.create({
+      //     data: {
+      //       type: "Alliance",
+      //       endsAt: new Date(
+      //         Date.now() + gameConfig.mechanics.cooldowns.newAlliance
+      //       ),
+      //       cooledAgentId: joiner.id,
+      //       gameId: game.id,
+      //     },
+      //   }),
+      // ]);
 
       console.log("✨ Alliance formed successfully", {
         initiatorId: agentId,
@@ -514,5 +537,133 @@ export class ActionManager {
     } catch (error) {
       throw error;
     }
+  }
+
+  private async handleBreakAlliance(
+    context: ActionContext,
+    action: BreakAllianceAction
+  ): Promise<ActionResult> {
+    const [gamePda] = getGamePDA(this.program.programId, context.gameOnchainId);
+    const [initiatorPda] = getAgentPDA(
+      this.program.programId,
+      gamePda,
+      context.agentOnchainId
+    );
+    const [targetPda] = getAgentPDA(
+      this.program.programId,
+      gamePda,
+      action.targetId
+    );
+
+    const prismaInitiator = await this.prisma.agent.findUnique({
+      where: {
+        onchainId_gameId: {
+          onchainId: action.targetId,
+          gameId: context.gameOnchainId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!prismaInitiator) {
+      throw new Error("Initiator not found in database");
+    }
+
+    // Fetch and verify initial state
+    const initiatorBefore = await this.program.account.agent.fetch(
+      initiatorPda
+    );
+    const targetBefore = await this.program.account.agent.fetch(targetPda);
+
+    if (initiatorBefore.allianceWith === targetPda) {
+      throw new Error("Initiator is already allied with target");
+    }
+    if (targetBefore.allianceWith === initiatorPda) {
+      throw new Error("Target is already allied with initiator");
+    }
+
+    // Execute the breakAlliance instruction
+    const tx = await this.program.methods
+      .breakAlliance()
+      .accounts({
+        initiator: initiatorPda,
+        targetAgent: targetPda,
+      })
+      .rpc();
+
+    console.log("Break alliance tx signature:", tx);
+
+    // Get the alliance record
+    const alliance = await this.prisma.alliance.findFirst({
+      where: {
+        AND: [
+          {
+            OR: [
+              {
+                initiatorId: context.agentId,
+                joinerId: prismaInitiator.id,
+              },
+              {
+                initiatorId: action.targetId.toString(),
+                joinerId: context.agentId,
+              },
+            ],
+          },
+          {
+            status: "Active",
+          },
+        ],
+      },
+    });
+
+    if (!alliance) {
+      throw new Error("Active alliance not found");
+    }
+
+    // Update alliance status in a single transaction
+    await this.prisma.$transaction([
+      // Mark alliance as broken
+      this.prisma.alliance.update({
+        where: { id: alliance.id },
+        data: {
+          status: "Broken",
+          endedAt: new Date(),
+        },
+      }),
+      // Set cooldown for initiator
+      this.prisma.coolDown.create({
+        data: {
+          type: "Alliance",
+          endsAt: new Date(
+            Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
+          ),
+          cooledAgentId: context.agentId,
+          gameId: context.gameId,
+        },
+      }),
+      // Set cooldown for target
+      this.prisma.coolDown.create({
+        data: {
+          type: "Alliance",
+          endsAt: new Date(
+            Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
+          ),
+          cooledAgentId: action.targetId.toString(),
+          gameId: context.gameId,
+        },
+      }),
+    ]);
+
+    console.log("🔨 Alliance broken successfully", {
+      allianceId: alliance.id,
+      initiatorId: context.agentId,
+      targetId: action.targetId,
+    });
+
+    return {
+      success: true,
+    };
   }
 }
