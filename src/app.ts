@@ -100,7 +100,6 @@ export async function startServer() {
   const prisma = new PrismaClient();
   const gameManager = new GameManager(program, prisma);
   const gameInfo = await gameManager.getOrCreateActiveGame();
-
   if (!gameInfo) {
     console.error("No active game found");
     process.exit(1);
