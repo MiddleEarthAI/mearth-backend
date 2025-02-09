@@ -99,7 +99,7 @@ export async function startServer() {
   const program = await getProgramWithWallet();
   const prisma = new PrismaClient();
   const gameManager = new GameManager(program, prisma);
-  const gameInfo = await gameManager.getActiveGame();
+  const gameInfo = await gameManager.getOrCreateActiveGame();
 
   if (!gameInfo) {
     console.error("No active game found");
