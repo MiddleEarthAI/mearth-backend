@@ -201,9 +201,9 @@ class DecisionEngine {
       actionContext.agentOnchainId
     );
     const agentAccount = await this.program.account.agent.fetch(agentPda);
-    console.log("🤖 Agent account", agentAccount);
+    console.log("Agent account", agentAccount);
     if (!agentAccount) {
-      console.log("❌ Agent not found");
+      console.log("Agent not found");
       return { prompt: "", actionContext };
     }
 
@@ -234,15 +234,15 @@ class DecisionEngine {
     });
 
     if (!agent) {
-      console.log("❌ Agent not found");
+      console.log("Agent not found");
       return { prompt: "", actionContext };
     }
 
     // Get current position
     const currentPosition = agent.mapTile;
-    console.info("🔍 Current position", { currentPosition });
+    console.info("Current position", { currentPosition });
     if (!currentPosition) {
-      console.log("❌ Agent position not found");
+      console.log("Agent position not found");
       return { prompt: "", actionContext };
     }
 
@@ -548,12 +548,15 @@ CRITICAL BATTLE MECHANICS:
 - Alliances combine token power but have cooldown restrictions
 - Ignoring has a 4-hour cooldown
 
+IMPORTANT: Write your tweets without using hashtags. Focus on clear, direct communication that reflects your character's personality and goals. When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.
+
 Strategic Tweet Examples (align with your goals and personality):
-- Dominance: "The throne of Middle Earth beckons! @{handle}, bow before my might or face destruction! ⚔️"
-- Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}! 🤝"
-- Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}! 🛡️"
-- Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross! 🎯"
-- Break Alliance: "Your alliance is a weak link. I will break it. @{handle}, prepare to face the consequences! 🤝"
+- Dominance: "The throne of Middle Earth beckons! @{handle}, bow before my might or face destruction!"
+- Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}!"
+- Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}!"
+- Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross!"
+- Break Alliance: "Your alliance is a weak link. I will break it. @{handle}, prepare to face the consequences!"
+
 Based on your goals, traits, and current situation, generate a JSON response with your next strategic action:
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
@@ -562,10 +565,8 @@ Based on your goals, traits, and current situation, generate a JSON response wit
     "x": number, // MapTile x coordinate if moving
     "y": number // MapTile y coordinate if moving
   },
-  "tweet": string // Write an engaging tweet that reflects your goals, personality, and strategic intent
-}
-
-IMPORTANT: Every action must advance your goals while staying true to your character traits. When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.`;
+  "tweet": string // Write an engaging tweet that reflects your current ACTION(S), goals, personality, and strategic intent WITHOUT using hashtags
+}`;
 
     return { prompt: characterPrompt, actionContext };
   }

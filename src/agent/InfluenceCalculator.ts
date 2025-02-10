@@ -1,4 +1,8 @@
-import { ActionSuggestion, InfluenceScore, UserMetrics } from "@/types/twitter";
+import {
+  ActionSuggestion,
+  InfluenceScore,
+  TwitterInteraction,
+} from "@/types/twitter";
 
 /**
  * InfluenceCalculator - Calculates influence scores for user interactions
@@ -18,34 +22,38 @@ class InfluenceCalculator {
 
   constructor(private nlpManager: NLPManager = new NLPManager()) {}
 
-  async calculateScore(interaction: any): Promise<InfluenceScore> {
+  async calculateScore(
+    interaction: TwitterInteraction
+  ): Promise<InfluenceScore> {
     console.info("🎯 Starting influence score calculation", {
-      interactionId: interaction.id,
+      interactionId: interaction.username,
     });
 
-    const baseScore = this.calculateBaseScore(interaction.userMetrics);
+    const baseScore = this.calculateBaseScore(interaction);
     console.info("📊 Calculated base score", { baseScore });
 
     const sentiment = await this.nlpManager.analyzeSentiment(
-      interaction.content
+      interaction.content || ""
     );
     console.info("😊 Analyzed sentiment", { sentiment });
 
-    const suggestion = await this.nlpManager.extractIntent(interaction.content);
+    const suggestion = await this.nlpManager.extractIntent(
+      interaction.content || ""
+    );
     console.info("💡 Extracted action suggestion", { suggestion });
 
     const finalScore =
       baseScore *
       (1 + sentiment) *
-      this.calculateTimeDecay(interaction.timestamp);
+      this.calculateTimeDecay(interaction.timestamp.getTime());
 
     console.info("🏆 Completed influence calculation", {
-      interactionId: interaction.id,
+      interactionId: interaction.username,
       finalScore,
     });
 
     return {
-      interactionId: interaction.id,
+      interactionId: interaction.username,
       score: finalScore,
       suggestion,
     };
@@ -55,19 +63,20 @@ class InfluenceCalculator {
    * Calculates base influence score from user metrics
    * Normalizes and weights different factors
    */
-  private calculateBaseScore(metrics: UserMetrics): number {
-    console.debug("📈 Calculating base score from metrics", { metrics });
+  private calculateBaseScore(interaction: TwitterInteraction): number {
+    console.debug("📈 Calculating base score from metrics", { interaction });
 
-    const normalizedFollowers = Math.log10(metrics.followerCount + 1) / 7;
-    const normalizedEngagement = metrics.averageEngagement / 100;
-    const normalizedAge = Math.min(metrics.accountAge / 365, 1);
+    const normalizedFollowers =
+      Math.log10(interaction.userMetrics.followerCount + 1) / 7;
+    const normalizedEngagement = interaction.userMetrics.likeCount / 100;
+    const normalizedAge = Math.min(interaction.userMetrics.accountAge / 365, 1);
 
     const score =
       normalizedFollowers * this.WEIGHTS.FOLLOWER_COUNT +
       normalizedEngagement * this.WEIGHTS.ENGAGEMENT_RATE +
       normalizedAge * this.WEIGHTS.ACCOUNT_AGE +
-      (metrics.verificationStatus ? 1 : 0) * this.WEIGHTS.VERIFICATION +
-      (metrics.reputationScore || 0.5) * 0.2;
+      (interaction.userMetrics.verified ? 1 : 0) * this.WEIGHTS.VERIFICATION +
+      (interaction.userMetrics.reputationScore || 0.5) * 0.2;
 
     console.debug("✨ Base score calculated", { score });
     return score;

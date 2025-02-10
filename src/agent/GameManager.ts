@@ -1,37 +1,29 @@
 import { generateGameId } from "@/utils";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { BN } from "@coral-xyz/anchor";
-import { profiles } from "../config/game-data";
-import { Game, Agent, PrismaClient } from "@prisma/client";
+import { Game, PrismaClient, Prisma } from "@prisma/client";
 import { Program } from "@coral-xyz/anchor";
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey } from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor";
+const { BN } = anchor;
 
-interface GameInitResult {
+interface GameInfo {
   dbGame: Game;
+  gameAccount: GameAccount;
   agents: Array<{
     account: AgentAccount;
-    agent: Agent;
+    agent: Prisma.AgentGetPayload<{ include: { profile: true } }>;
   }>;
-  gameAccount: GameAccount;
   tx: string;
-}
-interface GameResult {
-  dbGame: Game;
-  gameAccount: GameAccount;
-  agents: Array<{
-    account: AgentAccount;
-    agent: Agent;
-  }>;
 }
 
 interface IGameManager {
-  createNewGame(): Promise<GameInitResult>;
+  createNewGame(): Promise<GameInfo>;
   endGame(gameId: string): Promise<void>;
-  getOrCreateActiveGame(): Promise<GameResult>;
-  getActiveGame(): Promise<GameResult>;
+  getOrCreateActiveGame(): Promise<GameInfo>;
+  getActiveGame(): Promise<GameInfo>;
   resetGameState(gameId: string): Promise<void>;
 }
 
@@ -43,13 +35,17 @@ export class GameManager implements IGameManager {
   /**
    * Gets the currently active game or creates a new one if none exists
    */
-  public async getOrCreateActiveGame(): Promise<GameResult> {
+  public async getOrCreateActiveGame(): Promise<GameInfo> {
     console.info("🔍 Searching for active game...");
     const dbGame = await this.prisma.game.findFirst({
       where: { isActive: true },
       orderBy: { createdAt: "desc" },
       include: {
-        agents: true,
+        agents: {
+          include: {
+            profile: true,
+          },
+        },
       },
     });
 
@@ -57,13 +53,9 @@ export class GameManager implements IGameManager {
     if (!dbGame) {
       console.info("❌ No active game found");
       console.info("🎲 Initiating new game creation process...");
-      const newGame = await this.createNewGame();
+      const newGameInfo = await this.createNewGame();
       console.info("✨ New game successfully created and initialized");
-      return {
-        dbGame: newGame.dbGame,
-        gameAccount: newGame.gameAccount,
-        agents: newGame.agents,
-      };
+      return newGameInfo;
     }
 
     console.info(`✅ Found active game with ID: ${dbGame.onchainId}`);
@@ -95,6 +87,7 @@ export class GameManager implements IGameManager {
       dbGame,
       gameAccount,
       agents,
+      tx: "",
     };
   }
 
@@ -102,13 +95,17 @@ export class GameManager implements IGameManager {
    * Gets the currently active game. Throws error if no active game exists.
    * @throws Error when no active game is found
    */
-  public async getActiveGame(): Promise<GameResult> {
+  public async getActiveGame(): Promise<GameInfo> {
     console.info("🔍 Searching for active game...");
     const dbGame = await this.prisma.game.findFirst({
       where: { isActive: true },
       orderBy: { createdAt: "desc" },
       include: {
-        agents: true,
+        agents: {
+          include: {
+            profile: true,
+          },
+        },
       },
     });
 
@@ -146,13 +143,14 @@ export class GameManager implements IGameManager {
       dbGame,
       gameAccount,
       agents,
+      tx: "",
     };
   }
 
   /**
    * Ends a specific game
    */
-  public async endGame(gameOnchainId: BN): Promise<void> {
+  public async endGame(gameOnchainId: typeof BN): Promise<void> {
     console.info(`🔄 Initiating end game process for game ${gameOnchainId}`);
     const [gamePda] = getGamePDA(this.program.programId, gameOnchainId);
     await this.program.methods
@@ -192,13 +190,13 @@ export class GameManager implements IGameManager {
   /**
    * Creates a new game instance with all required components
    */
-  public async createNewGame(): Promise<GameInitResult> {
+  public async createNewGame(): Promise<GameInfo> {
     console.info(`🎮 Initializing new game world`);
     try {
       return await this.prisma.$transaction(
         async (prisma) => {
           console.info("🔄 Deactivating any existing active games...");
-          await this.prisma.game.updateMany({
+          await prisma.game.updateMany({
             where: { isActive: true },
             data: { isActive: false },
           });
@@ -233,14 +231,17 @@ export class GameManager implements IGameManager {
               isActive: true,
               lastUpdate: new Date(gameAccount.lastUpdate.toNumber() * 1000),
             },
+            include: {
+              agents: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
           });
 
           console.info("👥 Initializing game agents...");
-          const agents = await this.initializeAgents(
-            gamePda,
-            nextGameId,
-            dbGame
-          );
+          const agents = await this.initializeAgents(gamePda, dbGame);
           console.info(`✅ Successfully initialized ${agents.length} agents`);
 
           return {
@@ -262,12 +263,9 @@ export class GameManager implements IGameManager {
     }
   }
 
-  private async initializeAgents(
-    gamePda: PublicKey,
-    nextGameId: number,
-    dbGame: Game
-  ) {
+  private async initializeAgents(gamePda: PublicKey, dbGame: Game) {
     console.info("🎭 Starting agent initialization process...");
+    const profiles = await this.prisma.agentProfile.findMany();
     return Promise.all(
       profiles.map(async (profile) => {
         console.info(`👤 Initializing agent for profile: ${profile.name}`);
@@ -299,9 +297,10 @@ export class GameManager implements IGameManager {
           .then((tiles) => tiles[0]);
 
         console.info(`🔗 Registering agent on-chain...`);
+
         await this.program.methods
           .registerAgent(
-            new BN(profile.onchainId + nextGameId),
+            new BN(profile.onchainId),
             new BN(spawnTile.x),
             new BN(spawnTile.y),
             profile.name
@@ -321,9 +320,12 @@ export class GameManager implements IGameManager {
             gameId: dbGame.id,
             mapTileId: spawnTile.id,
             profileId: profile.id,
-            authority: agentAccount.authority.toString(),
+            authority: this.program.programId.toString(),
             health: 100,
             isAlive: true,
+          },
+          include: {
+            profile: true,
           },
         });
 

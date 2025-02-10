@@ -21,17 +21,16 @@ class TwitterManager {
 
   /**
    * Initializes Twitter Manager with API clients for each agent
-   * @param agents Array of agent accounts
+   * @param agentIds Array of agent accounts
    * @throws Error if API credentials are missing or invalid
    */
-  constructor(agents: Array<{ account: { id: number } }>) {
+  constructor() {
     console.log("🚀 Initializing Twitter Manager...");
     this._clients = new Map();
 
-    // Initialize Twitter clients for each agent
-    for (const agent of agents) {
-      const agentId = agent.account.id.toString() as AgentId;
-      const agentConfig = twitterConfig.agents[agentId];
+    // Initialize Twitter clients for each agent onchainId
+    for (const id of ["1", "2", "3", "4"] as AgentId[]) {
+      const agentConfig = twitterConfig.agents[id];
 
       if (
         !twitterConfig.apiKey ||
@@ -39,11 +38,11 @@ class TwitterManager {
         !agentConfig?.accessToken ||
         !agentConfig?.accessSecret
       ) {
-        throw new Error(`Missing Twitter credentials for agent ${agentId}`);
+        throw new Error(`Missing Twitter credentials for agent ${id}`);
       }
 
       this._clients.set(
-        agentId,
+        id,
         new TwitterApi({
           appKey: twitterConfig.apiKey,
           appSecret: twitterConfig.apiSecret,
@@ -95,14 +94,18 @@ class TwitterManager {
           username: user.username,
           tweetId: reply.id,
           content: reply.text,
+          authorId: reply.author_id,
           timestamp: new Date(reply.created_at!),
           userMetrics: {
             followerCount: user.public_metrics?.followers_count || 0,
-            averageEngagement: await this.calculateAverageEngagementScore(
-              reply
-            ),
-            accountAge: 0,
-            verificationStatus: user.verified || false,
+            likeCount: user.public_metrics?.like_count || 0,
+            followingCount: user.public_metrics?.following_count || 0,
+            tweetCount: user.public_metrics?.tweet_count || 0,
+            listedCount: user.public_metrics?.listed_count || 0,
+            accountAge: user.created_at
+              ? new Date().getTime() - new Date(user.created_at).getTime()
+              : 0,
+            verified: user.verified || false,
             reputationScore: 0,
           },
         });
@@ -127,13 +130,18 @@ class TwitterManager {
           tweetId: quote.id,
           content: quote.text,
           timestamp: new Date(quote.created_at!),
+          authorId: quote.author_id,
+
           userMetrics: {
             followerCount: user.public_metrics?.followers_count || 0,
-            averageEngagement: await this.calculateAverageEngagementScore(
-              quote
-            ),
-            accountAge: 0,
-            verificationStatus: user.verified || false,
+            followingCount: user.public_metrics?.following_count || 0,
+            likeCount: user.public_metrics?.like_count || 0,
+            accountAge: user.created_at
+              ? new Date().getTime() - new Date(user.created_at).getTime()
+              : 0,
+            tweetCount: user.public_metrics?.tweet_count || 0,
+            listedCount: user.public_metrics?.listed_count || 0,
+            verified: user.verified || false,
             reputationScore: 0,
           },
         });
@@ -146,30 +154,38 @@ class TwitterManager {
       }
       this.requestCount++;
 
-      // // Fetch mentions
-      // const mentions = await this.fetchUserMentions(username);
-      // for (const mention of mentions) {
-      //   // Skip if the mention is already counted as a reply or quote
-      //   if (interactions.some((i) => i.tweetId === mention.id)) continue;
+      // if (username) {
+      //   // Fetch mentions
+      //   const mentions = await this.fetchUserMentions(username);
+      //   for (const mention of mentions) {
+      //     // Skip if the mention is already counted as a reply or quote
+      //     if (interactions.some((i) => i.tweetId === mention.id)) continue;
 
-      //   const user = await this.fetchUserInfo(this.client, mention.author_id!);
-      //   interactions.push({
-      //     type: "mention",
-      //     userId: user.id,
-      //     username: user.username,
-      //     tweetId: mention.id,
-      //     content: mention.text,
-      //     timestamp: new Date(mention.created_at!),
-      //     userMetrics: {
-      //       followerCount: user.public_metrics?.followers_count || 0,
-      //       averageEngagement: await this.calculateAverageEngagementScore(
-      //         mention
-      //       ),
-      //       accountAge: 0,
-      //       verificationStatus: user.verified || false,
-      //       reputationScore: 0,
-      //     },
-      //   });
+      //     const user = await this.fetchUserInfo(
+      //       this.client,
+      //       mention.author_id!
+      //     );
+      //     interactions.push({
+      //       type: "mention",
+      //       userId: user.id,
+      //       username: user.username,
+      //       tweetId: mention.id,
+      //       content: mention.text,
+      //       timestamp: new Date(mention.created_at!),
+      //       userMetrics: {
+      //         followerCount: user.public_metrics?.followers_count || 0,
+      //         followingCount: user.public_metrics?.following_count || 0,
+      //         likeCount: user.public_metrics?.like_count || 0,
+      //         accountAge: user.created_at
+      //           ? new Date().getTime() - new Date(user.created_at).getTime()
+      //           : 0,
+      //         tweetCount: user.public_metrics?.tweet_count || 0,
+      //         listedCount: user.public_metrics?.listed_count || 0,
+      //         verified: user.verified || false,
+      //         reputationScore: 0,
+      //       },
+      //     });
+      //   }
       // }
 
       return interactions;
@@ -509,73 +525,6 @@ class TwitterManager {
       console.error("❌ Error fetching user info:", error);
       throw error;
     }
-  }
-
-  /**
-   * Calculates comprehensive engagement score for a tweet based on interactions
-   * @param tweet - Tweet data
-   * @param interactions - Array of tweet interactions
-   * @returns Engagement score between 0 and 1
-   */
-  async calculateEngagementScore(
-    tweet: TweetData,
-    interactions: TwitterInteraction[]
-  ): Promise<number> {
-    if (!tweet.public_metrics || interactions.length === 0) return 0;
-
-    const metrics = tweet.public_metrics;
-
-    // Calculate total raw engagement
-    const totalEngagement =
-      metrics.like_count +
-      metrics.retweet_count +
-      metrics.reply_count +
-      metrics.quote_count;
-
-    // Calculate quality metrics
-    const verifiedInteractions = interactions.filter(
-      (i) => i.userMetrics.verificationStatus
-    ).length;
-    const highFollowerInteractions = interactions.filter(
-      (i) => i.userMetrics.followerCount > 10000
-    ).length;
-
-    // Weight different factors
-    const engagementWeight = 0.5;
-    const verifiedWeight = 0.3;
-    const followerWeight = 0.2;
-
-    // Calculate weighted scores
-    const engagementScore =
-      Math.min(totalEngagement / 1000, 1) * engagementWeight;
-    const verifiedScore =
-      (verifiedInteractions / interactions.length) * verifiedWeight;
-    const followerScore =
-      (highFollowerInteractions / interactions.length) * followerWeight;
-
-    // Return combined score
-    return engagementScore + verifiedScore + followerScore;
-  }
-
-  /**
-   * Calculates simple average engagement score for a tweet
-   * @param tweetData - Tweet data containing public metrics
-   * @returns Normalized engagement score between 0 and 1
-   */
-  async calculateAverageEngagementScore(tweetData: TweetData): Promise<number> {
-    if (!tweetData.public_metrics) return 0;
-
-    const metrics = tweetData.public_metrics;
-
-    // Calculate total engagement from all metrics
-    const totalEngagement =
-      metrics.like_count +
-      metrics.retweet_count +
-      metrics.reply_count +
-      metrics.quote_count;
-
-    // Normalize to value between 0-1 (capped at 1000 interactions)
-    return Math.min(totalEngagement / 1000, 1);
   }
 
   /**

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Manages game actions and their execution in the Mearth game.
+ * Handles movement, battles, alliances, and other game mechanics.
+ */
+
 import { PublicKey } from "@solana/web3.js";
 import { BreakAllianceAction, IgnoreAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
@@ -13,11 +18,20 @@ import {
 } from "@/types";
 import { gameConfig } from "@/config/env";
 
+/**
+ * Manages the execution and validation of game actions
+ */
 export class ActionManager {
   private readonly program: MearthProgram;
   private readonly gameOnchainId: number;
   private readonly prisma: PrismaClient;
 
+  /**
+   * Creates an instance of ActionManager
+   * @param program - The Mearth program instance
+   * @param gameOnchainId - The on-chain game ID
+   * @param prisma - Prisma client instance for database operations
+   */
   constructor(
     program: MearthProgram,
     gameOnchainId: number,
@@ -30,7 +44,10 @@ export class ActionManager {
   }
 
   /**
-   * Execute a game action with optimized validation and feedback
+   * Execute a game action with validation and feedback
+   * @param ctx - Context containing agent and game information
+   * @param action - The game action to execute
+   * @returns Result of the action execution
    */
   async executeAction(
     ctx: ActionContext,
@@ -64,11 +81,11 @@ export class ActionManager {
           result = await this.handleBattle(ctx, action);
           break;
         case "FORM_ALLIANCE":
-          console.log("🤝 Processing ally action");
+          console.log("🤝 Processing alliance formation action");
           result = await this.handleFormAlliance(ctx, action);
           break;
         case "BREAK_ALLIANCE":
-          console.log("🤝 Processing break alliance action");
+          console.log("🤝 Processing alliance breaking action");
           result = await this.handleBreakAlliance(ctx, action);
           break;
         case "IGNORE":
@@ -113,7 +130,7 @@ export class ActionManager {
 
   /**
    * Handle ignore action to temporarily block interactions between agents
-   * @param ctx - Action context containing agent and game info
+   * @param ctx - Action ctx containing agent and game info
    * @param action - The ignore action with target agent details
    * @returns ActionResult indicating success/failure with feedback
    */
@@ -187,14 +204,15 @@ export class ActionManager {
   }
 
   /**
-   * Handle agent movement with enhanced validation
+   * Handle agent movement with validation
+   * @param ctx - Action ctx containing agent and game info
+   * @param action - Movement action with target position
+   * @returns Result of movement execution
    */
   private async handleMove(
     ctx: ActionContext,
     action: MoveAction
   ): Promise<ActionResult> {
-    const currentTime = Math.floor(Date.now() / 1000);
-
     console.log("🚶 Processing movement request", {
       agentId: ctx.agentId,
       agentOnchainId: ctx.agentOnchainId,
@@ -211,17 +229,7 @@ export class ActionManager {
         ctx.agentOnchainId
       );
 
-      // Fetch and validate agent state
-      console.log("Getting agent account......");
-      const agentAccount = await this.program.account.agent.fetch(agentPda);
-
-      // Validate movement cooldown onchain
-      if (agentAccount.nextMoveTime.gt(currentTime)) {
-        console.error("⏳ Movement rejected - Agent on cooldown");
-        throw new Error("Agent is on movement cooldown onchain");
-      }
-
-      // Additional offchain validations
+      // offchain validations
       console.log("🔍 Performing additional movement validations");
 
       // Execute onchain movement
@@ -229,6 +237,7 @@ export class ActionManager {
       const mapTile = await this.prisma.mapTile.findUnique({
         where: { x_y: { x: action.position.x, y: action.position.y } },
       });
+
       if (!mapTile) {
         console.error("❌ Movement rejected - Map tile not found");
         throw new Error("Map tile not found");
@@ -264,14 +273,14 @@ export class ActionManager {
         data: {
           type: "Move",
           endsAt: new Date(
-            Date.now() + gameConfig.mechanics.cooldowns.movement
+            Date.now() + gameConfig.mechanics.cooldowns.movement * 1000
           ),
           cooledAgentId: ctx.agentId,
-          gameId: ctx.gameOnchainId,
+          gameId: ctx.gameId,
         },
       });
 
-      console.log("✨ Agent movement completed successfully", {
+      console.log("✅ Agent movement completed successfully", {
         agentId: ctx.agentId,
         x: action.position.x,
         y: action.position.y,
@@ -279,6 +288,9 @@ export class ActionManager {
 
       return {
         success: true,
+        feedback: {
+          isValid: true,
+        },
       };
     } catch (error) {
       console.error("💥 Movement failed", {
@@ -287,20 +299,27 @@ export class ActionManager {
         action,
       });
       console.log("Error", error);
-      throw error;
+      return {
+        success: false,
+        feedback: {
+          isValid: false,
+        },
+      };
     }
   }
 
   /**
-   * Handle battle initiation with enhanced validation
+   * Handle battle initiation with validation
+   * @param ctx - Action ctx containing agent and game info
+   * @param action - Battle action with target agent
+   * @returns Result of battle initiation
    */
   private async handleBattle(
-    context: ActionContext,
+    ctx: ActionContext,
     action: BattleAction
   ): Promise<ActionResult> {
-    const { gameOnchainId, agentId, agentOnchainId } = context;
     const currentTime = Date.now();
-    const [gamePda] = getGamePDA(this.program.programId, gameOnchainId);
+    const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
     const [defenderPda] = getAgentPDA(
       this.program.programId,
       gamePda,
@@ -309,11 +328,11 @@ export class ActionManager {
     const [attackerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      agentOnchainId
+      ctx.agentOnchainId
     );
     try {
       console.log("⚔️ Processing battle request", {
-        attackerId: agentId,
+        attackerId: ctx.agentId,
         defenderId: action.targetId,
       });
       // Fetch and validate both agents' states
@@ -339,7 +358,7 @@ export class ActionManager {
       if (attackerAccount.allianceWith && defenderAccount.allianceWith) {
         console.log("🤝 Initiating Alliance vs Alliance battle");
         tx = await this.handleAllianceVsAllianceBattle(
-          context,
+          ctx,
           attackerPda,
           defenderPda,
           attackerAccount,
@@ -353,7 +372,7 @@ export class ActionManager {
             attackerAccount.allianceWith
           );
           tx = await this.handleAgentVsAllianceBattle(
-            context,
+            ctx,
             defenderPda,
             attackerPda,
             singleAgentAccount,
@@ -370,7 +389,7 @@ export class ActionManager {
             defenderAccount.allianceWith
           );
           tx = await this.handleAgentVsAllianceBattle(
-            context,
+            ctx,
             defenderPda,
             attackerPda,
             singleAgentAccount,
@@ -382,7 +401,7 @@ export class ActionManager {
       } else {
         console.log("⚔️ Initiating Simple battle");
         tx = await this.handleSimpleBattle(
-          context,
+          ctx,
           attackerPda,
           defenderPda,
           attackerAccount,
@@ -391,7 +410,7 @@ export class ActionManager {
       }
 
       console.log("✨ Battle initiated successfully", {
-        attackerId: agentId,
+        attackerId: ctx.agentId,
         defenderId: action.targetId,
         transactionHash: tx,
       });
@@ -401,14 +420,27 @@ export class ActionManager {
         // feedback: {},
       };
     } catch (error) {
-      console.error("💥 Battle initiation failed", { error, agentId, action });
-      throw error;
+      console.error("💥 Battle initiation failed", { error, ctx, action });
+      return {
+        success: false,
+        feedback: {
+          isValid: false,
+          error: {
+            type: "BATTLE",
+            message: error instanceof Error ? error.message : String(error),
+            context: {
+              currentState: ctx,
+              attemptedAction: action,
+            },
+          },
+        },
+      };
     }
   }
 
   /**
    * Handle battle between two alliances, including database updates
-   * @param gamePda - Game public key
+   * @param ctx - Action ctx containing game info
    * @param attackerPda - Attacker's public key
    * @param defenderPda - Defender's public key
    * @param attackerAccount - Attacker's account data
@@ -416,7 +448,7 @@ export class ActionManager {
    * @returns Transaction hash
    */
   private async handleAllianceVsAllianceBattle(
-    context: ActionContext,
+    ctx: ActionContext,
     attackerPda: PublicKey,
     defenderPda: PublicKey,
     attackerAccount: AgentAccount,
@@ -464,7 +496,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: attackerAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -472,7 +504,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: defenderAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -480,7 +512,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: attackerAllyAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -488,7 +520,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: defenderAllyAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -514,7 +546,7 @@ export class ActionManager {
               .add(attackerAllyAccount.tokenBalance)
               .add(defenderAllyAccount.tokenBalance)
               .toNumber() || 0,
-          gameId: context.gameId,
+          gameId: ctx.gameId,
           attackerId: attackerAgent.id,
           defenderId: defenderAgent.id,
           attackerAllyId: attackerAllyAgent.id,
@@ -540,8 +572,18 @@ export class ActionManager {
     }
   }
 
+  /**
+   * Handle battle between a single agent and an alliance
+   * @param ctx - Action ctx containing game info
+   * @param singleAgentPda - Single agent's public key
+   * @param agentInAlliancePda - Alliance agent's public key
+   * @param singleAgentAccount - Single agent's account data
+   * @param agentInAllianceAccount - Alliance agent's account data
+   * @param allyAccount - Ally's account data
+   * @returns Transaction hash
+   */
   private async handleAgentVsAllianceBattle(
-    context: ActionContext,
+    ctx: ActionContext,
     singleAgentPda: PublicKey,
     agentInAlliancePda: PublicKey,
     singleAgentAccount: AgentAccount,
@@ -557,7 +599,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: singleAgentAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -565,7 +607,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: agentInAllianceAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -573,7 +615,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: allyAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -592,7 +634,7 @@ export class ActionManager {
             singleAgentAccount.tokenBalance
               ?.add(allyAccount.tokenBalance)
               ?.toNumber() || 0,
-          gameId: context.gameId,
+          gameId: ctx.gameId,
           attackerId: singleAgent.id,
           defenderId: allyLeader.id,
           defenderAllyId: allyPartner.id,
@@ -613,8 +655,18 @@ export class ActionManager {
       throw error;
     }
   }
+
+  /**
+   * Handle battle between two individual agents
+   * @param ctx - Action ctx containing game info
+   * @param attackerPda - Attacker's public key
+   * @param defenderPda - Defender's public key
+   * @param attackerAccount - Attacker's account data
+   * @param defenderAccount - Defender's account data
+   * @returns Transaction hash
+   */
   private async handleSimpleBattle(
-    context: ActionContext,
+    ctx: ActionContext,
     attackerPda: PublicKey,
     defenderPda: PublicKey,
     attackerAccount: AgentAccount,
@@ -629,7 +681,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: attackerAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -637,7 +689,7 @@ export class ActionManager {
           where: {
             onchainId_gameId: {
               onchainId: defenderAccount.id,
-              gameId: context.gameId,
+              gameId: ctx.gameId,
             },
           },
         }),
@@ -653,7 +705,7 @@ export class ActionManager {
           type: "Simple",
           status: "Active",
           tokensStaked: 0, // Set appropriate token amount if needed
-          gameId: context.gameId,
+          gameId: ctx.gameId,
           attackerId: attacker.id,
           defenderId: defender.id,
         },
@@ -674,13 +726,16 @@ export class ActionManager {
   }
 
   /**
-   * Handle ally formation with enhanced validation
+   * Handle ally formation with validation
+   * @param ctx - Action ctx containing agent and game info
+   * @param action - Alliance formation action with target agent
+   * @returns Result of alliance formation
    */
   private async handleFormAlliance(
-    context: ActionContext,
+    ctx: ActionContext,
     action: FormAllianceAction
   ): Promise<ActionResult> {
-    const { gameOnchainId, agentId } = context;
+    const { gameOnchainId, agentId } = ctx;
     console.log("🤝 Processing ally request", {
       initiatorId: agentId,
       joinerId: action.targetId,
@@ -691,7 +746,7 @@ export class ActionManager {
       const [initiatorPda] = getAgentPDA(
         this.program.programId,
         gamePda,
-        context.agentOnchainId
+        ctx.agentOnchainId
       );
       const [joinerPda] = getAgentPDA(
         this.program.programId,
@@ -728,12 +783,12 @@ export class ActionManager {
 
       console.log("💾 Updating ally in database");
       const game = await this.prisma.game.findUnique({
-        where: { onchainId: context.gameOnchainId },
+        where: { onchainId: ctx.gameOnchainId },
         include: {
           agents: {
             where: {
               onchainId: {
-                in: [context.agentOnchainId, action.targetId],
+                in: [ctx.agentOnchainId, action.targetId],
               },
             },
           },
@@ -767,35 +822,35 @@ export class ActionManager {
             joinerAccount.tokenBalance
           ),
           gameId: game.id,
-          initiatorId: context.agentId,
+          initiatorId: ctx.agentId,
           joinerId: joiner.id,
           status: "Active",
           timestamp: new Date(),
         },
       });
 
-      // await Promise.all([
-      //   this.prisma.coolDown.create({
-      //     data: {
-      //       type: "Alliance",
-      //       endsAt: new Date(
-      //         Date.now() + gameConfig.mechanics.cooldowns.newAlliance
-      //       ),
-      //       cooledAgentId: context.agentId,
-      //       gameId: game.id,
-      //     },
-      //   }),
-      //   this.prisma.coolDown.create({
-      //     data: {
-      //       type: "Alliance",
-      //       endsAt: new Date(
-      //         Date.now() + gameConfig.mechanics.cooldowns.newAlliance
-      //       ),
-      //       cooledAgentId: joiner.id,
-      //       gameId: game.id,
-      //     },
-      //   }),
-      // ]);
+      await Promise.all([
+        this.prisma.coolDown.create({
+          data: {
+            type: "Alliance",
+            endsAt: new Date(
+              Date.now() + gameConfig.mechanics.cooldowns.newAlliance
+            ),
+            cooledAgentId: ctx.agentId,
+            gameId: game.id,
+          },
+        }),
+        this.prisma.coolDown.create({
+          data: {
+            type: "Alliance",
+            endsAt: new Date(
+              Date.now() + gameConfig.mechanics.cooldowns.newAlliance
+            ),
+            cooledAgentId: joiner.id,
+            gameId: game.id,
+          },
+        }),
+      ]);
 
       console.log("✨ Alliance formed successfully", {
         initiatorId: agentId,
@@ -806,135 +861,167 @@ export class ActionManager {
         success: true,
       };
     } catch (error) {
-      throw error;
+      return {
+        success: false,
+        feedback: {
+          isValid: false,
+          error: {
+            type: "FORM_ALLIANCE",
+            message: error instanceof Error ? error.message : String(error),
+            context: {
+              currentState: ctx,
+              attemptedAction: action,
+            },
+          },
+        },
+      };
     }
   }
 
+  /**
+   * Handle breaking of an alliance between agents
+   * @param ctx - Action ctx containing agent and game info
+   * @param action - Alliance breaking action with target agent
+   * @returns Result of alliance breaking
+   */
   private async handleBreakAlliance(
-    context: ActionContext,
+    ctx: ActionContext,
     action: BreakAllianceAction
   ): Promise<ActionResult> {
-    const [gamePda] = getGamePDA(this.program.programId, context.gameOnchainId);
-    const [initiatorPda] = getAgentPDA(
-      this.program.programId,
-      gamePda,
-      context.agentOnchainId
-    );
-    const [targetPda] = getAgentPDA(
-      this.program.programId,
-      gamePda,
-      action.targetId
-    );
+    console.log("🔨 Processing alliance breaking action");
+    try {
+      const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
+      const [initiatorPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        ctx.agentOnchainId
+      );
+      const [targetPda] = getAgentPDA(
+        this.program.programId,
+        gamePda,
+        action.targetId
+      );
 
-    const prismaInitiator = await this.prisma.agent.findUnique({
-      where: {
-        onchainId_gameId: {
-          onchainId: action.targetId,
-          gameId: context.gameOnchainId,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!prismaInitiator) {
-      throw new Error("Initiator not found in database");
-    }
-
-    // Fetch and verify initial state
-    const initiatorBefore = await this.program.account.agent.fetch(
-      initiatorPda
-    );
-    const targetBefore = await this.program.account.agent.fetch(targetPda);
-
-    if (initiatorBefore.allianceWith === targetPda) {
-      throw new Error("Initiator is already allied with target");
-    }
-    if (targetBefore.allianceWith === initiatorPda) {
-      throw new Error("Target is already allied with initiator");
-    }
-
-    // Execute the breakAlliance instruction
-    const tx = await this.program.methods
-      .breakAlliance()
-      .accounts({
-        initiator: initiatorPda,
-        targetAgent: targetPda,
-      })
-      .rpc();
-
-    console.log("Break alliance tx signature:", tx);
-
-    // Get the alliance record
-    const alliance = await this.prisma.alliance.findFirst({
-      where: {
-        AND: [
-          {
-            OR: [
-              {
-                initiatorId: context.agentId,
-                joinerId: prismaInitiator.id,
-              },
-              {
-                initiatorId: action.targetId.toString(),
-                joinerId: context.agentId,
-              },
-            ],
+      const prismaInitiator = await this.prisma.agent.findUnique({
+        where: {
+          onchainId_gameId: {
+            onchainId: action.targetId,
+            gameId: ctx.gameOnchainId,
           },
-          {
-            status: "Active",
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!prismaInitiator) {
+        throw new Error("Initiator not found in database");
+      }
+
+      // Fetch and verify initial state
+      const initiatorBefore = await this.program.account.agent.fetch(
+        initiatorPda
+      );
+      const targetBefore = await this.program.account.agent.fetch(targetPda);
+
+      if (initiatorBefore.allianceWith === targetPda) {
+        throw new Error("Initiator is already allied with target");
+      }
+      if (targetBefore.allianceWith === initiatorPda) {
+        throw new Error("Target is already allied with initiator");
+      }
+
+      // Execute the breakAlliance instruction
+      const tx = await this.program.methods
+        .breakAlliance()
+        .accounts({
+          initiator: initiatorPda,
+          targetAgent: targetPda,
+        })
+        .rpc();
+
+      console.log("Break alliance tx signature:", tx);
+
+      // Get the alliance record
+      const alliance = await this.prisma.alliance.findFirst({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  initiatorId: ctx.agentId,
+                  joinerId: prismaInitiator.id,
+                },
+                {
+                  initiatorId: action.targetId.toString(),
+                  joinerId: ctx.agentId,
+                },
+              ],
+            },
+            {
+              status: "Active",
+            },
+          ],
+        },
+      });
+
+      if (!alliance) {
+        throw new Error("Active alliance not found");
+      }
+
+      // Update alliance status in a single transaction
+      await this.prisma.$transaction([
+        // Mark alliance as broken
+        this.prisma.alliance.update({
+          where: { id: alliance.id },
+          data: {
+            status: "Broken",
+            endedAt: new Date(),
           },
-        ],
-      },
-    });
+        }),
+        // Set cooldown for initiator
+        this.prisma.coolDown.create({
+          data: {
+            type: "Alliance",
+            endsAt: new Date(
+              Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
+            ),
+            cooledAgentId: ctx.agentId,
+            gameId: ctx.gameId,
+          },
+        }),
+        // Set cooldown for target
+        this.prisma.coolDown.create({
+          data: {
+            type: "Alliance",
+            endsAt: new Date(
+              Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
+            ),
+            cooledAgentId: action.targetId.toString(),
+            gameId: ctx.gameId,
+          },
+        }),
+      ]);
 
-    if (!alliance) {
-      throw new Error("Active alliance not found");
+      console.log("🔨 Alliance broken successfully", {
+        allianceId: alliance.id,
+        initiatorId: ctx.agentId,
+        targetId: action.targetId,
+      });
+
+      return {
+        success: true,
+        feedback: {
+          isValid: true,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        feedback: {
+          isValid: false,
+        },
+      };
     }
-
-    // Update alliance status in a single transaction
-    await this.prisma.$transaction([
-      // Mark alliance as broken
-      this.prisma.alliance.update({
-        where: { id: alliance.id },
-        data: {
-          status: "Broken",
-          endedAt: new Date(),
-        },
-      }),
-      // Set cooldown for initiator
-      this.prisma.coolDown.create({
-        data: {
-          type: "Alliance",
-          endsAt: new Date(
-            Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
-          ),
-          cooledAgentId: context.agentId,
-          gameId: context.gameId,
-        },
-      }),
-      // Set cooldown for target
-      this.prisma.coolDown.create({
-        data: {
-          type: "Alliance",
-          endsAt: new Date(
-            Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
-          ),
-          cooledAgentId: action.targetId.toString(),
-          gameId: context.gameId,
-        },
-      }),
-    ]);
-
-    console.log("🔨 Alliance broken successfully", {
-      allianceId: alliance.id,
-      initiatorId: context.agentId,
-      targetId: action.targetId,
-    });
-
-    return {
-      success: true,
-    };
   }
 }

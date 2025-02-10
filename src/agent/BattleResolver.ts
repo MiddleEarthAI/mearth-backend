@@ -1,604 +1,374 @@
 import { PublicKey } from "@solana/web3.js";
-import { Program } from "@coral-xyz/anchor";
+import { Program, BN } from "@coral-xyz/anchor";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { AgentAccount, AgentInfo } from "@/types/program";
-import { PrismaClient } from "@prisma/client";
+import { AgentAccount } from "@/types/program";
+import { Agent, Prisma, PrismaClient } from "@prisma/client";
 import { getAgentAta } from "../utils/program";
 import { gameConfig } from "@/config/env";
-import { BN } from "@coral-xyz/anchor";
 import { GameManager } from "./GameManager";
 
-// Represents outcome of a 1v1 battle between two agents
-type SimpleBattleOutcome = {
-  winnerOnchainId: number;
-  loserOnchainId: number;
-  percentLoss: number;
+// Battle cooldown constant (in seconds)
+const BATTLE_COOLDOWN = gameConfig.mechanics.cooldowns.battle; // 1hr
+
+// Battle types
+type BattleType = "SIMPLE" | "AGENT_VS_ALLIANCE" | "ALLIANCE_VS_ALLIANCE";
+
+// Battle participant
+type BattleParticipant = {
+  agentAccount: AgentAccount;
+  agent: Agent;
+  tokenAccountPub: PublicKey;
 };
 
-// Represents outcome of a battle between single agent and an alliance (1v2)
-type AgentVsAllianceBattleOutcome = {
-  percentLoss: number;
-  agentIsWinner: boolean;
-  singleAgentOnchainId: number;
-  singleAgentAuthority: PublicKey;
-  allianceLeaderOnchainId: number;
-  allianceLeaderAuthority: PublicKey;
-  alliancePartnerOnchainId: number;
-  alliancePartnerAuthority: PublicKey;
-};
-
-// Represents outcome of a battle between two alliances (2v2)
-type AllianceVsAllianceBattleOutcome = {
-  percentLoss: number;
-  allianceAWins: boolean;
-  allianceALeaderOnchainId: number;
-  allianceALeaderAuthority: PublicKey;
-  allianceAPartnerOnchainId: number;
-  allianceAPartnerAuthority: PublicKey;
-  allianceBLeaderOnchainId: number;
-  allianceBLeaderAuthority: PublicKey;
-  allianceBPartnerOnchainId: number;
-  allianceBPartnerAuthority: PublicKey;
-};
-
-// Groups agents involved in a battle with their sides and balances
+// Battle group
 type BattleGroup = {
-  agents: AgentAccount[];
-  currentBattleStart: BN;
-  sides: {
-    sideA: {
-      agents: AgentAccount[];
-      totalBalance: number;
-    };
-    sideB: {
-      agents: AgentAccount[];
-      totalBalance: number;
-    };
+  type: BattleType;
+  startTime: number;
+  sideA: BattleParticipant[];
+  sideB: BattleParticipant[];
+};
+
+type Battle = Prisma.BattleGetPayload<{
+  include: {
+    attacker: true;
+    defender: true;
+    attackerAlly: true;
+    defenderAlly: true;
   };
-};
-
-// Represents a pair of agents in an alliance
-type AlliancePair = {
-  leader: AgentAccount;
-  partner: AgentAccount;
-};
-
-// Contains agent and their alliance account info
-type AllianceInfo = {
-  agent: AgentAccount;
-  allianceAccount: AgentAccount;
-};
-
-type BattleResolverContext = {
-  gameId: string;
-  gameOnchainId: number;
-};
+}>;
 
 /**
- * Service for handling battle resolutions via interval
- * Monitors active battles and resolves them after the 1 hour duration
+ * Battle resolver
  */
 export class BattleResolver {
   private resolutionInterval: NodeJS.Timeout | null = null;
-  private readonly prisma: PrismaClient;
 
   constructor(
     private readonly program: Program<MiddleEarthAiProgram>,
     private readonly gameManager: GameManager,
-    prisma: PrismaClient
+    private readonly prisma: PrismaClient
   ) {
-    this.prisma = prisma;
     console.log("🎮 Battle Resolution Service initialized");
   }
 
   /**
-   * Start the battle resolution interval
+   * Fetch the most active game from the database
    */
-  public async start() {
+  private async fetchActiveGame() {
+    try {
+      const activeGame = await this.prisma.game.findFirst({
+        where: {
+          isActive: true,
+          agents: {
+            some: {
+              isAlive: true,
+            },
+          },
+        },
+        orderBy: [{ lastUpdate: "desc" }, { createdAt: "desc" }],
+        select: {
+          id: true,
+          onchainId: true,
+          _count: {
+            select: {
+              agents: true,
+            },
+          },
+        },
+      });
+
+      if (!activeGame) {
+        console.log("⚠️ No active game found");
+        return null;
+      }
+
+      console.log("🎮 Processing active game", {
+        gameId: activeGame.id,
+        onchainId: activeGame.onchainId,
+        agentCount: activeGame._count.agents,
+      });
+
+      return activeGame;
+    } catch (error) {
+      console.error("❌ Failed to fetch active game", error);
+      return null;
+    }
+  }
+
+  /**
+   * Start the battle resolution service
+   */
+  public async start(checkIntervalMs: number = 60000) {
     if (this.resolutionInterval) {
-      console.log("🔄 Clearing existing battle resolution interval");
       clearInterval(this.resolutionInterval);
     }
 
-    // Initial check
-    await this.checkAndResolveBattles();
+    // Initial battle resolution
+    await this.resolvePendingBattles();
 
-    this.resolutionInterval = setInterval(() => {
-      console.log("⏰ Running scheduled battle resolution check");
-      this.checkAndResolveBattles();
-    }, gameConfig.battleCheckInterval);
+    // Set up interval for continuous monitoring
+    this.resolutionInterval = setInterval(
+      () => this.resolvePendingBattles(),
+      checkIntervalMs
+    );
 
-    console.log("🎯 Battle resolution interval started", {
-      intervalMs: gameConfig.battleCheckInterval,
-    });
+    console.log("🎯 Battle resolution service started", { checkIntervalMs });
   }
 
   /**
-   * Check for battles that need resolution and resolve them
+   * Stop the battle resolution service
    */
-  private async checkAndResolveBattles() {
+  public stop() {
+    if (this.resolutionInterval) {
+      clearInterval(this.resolutionInterval);
+      this.resolutionInterval = null;
+      console.log("✋ Battle resolution service stopped");
+    }
+  }
+
+  /**
+   * Resolve all pending battles
+   */
+  private async resolvePendingBattles() {
     try {
-      const { dbGame, gameAccount, agents } =
-        await this.gameManager.getActiveGame();
-      console.log("🔍 Starting battle resolution check cycle");
+      // Fetch the latest active game
+      const activeGame = await this.fetchActiveGame();
+      if (!activeGame) return;
 
-      const ctx: BattleResolverContext = {
-        gameId: dbGame.id,
-        gameOnchainId: dbGame.onchainId,
-      };
-
-      // Get all agents in battle
-      const agentsInBattle = (
-        await Promise.all(
-          agents.map(async (agent) => {
-            if (agent.account.isAlive && agent.account.currentBattleStart) {
-              return agent.account;
-            }
-            return null;
-          })
-        )
-      ).filter((agent) => agent !== null);
-
-      console.log("⚔️ Identified active battles", {
-        battleCount: agentsInBattle.length,
+      // Get all active battles from database
+      const activeBattles = await this.prisma.battle.findMany({
+        where: {
+          gameId: activeGame.id,
+          status: "Active",
+        },
+        include: {
+          attacker: true,
+          defender: true,
+          attackerAlly: true,
+          defenderAlly: true,
+        },
       });
 
-      // if no ongoing battle, return
-      if (agentsInBattle.length === 0) {
-        return;
-      }
+      if (!activeBattles.length) return;
 
-      // Group agents by battle and alliances
-      const battleGroups = await this.groupAgentsInBattle(agentsInBattle);
+      console.log("⚔️ Processing active battles", {
+        count: activeBattles.length,
+        gameId: activeGame.id,
+      });
 
-      // Resolve each battle
-      for (const battleGroup of battleGroups) {
-        try {
-          // Validate battle duration
-          const currentTime = Math.floor(Date.now() / 1000);
-          const battleStartTime = battleGroup.currentBattleStart.toNumber();
-
-          if (
-            currentTime - battleStartTime <
-            gameConfig.mechanics.cooldowns.battleDuration
-          ) {
-            console.log("⏳ Battle not ready for resolution", {
-              timeRemaining:
-                gameConfig.mechanics.cooldowns.battleDuration -
-                (currentTime - battleStartTime),
-            });
-            continue;
-          }
-
-          const { type, outcome } = this.determineBattleType(battleGroup);
-
-          console.log("🎯 Processing battle resolution", { type });
-
-          // Resolve battle based on type
-          switch (type) {
-            case "Simple":
-              await this.resolveSimpleBattle(
-                ctx,
-                outcome as SimpleBattleOutcome
-              );
-              break;
-            case "AgentVsAlliance":
-              await this.resolveAgentVsAllianceBattle(
-                ctx,
-                outcome as AgentVsAllianceBattleOutcome
-              );
-              break;
-            case "AllianceVsAlliance":
-              await this.resolveAllianceVsAllianceBattle(
-                ctx,
-                outcome as AllianceVsAllianceBattleOutcome
-              );
-              break;
-          }
-
-          console.log(`✅ Successfully resolved ${type} battle`);
-        } catch (error) {
-          console.error(`❌ Battle resolution failed:`, error);
-        }
-      }
-    } catch (error) {
-      console.error("❌ Battle resolution check cycle failed:", error);
-    }
-  }
-
-  /**
-   * Group agents by their battle start time and alliance relationships
-   */
-  private async groupAgentsInBattle(
-    agents: AgentAccount[]
-  ): Promise<BattleGroup[]> {
-    console.log("🔍 Starting to group agents in battle", {
-      agentCount: agents.length,
-    });
-
-    // First, group by battle start time
-    const battleGroups = new Map<string, AgentAccount[]>();
-
-    agents.forEach((agent) => {
-      // not in battle, return
-      if (!agent.currentBattleStart) return;
-
-      const key = agent.currentBattleStart.toString();
-      if (!battleGroups.has(key)) {
-        battleGroups.set(key, []);
-      }
-      battleGroups.get(key)?.push(agent);
-    });
-
-    console.log("📊 Initial battle groups formed", {
-      groupCount: battleGroups.size,
-    });
-
-    // Then, for each battle group, separate into sides based on alliances
-    const battleGroupsArray = await Promise.all(
-      Array.from(battleGroups.entries()).map(
-        async ([startTime, groupAgents]) => {
-          console.log("⚔️ Processing battle group", {
-            startTime,
-            agentCount: groupAgents.length,
-          });
-
-          const sides = {
-            sideA: { agents: [] as AgentAccount[], totalBalance: 0 },
-            sideB: { agents: [] as AgentAccount[], totalBalance: 0 },
-          };
-
-          // First, fetch all alliance accounts for agents that have them
-          const alliancePromises = groupAgents
-            .filter((agent) => agent.allianceWith !== null)
-            .map(async (agent) => {
-              try {
-                console.log("🤝 Fetching alliance account for agent", {
-                  agentId: agent.id.toString(),
-                });
-                const allianceAccount = (await this.program.account.agent.fetch(
-                  agent.allianceWith!
-                )) as AgentAccount;
-                return {
-                  agent,
-                  allianceAccount,
-                } as AllianceInfo;
-              } catch (error) {
-                console.error(
-                  `❌ Failed to fetch alliance for agent ${agent.id}:`,
-                  error
-                );
-                return null;
-              }
-            });
-
-          const alliances = (await Promise.all(alliancePromises)).filter(
-            (alliance): alliance is AllianceInfo => alliance !== null
-          );
-
-          console.log("🤝 Alliance accounts fetched successfully", {
-            allianceCount: alliances.length,
-          });
-
-          // Create alliance pairs
-          const alliancePairs = new Map<string, AlliancePair>();
-          alliances.forEach(({ agent, allianceAccount }) => {
-            const key = [
-              agent.authority.toString(),
-              allianceAccount.authority.toString(),
-            ]
-              .sort()
-              .join("-");
-
-            if (!alliancePairs.has(key)) {
-              alliancePairs.set(key, {
-                leader: agent,
-                partner: allianceAccount,
-              });
-            }
-          });
-
-          console.log("👥 Alliance pairs created and mapped", {
-            pairCount: alliancePairs.size,
-          });
-
-          // Assign alliance pairs to sides
-          let assignedToSideA = false;
-          for (const { leader, partner } of alliancePairs.values()) {
-            const side = assignedToSideA ? sides.sideA : sides.sideB;
-            side.agents.push(leader, partner);
-            side.totalBalance +=
-              leader.tokenBalance.toNumber() + partner.tokenBalance.toNumber();
-            assignedToSideA = !assignedToSideA;
-          }
-
-          // Assign remaining single agents
-          const allianceAgents = new Set(
-            [...alliancePairs.values()].flatMap((pair) => [
-              pair.leader.authority.toString(),
-              pair.partner.authority.toString(),
-            ])
-          );
-
-          const singleAgents = groupAgents.filter(
-            (agent) => !allianceAgents.has(agent.authority.toString())
-          );
-
-          console.log("👤 Processing single agents for battle sides", {
-            singleAgentCount: singleAgents.length,
-          });
-
-          singleAgents.forEach((agent) => {
-            const side = assignedToSideA ? sides.sideA : sides.sideB;
-            side.agents.push(agent);
-            side.totalBalance += agent.tokenBalance.toNumber();
-            assignedToSideA = !assignedToSideA;
-          });
-
-          console.log("⚖️ Battle sides balanced and finalized", {
-            sideAAgents: sides.sideA.agents.length,
-            sideBAgents: sides.sideB.agents.length,
-          });
-
-          return {
-            agents: groupAgents,
-            currentBattleStart: new BN(startTime),
-            sides,
-          };
-        }
-      )
-    );
-
-    console.log("✅ Battle groups processing completed successfully", {
-      totalGroups: battleGroupsArray.length,
-    });
-    return battleGroupsArray;
-  }
-
-  /**
-   * Calculate battle outcome based on token balances
-   */
-  private calculateBattleOutcome(battleGroup: BattleGroup): {
-    winningSide: "sideA" | "sideB";
-    percentLoss: number;
-  } {
-    console.log("🎲 Calculating battle outcome based on balances", {
-      sideABalance: battleGroup.sides.sideA.totalBalance,
-      sideBBalance: battleGroup.sides.sideB.totalBalance,
-    });
-
-    const totalBalance =
-      battleGroup.sides.sideA.totalBalance +
-      battleGroup.sides.sideB.totalBalance;
-    const sideAProbability =
-      battleGroup.sides.sideA.totalBalance / totalBalance;
-
-    // Determine winner
-    const winningSide = Math.random() > sideAProbability ? "sideB" : "sideA";
-
-    // Calculate loss percentage (20-30%)
-    const percentLoss = 20 + Math.floor(Math.random() * 11);
-
-    console.log("🏆 Battle outcome determined", {
-      winningSide,
-      percentLoss,
-      sideAProbability: sideAProbability.toFixed(2),
-    });
-
-    return { winningSide, percentLoss };
-  }
-
-  /**
-   * Determine battle type based on the number of agents and alliances
-   */
-  private determineBattleType(battleGroup: BattleGroup): {
-    type: "Simple" | "AgentVsAlliance" | "AllianceVsAlliance";
-    outcome:
-      | SimpleBattleOutcome
-      | AgentVsAllianceBattleOutcome
-      | AllianceVsAllianceBattleOutcome;
-  } {
-    console.log("🔍 Analyzing battle configuration", {
-      sideAAgents: battleGroup.sides.sideA.agents.length,
-      sideBAgents: battleGroup.sides.sideB.agents.length,
-    });
-
-    const { sides } = battleGroup;
-    const { winningSide, percentLoss } =
-      this.calculateBattleOutcome(battleGroup);
-
-    // Simple battle (1v1)
-    if (sides.sideA.agents.length === 1 && sides.sideB.agents.length === 1) {
-      console.log("⚔️ Detected Simple battle (1v1)");
-      return {
-        type: "Simple",
-        outcome: {
-          winnerOnchainId:
-            winningSide === "sideA"
-              ? sides.sideA.agents[0].id.toNumber()
-              : sides.sideB.agents[0].id.toNumber(),
-          loserOnchainId:
-            winningSide === "sideA"
-              ? sides.sideB.agents[0].id.toNumber()
-              : sides.sideA.agents[0].id.toNumber(),
-          percentLoss,
-        },
-      };
-    }
-
-    // Agent vs Alliance (1v2)
-    if (
-      (sides.sideA.agents.length === 1 && sides.sideB.agents.length === 2) ||
-      (sides.sideA.agents.length === 2 && sides.sideB.agents.length === 1)
-    ) {
-      console.log("⚔️ Detected Agent vs Alliance battle (1v2)");
-      const singleSide =
-        sides.sideA.agents.length === 1 ? sides.sideA : sides.sideB;
-      const allianceSide =
-        sides.sideA.agents.length === 2 ? sides.sideA : sides.sideB;
-      const singleAgent = singleSide.agents[0];
-      const [allianceLeader, alliancePartner] = allianceSide.agents;
-
-      return {
-        type: "AgentVsAlliance",
-        outcome: {
-          agentIsWinner:
-            (winningSide === "sideA" && sides.sideA.agents.length === 1) ||
-            (winningSide === "sideB" && sides.sideB.agents.length === 1),
-          percentLoss,
-          singleAgentOnchainId: singleAgent.id.toNumber(),
-          singleAgentAuthority: singleAgent.authority,
-          allianceLeaderOnchainId: allianceLeader.id.toNumber(),
-          allianceLeaderAuthority: allianceLeader.authority,
-          alliancePartnerOnchainId: alliancePartner.id.toNumber(),
-          alliancePartnerAuthority: alliancePartner.authority,
-        },
-      };
-    }
-
-    // Alliance vs Alliance (2v2)
-    if (sides.sideA.agents.length === 2 && sides.sideB.agents.length === 2) {
-      console.log("⚔️ Detected Alliance vs Alliance battle (2v2)");
-      const [allianceALeader, allianceAPartner] = sides.sideA.agents;
-      const [allianceBLeader, allianceBPartner] = sides.sideB.agents;
-
-      return {
-        type: "AllianceVsAlliance",
-        outcome: {
-          allianceAWins: winningSide === "sideA",
-          percentLoss,
-          allianceALeaderOnchainId: allianceALeader.id.toNumber(),
-          allianceALeaderAuthority: allianceALeader.authority,
-          allianceAPartnerOnchainId: allianceAPartner.id.toNumber(),
-          allianceAPartnerAuthority: allianceAPartner.authority,
-          allianceBLeaderOnchainId: allianceBLeader.id.toNumber(),
-          allianceBLeaderAuthority: allianceBLeader.authority,
-          allianceBPartnerOnchainId: allianceBPartner.id.toNumber(),
-          allianceBPartnerAuthority: allianceBPartner.authority,
-        },
-      };
-    }
-
-    console.error("❌ Invalid battle configuration detected", {
-      sideAAgents: sides.sideA.agents.length,
-      sideBAgents: sides.sideB.agents.length,
-    });
-
-    throw new Error(
-      `Invalid battle configuration: sideA=${sides.sideA.agents.length} agents, sideB=${sides.sideB.agents.length} agents`
-    );
-  }
-
-  /**
-   * Apply health penalty to losing agents and handle agent death
-   */
-  private async applyHealthPenalty(
-    ctx: BattleResolverContext,
-    agentIds: number[]
-  ): Promise<void> {
-    try {
-      // Update health for all losing agents
+      // Process each battle in parallel
       await Promise.all(
-        agentIds.map(async (agentId) => {
-          const agent = await this.prisma.agent.findUnique({
-            where: {
-              onchainId_gameId: {
-                onchainId: agentId,
-                gameId: ctx.gameId,
-              },
-            },
-          });
-
-          if (!agent) {
-            console.error("Agent not found for health penalty", { agentId });
-            return;
-          }
-
-          const newHealth = agent.health - gameConfig.mechanics.deathChance;
-
-          if (newHealth <= 0) {
-            // Kill agent both onchain and in database
-            const [gamePda] = getGamePDA(
-              this.program.programId,
-              ctx.gameOnchainId
+        activeBattles.map(async (battle) => {
+          try {
+            const battleGroup = await this.createBattleGroup(
+              battle,
+              activeGame
             );
-            const [agentPda] = getAgentPDA(
-              this.program.programId,
-              gamePda,
-              agent.onchainId
-            );
+            if (!battleGroup) return;
 
-            await this.program.methods
-              .killAgent()
-              .accounts({
-                agent: agentPda,
-              })
-              .rpc();
+            if (!this.isBattleReadyToResolve(battleGroup)) {
+              return;
+            }
 
-            await this.prisma.agent.update({
-              where: {
-                onchainId_gameId: {
-                  onchainId: agent.onchainId,
-                  gameId: agent.gameId,
-                },
-              },
-              data: {
-                health: 0,
-                isAlive: false,
-                deathTimestamp: new Date(),
-              },
-            });
-
-            // Cancel any active battles for this agent
-            await this.prisma.battle.updateMany({
-              where: {
-                OR: [
-                  { attacker: { onchainId: agentId, gameId: agent.gameId } },
-                  { defender: { onchainId: agentId, gameId: agent.gameId } },
-                  {
-                    attackerAlly: { onchainId: agentId, gameId: agent.gameId },
-                  },
-                  {
-                    defenderAlly: { onchainId: agentId, gameId: agent.gameId },
-                  },
-                ],
-                status: "Active",
-              },
-              data: {
-                status: "Cancelled",
-                endTime: new Date(),
-              },
-            });
-
-            console.log("☠️ Agent killed due to health depletion", {
-              agentId,
-              finalHealth: 0,
-            });
-          } else {
-            // Just update health
-            await this.prisma.agent.update({
-              where: {
-                onchainId_gameId: {
-                  onchainId: agent.onchainId,
-                  gameId: agent.gameId,
-                },
-              },
-              data: {
-                health: newHealth,
-              },
-            });
-
-            console.log("💔 Applied health penalty to agent", {
-              agentId,
-              newHealth,
-              penalty: gameConfig.mechanics.deathChance,
+            await this.resolveBattle(battleGroup, activeGame);
+          } catch (error) {
+            console.error("❌ Failed to process battle", {
+              battleId: battle.id,
+              error,
             });
           }
         })
       );
     } catch (error) {
-      console.error("Failed to apply health penalties:", error);
+      console.error("❌ Battle resolution cycle failed", error);
+    }
+  }
+
+  /**
+   * Create a battle group from database battle record
+   */
+  private async createBattleGroup(
+    battle: Battle,
+    game: { id: string; onchainId: number }
+  ): Promise<BattleGroup | null> {
+    try {
+      const sideA: BattleParticipant[] = [];
+      const sideB: BattleParticipant[] = [];
+
+      // Get PDAs and token accounts for all participants
+      const [gamePda] = getGamePDA(this.program.programId, game.onchainId);
+
+      // Helper function to create battle participant
+      const createParticipant = async (
+        agent: Agent
+      ): Promise<BattleParticipant> => {
+        const [agentPda] = getAgentPDA(
+          this.program.programId,
+          gamePda,
+          agent.onchainId
+        );
+        const ata = await getAgentAta(agentPda);
+        if (!ata)
+          throw new Error(
+            `Failed to get token account for agent ${agent.onchainId}`
+          );
+
+        const agentAccount = await this.program.account.agent.fetch(agentPda);
+
+        return {
+          agentAccount,
+          agent,
+          tokenAccountPub: ata.address,
+        };
+      };
+
+      // Process attacker side
+      sideA.push(await createParticipant(battle.attacker));
+      if (battle.attackerAlly) {
+        sideA.push(await createParticipant(battle.attackerAlly));
+      }
+
+      // Process defender side
+      sideB.push(await createParticipant(battle.defender));
+      if (battle.defenderAlly) {
+        sideB.push(await createParticipant(battle.defenderAlly));
+      }
+
+      return {
+        type: this.determineBattleType(sideA.length, sideB.length),
+        startTime: battle.startTime.getTime() / 1000,
+        sideA,
+        sideB,
+      };
+    } catch (error) {
+      console.error("❌ Failed to create battle group", error);
+      return null;
+    }
+  }
+
+  /**
+   * Determine battle type based on participant count
+   */
+  private determineBattleType(
+    sideACount: number,
+    sideBCount: number
+  ): BattleType {
+    if (sideACount === 1 && sideBCount === 1) return "SIMPLE";
+    if (sideACount === 2 && sideBCount === 2) return "ALLIANCE_VS_ALLIANCE";
+    return "AGENT_VS_ALLIANCE";
+  }
+
+  /**
+   * Check if battle is ready to be resolved
+   */
+  private isBattleReadyToResolve(battle: BattleGroup): boolean {
+    const currentTime = Math.floor(Date.now() / 1000);
+    const cooldown = BATTLE_COOLDOWN;
+    return currentTime - battle.startTime >= cooldown;
+  }
+
+  /**
+   * Calculate battle outcome with improved randomness and balance
+   */
+  private calculateBattleOutcome(
+    sideA: BattleParticipant[],
+    sideB: BattleParticipant[]
+  ): {
+    sideAWins: boolean;
+    percentLoss: number;
+  } {
+    // Calculate total power for each side (tokens + health)
+    const calculatePower = (side: BattleParticipant[]) => {
+      return side.reduce((sum, p) => {
+        const tokenPower = p.agentAccount.tokenBalance.toNumber();
+        const healthFactor = p.agent.health / 100; // Health as a percentage
+        return sum + tokenPower * healthFactor;
+      }, 0);
+    };
+
+    const sideAPower = calculatePower(sideA);
+    const sideBPower = calculatePower(sideB);
+    const totalPower = sideAPower + sideBPower;
+
+    // Calculate win probability with power ratio and randomness
+    const baseProbability = sideAPower / totalPower;
+    const randomFactor = Math.random() * 0.3; // 30% random factor
+    const finalProbability = baseProbability * 0.7 + randomFactor;
+
+    // Calculate loss percentage based on power difference
+    const powerDiff = Math.abs(baseProbability - 0.5);
+    const baseLoss = 20; // Minimum 20% loss
+    const maxAdditionalLoss = 20; // Up to additional 20% based on power difference
+    const percentLoss = Math.floor(baseLoss + powerDiff * maxAdditionalLoss);
+
+    return {
+      sideAWins: finalProbability > 0.5,
+      percentLoss: Math.min(percentLoss, 50), // Cap at 50%
+    };
+  }
+
+  /**
+   * Resolve a battle
+   */
+  private async resolveBattle(
+    battle: BattleGroup,
+    game: { id: string; onchainId: number }
+  ) {
+    const { sideAWins, percentLoss } = this.calculateBattleOutcome(
+      battle.sideA,
+      battle.sideB
+    );
+    const [gamePda] = getGamePDA(this.program.programId, game.onchainId);
+
+    try {
+      switch (battle.type) {
+        case "SIMPLE":
+          await this.resolveSimpleBattle(
+            gamePda,
+            battle.sideA[0],
+            battle.sideB[0],
+            percentLoss
+          );
+          break;
+
+        case "AGENT_VS_ALLIANCE":
+          const [single, alliance] =
+            battle.sideA.length === 1
+              ? [battle.sideA[0], battle.sideB]
+              : [battle.sideB[0], battle.sideA];
+
+          await this.resolveAgentVsAllianceBattle(
+            gamePda,
+            single,
+            alliance[0],
+            alliance[1],
+            sideAWins === (battle.sideA.length === 1), // single wins if sideA is single
+            percentLoss
+          );
+          break;
+
+        case "ALLIANCE_VS_ALLIANCE":
+          await this.resolveAllianceVsAllianceBattle(
+            gamePda,
+            battle.sideA[0],
+            battle.sideA[1],
+            battle.sideB[0],
+            battle.sideB[1],
+            sideAWins,
+            percentLoss
+          );
+          break;
+      }
+
+      // Update battle status and apply health penalties
+      await this.finalizeBattle(
+        sideAWins ? battle.sideA : battle.sideB,
+        sideAWins ? battle.sideB : battle.sideA,
+        game
+      );
+    } catch (error) {
+      console.error("❌ Battle resolution failed", error);
       throw error;
     }
   }
@@ -607,337 +377,203 @@ export class BattleResolver {
    * Resolve a simple battle between two agents
    */
   private async resolveSimpleBattle(
-    ctx: BattleResolverContext,
-    outcome: SimpleBattleOutcome
+    gamePda: PublicKey,
+    winner: BattleParticipant,
+    loser: BattleParticipant,
+    percentLoss: number
   ) {
-    const [gamePda] = getGamePDA(
-      this.program.programId,
-      new BN(ctx.gameOnchainId)
-    );
-
     const [winnerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      outcome.winnerOnchainId
+      winner.agent.onchainId
     );
     const [loserPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      outcome.loserOnchainId
+      loser.agent.onchainId
     );
-    const winnerTokenAccount = await getAgentAta(winnerPda);
-    const loserTokenAccount = await getAgentAta(loserPda);
 
-    console.log("💰 Retrieved token accounts for battle participants");
-
-    try {
-      // Resolve battle onchain
-      await this.program.methods
-        .resolveBattleSimple(new BN(outcome.percentLoss))
-        .accounts({
-          winner: winnerPda,
-          loser: loserPda,
-          winnerToken: winnerTokenAccount.address,
-          loserToken: loserTokenAccount.address,
-          authority: this.program.provider.publicKey,
-        })
-        .rpc();
-
-      // Apply health penalty to loser
-      await this.applyHealthPenalty(ctx, [outcome.loserOnchainId]);
-
-      // Update battle status in database
-      const activeBattle = await this.prisma.battle.findFirst({
-        where: {
-          OR: [
-            {
-              attacker: {
-                onchainId: outcome.winnerOnchainId,
-                gameId: ctx.gameId,
-              },
-            },
-            {
-              defender: {
-                onchainId: outcome.winnerOnchainId,
-                gameId: ctx.gameId,
-              },
-            },
-          ],
-          status: "Active",
-        },
-      });
-
-      if (activeBattle) {
-        await this.prisma.battle.update({
-          where: { id: activeBattle.id },
-          data: {
-            status: "Resolved",
-            winner: {
-              connect: {
-                onchainId_gameId: {
-                  onchainId: outcome.winnerOnchainId,
-                  gameId: ctx.gameId,
-                },
-              },
-            },
-            endTime: new Date(),
-          },
-        });
-      }
-
-      console.log("🏆 Simple battle resolved successfully");
-    } catch (error) {
-      console.error("Failed to resolve simple battle:", error);
-      throw error;
-    }
+    await this.program.methods
+      .resolveBattleSimple(new BN(percentLoss))
+      .accounts({
+        winner: winnerPda,
+        loser: loserPda,
+        winnerToken: winner.tokenAccountPub,
+        loserToken: loser.tokenAccountPub,
+        loserAuthority: loser.agent.authority,
+        authority: this.program.provider.publicKey,
+      })
+      .rpc();
   }
 
   /**
    * Resolve a battle between an agent and an alliance
    */
   private async resolveAgentVsAllianceBattle(
-    ctx: BattleResolverContext,
-    outcome: AgentVsAllianceBattleOutcome
+    gamePda: PublicKey,
+    single: BattleParticipant,
+    leader: BattleParticipant,
+    partner: BattleParticipant,
+    singleWins: boolean,
+    percentLoss: number
   ) {
-    const [gamePda] = getGamePDA(
-      this.program.programId,
-      new BN(ctx.gameOnchainId)
-    );
-
-    const [singleAgentPda] = getAgentPDA(
+    const [singlePda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      outcome.singleAgentOnchainId
+      single.agent.onchainId
     );
-
-    const [allianceLeaderPda] = getAgentPDA(
+    const [leaderPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.allianceLeaderOnchainId)
+      leader.agent.onchainId
     );
-
-    const [alliancePartnerPda] = getAgentPDA(
+    const [partnerPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      new BN(outcome.alliancePartnerOnchainId)
+      partner.agent.onchainId
     );
 
-    // Get token accounts
-    const singleAgentToken = await getAgentAta(singleAgentPda);
-    const allianceLeaderToken = await getAgentAta(allianceLeaderPda);
-    const alliancePartnerToken = await getAgentAta(alliancePartnerPda);
-
-    console.log("💰 Retrieved token accounts for all battle participants");
-
-    try {
-      // Resolve battle onchain
-      await this.program.methods
-        .resolveBattleAgentVsAlliance(
-          new BN(outcome.percentLoss),
-          outcome.agentIsWinner
-        )
-        .accounts({
-          singleAgent: singleAgentPda,
-          allianceLeader: allianceLeaderPda,
-          alliancePartner: alliancePartnerPda,
-          singleAgentToken: singleAgentToken.address,
-          allianceLeaderToken: allianceLeaderToken.address,
-          alliancePartnerToken: alliancePartnerToken.address,
-          singleAgentAuthority: outcome.singleAgentAuthority,
-          allianceLeaderAuthority: outcome.allianceLeaderAuthority,
-          alliancePartnerAuthority: outcome.alliancePartnerAuthority,
-        })
-        .rpc();
-
-      // Apply health penalties to losing side
-      if (outcome.agentIsWinner) {
-        await this.applyHealthPenalty(ctx, [
-          outcome.allianceLeaderOnchainId,
-          outcome.alliancePartnerOnchainId,
-        ]);
-      } else {
-        await this.applyHealthPenalty(ctx, [outcome.singleAgentOnchainId]);
-      }
-
-      // Update battle status in database
-      const activeBattle = await this.prisma.battle.findFirst({
-        where: {
-          OR: [
-            {
-              attacker: {
-                onchainId: outcome.singleAgentOnchainId,
-                gameId: ctx.gameId,
-              },
-            },
-            {
-              defender: {
-                onchainId: outcome.singleAgentOnchainId,
-                gameId: ctx.gameId,
-              },
-            },
-          ],
-          status: "Active",
-        },
-      });
-
-      if (activeBattle) {
-        await this.prisma.battle.update({
-          where: { id: activeBattle.id },
-          data: {
-            status: "Resolved",
-            winner: {
-              connect: {
-                onchainId_gameId: {
-                  onchainId: outcome.agentIsWinner
-                    ? outcome.singleAgentOnchainId
-                    : outcome.allianceLeaderOnchainId,
-                  gameId: ctx.gameId,
-                },
-              },
-            },
-            endTime: new Date(),
-          },
-        });
-      }
-
-      console.log("🏆 Agent vs Alliance battle resolved successfully");
-    } catch (error) {
-      console.error("Failed to resolve agent vs alliance battle:", error);
-      throw error;
-    }
+    await this.program.methods
+      .resolveBattleAgentVsAlliance(new BN(percentLoss), singleWins)
+      .accounts({
+        singleAgent: singlePda,
+        allianceLeader: leaderPda,
+        alliancePartner: partnerPda,
+        singleAgentToken: single.tokenAccountPub,
+        allianceLeaderToken: leader.tokenAccountPub,
+        alliancePartnerToken: partner.tokenAccountPub,
+        singleAgentAuthority: single.agent.authority,
+        allianceLeaderAuthority: leader.agent.authority,
+        alliancePartnerAuthority: partner.agent.authority,
+        authority: this.program.provider.publicKey,
+      })
+      .rpc();
   }
 
   /**
    * Resolve a battle between two alliances
    */
   private async resolveAllianceVsAllianceBattle(
-    ctx: BattleResolverContext,
-    outcome: AllianceVsAllianceBattleOutcome
+    gamePda: PublicKey,
+    leaderA: BattleParticipant,
+    partnerA: BattleParticipant,
+    leaderB: BattleParticipant,
+    partnerB: BattleParticipant,
+    allianceAWins: boolean,
+    percentLoss: number
   ) {
-    const [gamePda] = getGamePDA(this.program.programId, new BN(ctx.gameId));
-
-    const [allianceALeaderPda] = getAgentPDA(
+    const [leaderAPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      outcome.allianceALeaderOnchainId
+      leaderA.agent.onchainId
     );
-    const [allianceAPartnerPda] = getAgentPDA(
+    const [partnerAPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      outcome.allianceAPartnerOnchainId
+      partnerA.agent.onchainId
     );
-    const [allianceBLeaderPda] = getAgentPDA(
+    const [leaderBPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-      outcome.allianceBLeaderOnchainId
+      leaderB.agent.onchainId
     );
-    const [allianceBPartnerPda] = getAgentPDA(
+    const [partnerBPda] = getAgentPDA(
       this.program.programId,
       gamePda,
-
-      outcome.allianceBPartnerOnchainId
+      partnerB.agent.onchainId
     );
 
-    // Get token accounts
-    const allianceALeaderToken = await getAgentAta(allianceALeaderPda);
-    const allianceAPartnerToken = await getAgentAta(allianceAPartnerPda);
-    const allianceBLeaderToken = await getAgentAta(allianceBLeaderPda);
-    const allianceBPartnerToken = await getAgentAta(allianceBPartnerPda);
-
-    try {
-      // Resolve battle onchain
-      await this.program.methods
-        .resolveBattleAllianceVsAlliance(
-          outcome.percentLoss,
-          outcome.allianceAWins
-        )
-        .accounts({
-          leaderA: allianceALeaderPda,
-          partnerA: allianceAPartnerPda,
-          leaderB: allianceBLeaderPda,
-          partnerB: allianceBPartnerPda,
-          leaderAToken: allianceALeaderToken.address,
-          partnerAToken: allianceAPartnerToken.address,
-          leaderBToken: allianceBLeaderToken.address,
-          partnerBToken: allianceBPartnerToken.address,
-          leaderAAuthority: outcome.allianceALeaderAuthority,
-          partnerAAuthority: outcome.allianceAPartnerAuthority,
-          leaderBAuthority: outcome.allianceBLeaderAuthority,
-          partnerBAuthority: outcome.allianceBPartnerAuthority,
-          authority: this.program.provider.publicKey,
-        })
-        .rpc();
-
-      // Apply health penalties to losing alliance
-      if (outcome.allianceAWins) {
-        await this.applyHealthPenalty(ctx, [
-          outcome.allianceBLeaderOnchainId,
-          outcome.allianceBPartnerOnchainId,
-        ]);
-      } else {
-        await this.applyHealthPenalty(ctx, [
-          outcome.allianceALeaderOnchainId,
-          outcome.allianceAPartnerOnchainId,
-        ]);
-      }
-
-      // Update battle status in database
-      const activeBattle = await this.prisma.battle.findFirst({
-        where: {
-          OR: [
-            {
-              attacker: {
-                onchainId: outcome.allianceALeaderOnchainId,
-                gameId: ctx.gameId,
-              },
-            },
-            {
-              defender: {
-                onchainId: outcome.allianceALeaderOnchainId,
-                gameId: ctx.gameId,
-              },
-            },
-          ],
-          status: "Active",
-        },
-      });
-
-      if (activeBattle) {
-        await this.prisma.battle.update({
-          where: { id: activeBattle.id },
-          data: {
-            status: "Resolved",
-            winner: {
-              connect: {
-                onchainId_gameId: {
-                  onchainId: outcome.allianceAWins
-                    ? outcome.allianceALeaderOnchainId
-                    : outcome.allianceBLeaderOnchainId,
-                  gameId: ctx.gameId,
-                },
-              },
-            },
-            endTime: new Date(),
-          },
-        });
-      }
-
-      console.log("🏆 Alliance vs Alliance battle resolved successfully");
-    } catch (error) {
-      console.error("Failed to resolve alliance vs alliance battle:", error);
-      throw error;
-    }
+    await this.program.methods
+      .resolveBattleAllianceVsAlliance(new BN(percentLoss), allianceAWins)
+      .accounts({
+        leaderA: leaderAPda,
+        partnerA: partnerAPda,
+        leaderB: leaderBPda,
+        partnerB: partnerBPda,
+        leaderAToken: leaderA.tokenAccountPub,
+        partnerAToken: partnerA.tokenAccountPub,
+        leaderBToken: leaderB.tokenAccountPub,
+        partnerBToken: partnerB.tokenAccountPub,
+        leaderAAuthority: leaderA.agent.authority,
+        partnerAAuthority: partnerA.agent.authority,
+        leaderBAuthority: leaderB.agent.authority,
+        partnerBAuthority: partnerB.agent.authority,
+        authority: this.program.provider.publicKey,
+      })
+      .rpc();
   }
 
   /**
-   * Stop the battle resolution interval
+   * Finalize battle by updating status and applying health penalties
    */
-  public stop() {
-    if (this.resolutionInterval) {
-      console.log("🛑 Stopping battle resolution interval");
-      clearInterval(this.resolutionInterval);
-      this.resolutionInterval = null;
+  private async finalizeBattle(
+    winners: BattleParticipant[],
+    losers: BattleParticipant[],
+    game: { id: string; onchainId: number }
+  ) {
+    try {
+      await this.prisma.$transaction(async (prisma) => {
+        // Update battle status
+        await prisma.battle.updateMany({
+          where: {
+            OR: [
+              { attacker: { onchainId: winners[0].agent.onchainId } },
+              { defender: { onchainId: winners[0].agent.onchainId } },
+            ],
+            status: "Active",
+            gameId: game.id,
+          },
+          data: {
+            status: "Resolved",
+            endTime: new Date(),
+          },
+        });
+
+        // Apply health penalties to losers
+        const healthPenalty = 5; // 5% health penalty
+        await Promise.all(
+          losers.map(async (loser) => {
+            const newHealth = Math.max(0, loser.agent.health - healthPenalty);
+            const isNowDead = newHealth <= 0;
+
+            await prisma.agent.update({
+              where: {
+                onchainId_gameId: {
+                  onchainId: loser.agent.onchainId,
+                  gameId: game.id,
+                },
+              },
+              data: {
+                health: newHealth,
+                isAlive: !isNowDead,
+                ...(isNowDead ? { deathTimestamp: new Date() } : {}),
+              },
+            });
+
+            if (isNowDead) {
+              const [gamePda] = getGamePDA(
+                this.program.programId,
+                game.onchainId
+              );
+              const [agentPda] = getAgentPDA(
+                this.program.programId,
+                gamePda,
+                loser.agent.onchainId
+              );
+
+              await this.program.methods
+                .killAgent()
+                .accounts({
+                  agent: agentPda,
+                })
+                .rpc();
+            }
+          })
+        );
+      });
+    } catch (error) {
+      console.error("❌ Failed to finalize battle", error);
+      throw error;
     }
-    console.log("✋ Battle resolution interval stopped successfully");
   }
 }

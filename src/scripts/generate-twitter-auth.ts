@@ -63,10 +63,10 @@ async function getAccessTokens(
 // Comment out the URL generation since we already have the verifier
 // generateAuthUrls();
 
-// Get access tokens for Scootles
-getAccessTokens(
-  "Scootles",
-  "Fe_JlgAAAAABvcbjAAABlLyBJTo", // oauth_token from the URL
-  "DLPXTJc4xDz3e5PIhzHfxCPQMN3PF0U9", // oauth_secret from earlier
-  "xqshvH8dWYqCdK3TnhZGQ2Ss0z4QIt9a" // oauth_verifier from the URL
-);
+// // Get access tokens for Scootles
+// getAccessTokens(
+//   "Scootles",
+//   "cwLGEwAAAAABvcbjAAABlOrvZ0M", // oauth_token from the URL
+//   "DLPXTJc4xDz3e5PIhzHfxCPQMN3PF0U9", // oauth_secret from earlier
+//   "l3SHkwvetu2G3b9TzPLmyvU1ffc66CQ5" // oauth_verifier from the URL
+// );

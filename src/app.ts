@@ -10,7 +10,6 @@ import { InfluenceCalculator } from "./agent/InfluenceCalculator";
 import CacheManager from "./agent/CacheManager";
 import TwitterManager from "./agent/TwitterManager";
 import { DecisionEngine } from "./agent/DecisionEngine";
-
 import { checkDatabaseConnection } from "./utils";
 import { getProgramWithWallet } from "./utils/program";
 import { PrismaClient } from "@prisma/client";
@@ -68,7 +67,7 @@ app.use("/api", router);
 app.use((_req, res) => {
   res.status(404).json({
     success: false,
-    error: "Route not found",
+    error: "Route does not exist",
   });
 });
 
@@ -105,7 +104,7 @@ export async function startServer() {
     process.exit(1);
   }
 
-  const twitter = new TwitterManager(gameInfo.agents);
+  const twitter = new TwitterManager();
   const cache = new CacheManager();
   const calculator = new InfluenceCalculator();
   const eventEmitter = new EventEmitter();
@@ -120,7 +119,7 @@ export async function startServer() {
 
   const orchestrator = new GameOrchestrator(
     gameInfo.gameAccount.gameId,
-    gameInfo.agents[0].agent.gameId,
+    gameInfo.dbGame.id,
     actionManager,
     twitter,
     cache,

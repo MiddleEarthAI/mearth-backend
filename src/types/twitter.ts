@@ -6,14 +6,6 @@ export interface AgentTrait {
   description: string;
 }
 
-export interface UserMetrics {
-  followerCount: number;
-  averageEngagement: number;
-  accountAge: number;
-  verificationStatus: boolean;
-  reputationScore: number;
-}
-
 export interface InfluenceScore {
   interactionId: string;
   score: number;
@@ -47,11 +39,23 @@ export interface TweetData {
 }
 
 export interface TwitterInteraction {
-  type: "reply" | "quote" | "retweet" | "like" | "mention";
+  type: "reply" | "quote" | "mention";
   userId: string;
   username: string;
   tweetId: string;
   content?: string;
+  authorId?: string;
   timestamp: Date;
   userMetrics: UserMetrics;
+}
+
+export interface UserMetrics {
+  followerCount: number;
+  followingCount: number;
+  likeCount: number;
+  accountAge: number; // number of seconds past since account was created
+  tweetCount: number;
+  listedCount: number;
+  verified: boolean;
+  reputationScore: number;
 }
