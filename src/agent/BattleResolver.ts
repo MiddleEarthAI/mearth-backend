@@ -282,8 +282,7 @@ export class BattleResolver {
     const calculatePower = (side: BattleParticipant[]) => {
       return side.reduce((sum, p) => {
         const tokenPower = p.agentAccount.tokenBalance.toNumber();
-        const healthFactor = p.agent.health / 100; // Health as a percentage
-        return sum + tokenPower * healthFactor;
+        return sum + tokenPower;
       }, 0);
     };
 
@@ -529,12 +528,10 @@ export class BattleResolver {
           },
         });
 
-        // Apply health penalties to losers
-        const healthPenalty = 5; // 5% health penalty
+        // Kill any agent that happen to have a death chance in the range 5% - 10%
         await Promise.all(
           losers.map(async (loser) => {
-            const newHealth = Math.max(0, loser.agent.health - healthPenalty);
-            const isNowDead = newHealth <= 0;
+            const shouldDie = Math.random() <= 0.1; // 10% chance of death
 
             await prisma.agent.update({
               where: {
@@ -544,13 +541,12 @@ export class BattleResolver {
                 },
               },
               data: {
-                health: newHealth,
-                isAlive: !isNowDead,
-                ...(isNowDead ? { deathTimestamp: new Date() } : {}),
+                isAlive: !shouldDie,
+                ...(shouldDie ? { deathTimestamp: new Date() } : {}),
               },
             });
 
-            if (isNowDead) {
+            if (shouldDie) {
               const [gamePda] = getGamePDA(
                 this.program.programId,
                 game.onchainId

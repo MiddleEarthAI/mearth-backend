@@ -1,8 +1,8 @@
 import { cleanEnv, str, num, bool, url, port, makeValidator } from "envalid";
-import { config } from "dotenv";
+import { config as dotenvConfig } from "dotenv";
 
 // Load .env file
-config();
+dotenvConfig();
 
 /**
  * Custom validator for BigInt values
@@ -29,7 +29,7 @@ const percentage = makeValidator<number>((input: string) => {
 /**
  * Environment configuration with validation
  */
-export const env = cleanEnv(process.env, {
+const env = cleanEnv(process.env, {
   // Server Configuration
   NODE_ENV: str({
     choices: ["development", "test", "production", "staging"],

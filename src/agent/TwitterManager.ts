@@ -212,8 +212,9 @@ class TwitterManager {
     console.log("📝 Posting new tweet...");
     return agentClient.v2
       .tweet(content, {})
-      .then(() => {
-        console.log("✅ Tweet posted successfully");
+      .then((tweet) => {
+        console.log("✅ Tweet posted successfully", tweet);
+        return tweet;
       })
       .catch((error) => {
         console.error("❌ Failed to post tweet", error);

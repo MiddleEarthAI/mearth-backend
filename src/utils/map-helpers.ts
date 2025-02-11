@@ -17,11 +17,14 @@ export enum Direction {
 /**
  * Gets the coordinates of the adjacent tile in the specified direction
  */
-function getAdjacentCoordinates(
+export function getAdjacentCoordinates(
   x: number,
   y: number,
-  direction: Direction
+  direction?: Direction
 ): { x: number; y: number } {
+  if (!direction) {
+    return { x, y };
+  }
   switch (direction) {
     case Direction.NORTH:
       return { x, y: y - 1 };
@@ -79,7 +82,7 @@ export async function getAllAdjacentTiles(
 export async function getAdjacentTile(
   prisma: PrismaClient,
   tile: MapTile,
-  direction: Direction
+  direction?: Direction
 ): Promise<MapTile | null> {
   const { x, y } = getAdjacentCoordinates(tile.x, tile.y, direction);
 
@@ -147,4 +150,51 @@ export function areAdjacent(tile1: MapTile, tile2: MapTile): boolean {
 
   // Tiles are adjacent if they differ by at most 1 in both x and y coordinates
   return xDiff <= 1 && yDiff <= 1 && !(xDiff === 0 && yDiff === 0);
+}
+
+/**
+ * Gets four adjacent tiles in a cross formation (+)
+ * If no center tile provided, finds a random suitable tile to use as center
+ * @param prisma - PrismaClient instance
+ * @param centerTile - Optional center MapTile to get adjacent tiles around
+ * @returns Promise<MapTile[]> - Array of 4 adjacent MapTiles in cross formation
+ */
+export async function getFourTiles(
+  prisma: PrismaClient,
+  centerTile?: MapTile
+): Promise<MapTile[]> {
+  // If no center provided, get random unoccupied tile
+  const center =
+    centerTile ??
+    (await prisma.mapTile.findFirstOrThrow({
+      where: {
+        agent: null,
+        // Ensure tile has room for adjacent tiles
+        x: { gt: 0 },
+        y: { gt: 0 },
+      },
+      orderBy: {
+        // Random ordering
+        id: Math.random() > 0.5 ? "asc" : "desc",
+      },
+    }));
+
+  // Get adjacent tiles in cross pattern
+  const adjacentTiles = await prisma.mapTile.findMany({
+    where: {
+      OR: [
+        { x: center.x, y: center.y - 1 }, // North
+        { x: center.x + 1, y: center.y }, // East
+        { x: center.x, y: center.y + 1 }, // South
+        { x: center.x - 1, y: center.y }, // West
+      ],
+      agent: null, // Only get unoccupied tiles
+    },
+  });
+
+  if (adjacentTiles.length !== 4) {
+    throw new Error("Could not find 4 adjacent unoccupied tiles");
+  }
+
+  return adjacentTiles;
 }

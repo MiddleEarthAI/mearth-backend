@@ -150,7 +150,6 @@ exports.Prisma.AgentScalarFieldEnum = {
   id: 'id',
   onchainId: 'onchainId',
   authority: 'authority',
-  health: 'health',
   gameId: 'gameId',
   isAlive: 'isAlive',
   profileId: 'profileId',
@@ -238,12 +237,28 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.GameLogScalarFieldEnum = {
+  id: 'id',
+  timestamp: 'timestamp',
+  type: 'type',
+  level: 'level',
+  message: 'message',
+  data: 'data',
+  agentId: 'agentId',
+  gameId: 'gameId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
@@ -305,6 +320,22 @@ exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER'
 };
 
+exports.LogType = exports.$Enums.LogType = {
+  BATTLE: 'BATTLE',
+  MOVEMENT: 'MOVEMENT',
+  ALLIANCE: 'ALLIANCE',
+  SYSTEM: 'SYSTEM',
+  ERROR: 'ERROR',
+  AGENT_ACTION: 'AGENT_ACTION'
+};
+
+exports.LogLevel = exports.$Enums.LogLevel = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  ERROR: 'ERROR',
+  DEBUG: 'DEBUG'
+};
+
 exports.Prisma.ModelName = {
   Game: 'Game',
   AgentProfile: 'AgentProfile',
@@ -316,7 +347,8 @@ exports.Prisma.ModelName = {
   Battle: 'Battle',
   Interaction: 'Interaction',
   CoolDown: 'CoolDown',
-  User: 'User'
+  User: 'User',
+  GameLog: 'GameLog'
 };
 
 /**

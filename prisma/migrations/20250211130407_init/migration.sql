@@ -19,6 +19,12 @@ CREATE TYPE "CooldownType" AS ENUM ('Alliance', 'Battle', 'Ignore', 'Move');
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'MANAGER', 'USER');
 
+-- CreateEnum
+CREATE TYPE "LogType" AS ENUM ('BATTLE', 'MOVEMENT', 'ALLIANCE', 'SYSTEM', 'ERROR', 'AGENT_ACTION');
+
+-- CreateEnum
+CREATE TYPE "LogLevel" AS ENUM ('INFO', 'WARNING', 'ERROR', 'DEBUG');
+
 -- CreateTable
 CREATE TABLE "Game" (
     "id" TEXT NOT NULL,
@@ -59,7 +65,6 @@ CREATE TABLE "Agent" (
     "id" TEXT NOT NULL,
     "onchainId" INTEGER NOT NULL,
     "authority" TEXT NOT NULL,
-    "health" INTEGER NOT NULL DEFAULT 100,
     "gameId" TEXT NOT NULL,
     "isAlive" BOOLEAN NOT NULL DEFAULT true,
     "profileId" TEXT NOT NULL,
@@ -173,6 +178,20 @@ CREATE TABLE "User" (
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "GameLog" (
+    "id" TEXT NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "type" "LogType" NOT NULL,
+    "level" "LogLevel" NOT NULL,
+    "message" TEXT NOT NULL,
+    "data" JSONB,
+    "agentId" TEXT,
+    "gameId" TEXT,
+
+    CONSTRAINT "GameLog_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Game_onchainId_key" ON "Game"("onchainId");
 
@@ -202,6 +221,21 @@ CREATE UNIQUE INDEX "User_privyUserId_key" ON "User"("privyUserId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE INDEX "GameLog_timestamp_idx" ON "GameLog"("timestamp");
+
+-- CreateIndex
+CREATE INDEX "GameLog_type_idx" ON "GameLog"("type");
+
+-- CreateIndex
+CREATE INDEX "GameLog_level_idx" ON "GameLog"("level");
+
+-- CreateIndex
+CREATE INDEX "GameLog_agentId_idx" ON "GameLog"("agentId");
+
+-- CreateIndex
+CREATE INDEX "GameLog_gameId_idx" ON "GameLog"("gameId");
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -259,3 +293,9 @@ ALTER TABLE "CoolDown" ADD CONSTRAINT "CoolDown_cooledAgentId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "CoolDown" ADD CONSTRAINT "CoolDown_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GameLog" ADD CONSTRAINT "GameLog_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GameLog" ADD CONSTRAINT "GameLog_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE SET NULL ON UPDATE CASCADE;

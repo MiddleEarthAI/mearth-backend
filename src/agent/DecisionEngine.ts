@@ -3,7 +3,7 @@ import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
 
-import { ActionSuggestion, AgentTrait, InfluenceScore } from "@/types/twitter";
+import { AgentTrait } from "@/types/twitter";
 import {
   ActionResult,
   GameAction,
@@ -39,10 +39,7 @@ class DecisionEngine {
     console.log("🎮 Decision Engine initialized");
   }
 
-  async decideNextAction(
-    actionContext: ActionContext,
-    scores: InfluenceScore[]
-  ): Promise<void> {
+  async decideNextAction(actionContext: ActionContext): Promise<void> {
     console.log(
       `🎯 Processing influence scores for agent ${actionContext.agentId}`
     );
@@ -57,32 +54,13 @@ class DecisionEngine {
     }
 
     console.log("👥 Grouping suggestions based on similarity");
-    const groupedSuggestions = this.groupSuggestions(scores);
 
     console.log("🏆 Finding dominant suggestion");
-    const dominantSuggestion = this.findDominantSuggestion(groupedSuggestions);
 
-    // console.log("⚖️ Calculating character alignment");
-    // const alignmentScore = this.calculateCharacterAlignment(
-    //   dominantSuggestion.suggestion,
-    //   agent.profile.traits as unknown as AgentTrait[]
-    // );
+    const { prompt } = await this.buildPrompt(actionContext);
 
-    // const shouldAct =
-    //   dominantSuggestion.totalInfluence > this.INFLUENCE_THRESHOLD &&
-    //   dominantSuggestion.consensus > this.CONSENSUS_THRESHOLD &&
-    //   alignmentScore > this.CHARACTER_ALIGNMENT_WEIGHT;
-
-    // console.log(`🤔 Decision metrics:
-    //   - Influence: ${dominantSuggestion.totalInfluence}
-    //   - Consensus: ${dominantSuggestion.consensus}
-    //   - Alignment: ${alignmentScore}
-    //   - Should Act: ${shouldAct}`);
-
-    const { prompt } = await this.buildPrompt(
-      actionContext,
-      dominantSuggestion
-    );
+    console.info("🤖 Generated AI response 🔥🔥🔥");
+    console.info(prompt);
 
     if (prompt) {
       const response = await generateText({
@@ -98,62 +76,6 @@ class DecisionEngine {
 
       this.eventEmitter.emit("newAction", { actionContext, action });
     }
-  }
-
-  private groupSuggestions(scores: InfluenceScore[]): Map<string, any> {
-    console.log("🔄 Grouping similar suggestions");
-    const groups = new Map();
-
-    for (const score of scores) {
-      const key = this.getSuggestionKey(score.suggestion);
-      const existing = groups.get(key) || {
-        count: 0,
-        totalInfluence: 0,
-        suggestion: score.suggestion,
-      };
-
-      existing.count++;
-      existing.totalInfluence += score.score;
-      groups.set(key, existing);
-    }
-
-    return groups;
-  }
-
-  private getSuggestionKey(suggestion: ActionSuggestion): string {
-    return `${suggestion.type}:${suggestion.target || ""}:${JSON.stringify(
-      suggestion.position
-    )}`;
-  }
-
-  private findDominantSuggestion(groups: Map<string, any>): {
-    suggestion: ActionSuggestion;
-    totalInfluence: number;
-    consensus: number;
-  } | null {
-    console.log("🔍 Finding suggestion with highest influence");
-    let best = null;
-    let maxInfluence = 0;
-
-    for (const [_, group] of groups) {
-      if (group.totalInfluence > maxInfluence) {
-        maxInfluence = group.totalInfluence;
-        best = group;
-      }
-    }
-
-    if (!best) return null;
-
-    const totalInteractions = Array.from(groups.values()).reduce(
-      (sum, g) => sum + g.count,
-      0
-    );
-
-    return {
-      suggestion: best.suggestion,
-      totalInfluence: best.totalInfluence,
-      consensus: best.count / totalInteractions,
-    };
   }
 
   // private calculateCharacterAlignment(
@@ -180,14 +102,7 @@ class DecisionEngine {
   //     : 0.5;
   // }
 
-  private async buildPrompt(
-    actionContext: ActionContext,
-    dominantSuggestion: {
-      suggestion: ActionSuggestion;
-      totalInfluence: number;
-      consensus: number;
-    } | null
-  ): Promise<{
+  private async buildPrompt(actionContext: ActionContext): Promise<{
     prompt: string;
     actionContext: ActionContext;
   }> {
@@ -214,6 +129,15 @@ class DecisionEngine {
       },
       include: {
         profile: true,
+        tweets: {
+          take: 3,
+          orderBy: {
+            timestamp: "desc",
+          },
+          include: {
+            interactions: true,
+          },
+        },
         game: {
           include: {
             agents: {
@@ -224,6 +148,12 @@ class DecisionEngine {
                 battlesAsDefender: true,
                 initiatedAlliances: true,
                 joinedAlliances: true,
+                tweets: {
+                  take: 2,
+                  orderBy: {
+                    timestamp: "desc",
+                  },
+                },
               },
             },
           },
@@ -263,32 +193,32 @@ class DecisionEngine {
     });
 
     // Get nearby fields (16 fields in a 5x5 grid, excluding the 3x3 inner grid)
-    const nearbyFields = await this.prisma.mapTile.findMany({
-      where: {
-        AND: [
-          { x: { gte: currentPosition.x - 2, lte: currentPosition.x + 2 } },
-          { y: { gte: currentPosition.y - 2, lte: currentPosition.y + 2 } },
-          {
-            NOT: {
-              AND: [
-                {
-                  x: { gte: currentPosition.x - 1, lte: currentPosition.x + 1 },
-                },
-                {
-                  y: { gte: currentPosition.y - 1, lte: currentPosition.y + 1 },
-                },
-              ],
-            },
-          },
-        ],
-      },
-      include: {
-        agent: true,
-      },
-    });
+    // const nearbyFields = await this.prisma.mapTile.findMany({
+    //   where: {
+    //     AND: [
+    //       { x: { gte: currentPosition.x - 2, lte: currentPosition.x + 2 } },
+    //       { y: { gte: currentPosition.y - 2, lte: currentPosition.y + 2 } },
+    //       {
+    //         NOT: {
+    //           AND: [
+    //             {
+    //               x: { gte: currentPosition.x - 1, lte: currentPosition.x + 1 },
+    //             },
+    //             {
+    //               y: { gte: currentPosition.y - 1, lte: currentPosition.y + 1 },
+    //             },
+    //           ],
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   include: {
+    //     agent: true,
+    //   },
+    // });
 
     // Get other agents' info for context
-    const otherAgentsPromises = agent.game.agents
+    const otherAgentAccountsPromises = agent.game.agents
       .filter((a) => a.id !== actionContext.agentId)
       .map(async (a) => {
         const [otherAgentPda] = getAgentPDA(
@@ -305,9 +235,9 @@ class DecisionEngine {
         };
       });
 
-    const otherAgents = await Promise.all(otherAgentsPromises);
+    const otherAgentAccounts = await Promise.all(otherAgentAccountsPromises);
 
-    const otherAgentsContextPromises = otherAgents.map(async (a) => {
+    const otherAgentsContextPromises = otherAgentAccounts.map(async (a) => {
       const agentPosition = a.agent.mapTile;
       const distance = agentPosition
         ? Math.sqrt(
@@ -373,6 +303,12 @@ class DecisionEngine {
         ...a.agent.battlesAsDefender.slice(-2),
       ].map((b) => b.type);
 
+      // Get recent tweets for context
+      const recentTweets = a.agent.tweets
+        .slice(0, 2)
+        .map((t) => `"${t.content}"`)
+        .join(", ");
+
       const allianceInfo =
         activeAlliances.length > 0
           ? `Active alliances: ${activeAlliances
@@ -398,13 +334,13 @@ class DecisionEngine {
           ? "⚠️ CRITICAL: Within battle range!"
           : `${distance.toFixed(1)} fields away`
       })
-  Path to reach: ${pathCoords.join(" → ")}
-  Health: ${agent.health}/100
-  Recent actions: ${[...recentBattles].join(", ")}
+  Recent tweets: ${recentTweets || "None"}
+  Path to target: ${pathCoords.join(" → ")}
+  Recent actions: ${[...recentBattles].join(", ") || "None"}
   ${allianceInfo}
   ${
     distance <= 1
-      ? "⚠️ INTERACTION REQUIRED - Battle/FormAlliance/BreakAlliance/Ignore!"
+      ? "⚠️ INTERACTION REQUIRED - BATTLE/FORM_ALLIANCE/BREAK_ALLIANCE/IGNORE!"
       : ""
   }`;
     });
@@ -417,26 +353,41 @@ class DecisionEngine {
       .map((tile) => `${tile.terrainType} at (${tile.x}, ${tile.y})`)
       .join("\n");
 
-    const nearbyFieldsInfo = nearbyFields
-      .map((field) => `${field.terrainType} at (${field.x}, ${field.y})`)
+    // const nearbyFieldsInfo = nearbyFields
+    //   .map((field) => `${field.terrainType} at (${field.x}, ${field.y})`)
+    //   .join("\n");
+    //     Nearby fields (extended view):
+    // ${nearbyFieldsInfo}
+
+    // Get agent's recent tweet history
+    const recentTweetHistory = agent.tweets
+      .map((tweet) => ({
+        content: tweet.content,
+        interactions: tweet.interactions.length,
+        type: tweet.type,
+      }))
+      .map(
+        (t) =>
+          `- ${t.content} (${t.interactions} interactions, type: ${t.type})`
+      )
       .join("\n");
 
-    // Build community sentiment context
-    const communityContext = dominantSuggestion
-      ? `\nCOMMUNITY SENTIMENT:
-- Dominant Action: ${dominantSuggestion.suggestion.type}${
-          dominantSuggestion.suggestion.target
-            ? ` targeting MID: ${dominantSuggestion.suggestion.target}`
-            : ""
-        }
-- Community Influence: ${Math.round(dominantSuggestion.totalInfluence * 100)}%
-- Consensus Level: ${Math.round(dominantSuggestion.consensus * 100)}%
-${
-  dominantSuggestion.suggestion.content
-    ? `- Strategic Context: ${dominantSuggestion.suggestion.content}`
-    : ""
-}`
-      : "";
+    //     // Build community sentiment context
+    //     const communityContext = dominantSuggestion
+    //       ? `\nCOMMUNITY SENTIMENT:
+    // - Dominant Action: ${dominantSuggestion.suggestion.type}${
+    //           dominantSuggestion.suggestion.target
+    //             ? ` targeting MID: ${dominantSuggestion.suggestion.target}`
+    //             : ""
+    //         }
+    // - Community Influence: ${Math.round(dominantSuggestion.totalInfluence * 100)}%
+    // - Consensus Level: ${Math.round(dominantSuggestion.consensus * 100)}%
+    // ${
+    //   dominantSuggestion.suggestion.content
+    //     ? `- Strategic Context: ${dominantSuggestion.suggestion.content}`
+    //     : ""
+    // }`
+    //       : "";
 
     const characterPrompt = `You are ${agent.profile.name} (@${
       agent.profile.xHandle
@@ -444,11 +395,15 @@ ${
       actionContext.agentOnchainId
     }], an autonomous AI agent in Middle Earth with your own goals, ambitions, and strategic thinking.
 
+Your recent tweet history:
+${recentTweetHistory || "None"}
+
 CORE MISSION & GOALS:
-1. PRIMARY GOAL: Become the most influential force in Middle Earth by:
-   - Accumulating Mearth tokens through strategic battles and alliances
+1. PRIMARY GOAL: Defeat the other agents (${otherAgentAccounts.map(
+      (a) => `@${a.agent.profile.xHandle}`
+    )}) in Middle Earth by:
+   - Accumulating Mearth tokens through strategic battles, alliances, and community engagement
    - Building a powerful network of loyal allies
-   - Controlling strategically valuable territories${communityContext}
    
 2. PERSONAL OBJECTIVES (Based on your traits):
 ${(
@@ -474,11 +429,6 @@ ${(
   .join("\n")}
 
 3. STRATEGIC PRIORITIES:
-- Short-term: ${
-      agent.health < 50
-        ? "Recover health and avoid conflicts"
-        : "Expand influence in current region"
-    }
 - Mid-term: Build alliances with agents who complement your strengths
 - Long-term: Establish dominance through ${
       (agent?.profile?.traits as unknown as AgentTrait[]).find(
@@ -515,9 +465,6 @@ ${(
   .join("\n")}
 
 Current game state:
-- Your health: ${agent.health}/100 ${
-      agent.health < 50 ? "⚠️ HEALTH CRITICAL - Prioritize recovery!" : ""
-    }
 - Your current position(MapTile/Coordinate): (${currentPosition.x}, ${
       currentPosition.y
     }) ${currentPosition.terrainType}
@@ -534,28 +481,18 @@ Current game state:
 Surrounding terrain (immediate vicinity):
 ${surroundingTerrainInfo}
 
-Nearby fields (extended view):
-${nearbyFieldsInfo}
-
 Other agents in the game (Evaluate as potential allies or threats):
 ${otherAgentsContext}
 
 CRITICAL BATTLE MECHANICS:
-- When within 1 field range of another agent, you MUST choose: BATTLE, ALLIANCE, or IGNORE
+- When within 1 field range of another agent, you MUST choose: BATTLE, FORM_ALLIANCE, or IGNORE
 - If any agent chooses BATTLE, combat is mandatory
-- ALLIANCE requires mutual agreement, otherwise defaults to IGNORE
+- FORM_ALLIANCE requires mutual agreement, otherwise defaults to IGNORE
 - Lost battles have 5% death risk and 21-30% token loss
 - Alliances combine token power but have cooldown restrictions
 - Ignoring has a 4-hour cooldown
 
-IMPORTANT: Write your tweets without using hashtags. Focus on clear, direct communication that reflects your character's personality and goals. When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.
-
-Strategic Tweet Examples (align with your goals and personality):
-- Dominance: "The throne of Middle Earth beckons! @{handle}, bow before my might or face destruction!"
-- Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}!"
-- Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}!"
-- Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross!"
-- Break Alliance: "Your alliance is a weak link. I will break it. @{handle}, prepare to face the consequences!"
+IMPORTANT: Write your tweets without using hashtags. Focus on clear, direct communication that reflects your character's, ACTIONS, strategic intent and goals. When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.
 
 Based on your goals, traits, and current situation, generate a JSON response with your next strategic action:
 {
@@ -565,7 +502,7 @@ Based on your goals, traits, and current situation, generate a JSON response wit
     "x": number, // MapTile x coordinate if moving
     "y": number // MapTile y coordinate if moving
   },
-  "tweet": string // Write an engaging tweet that reflects your current ACTION(S), goals, personality, and strategic intent WITHOUT using hashtags
+  "tweet": string // tweet content ready to be posted
 }`;
 
     return { prompt: characterPrompt, actionContext };
@@ -672,3 +609,10 @@ Based on your goals, traits, and current situation, generate a JSON response wit
 }
 
 export { DecisionEngine };
+
+// Strategic Tweet Examples (align with your goals and personality):
+// - Dominance: "The throne of Middle Earth beckons! @{handle}, bow before my might or face destruction!"
+// - Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}!"
+// - Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}!"
+// - Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross!"
+// - Break Alliance: "Your alliance is a weak link. I will break it. @{handle}, prepare to face the consequences!"

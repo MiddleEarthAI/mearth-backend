@@ -1,102 +1,91 @@
 import { Router, Response } from "express";
-import { privyAuth, AuthenticatedRequest } from "@/middleware/privy-auth";
+import { AuthenticatedRequest } from "@/middleware/privy-auth";
 // import { requireAdmin, requireGameAccess } from "@/middleware/authorize";
 import { getGamePDA } from "@/utils/pda";
 import { getProgramWithWallet } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
 
-import { GameOrchestrator } from "@/agent/GameOrchestrator";
 import { prisma } from "@/config/prisma";
 import { checkDatabaseConnection } from "@/utils";
-import { BattleResolver } from "@/agent/BattleResolver";
-import { PrismaClient } from "@prisma/client";
-import TwitterApi from "twitter-api-v2";
-import { EventEmitter } from "events";
-import TwitterManager, { AgentId } from "@/agent/TwitterManager";
-import CacheManager from "@/agent/CacheManager";
-import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
-import { DecisionEngine } from "@/agent/DecisionEngine";
-import { ActionManager } from "@/agent/ActionManager";
-import { GameManager } from "@/agent/GameManager";
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * Initialize a new game
  * Protected: Requires admin role
  */
 router.post(
-  "/init",
+  "/init"
   // [privyAuth, requireAdmin],
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      await checkDatabaseConnection();
+  // async (req: AuthenticatedRequest, res: Response) => {
+  //   try {
+  //     await checkDatabaseConnection();
 
-      const program = await getProgramWithWallet();
-      const prisma = new PrismaClient();
-      const gameManager = new GameManager(program, prisma);
-      const { agents, gameAccount } = await gameManager.createNewGame();
+  //     const program = await getProgramWithWallet();
+  //     const prisma = new PrismaClient();
+  //     const gameManager = new GameManager(program, prisma);
+  //     const { agents, gameAccount } = await gameManager.createNewGame();
 
-      const twitter = new TwitterManager(agents);
-      const cache = new CacheManager();
-      const calculator = new InfluenceCalculator();
-      const eventEmitter = new EventEmitter();
-      const actionManager = new ActionManager(
-        program,
-        gameAccount.gameId,
-        prisma
-      );
-      const engine = new DecisionEngine(prisma, eventEmitter, program);
+  //     const twitter = new TwitterManager(agents);
+  //     const cache = new CacheManager();
 
-      const battleResolver = new BattleResolver(
-        {
-          gameOnchainId: gameAccount.gameId,
-          gameId: gameAccount.gameId,
-        },
-        program,
-        prisma
-      );
+  //     const eventEmitter = new EventEmitter();
+  //     const actionManager = new ActionManager(
+  //       program,
+  //       gameAccount.gameId,
+  //       prisma
+  //     );
+  //     const engine = new DecisionEngine(prisma, eventEmitter, program);
 
-      const orchestrator = new GameOrchestrator(
-        gameAccount.gameId,
-        agents[0].agent.gameId,
-        actionManager,
-        twitter,
-        cache,
-        calculator,
-        engine,
-        prisma,
-        eventEmitter,
-        battleResolver
-      );
+  //     const battleResolver = new BattleResolver(
+  //       {
+  //         gameOnchainId: gameAccount.gameId,
+  //         gameId: gameAccount.gameId,
+  //       },
+  //       program,
+  //       prisma
+  //     );
 
-      try {
-        await orchestrator.start();
-        console.info("System started successfully");
-      } catch (error) {
-        console.error("Failed to start system", { error });
-        process.exit(1);
-      }
+  //     const orchestrator = new GameOrchestrator(
+  //       gameAccount.gameId,
+  //       agents[0].agent.gameId,
+  //       actionManager,
+  //       twitter,
+  //       cache,
+  //       calculator,
+  //       engine,
+  //       prisma,
+  //       eventEmitter,
+  //       battleResolver
+  //     );
 
-      console.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
-      res.json({
-        success: true,
-        data: {
-          gameId: gameAccount.gameId,
-          gameAccount,
-          initializationTime: new Date().toISOString(),
-          initiatedBy: req.user?.id,
-        },
-      });
-    } catch (error) {
-      console.error(`💥 Failed to initialize game:`, error);
-      res.status(500).json({
-        success: false,
-        error: "Failed to initialize game",
-        details: (error as Error).message,
-      });
-    }
-  }
+  //     try {
+  //       await orchestrator.start();
+  //       console.info("System started successfully");
+  //     } catch (error) {
+  //       console.error("Failed to start system", { error });
+  //       process.exit(1);
+  //     }
+
+  //     console.info(`✨ Game ${gameAccount.gameId} successfully initialized!`);
+  //     res.json({
+  //       success: true,
+  //       data: {
+  //         gameId: gameAccount.gameId,
+  //         gameAccount,
+  //         initializationTime: new Date().toISOString(),
+  //         initiatedBy: req.user?.id,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.error(`💥 Failed to initialize game:`, error);
+  //     res.status(500).json({
+  //       success: false,
+  //       error: "Failed to initialize game",
+  //       details: (error as Error).message,
+  //     });
+  //   }
+  // }
 );
 
 /**

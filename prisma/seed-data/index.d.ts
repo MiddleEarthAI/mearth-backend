@@ -68,6 +68,11 @@ export type CoolDown = $Result.DefaultSelection<Prisma.$CoolDownPayload>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model GameLog
+ * 
+ */
+export type GameLog = $Result.DefaultSelection<Prisma.$GameLogPayload>
 
 /**
  * Enums
@@ -136,6 +141,28 @@ export const UserRole: {
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
+
+export const LogType: {
+  BATTLE: 'BATTLE',
+  MOVEMENT: 'MOVEMENT',
+  ALLIANCE: 'ALLIANCE',
+  SYSTEM: 'SYSTEM',
+  ERROR: 'ERROR',
+  AGENT_ACTION: 'AGENT_ACTION'
+};
+
+export type LogType = (typeof LogType)[keyof typeof LogType]
+
+
+export const LogLevel: {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  ERROR: 'ERROR',
+  DEBUG: 'DEBUG'
+};
+
+export type LogLevel = (typeof LogLevel)[keyof typeof LogLevel]
+
 }
 
 export type AllianceStatus = $Enums.AllianceStatus
@@ -165,6 +192,14 @@ export const CooldownType: typeof $Enums.CooldownType
 export type UserRole = $Enums.UserRole
 
 export const UserRole: typeof $Enums.UserRole
+
+export type LogType = $Enums.LogType
+
+export const LogType: typeof $Enums.LogType
+
+export type LogLevel = $Enums.LogLevel
+
+export const LogLevel: typeof $Enums.LogLevel
 
 /**
  * ##  Prisma Client ʲˢ
@@ -400,6 +435,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.gameLog`: Exposes CRUD operations for the **GameLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GameLogs
+    * const gameLogs = await prisma.gameLog.findMany()
+    * ```
+    */
+  get gameLog(): Prisma.GameLogDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -850,7 +895,8 @@ export namespace Prisma {
     Battle: 'Battle',
     Interaction: 'Interaction',
     CoolDown: 'CoolDown',
-    User: 'User'
+    User: 'User',
+    GameLog: 'GameLog'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -866,7 +912,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "game" | "agentProfile" | "agent" | "ignore" | "mapTile" | "tweet" | "alliance" | "battle" | "interaction" | "coolDown" | "user"
+      modelProps: "game" | "agentProfile" | "agent" | "ignore" | "mapTile" | "tweet" | "alliance" | "battle" | "interaction" | "coolDown" | "user" | "gameLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1684,6 +1730,80 @@ export namespace Prisma {
           }
         }
       }
+      GameLog: {
+        payload: Prisma.$GameLogPayload<ExtArgs>
+        fields: Prisma.GameLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GameLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GameLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>
+          }
+          findFirst: {
+            args: Prisma.GameLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GameLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>
+          }
+          findMany: {
+            args: Prisma.GameLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>[]
+          }
+          create: {
+            args: Prisma.GameLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>
+          }
+          createMany: {
+            args: Prisma.GameLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.GameLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>[]
+          }
+          delete: {
+            args: Prisma.GameLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>
+          }
+          update: {
+            args: Prisma.GameLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.GameLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GameLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.GameLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.GameLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameLogPayload>
+          }
+          aggregate: {
+            args: Prisma.GameLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGameLog>
+          }
+          groupBy: {
+            args: Prisma.GameLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GameLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GameLogCountArgs<ExtArgs>
+            result: $Utils.Optional<GameLogCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1779,6 +1899,7 @@ export namespace Prisma {
     interaction?: InteractionOmit
     coolDown?: CoolDownOmit
     user?: UserOmit
+    gameLog?: GameLogOmit
   }
 
   /* Types for Logging */
@@ -1878,6 +1999,7 @@ export namespace Prisma {
     battles: number
     coolDown: number
     Ignore: number
+    GameLog: number
   }
 
   export type GameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1886,6 +2008,7 @@ export namespace Prisma {
     battles?: boolean | GameCountOutputTypeCountBattlesArgs
     coolDown?: boolean | GameCountOutputTypeCountCoolDownArgs
     Ignore?: boolean | GameCountOutputTypeCountIgnoreArgs
+    GameLog?: boolean | GameCountOutputTypeCountGameLogArgs
   }
 
   // Custom InputTypes
@@ -1932,6 +2055,13 @@ export namespace Prisma {
    */
   export type GameCountOutputTypeCountIgnoreArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: IgnoreWhereInput
+  }
+
+  /**
+   * GameCountOutputType without action
+   */
+  export type GameCountOutputTypeCountGameLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GameLogWhereInput
   }
 
 
@@ -1982,6 +2112,7 @@ export namespace Prisma {
     joinedAlliances: number
     ignoredBy: number
     ignoring: number
+    GameLog: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1996,6 +2127,7 @@ export namespace Prisma {
     joinedAlliances?: boolean | AgentCountOutputTypeCountJoinedAlliancesArgs
     ignoredBy?: boolean | AgentCountOutputTypeCountIgnoredByArgs
     ignoring?: boolean | AgentCountOutputTypeCountIgnoringArgs
+    GameLog?: boolean | AgentCountOutputTypeCountGameLogArgs
   }
 
   // Custom InputTypes
@@ -2084,6 +2216,13 @@ export namespace Prisma {
    */
   export type AgentCountOutputTypeCountIgnoringArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: IgnoreWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountGameLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GameLogWhereInput
   }
 
 
@@ -2393,6 +2532,7 @@ export namespace Prisma {
     battles?: boolean | Game$battlesArgs<ExtArgs>
     coolDown?: boolean | Game$coolDownArgs<ExtArgs>
     Ignore?: boolean | Game$IgnoreArgs<ExtArgs>
+    GameLog?: boolean | Game$GameLogArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["game"]>
 
@@ -2448,6 +2588,7 @@ export namespace Prisma {
     battles?: boolean | Game$battlesArgs<ExtArgs>
     coolDown?: boolean | Game$coolDownArgs<ExtArgs>
     Ignore?: boolean | Game$IgnoreArgs<ExtArgs>
+    GameLog?: boolean | Game$GameLogArgs<ExtArgs>
     _count?: boolean | GameCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2461,6 +2602,7 @@ export namespace Prisma {
       battles: Prisma.$BattlePayload<ExtArgs>[]
       coolDown: Prisma.$CoolDownPayload<ExtArgs>[]
       Ignore: Prisma.$IgnorePayload<ExtArgs>[]
+      GameLog: Prisma.$GameLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2874,6 +3016,7 @@ export namespace Prisma {
     battles<T extends Game$battlesArgs<ExtArgs> = {}>(args?: Subset<T, Game$battlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BattlePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     coolDown<T extends Game$coolDownArgs<ExtArgs> = {}>(args?: Subset<T, Game$coolDownArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoolDownPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     Ignore<T extends Game$IgnoreArgs<ExtArgs> = {}>(args?: Subset<T, Game$IgnoreArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    GameLog<T extends Game$GameLogArgs<ExtArgs> = {}>(args?: Subset<T, Game$GameLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3408,6 +3551,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
+   * Game.GameLog
+   */
+  export type Game$GameLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    where?: GameLogWhereInput
+    orderBy?: GameLogOrderByWithRelationInput | GameLogOrderByWithRelationInput[]
+    cursor?: GameLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: GameLogScalarFieldEnum | GameLogScalarFieldEnum[]
   }
 
   /**
@@ -4593,19 +4760,16 @@ export namespace Prisma {
 
   export type AgentAvgAggregateOutputType = {
     onchainId: number | null
-    health: number | null
   }
 
   export type AgentSumAggregateOutputType = {
     onchainId: number | null
-    health: number | null
   }
 
   export type AgentMinAggregateOutputType = {
     id: string | null
     onchainId: number | null
     authority: string | null
-    health: number | null
     gameId: string | null
     isAlive: boolean | null
     profileId: string | null
@@ -4617,7 +4781,6 @@ export namespace Prisma {
     id: string | null
     onchainId: number | null
     authority: string | null
-    health: number | null
     gameId: string | null
     isAlive: boolean | null
     profileId: string | null
@@ -4629,7 +4792,6 @@ export namespace Prisma {
     id: number
     onchainId: number
     authority: number
-    health: number
     gameId: number
     isAlive: number
     profileId: number
@@ -4641,19 +4803,16 @@ export namespace Prisma {
 
   export type AgentAvgAggregateInputType = {
     onchainId?: true
-    health?: true
   }
 
   export type AgentSumAggregateInputType = {
     onchainId?: true
-    health?: true
   }
 
   export type AgentMinAggregateInputType = {
     id?: true
     onchainId?: true
     authority?: true
-    health?: true
     gameId?: true
     isAlive?: true
     profileId?: true
@@ -4665,7 +4824,6 @@ export namespace Prisma {
     id?: true
     onchainId?: true
     authority?: true
-    health?: true
     gameId?: true
     isAlive?: true
     profileId?: true
@@ -4677,7 +4835,6 @@ export namespace Prisma {
     id?: true
     onchainId?: true
     authority?: true
-    health?: true
     gameId?: true
     isAlive?: true
     profileId?: true
@@ -4776,7 +4933,6 @@ export namespace Prisma {
     id: string
     onchainId: number
     authority: string
-    health: number
     gameId: string
     isAlive: boolean
     profileId: string
@@ -4807,7 +4963,6 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
-    health?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -4827,6 +4982,7 @@ export namespace Prisma {
     mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
     ignoredBy?: boolean | Agent$ignoredByArgs<ExtArgs>
     ignoring?: boolean | Agent$ignoringArgs<ExtArgs>
+    GameLog?: boolean | Agent$GameLogArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -4834,7 +4990,6 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
-    health?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -4849,7 +5004,6 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
-    health?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -4864,7 +5018,6 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
-    health?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -4872,7 +5025,7 @@ export namespace Prisma {
     mapTileId?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "health" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
@@ -4888,6 +5041,7 @@ export namespace Prisma {
     mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
     ignoredBy?: boolean | Agent$ignoredByArgs<ExtArgs>
     ignoring?: boolean | Agent$ignoringArgs<ExtArgs>
+    GameLog?: boolean | Agent$GameLogArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4918,12 +5072,12 @@ export namespace Prisma {
       mapTile: Prisma.$MapTilePayload<ExtArgs>
       ignoredBy: Prisma.$IgnorePayload<ExtArgs>[]
       ignoring: Prisma.$IgnorePayload<ExtArgs>[]
+      GameLog: Prisma.$GameLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       onchainId: number
       authority: string
-      health: number
       gameId: string
       isAlive: boolean
       profileId: string
@@ -5337,6 +5491,7 @@ export namespace Prisma {
     mapTile<T extends MapTileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MapTileDefaultArgs<ExtArgs>>): Prisma__MapTileClient<$Result.GetResult<Prisma.$MapTilePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     ignoredBy<T extends Agent$ignoredByArgs<ExtArgs> = {}>(args?: Subset<T, Agent$ignoredByArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     ignoring<T extends Agent$ignoringArgs<ExtArgs> = {}>(args?: Subset<T, Agent$ignoringArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IgnorePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    GameLog<T extends Agent$GameLogArgs<ExtArgs> = {}>(args?: Subset<T, Agent$GameLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5369,7 +5524,6 @@ export namespace Prisma {
     readonly id: FieldRef<"Agent", 'String'>
     readonly onchainId: FieldRef<"Agent", 'Int'>
     readonly authority: FieldRef<"Agent", 'String'>
-    readonly health: FieldRef<"Agent", 'Int'>
     readonly gameId: FieldRef<"Agent", 'String'>
     readonly isAlive: FieldRef<"Agent", 'Boolean'>
     readonly profileId: FieldRef<"Agent", 'String'>
@@ -6020,6 +6174,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: IgnoreScalarFieldEnum | IgnoreScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.GameLog
+   */
+  export type Agent$GameLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    where?: GameLogWhereInput
+    orderBy?: GameLogOrderByWithRelationInput | GameLogOrderByWithRelationInput[]
+    cursor?: GameLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: GameLogScalarFieldEnum | GameLogScalarFieldEnum[]
   }
 
   /**
@@ -14863,6 +15041,1133 @@ export namespace Prisma {
 
 
   /**
+   * Model GameLog
+   */
+
+  export type AggregateGameLog = {
+    _count: GameLogCountAggregateOutputType | null
+    _min: GameLogMinAggregateOutputType | null
+    _max: GameLogMaxAggregateOutputType | null
+  }
+
+  export type GameLogMinAggregateOutputType = {
+    id: string | null
+    timestamp: Date | null
+    type: $Enums.LogType | null
+    level: $Enums.LogLevel | null
+    message: string | null
+    agentId: string | null
+    gameId: string | null
+  }
+
+  export type GameLogMaxAggregateOutputType = {
+    id: string | null
+    timestamp: Date | null
+    type: $Enums.LogType | null
+    level: $Enums.LogLevel | null
+    message: string | null
+    agentId: string | null
+    gameId: string | null
+  }
+
+  export type GameLogCountAggregateOutputType = {
+    id: number
+    timestamp: number
+    type: number
+    level: number
+    message: number
+    data: number
+    agentId: number
+    gameId: number
+    _all: number
+  }
+
+
+  export type GameLogMinAggregateInputType = {
+    id?: true
+    timestamp?: true
+    type?: true
+    level?: true
+    message?: true
+    agentId?: true
+    gameId?: true
+  }
+
+  export type GameLogMaxAggregateInputType = {
+    id?: true
+    timestamp?: true
+    type?: true
+    level?: true
+    message?: true
+    agentId?: true
+    gameId?: true
+  }
+
+  export type GameLogCountAggregateInputType = {
+    id?: true
+    timestamp?: true
+    type?: true
+    level?: true
+    message?: true
+    data?: true
+    agentId?: true
+    gameId?: true
+    _all?: true
+  }
+
+  export type GameLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GameLog to aggregate.
+     */
+    where?: GameLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameLogs to fetch.
+     */
+    orderBy?: GameLogOrderByWithRelationInput | GameLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GameLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GameLogs
+    **/
+    _count?: true | GameLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GameLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GameLogMaxAggregateInputType
+  }
+
+  export type GetGameLogAggregateType<T extends GameLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateGameLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGameLog[P]>
+      : GetScalarType<T[P], AggregateGameLog[P]>
+  }
+
+
+
+
+  export type GameLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GameLogWhereInput
+    orderBy?: GameLogOrderByWithAggregationInput | GameLogOrderByWithAggregationInput[]
+    by: GameLogScalarFieldEnum[] | GameLogScalarFieldEnum
+    having?: GameLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GameLogCountAggregateInputType | true
+    _min?: GameLogMinAggregateInputType
+    _max?: GameLogMaxAggregateInputType
+  }
+
+  export type GameLogGroupByOutputType = {
+    id: string
+    timestamp: Date
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data: JsonValue | null
+    agentId: string | null
+    gameId: string | null
+    _count: GameLogCountAggregateOutputType | null
+    _min: GameLogMinAggregateOutputType | null
+    _max: GameLogMaxAggregateOutputType | null
+  }
+
+  type GetGameLogGroupByPayload<T extends GameLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GameLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GameLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GameLogGroupByOutputType[P]>
+            : GetScalarType<T[P], GameLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GameLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    timestamp?: boolean
+    type?: boolean
+    level?: boolean
+    message?: boolean
+    data?: boolean
+    agentId?: boolean
+    gameId?: boolean
+    agent?: boolean | GameLog$agentArgs<ExtArgs>
+    game?: boolean | GameLog$gameArgs<ExtArgs>
+  }, ExtArgs["result"]["gameLog"]>
+
+  export type GameLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    timestamp?: boolean
+    type?: boolean
+    level?: boolean
+    message?: boolean
+    data?: boolean
+    agentId?: boolean
+    gameId?: boolean
+    agent?: boolean | GameLog$agentArgs<ExtArgs>
+    game?: boolean | GameLog$gameArgs<ExtArgs>
+  }, ExtArgs["result"]["gameLog"]>
+
+  export type GameLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    timestamp?: boolean
+    type?: boolean
+    level?: boolean
+    message?: boolean
+    data?: boolean
+    agentId?: boolean
+    gameId?: boolean
+    agent?: boolean | GameLog$agentArgs<ExtArgs>
+    game?: boolean | GameLog$gameArgs<ExtArgs>
+  }, ExtArgs["result"]["gameLog"]>
+
+  export type GameLogSelectScalar = {
+    id?: boolean
+    timestamp?: boolean
+    type?: boolean
+    level?: boolean
+    message?: boolean
+    data?: boolean
+    agentId?: boolean
+    gameId?: boolean
+  }
+
+  export type GameLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "timestamp" | "type" | "level" | "message" | "data" | "agentId" | "gameId", ExtArgs["result"]["gameLog"]>
+  export type GameLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | GameLog$agentArgs<ExtArgs>
+    game?: boolean | GameLog$gameArgs<ExtArgs>
+  }
+  export type GameLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | GameLog$agentArgs<ExtArgs>
+    game?: boolean | GameLog$gameArgs<ExtArgs>
+  }
+  export type GameLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    agent?: boolean | GameLog$agentArgs<ExtArgs>
+    game?: boolean | GameLog$gameArgs<ExtArgs>
+  }
+
+  export type $GameLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GameLog"
+    objects: {
+      agent: Prisma.$AgentPayload<ExtArgs> | null
+      game: Prisma.$GamePayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      timestamp: Date
+      type: $Enums.LogType
+      level: $Enums.LogLevel
+      message: string
+      data: Prisma.JsonValue | null
+      agentId: string | null
+      gameId: string | null
+    }, ExtArgs["result"]["gameLog"]>
+    composites: {}
+  }
+
+  type GameLogGetPayload<S extends boolean | null | undefined | GameLogDefaultArgs> = $Result.GetResult<Prisma.$GameLogPayload, S>
+
+  type GameLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GameLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GameLogCountAggregateInputType | true
+    }
+
+  export interface GameLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GameLog'], meta: { name: 'GameLog' } }
+    /**
+     * Find zero or one GameLog that matches the filter.
+     * @param {GameLogFindUniqueArgs} args - Arguments to find a GameLog
+     * @example
+     * // Get one GameLog
+     * const gameLog = await prisma.gameLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GameLogFindUniqueArgs>(args: SelectSubset<T, GameLogFindUniqueArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find one GameLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GameLogFindUniqueOrThrowArgs} args - Arguments to find a GameLog
+     * @example
+     * // Get one GameLog
+     * const gameLog = await prisma.gameLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GameLogFindUniqueOrThrowArgs>(args: SelectSubset<T, GameLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first GameLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogFindFirstArgs} args - Arguments to find a GameLog
+     * @example
+     * // Get one GameLog
+     * const gameLog = await prisma.gameLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GameLogFindFirstArgs>(args?: SelectSubset<T, GameLogFindFirstArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+
+    /**
+     * Find the first GameLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogFindFirstOrThrowArgs} args - Arguments to find a GameLog
+     * @example
+     * // Get one GameLog
+     * const gameLog = await prisma.gameLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GameLogFindFirstOrThrowArgs>(args?: SelectSubset<T, GameLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Find zero or more GameLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GameLogs
+     * const gameLogs = await prisma.gameLog.findMany()
+     * 
+     * // Get first 10 GameLogs
+     * const gameLogs = await prisma.gameLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const gameLogWithIdOnly = await prisma.gameLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GameLogFindManyArgs>(args?: SelectSubset<T, GameLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "findMany", ClientOptions>>
+
+    /**
+     * Create a GameLog.
+     * @param {GameLogCreateArgs} args - Arguments to create a GameLog.
+     * @example
+     * // Create one GameLog
+     * const GameLog = await prisma.gameLog.create({
+     *   data: {
+     *     // ... data to create a GameLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends GameLogCreateArgs>(args: SelectSubset<T, GameLogCreateArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Create many GameLogs.
+     * @param {GameLogCreateManyArgs} args - Arguments to create many GameLogs.
+     * @example
+     * // Create many GameLogs
+     * const gameLog = await prisma.gameLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GameLogCreateManyArgs>(args?: SelectSubset<T, GameLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many GameLogs and returns the data saved in the database.
+     * @param {GameLogCreateManyAndReturnArgs} args - Arguments to create many GameLogs.
+     * @example
+     * // Create many GameLogs
+     * const gameLog = await prisma.gameLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many GameLogs and only return the `id`
+     * const gameLogWithIdOnly = await prisma.gameLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends GameLogCreateManyAndReturnArgs>(args?: SelectSubset<T, GameLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "createManyAndReturn", ClientOptions>>
+
+    /**
+     * Delete a GameLog.
+     * @param {GameLogDeleteArgs} args - Arguments to delete one GameLog.
+     * @example
+     * // Delete one GameLog
+     * const GameLog = await prisma.gameLog.delete({
+     *   where: {
+     *     // ... filter to delete one GameLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GameLogDeleteArgs>(args: SelectSubset<T, GameLogDeleteArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Update one GameLog.
+     * @param {GameLogUpdateArgs} args - Arguments to update one GameLog.
+     * @example
+     * // Update one GameLog
+     * const gameLog = await prisma.gameLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GameLogUpdateArgs>(args: SelectSubset<T, GameLogUpdateArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+
+    /**
+     * Delete zero or more GameLogs.
+     * @param {GameLogDeleteManyArgs} args - Arguments to filter GameLogs to delete.
+     * @example
+     * // Delete a few GameLogs
+     * const { count } = await prisma.gameLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GameLogDeleteManyArgs>(args?: SelectSubset<T, GameLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GameLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GameLogs
+     * const gameLog = await prisma.gameLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GameLogUpdateManyArgs>(args: SelectSubset<T, GameLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GameLogs and returns the data updated in the database.
+     * @param {GameLogUpdateManyAndReturnArgs} args - Arguments to update many GameLogs.
+     * @example
+     * // Update many GameLogs
+     * const gameLog = await prisma.gameLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more GameLogs and only return the `id`
+     * const gameLogWithIdOnly = await prisma.gameLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends GameLogUpdateManyAndReturnArgs>(args: SelectSubset<T, GameLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "updateManyAndReturn", ClientOptions>>
+
+    /**
+     * Create or update one GameLog.
+     * @param {GameLogUpsertArgs} args - Arguments to update or create a GameLog.
+     * @example
+     * // Update or create a GameLog
+     * const gameLog = await prisma.gameLog.upsert({
+     *   create: {
+     *     // ... data to create a GameLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GameLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GameLogUpsertArgs>(args: SelectSubset<T, GameLogUpsertArgs<ExtArgs>>): Prisma__GameLogClient<$Result.GetResult<Prisma.$GameLogPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+
+
+    /**
+     * Count the number of GameLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogCountArgs} args - Arguments to filter GameLogs to count.
+     * @example
+     * // Count the number of GameLogs
+     * const count = await prisma.gameLog.count({
+     *   where: {
+     *     // ... the filter for the GameLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends GameLogCountArgs>(
+      args?: Subset<T, GameLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GameLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GameLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GameLogAggregateArgs>(args: Subset<T, GameLogAggregateArgs>): Prisma.PrismaPromise<GetGameLogAggregateType<T>>
+
+    /**
+     * Group by GameLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GameLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GameLogGroupByArgs['orderBy'] }
+        : { orderBy?: GameLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GameLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGameLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GameLog model
+   */
+  readonly fields: GameLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GameLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GameLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    agent<T extends GameLog$agentArgs<ExtArgs> = {}>(args?: Subset<T, GameLog$agentArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    game<T extends GameLog$gameArgs<ExtArgs> = {}>(args?: Subset<T, GameLog$gameArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GameLog model
+   */ 
+  interface GameLogFieldRefs {
+    readonly id: FieldRef<"GameLog", 'String'>
+    readonly timestamp: FieldRef<"GameLog", 'DateTime'>
+    readonly type: FieldRef<"GameLog", 'LogType'>
+    readonly level: FieldRef<"GameLog", 'LogLevel'>
+    readonly message: FieldRef<"GameLog", 'String'>
+    readonly data: FieldRef<"GameLog", 'Json'>
+    readonly agentId: FieldRef<"GameLog", 'String'>
+    readonly gameId: FieldRef<"GameLog", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GameLog findUnique
+   */
+  export type GameLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * Filter, which GameLog to fetch.
+     */
+    where: GameLogWhereUniqueInput
+  }
+
+  /**
+   * GameLog findUniqueOrThrow
+   */
+  export type GameLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * Filter, which GameLog to fetch.
+     */
+    where: GameLogWhereUniqueInput
+  }
+
+  /**
+   * GameLog findFirst
+   */
+  export type GameLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * Filter, which GameLog to fetch.
+     */
+    where?: GameLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameLogs to fetch.
+     */
+    orderBy?: GameLogOrderByWithRelationInput | GameLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GameLogs.
+     */
+    cursor?: GameLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GameLogs.
+     */
+    distinct?: GameLogScalarFieldEnum | GameLogScalarFieldEnum[]
+  }
+
+  /**
+   * GameLog findFirstOrThrow
+   */
+  export type GameLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * Filter, which GameLog to fetch.
+     */
+    where?: GameLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameLogs to fetch.
+     */
+    orderBy?: GameLogOrderByWithRelationInput | GameLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GameLogs.
+     */
+    cursor?: GameLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GameLogs.
+     */
+    distinct?: GameLogScalarFieldEnum | GameLogScalarFieldEnum[]
+  }
+
+  /**
+   * GameLog findMany
+   */
+  export type GameLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * Filter, which GameLogs to fetch.
+     */
+    where?: GameLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameLogs to fetch.
+     */
+    orderBy?: GameLogOrderByWithRelationInput | GameLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GameLogs.
+     */
+    cursor?: GameLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameLogs.
+     */
+    skip?: number
+    distinct?: GameLogScalarFieldEnum | GameLogScalarFieldEnum[]
+  }
+
+  /**
+   * GameLog create
+   */
+  export type GameLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a GameLog.
+     */
+    data: XOR<GameLogCreateInput, GameLogUncheckedCreateInput>
+  }
+
+  /**
+   * GameLog createMany
+   */
+  export type GameLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GameLogs.
+     */
+    data: GameLogCreateManyInput | GameLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GameLog createManyAndReturn
+   */
+  export type GameLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many GameLogs.
+     */
+    data: GameLogCreateManyInput | GameLogCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GameLog update
+   */
+  export type GameLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a GameLog.
+     */
+    data: XOR<GameLogUpdateInput, GameLogUncheckedUpdateInput>
+    /**
+     * Choose, which GameLog to update.
+     */
+    where: GameLogWhereUniqueInput
+  }
+
+  /**
+   * GameLog updateMany
+   */
+  export type GameLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GameLogs.
+     */
+    data: XOR<GameLogUpdateManyMutationInput, GameLogUncheckedUpdateManyInput>
+    /**
+     * Filter which GameLogs to update
+     */
+    where?: GameLogWhereInput
+  }
+
+  /**
+   * GameLog updateManyAndReturn
+   */
+  export type GameLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * The data used to update GameLogs.
+     */
+    data: XOR<GameLogUpdateManyMutationInput, GameLogUncheckedUpdateManyInput>
+    /**
+     * Filter which GameLogs to update
+     */
+    where?: GameLogWhereInput
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GameLog upsert
+   */
+  export type GameLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the GameLog to update in case it exists.
+     */
+    where: GameLogWhereUniqueInput
+    /**
+     * In case the GameLog found by the `where` argument doesn't exist, create a new GameLog with this data.
+     */
+    create: XOR<GameLogCreateInput, GameLogUncheckedCreateInput>
+    /**
+     * In case the GameLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GameLogUpdateInput, GameLogUncheckedUpdateInput>
+  }
+
+  /**
+   * GameLog delete
+   */
+  export type GameLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+    /**
+     * Filter which GameLog to delete.
+     */
+    where: GameLogWhereUniqueInput
+  }
+
+  /**
+   * GameLog deleteMany
+   */
+  export type GameLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GameLogs to delete
+     */
+    where?: GameLogWhereInput
+  }
+
+  /**
+   * GameLog.agent
+   */
+  export type GameLog$agentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Agent
+     */
+    select?: AgentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Agent
+     */
+    omit?: AgentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AgentInclude<ExtArgs> | null
+    where?: AgentWhereInput
+  }
+
+  /**
+   * GameLog.game
+   */
+  export type GameLog$gameArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Game
+     */
+    select?: GameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Game
+     */
+    omit?: GameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameInclude<ExtArgs> | null
+    where?: GameWhereInput
+  }
+
+  /**
+   * GameLog without action
+   */
+  export type GameLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameLog
+     */
+    select?: GameLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameLog
+     */
+    omit?: GameLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameLogInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -14915,7 +16220,6 @@ export namespace Prisma {
     id: 'id',
     onchainId: 'onchainId',
     authority: 'authority',
-    health: 'health',
     gameId: 'gameId',
     isAlive: 'isAlive',
     profileId: 'profileId',
@@ -15030,6 +16334,20 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const GameLogScalarFieldEnum: {
+    id: 'id',
+    timestamp: 'timestamp',
+    type: 'type',
+    level: 'level',
+    message: 'message',
+    data: 'data',
+    agentId: 'agentId',
+    gameId: 'gameId'
+  };
+
+  export type GameLogScalarFieldEnum = (typeof GameLogScalarFieldEnum)[keyof typeof GameLogScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -15043,6 +16361,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -15241,6 +16567,34 @@ export namespace Prisma {
    */
   export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
     
+
+
+  /**
+   * Reference to a field of type 'LogType'
+   */
+  export type EnumLogTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LogType'>
+    
+
+
+  /**
+   * Reference to a field of type 'LogType[]'
+   */
+  export type ListEnumLogTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LogType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'LogLevel'
+   */
+  export type EnumLogLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LogLevel'>
+    
+
+
+  /**
+   * Reference to a field of type 'LogLevel[]'
+   */
+  export type ListEnumLogLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LogLevel[]'>
+    
   /**
    * Deep Input Types
    */
@@ -15267,6 +16621,7 @@ export namespace Prisma {
     battles?: BattleListRelationFilter
     coolDown?: CoolDownListRelationFilter
     Ignore?: IgnoreListRelationFilter
+    GameLog?: GameLogListRelationFilter
   }
 
   export type GameOrderByWithRelationInput = {
@@ -15287,6 +16642,7 @@ export namespace Prisma {
     battles?: BattleOrderByRelationAggregateInput
     coolDown?: CoolDownOrderByRelationAggregateInput
     Ignore?: IgnoreOrderByRelationAggregateInput
+    GameLog?: GameLogOrderByRelationAggregateInput
   }
 
   export type GameWhereUniqueInput = Prisma.AtLeast<{
@@ -15310,6 +16666,7 @@ export namespace Prisma {
     battles?: BattleListRelationFilter
     coolDown?: CoolDownListRelationFilter
     Ignore?: IgnoreListRelationFilter
+    GameLog?: GameLogListRelationFilter
   }, "id" | "onchainId">
 
   export type GameOrderByWithAggregationInput = {
@@ -15444,7 +16801,6 @@ export namespace Prisma {
     id?: StringFilter<"Agent"> | string
     onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
-    health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
@@ -15464,13 +16820,13 @@ export namespace Prisma {
     mapTile?: XOR<MapTileScalarRelationFilter, MapTileWhereInput>
     ignoredBy?: IgnoreListRelationFilter
     ignoring?: IgnoreListRelationFilter
+    GameLog?: GameLogListRelationFilter
   }
 
   export type AgentOrderByWithRelationInput = {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
-    health?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -15490,6 +16846,7 @@ export namespace Prisma {
     mapTile?: MapTileOrderByWithRelationInput
     ignoredBy?: IgnoreOrderByRelationAggregateInput
     ignoring?: IgnoreOrderByRelationAggregateInput
+    GameLog?: GameLogOrderByRelationAggregateInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -15501,7 +16858,6 @@ export namespace Prisma {
     NOT?: AgentWhereInput | AgentWhereInput[]
     onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
-    health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
@@ -15520,13 +16876,13 @@ export namespace Prisma {
     mapTile?: XOR<MapTileScalarRelationFilter, MapTileWhereInput>
     ignoredBy?: IgnoreListRelationFilter
     ignoring?: IgnoreListRelationFilter
+    GameLog?: GameLogListRelationFilter
   }, "id" | "mapTileId" | "onchainId_gameId">
 
   export type AgentOrderByWithAggregationInput = {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
-    health?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -15546,7 +16902,6 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Agent"> | string
     onchainId?: IntWithAggregatesFilter<"Agent"> | number
     authority?: StringWithAggregatesFilter<"Agent"> | string
-    health?: IntWithAggregatesFilter<"Agent"> | number
     gameId?: StringWithAggregatesFilter<"Agent"> | string
     isAlive?: BoolWithAggregatesFilter<"Agent"> | boolean
     profileId?: StringWithAggregatesFilter<"Agent"> | string
@@ -16115,6 +17470,79 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
+  export type GameLogWhereInput = {
+    AND?: GameLogWhereInput | GameLogWhereInput[]
+    OR?: GameLogWhereInput[]
+    NOT?: GameLogWhereInput | GameLogWhereInput[]
+    id?: StringFilter<"GameLog"> | string
+    timestamp?: DateTimeFilter<"GameLog"> | Date | string
+    type?: EnumLogTypeFilter<"GameLog"> | $Enums.LogType
+    level?: EnumLogLevelFilter<"GameLog"> | $Enums.LogLevel
+    message?: StringFilter<"GameLog"> | string
+    data?: JsonNullableFilter<"GameLog">
+    agentId?: StringNullableFilter<"GameLog"> | string | null
+    gameId?: StringNullableFilter<"GameLog"> | string | null
+    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    game?: XOR<GameNullableScalarRelationFilter, GameWhereInput> | null
+  }
+
+  export type GameLogOrderByWithRelationInput = {
+    id?: SortOrder
+    timestamp?: SortOrder
+    type?: SortOrder
+    level?: SortOrder
+    message?: SortOrder
+    data?: SortOrderInput | SortOrder
+    agentId?: SortOrderInput | SortOrder
+    gameId?: SortOrderInput | SortOrder
+    agent?: AgentOrderByWithRelationInput
+    game?: GameOrderByWithRelationInput
+  }
+
+  export type GameLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: GameLogWhereInput | GameLogWhereInput[]
+    OR?: GameLogWhereInput[]
+    NOT?: GameLogWhereInput | GameLogWhereInput[]
+    timestamp?: DateTimeFilter<"GameLog"> | Date | string
+    type?: EnumLogTypeFilter<"GameLog"> | $Enums.LogType
+    level?: EnumLogLevelFilter<"GameLog"> | $Enums.LogLevel
+    message?: StringFilter<"GameLog"> | string
+    data?: JsonNullableFilter<"GameLog">
+    agentId?: StringNullableFilter<"GameLog"> | string | null
+    gameId?: StringNullableFilter<"GameLog"> | string | null
+    agent?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
+    game?: XOR<GameNullableScalarRelationFilter, GameWhereInput> | null
+  }, "id">
+
+  export type GameLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    timestamp?: SortOrder
+    type?: SortOrder
+    level?: SortOrder
+    message?: SortOrder
+    data?: SortOrderInput | SortOrder
+    agentId?: SortOrderInput | SortOrder
+    gameId?: SortOrderInput | SortOrder
+    _count?: GameLogCountOrderByAggregateInput
+    _max?: GameLogMaxOrderByAggregateInput
+    _min?: GameLogMinOrderByAggregateInput
+  }
+
+  export type GameLogScalarWhereWithAggregatesInput = {
+    AND?: GameLogScalarWhereWithAggregatesInput | GameLogScalarWhereWithAggregatesInput[]
+    OR?: GameLogScalarWhereWithAggregatesInput[]
+    NOT?: GameLogScalarWhereWithAggregatesInput | GameLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GameLog"> | string
+    timestamp?: DateTimeWithAggregatesFilter<"GameLog"> | Date | string
+    type?: EnumLogTypeWithAggregatesFilter<"GameLog"> | $Enums.LogType
+    level?: EnumLogLevelWithAggregatesFilter<"GameLog"> | $Enums.LogLevel
+    message?: StringWithAggregatesFilter<"GameLog"> | string
+    data?: JsonNullableWithAggregatesFilter<"GameLog">
+    agentId?: StringNullableWithAggregatesFilter<"GameLog"> | string | null
+    gameId?: StringNullableWithAggregatesFilter<"GameLog"> | string | null
+  }
+
   export type GameCreateInput = {
     id?: string
     onchainId: number
@@ -16133,6 +17561,7 @@ export namespace Prisma {
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
     Ignore?: IgnoreCreateNestedManyWithoutGameInput
+    GameLog?: GameLogCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateInput = {
@@ -16153,6 +17582,7 @@ export namespace Prisma {
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
     Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameUpdateInput = {
@@ -16173,6 +17603,7 @@ export namespace Prisma {
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateInput = {
@@ -16193,6 +17624,7 @@ export namespace Prisma {
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type GameCreateManyInput = {
@@ -16346,7 +17778,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -16363,13 +17794,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -16386,13 +17817,13 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -16409,13 +17840,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -16432,13 +17863,13 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -16450,7 +17881,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -16459,7 +17889,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -17019,6 +18448,81 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type GameLogCreateInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agent?: AgentCreateNestedOneWithoutGameLogInput
+    game?: GameCreateNestedOneWithoutGameLogInput
+  }
+
+  export type GameLogUncheckedCreateInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: string | null
+    gameId?: string | null
+  }
+
+  export type GameLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agent?: AgentUpdateOneWithoutGameLogNestedInput
+    game?: GameUpdateOneWithoutGameLogNestedInput
+  }
+
+  export type GameLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+    gameId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type GameLogCreateManyInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: string | null
+    gameId?: string | null
+  }
+
+  export type GameLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type GameLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+    gameId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -17102,6 +18606,12 @@ export namespace Prisma {
     none?: IgnoreWhereInput
   }
 
+  export type GameLogListRelationFilter = {
+    every?: GameLogWhereInput
+    some?: GameLogWhereInput
+    none?: GameLogWhereInput
+  }
+
   export type AgentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -17119,6 +18629,10 @@ export namespace Prisma {
   }
 
   export type IgnoreOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type GameLogOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17398,7 +18912,6 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
-    health?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -17408,14 +18921,12 @@ export namespace Prisma {
 
   export type AgentAvgOrderByAggregateInput = {
     onchainId?: SortOrder
-    health?: SortOrder
   }
 
   export type AgentMaxOrderByAggregateInput = {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
-    health?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -17427,7 +18938,6 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
-    health?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -17437,7 +18947,6 @@ export namespace Prisma {
 
   export type AgentSumOrderByAggregateInput = {
     onchainId?: SortOrder
-    health?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -17945,6 +19454,123 @@ export namespace Prisma {
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
+  export type EnumLogTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogType | EnumLogTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogTypeFilter<$PrismaModel> | $Enums.LogType
+  }
+
+  export type EnumLogLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogLevel | EnumLogLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogLevelFilter<$PrismaModel> | $Enums.LogLevel
+  }
+  export type JsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type GameNullableScalarRelationFilter = {
+    is?: GameWhereInput | null
+    isNot?: GameWhereInput | null
+  }
+
+  export type GameLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    timestamp?: SortOrder
+    type?: SortOrder
+    level?: SortOrder
+    message?: SortOrder
+    data?: SortOrder
+    agentId?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type GameLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    timestamp?: SortOrder
+    type?: SortOrder
+    level?: SortOrder
+    message?: SortOrder
+    agentId?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type GameLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    timestamp?: SortOrder
+    type?: SortOrder
+    level?: SortOrder
+    message?: SortOrder
+    agentId?: SortOrder
+    gameId?: SortOrder
+  }
+
+  export type EnumLogTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogType | EnumLogTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogTypeWithAggregatesFilter<$PrismaModel> | $Enums.LogType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLogTypeFilter<$PrismaModel>
+    _max?: NestedEnumLogTypeFilter<$PrismaModel>
+  }
+
+  export type EnumLogLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogLevel | EnumLogLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogLevelWithAggregatesFilter<$PrismaModel> | $Enums.LogLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLogLevelFilter<$PrismaModel>
+    _max?: NestedEnumLogLevelFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
   export type AgentCreateNestedManyWithoutGameInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -17980,6 +19606,13 @@ export namespace Prisma {
     connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
   }
 
+  export type GameLogCreateNestedManyWithoutGameInput = {
+    create?: XOR<GameLogCreateWithoutGameInput, GameLogUncheckedCreateWithoutGameInput> | GameLogCreateWithoutGameInput[] | GameLogUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutGameInput | GameLogCreateOrConnectWithoutGameInput[]
+    createMany?: GameLogCreateManyGameInputEnvelope
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+  }
+
   export type AgentUncheckedCreateNestedManyWithoutGameInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -18013,6 +19646,13 @@ export namespace Prisma {
     connectOrCreate?: IgnoreCreateOrConnectWithoutGameInput | IgnoreCreateOrConnectWithoutGameInput[]
     createMany?: IgnoreCreateManyGameInputEnvelope
     connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+  }
+
+  export type GameLogUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<GameLogCreateWithoutGameInput, GameLogUncheckedCreateWithoutGameInput> | GameLogCreateWithoutGameInput[] | GameLogUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutGameInput | GameLogCreateOrConnectWithoutGameInput[]
+    createMany?: GameLogCreateManyGameInputEnvelope
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -18113,6 +19753,20 @@ export namespace Prisma {
     deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
   }
 
+  export type GameLogUpdateManyWithoutGameNestedInput = {
+    create?: XOR<GameLogCreateWithoutGameInput, GameLogUncheckedCreateWithoutGameInput> | GameLogCreateWithoutGameInput[] | GameLogUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutGameInput | GameLogCreateOrConnectWithoutGameInput[]
+    upsert?: GameLogUpsertWithWhereUniqueWithoutGameInput | GameLogUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: GameLogCreateManyGameInputEnvelope
+    set?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    disconnect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    delete?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    update?: GameLogUpdateWithWhereUniqueWithoutGameInput | GameLogUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: GameLogUpdateManyWithWhereWithoutGameInput | GameLogUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: GameLogScalarWhereInput | GameLogScalarWhereInput[]
+  }
+
   export type AgentUncheckedUpdateManyWithoutGameNestedInput = {
     create?: XOR<AgentCreateWithoutGameInput, AgentUncheckedCreateWithoutGameInput> | AgentCreateWithoutGameInput[] | AgentUncheckedCreateWithoutGameInput[]
     connectOrCreate?: AgentCreateOrConnectWithoutGameInput | AgentCreateOrConnectWithoutGameInput[]
@@ -18181,6 +19835,20 @@ export namespace Prisma {
     update?: IgnoreUpdateWithWhereUniqueWithoutGameInput | IgnoreUpdateWithWhereUniqueWithoutGameInput[]
     updateMany?: IgnoreUpdateManyWithWhereWithoutGameInput | IgnoreUpdateManyWithWhereWithoutGameInput[]
     deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
+  export type GameLogUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<GameLogCreateWithoutGameInput, GameLogUncheckedCreateWithoutGameInput> | GameLogCreateWithoutGameInput[] | GameLogUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutGameInput | GameLogCreateOrConnectWithoutGameInput[]
+    upsert?: GameLogUpsertWithWhereUniqueWithoutGameInput | GameLogUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: GameLogCreateManyGameInputEnvelope
+    set?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    disconnect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    delete?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    update?: GameLogUpdateWithWhereUniqueWithoutGameInput | GameLogUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: GameLogUpdateManyWithWhereWithoutGameInput | GameLogUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: GameLogScalarWhereInput | GameLogScalarWhereInput[]
   }
 
   export type AgentProfileCreatebioInput = {
@@ -18365,6 +20033,13 @@ export namespace Prisma {
     connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
   }
 
+  export type GameLogCreateNestedManyWithoutAgentInput = {
+    create?: XOR<GameLogCreateWithoutAgentInput, GameLogUncheckedCreateWithoutAgentInput> | GameLogCreateWithoutAgentInput[] | GameLogUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutAgentInput | GameLogCreateOrConnectWithoutAgentInput[]
+    createMany?: GameLogCreateManyAgentInputEnvelope
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+  }
+
   export type TweetUncheckedCreateNestedManyWithoutAgentInput = {
     create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
@@ -18440,6 +20115,13 @@ export namespace Prisma {
     connectOrCreate?: IgnoreCreateOrConnectWithoutIgnoredAgentInput | IgnoreCreateOrConnectWithoutIgnoredAgentInput[]
     createMany?: IgnoreCreateManyIgnoredAgentInputEnvelope
     connect?: IgnoreWhereUniqueInput | IgnoreWhereUniqueInput[]
+  }
+
+  export type GameLogUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<GameLogCreateWithoutAgentInput, GameLogUncheckedCreateWithoutAgentInput> | GameLogCreateWithoutAgentInput[] | GameLogUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutAgentInput | GameLogCreateOrConnectWithoutAgentInput[]
+    createMany?: GameLogCreateManyAgentInputEnvelope
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -18624,6 +20306,20 @@ export namespace Prisma {
     deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
   }
 
+  export type GameLogUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<GameLogCreateWithoutAgentInput, GameLogUncheckedCreateWithoutAgentInput> | GameLogCreateWithoutAgentInput[] | GameLogUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutAgentInput | GameLogCreateOrConnectWithoutAgentInput[]
+    upsert?: GameLogUpsertWithWhereUniqueWithoutAgentInput | GameLogUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: GameLogCreateManyAgentInputEnvelope
+    set?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    disconnect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    delete?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    update?: GameLogUpdateWithWhereUniqueWithoutAgentInput | GameLogUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: GameLogUpdateManyWithWhereWithoutAgentInput | GameLogUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: GameLogScalarWhereInput | GameLogScalarWhereInput[]
+  }
+
   export type TweetUncheckedUpdateManyWithoutAgentNestedInput = {
     create?: XOR<TweetCreateWithoutAgentInput, TweetUncheckedCreateWithoutAgentInput> | TweetCreateWithoutAgentInput[] | TweetUncheckedCreateWithoutAgentInput[]
     connectOrCreate?: TweetCreateOrConnectWithoutAgentInput | TweetCreateOrConnectWithoutAgentInput[]
@@ -18776,6 +20472,20 @@ export namespace Prisma {
     update?: IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput | IgnoreUpdateWithWhereUniqueWithoutIgnoredAgentInput[]
     updateMany?: IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput | IgnoreUpdateManyWithWhereWithoutIgnoredAgentInput[]
     deleteMany?: IgnoreScalarWhereInput | IgnoreScalarWhereInput[]
+  }
+
+  export type GameLogUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<GameLogCreateWithoutAgentInput, GameLogUncheckedCreateWithoutAgentInput> | GameLogCreateWithoutAgentInput[] | GameLogUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: GameLogCreateOrConnectWithoutAgentInput | GameLogCreateOrConnectWithoutAgentInput[]
+    upsert?: GameLogUpsertWithWhereUniqueWithoutAgentInput | GameLogUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: GameLogCreateManyAgentInputEnvelope
+    set?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    disconnect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    delete?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    connect?: GameLogWhereUniqueInput | GameLogWhereUniqueInput[]
+    update?: GameLogUpdateWithWhereUniqueWithoutAgentInput | GameLogUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: GameLogUpdateManyWithWhereWithoutAgentInput | GameLogUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: GameLogScalarWhereInput | GameLogScalarWhereInput[]
   }
 
   export type AgentCreateNestedOneWithoutIgnoredByInput = {
@@ -19120,6 +20830,46 @@ export namespace Prisma {
 
   export type EnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole
+  }
+
+  export type AgentCreateNestedOneWithoutGameLogInput = {
+    create?: XOR<AgentCreateWithoutGameLogInput, AgentUncheckedCreateWithoutGameLogInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutGameLogInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type GameCreateNestedOneWithoutGameLogInput = {
+    create?: XOR<GameCreateWithoutGameLogInput, GameUncheckedCreateWithoutGameLogInput>
+    connectOrCreate?: GameCreateOrConnectWithoutGameLogInput
+    connect?: GameWhereUniqueInput
+  }
+
+  export type EnumLogTypeFieldUpdateOperationsInput = {
+    set?: $Enums.LogType
+  }
+
+  export type EnumLogLevelFieldUpdateOperationsInput = {
+    set?: $Enums.LogLevel
+  }
+
+  export type AgentUpdateOneWithoutGameLogNestedInput = {
+    create?: XOR<AgentCreateWithoutGameLogInput, AgentUncheckedCreateWithoutGameLogInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutGameLogInput
+    upsert?: AgentUpsertWithoutGameLogInput
+    disconnect?: AgentWhereInput | boolean
+    delete?: AgentWhereInput | boolean
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutGameLogInput, AgentUpdateWithoutGameLogInput>, AgentUncheckedUpdateWithoutGameLogInput>
+  }
+
+  export type GameUpdateOneWithoutGameLogNestedInput = {
+    create?: XOR<GameCreateWithoutGameLogInput, GameUncheckedCreateWithoutGameLogInput>
+    connectOrCreate?: GameCreateOrConnectWithoutGameLogInput
+    upsert?: GameUpsertWithoutGameLogInput
+    disconnect?: GameWhereInput | boolean
+    delete?: GameWhereInput | boolean
+    connect?: GameWhereUniqueInput
+    update?: XOR<XOR<GameUpdateToOneWithWhereWithoutGameLogInput, GameUpdateWithoutGameLogInput>, GameUncheckedUpdateWithoutGameLogInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -19480,11 +21230,66 @@ export namespace Prisma {
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
+  export type NestedEnumLogTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogType | EnumLogTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogTypeFilter<$PrismaModel> | $Enums.LogType
+  }
+
+  export type NestedEnumLogLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogLevel | EnumLogLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogLevelFilter<$PrismaModel> | $Enums.LogLevel
+  }
+
+  export type NestedEnumLogTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogType | EnumLogTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogType[] | ListEnumLogTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogTypeWithAggregatesFilter<$PrismaModel> | $Enums.LogType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLogTypeFilter<$PrismaModel>
+    _max?: NestedEnumLogTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumLogLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LogLevel | EnumLogLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LogLevel[] | ListEnumLogLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumLogLevelWithAggregatesFilter<$PrismaModel> | $Enums.LogLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLogLevelFilter<$PrismaModel>
+    _max?: NestedEnumLogLevelFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type AgentCreateWithoutGameInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -19500,13 +21305,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutGameInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
@@ -19522,6 +21327,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutGameInput = {
@@ -19652,6 +21458,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type GameLogCreateWithoutGameInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agent?: AgentCreateNestedOneWithoutGameLogInput
+  }
+
+  export type GameLogUncheckedCreateWithoutGameInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: string | null
+  }
+
+  export type GameLogCreateOrConnectWithoutGameInput = {
+    where: GameLogWhereUniqueInput
+    create: XOR<GameLogCreateWithoutGameInput, GameLogUncheckedCreateWithoutGameInput>
+  }
+
+  export type GameLogCreateManyGameInputEnvelope = {
+    data: GameLogCreateManyGameInput | GameLogCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AgentUpsertWithWhereUniqueWithoutGameInput = {
     where: AgentWhereUniqueInput
     update: XOR<AgentUpdateWithoutGameInput, AgentUncheckedUpdateWithoutGameInput>
@@ -19675,7 +21511,6 @@ export namespace Prisma {
     id?: StringFilter<"Agent"> | string
     onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
-    health?: IntFilter<"Agent"> | number
     gameId?: StringFilter<"Agent"> | string
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
@@ -19802,11 +21637,40 @@ export namespace Prisma {
     ignoredAgentId?: StringFilter<"Ignore"> | string
   }
 
+  export type GameLogUpsertWithWhereUniqueWithoutGameInput = {
+    where: GameLogWhereUniqueInput
+    update: XOR<GameLogUpdateWithoutGameInput, GameLogUncheckedUpdateWithoutGameInput>
+    create: XOR<GameLogCreateWithoutGameInput, GameLogUncheckedCreateWithoutGameInput>
+  }
+
+  export type GameLogUpdateWithWhereUniqueWithoutGameInput = {
+    where: GameLogWhereUniqueInput
+    data: XOR<GameLogUpdateWithoutGameInput, GameLogUncheckedUpdateWithoutGameInput>
+  }
+
+  export type GameLogUpdateManyWithWhereWithoutGameInput = {
+    where: GameLogScalarWhereInput
+    data: XOR<GameLogUpdateManyMutationInput, GameLogUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type GameLogScalarWhereInput = {
+    AND?: GameLogScalarWhereInput | GameLogScalarWhereInput[]
+    OR?: GameLogScalarWhereInput[]
+    NOT?: GameLogScalarWhereInput | GameLogScalarWhereInput[]
+    id?: StringFilter<"GameLog"> | string
+    timestamp?: DateTimeFilter<"GameLog"> | Date | string
+    type?: EnumLogTypeFilter<"GameLog"> | $Enums.LogType
+    level?: EnumLogLevelFilter<"GameLog"> | $Enums.LogLevel
+    message?: StringFilter<"GameLog"> | string
+    data?: JsonNullableFilter<"GameLog">
+    agentId?: StringNullableFilter<"GameLog"> | string | null
+    gameId?: StringNullableFilter<"GameLog"> | string | null
+  }
+
   export type AgentCreateWithoutProfileInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -19822,13 +21686,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutProfileInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
@@ -19844,6 +21708,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutProfileInput = {
@@ -19917,6 +21782,7 @@ export namespace Prisma {
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
     Ignore?: IgnoreCreateNestedManyWithoutGameInput
+    GameLog?: GameLogCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAgentsInput = {
@@ -19936,6 +21802,7 @@ export namespace Prisma {
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
     Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAgentsInput = {
@@ -20323,6 +22190,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type GameLogCreateWithoutAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    game?: GameCreateNestedOneWithoutGameLogInput
+  }
+
+  export type GameLogUncheckedCreateWithoutAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    gameId?: string | null
+  }
+
+  export type GameLogCreateOrConnectWithoutAgentInput = {
+    where: GameLogWhereUniqueInput
+    create: XOR<GameLogCreateWithoutAgentInput, GameLogUncheckedCreateWithoutAgentInput>
+  }
+
+  export type GameLogCreateManyAgentInputEnvelope = {
+    data: GameLogCreateManyAgentInput | GameLogCreateManyAgentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type TweetUpsertWithWhereUniqueWithoutAgentInput = {
     where: TweetWhereUniqueInput
     update: XOR<TweetUpdateWithoutAgentInput, TweetUncheckedUpdateWithoutAgentInput>
@@ -20379,6 +22276,7 @@ export namespace Prisma {
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAgentsInput = {
@@ -20398,6 +22296,7 @@ export namespace Prisma {
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type BattleUpsertWithWhereUniqueWithoutAttackerInput = {
@@ -20626,11 +22525,26 @@ export namespace Prisma {
     data: XOR<IgnoreUpdateManyMutationInput, IgnoreUncheckedUpdateManyWithoutIgnoredAgentInput>
   }
 
+  export type GameLogUpsertWithWhereUniqueWithoutAgentInput = {
+    where: GameLogWhereUniqueInput
+    update: XOR<GameLogUpdateWithoutAgentInput, GameLogUncheckedUpdateWithoutAgentInput>
+    create: XOR<GameLogCreateWithoutAgentInput, GameLogUncheckedCreateWithoutAgentInput>
+  }
+
+  export type GameLogUpdateWithWhereUniqueWithoutAgentInput = {
+    where: GameLogWhereUniqueInput
+    data: XOR<GameLogUpdateWithoutAgentInput, GameLogUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type GameLogUpdateManyWithWhereWithoutAgentInput = {
+    where: GameLogScalarWhereInput
+    data: XOR<GameLogUpdateManyMutationInput, GameLogUncheckedUpdateManyWithoutAgentInput>
+  }
+
   export type AgentCreateWithoutIgnoredByInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -20646,13 +22560,13 @@ export namespace Prisma {
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutIgnoredByInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -20668,6 +22582,7 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutIgnoredByInput = {
@@ -20692,6 +22607,7 @@ export namespace Prisma {
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
+    GameLog?: GameLogCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutIgnoreInput = {
@@ -20711,6 +22627,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutIgnoreInput = {
@@ -20722,7 +22639,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -20738,13 +22654,13 @@ export namespace Prisma {
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutIgnoringInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -20760,6 +22676,7 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutIgnoringInput = {
@@ -20782,7 +22699,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -20798,13 +22714,13 @@ export namespace Prisma {
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutIgnoredByInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -20820,6 +22736,7 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameUpsertWithoutIgnoreInput = {
@@ -20850,6 +22767,7 @@ export namespace Prisma {
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutIgnoreInput = {
@@ -20869,6 +22787,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutIgnoringInput = {
@@ -20886,7 +22805,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -20902,13 +22820,13 @@ export namespace Prisma {
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutIgnoringInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -20924,13 +22842,13 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateWithoutMapTileInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -20946,13 +22864,13 @@ export namespace Prisma {
     profile: AgentProfileCreateNestedOneWithoutAgentsInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutMapTileInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -20968,6 +22886,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutMapTileInput = {
@@ -20990,7 +22909,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -21006,13 +22924,13 @@ export namespace Prisma {
     profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutMapTileInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21028,13 +22946,13 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateWithoutTweetsInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     game: GameCreateNestedOneWithoutAgentsInput
@@ -21050,13 +22968,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutTweetsInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21072,6 +22990,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutTweetsInput = {
@@ -21122,7 +23041,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
@@ -21138,13 +23056,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutTweetsInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21160,6 +23078,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type InteractionUpsertWithWhereUniqueWithoutTweetInput = {
@@ -21208,6 +23127,7 @@ export namespace Prisma {
     battles?: BattleCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
     Ignore?: IgnoreCreateNestedManyWithoutGameInput
+    GameLog?: GameLogCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutAlliancesInput = {
@@ -21227,6 +23147,7 @@ export namespace Prisma {
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
     Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutAlliancesInput = {
@@ -21238,7 +23159,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21254,13 +23174,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutInitiatedAlliancesInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21276,6 +23196,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutInitiatedAlliancesInput = {
@@ -21287,7 +23208,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21303,13 +23223,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutJoinedAlliancesInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21325,6 +23245,7 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutJoinedAlliancesInput = {
@@ -21360,6 +23281,7 @@ export namespace Prisma {
     battles?: BattleUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutAlliancesInput = {
@@ -21379,6 +23301,7 @@ export namespace Prisma {
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutInitiatedAlliancesInput = {
@@ -21396,7 +23319,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -21412,13 +23334,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutInitiatedAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21434,6 +23356,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutJoinedAlliancesInput = {
@@ -21451,7 +23374,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -21467,13 +23389,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutJoinedAlliancesInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21489,6 +23411,7 @@ export namespace Prisma {
     initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameCreateWithoutBattlesInput = {
@@ -21508,6 +23431,7 @@ export namespace Prisma {
     alliances?: AllianceCreateNestedManyWithoutGameInput
     coolDown?: CoolDownCreateNestedManyWithoutGameInput
     Ignore?: IgnoreCreateNestedManyWithoutGameInput
+    GameLog?: GameLogCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutBattlesInput = {
@@ -21527,6 +23451,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
     Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutBattlesInput = {
@@ -21538,7 +23463,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21554,13 +23478,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsAttackerInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21576,6 +23500,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsAttackerInput = {
@@ -21587,7 +23512,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21603,13 +23527,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsDefenderInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21625,6 +23549,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsDefenderInput = {
@@ -21636,7 +23561,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21652,13 +23576,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsAttackerAllyInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21674,6 +23598,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsAttackerAllyInput = {
@@ -21685,7 +23610,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21701,13 +23625,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutBattlesAsDefenderAllyInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21723,6 +23647,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutBattlesAsDefenderAllyInput = {
@@ -21734,7 +23659,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -21750,13 +23674,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutWonBattlesInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -21772,6 +23696,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutWonBattlesInput = {
@@ -21807,6 +23732,7 @@ export namespace Prisma {
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutBattlesInput = {
@@ -21826,6 +23752,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsAttackerInput = {
@@ -21843,7 +23770,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -21859,13 +23785,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsAttackerInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21881,6 +23807,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsDefenderInput = {
@@ -21898,7 +23825,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -21914,13 +23840,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsDefenderInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21936,6 +23862,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsAttackerAllyInput = {
@@ -21953,7 +23880,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -21969,13 +23895,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsAttackerAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -21991,6 +23917,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutBattlesAsDefenderAllyInput = {
@@ -22008,7 +23935,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -22024,13 +23950,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutBattlesAsDefenderAllyInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -22046,6 +23972,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUpsertWithoutWonBattlesInput = {
@@ -22063,7 +23990,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -22079,13 +24005,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutWonBattlesInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -22101,6 +24027,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type TweetCreateWithoutInteractionsInput = {
@@ -22159,7 +24086,6 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -22175,13 +24101,13 @@ export namespace Prisma {
     mapTile: MapTileCreateNestedOneWithoutAgentInput
     ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutCoolDownInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -22197,6 +24123,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
     ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
     ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutCoolDownInput = {
@@ -22221,6 +24148,7 @@ export namespace Prisma {
     alliances?: AllianceCreateNestedManyWithoutGameInput
     battles?: BattleCreateNestedManyWithoutGameInput
     Ignore?: IgnoreCreateNestedManyWithoutGameInput
+    GameLog?: GameLogCreateNestedManyWithoutGameInput
   }
 
   export type GameUncheckedCreateWithoutCoolDownInput = {
@@ -22240,6 +24168,7 @@ export namespace Prisma {
     alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
     battles?: BattleUncheckedCreateNestedManyWithoutGameInput
     Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
+    GameLog?: GameLogUncheckedCreateNestedManyWithoutGameInput
   }
 
   export type GameCreateOrConnectWithoutCoolDownInput = {
@@ -22262,7 +24191,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -22278,13 +24206,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutCoolDownInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -22300,6 +24228,7 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type GameUpsertWithoutCoolDownInput = {
@@ -22330,6 +24259,7 @@ export namespace Prisma {
     alliances?: AllianceUpdateManyWithoutGameNestedInput
     battles?: BattleUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUpdateManyWithoutGameNestedInput
   }
 
   export type GameUncheckedUpdateWithoutCoolDownInput = {
@@ -22349,13 +24279,213 @@ export namespace Prisma {
     alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
     battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
     Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type AgentCreateWithoutGameLogInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    isAlive?: boolean
+    deathTimestamp?: Date | string | null
+    tweets?: TweetCreateNestedManyWithoutAgentInput
+    game: GameCreateNestedOneWithoutAgentsInput
+    battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceCreateNestedManyWithoutJoinerInput
+    profile: AgentProfileCreateNestedOneWithoutAgentsInput
+    mapTile: MapTileCreateNestedOneWithoutAgentInput
+    ignoredBy?: IgnoreCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreCreateNestedManyWithoutIgnoredAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutGameLogInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    gameId: string
+    isAlive?: boolean
+    profileId: string
+    deathTimestamp?: Date | string | null
+    mapTileId: string
+    tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
+    battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
+    battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
+    battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
+    battlesAsDefenderAlly?: BattleUncheckedCreateNestedManyWithoutDefenderAllyInput
+    wonBattles?: BattleUncheckedCreateNestedManyWithoutWinnerInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutCooledAgentInput
+    initiatedAlliances?: AllianceUncheckedCreateNestedManyWithoutInitiatorInput
+    joinedAlliances?: AllianceUncheckedCreateNestedManyWithoutJoinerInput
+    ignoredBy?: IgnoreUncheckedCreateNestedManyWithoutAgentInput
+    ignoring?: IgnoreUncheckedCreateNestedManyWithoutIgnoredAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutGameLogInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutGameLogInput, AgentUncheckedCreateWithoutGameLogInput>
+  }
+
+  export type GameCreateWithoutGameLogInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agents?: AgentCreateNestedManyWithoutGameInput
+    alliances?: AllianceCreateNestedManyWithoutGameInput
+    battles?: BattleCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreCreateNestedManyWithoutGameInput
+  }
+
+  export type GameUncheckedCreateWithoutGameLogInput = {
+    id?: string
+    onchainId: number
+    authority: string
+    tokenMint: string
+    rewardsVault: string
+    mapDiameter: number
+    isActive?: boolean
+    lastUpdate?: Date | string
+    bump: number
+    dailyRewardTokens: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    agents?: AgentUncheckedCreateNestedManyWithoutGameInput
+    alliances?: AllianceUncheckedCreateNestedManyWithoutGameInput
+    battles?: BattleUncheckedCreateNestedManyWithoutGameInput
+    coolDown?: CoolDownUncheckedCreateNestedManyWithoutGameInput
+    Ignore?: IgnoreUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type GameCreateOrConnectWithoutGameLogInput = {
+    where: GameWhereUniqueInput
+    create: XOR<GameCreateWithoutGameLogInput, GameUncheckedCreateWithoutGameLogInput>
+  }
+
+  export type AgentUpsertWithoutGameLogInput = {
+    update: XOR<AgentUpdateWithoutGameLogInput, AgentUncheckedUpdateWithoutGameLogInput>
+    create: XOR<AgentCreateWithoutGameLogInput, AgentUncheckedCreateWithoutGameLogInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutGameLogInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutGameLogInput, AgentUncheckedUpdateWithoutGameLogInput>
+  }
+
+  export type AgentUpdateWithoutGameLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tweets?: TweetUpdateManyWithoutAgentNestedInput
+    game?: GameUpdateOneRequiredWithoutAgentsNestedInput
+    battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUpdateManyWithoutJoinerNestedInput
+    profile?: AgentProfileUpdateOneRequiredWithoutAgentsNestedInput
+    mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
+    ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutGameLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    isAlive?: BoolFieldUpdateOperationsInput | boolean
+    profileId?: StringFieldUpdateOperationsInput | string
+    deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mapTileId?: StringFieldUpdateOperationsInput | string
+    tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
+    battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
+    battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
+    battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
+    battlesAsDefenderAlly?: BattleUncheckedUpdateManyWithoutDefenderAllyNestedInput
+    wonBattles?: BattleUncheckedUpdateManyWithoutWinnerNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutCooledAgentNestedInput
+    initiatedAlliances?: AllianceUncheckedUpdateManyWithoutInitiatorNestedInput
+    joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
+    ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
+    ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+  }
+
+  export type GameUpsertWithoutGameLogInput = {
+    update: XOR<GameUpdateWithoutGameLogInput, GameUncheckedUpdateWithoutGameLogInput>
+    create: XOR<GameCreateWithoutGameLogInput, GameUncheckedCreateWithoutGameLogInput>
+    where?: GameWhereInput
+  }
+
+  export type GameUpdateToOneWithWhereWithoutGameLogInput = {
+    where?: GameWhereInput
+    data: XOR<GameUpdateWithoutGameLogInput, GameUncheckedUpdateWithoutGameLogInput>
+  }
+
+  export type GameUpdateWithoutGameLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agents?: AgentUpdateManyWithoutGameNestedInput
+    alliances?: AllianceUpdateManyWithoutGameNestedInput
+    battles?: BattleUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUpdateManyWithoutGameNestedInput
+  }
+
+  export type GameUncheckedUpdateWithoutGameLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    onchainId?: IntFieldUpdateOperationsInput | number
+    authority?: StringFieldUpdateOperationsInput | string
+    tokenMint?: StringFieldUpdateOperationsInput | string
+    rewardsVault?: StringFieldUpdateOperationsInput | string
+    mapDiameter?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastUpdate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bump?: IntFieldUpdateOperationsInput | number
+    dailyRewardTokens?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    agents?: AgentUncheckedUpdateManyWithoutGameNestedInput
+    alliances?: AllianceUncheckedUpdateManyWithoutGameNestedInput
+    battles?: BattleUncheckedUpdateManyWithoutGameNestedInput
+    coolDown?: CoolDownUncheckedUpdateManyWithoutGameNestedInput
+    Ignore?: IgnoreUncheckedUpdateManyWithoutGameNestedInput
   }
 
   export type AgentCreateManyGameInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
@@ -22401,11 +24531,20 @@ export namespace Prisma {
     ignoredAgentId: string
   }
 
+  export type GameLogCreateManyGameInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: string | null
+  }
+
   export type AgentUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -22421,13 +24560,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22443,13 +24582,13 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22573,11 +24712,40 @@ export namespace Prisma {
     ignoredAgentId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type GameLogUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agent?: AgentUpdateOneWithoutGameLogNestedInput
+  }
+
+  export type GameLogUncheckedUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type GameLogUncheckedUpdateManyWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    agentId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type AgentCreateManyProfileInput = {
     id?: string
     onchainId: number
     authority: string
-    health?: number
     gameId: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
@@ -22588,7 +24756,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -22604,13 +24771,13 @@ export namespace Prisma {
     mapTile?: MapTileUpdateOneRequiredWithoutAgentNestedInput
     ignoredBy?: IgnoreUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22626,13 +24793,13 @@ export namespace Prisma {
     joinedAlliances?: AllianceUncheckedUpdateManyWithoutJoinerNestedInput
     ignoredBy?: IgnoreUncheckedUpdateManyWithoutAgentNestedInput
     ignoring?: IgnoreUncheckedUpdateManyWithoutIgnoredAgentNestedInput
+    GameLog?: GameLogUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateManyWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
-    health?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22758,6 +24925,16 @@ export namespace Prisma {
     timestamp?: Date | string
     duration?: number
     gameId: string
+  }
+
+  export type GameLogCreateManyAgentInput = {
+    id?: string
+    timestamp?: Date | string
+    type: $Enums.LogType
+    level: $Enums.LogLevel
+    message: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    gameId?: string | null
   }
 
   export type TweetUpdateWithoutAgentInput = {
@@ -23123,6 +25300,36 @@ export namespace Prisma {
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     duration?: IntFieldUpdateOperationsInput | number
     gameId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type GameLogUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    game?: GameUpdateOneWithoutGameLogNestedInput
+  }
+
+  export type GameLogUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    gameId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type GameLogUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumLogTypeFieldUpdateOperationsInput | $Enums.LogType
+    level?: EnumLogLevelFieldUpdateOperationsInput | $Enums.LogLevel
+    message?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    gameId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type InteractionCreateManyTweetInput = {

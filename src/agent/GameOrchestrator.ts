@@ -4,11 +4,8 @@ import { PrismaClient } from "@prisma/client";
 import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
-import { InfluenceCalculator } from "@/agent/InfluenceCalculator";
 import EventEmitter from "events";
 import { BattleResolver } from "./BattleResolver";
-import { stringToUuid } from "@/utils/uuid";
-import { TweetV2 } from "twitter-api-v2";
 import { ActionContext, GameAction } from "@/types";
 import {
   InitializationError,
@@ -20,7 +17,7 @@ import {
 import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./ActionManager";
 import { gameConfig } from "@/config/env";
-import { InfluenceScore } from "@/types/twitter";
+import { TwitterInteractionManager } from "./TwitterInteractionManager";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -41,8 +38,8 @@ export class GameOrchestrator {
     private readonly gameId: string,
     private readonly actionManager: ActionManager,
     private readonly twitter: TwitterManager,
+    private readonly twitterInteractions: TwitterInteractionManager,
     private readonly cache: CacheManager,
-    private readonly calculator: InfluenceCalculator,
     private readonly engine: DecisionEngine,
     private readonly prisma: PrismaClient,
     private readonly eventEmitter: EventEmitter,
@@ -50,6 +47,10 @@ export class GameOrchestrator {
   ) {
     this.setupEventHandlers();
     this.setupErrorBoundary();
+    console.log("🎮 Game Orchestrator initialized", {
+      gameId: this.gameId,
+      onchainId: this.currentGameOnchainId.toNumber(),
+    });
   }
 
   /**
@@ -234,12 +235,26 @@ export class GameOrchestrator {
 
       // if action is successful, post a tweet
       if (result.success) {
-        await this.twitter.postTweet(
+        const tweet = await this.twitter.postTweet(
           data.actionContext.agentOnchainId.toString() as AgentId,
           `${getTwitterUserNameByAgentId(
             data.actionContext.agentOnchainId.toString() as AgentId
           )} => ${data.action.tweet}`
         );
+
+        if (tweet?.data?.id) {
+          await this.prisma.tweet.create({
+            data: {
+              id: tweet.data.id,
+              conversationId: tweet.data.id,
+              agentId: data.actionContext.agentId,
+              content: data.action.tweet,
+              type: data.action.type,
+              timestamp: new Date(),
+            },
+          });
+        }
+
         console.info("✅ Action successfully processed", {
           gameId: this.currentGameOnchainId,
           agentId: data.actionContext.agentId,
@@ -256,16 +271,12 @@ export class GameOrchestrator {
             return "Scootles";
           case "3":
             return "Sir Gullihop";
-
           case "4":
             return "Wanderleaf";
-
           default:
             throw new Error("Invalid agent ID");
         }
       }
-
-      // this.engine.handleActionResult(data.actionContext, result);
     } catch (err) {
       const actionError = new AgentError("Failed to handle new action", {
         agentId: data.actionContext.agentId,
@@ -385,7 +396,7 @@ export class GameOrchestrator {
           isActive: true,
           onchainId: this.currentGameOnchainId.toNumber(),
         },
-        health: { gt: 0 },
+        isAlive: true,
       },
       include: {
         game: {
@@ -399,14 +410,40 @@ export class GameOrchestrator {
 
     // Process aliveAgents sequentially with delay
     for (const agent of aliveAgents) {
-      await this.processAgent({
-        agentId: agent.id,
-        agentOnchainId: agent.onchainId,
-        gameId: agent.game.id,
-        gameOnchainId: agent.game.onchainId,
-      });
+      try {
+        // Check for new interactions
+        const lastChecked = new Date(Date.now() - 3600000); // 1 hour ago
+        const interactions =
+          await this.twitterInteractions.fetchRecentInteractions(
+            agent.id,
+            lastChecked
+          );
 
-      // Add delay between processing aliveAgents
+        if (interactions.length > 0) {
+          await this.twitterInteractions.processInteractions(
+            interactions,
+            agent.id
+          );
+          console.info(
+            `Processed ${interactions.length} interactions for agent ${agent.id}`
+          );
+        }
+
+        // Decide next action based on processed interactions
+        await this.engine.decideNextAction({
+          agentId: agent.id,
+          agentOnchainId: agent.onchainId,
+          gameId: agent.game.id,
+          gameOnchainId: agent.game.onchainId,
+        });
+      } catch (error) {
+        console.error("Error processing agent interactions", {
+          agentId: agent.id,
+          error,
+        });
+      }
+
+      // Add delay between processing agents
       if (aliveAgents.indexOf(agent) < aliveAgents.length - 1) {
         console.info(
           `⏳ Waiting ${this.agentInitGapDelay}ms before processing next agent`
@@ -418,77 +455,6 @@ export class GameOrchestrator {
     }
 
     console.info(`✅ Processed ${aliveAgents.length} agents sequentially`);
-  }
-
-  private async processAgent(actionContext: ActionContext): Promise<void> {
-    console.info(`🤖 Processing agent ${actionContext.agentId}`);
-    let scores: InfluenceScore[] = [];
-    try {
-      try {
-        const agentTweetTweets = await this.twitter.fetchTweetsFromPastHour(
-          actionContext.agentOnchainId.toString() as AgentId,
-          5
-        );
-        console.log(agentTweetTweets);
-        scores = await this.processTweetInteractions(
-          actionContext,
-          agentTweetTweets ? agentTweetTweets[0] : null
-        );
-        console.log(scores);
-      } catch (error) {
-        console.error("Error fetching tweets continuing...", {
-          agentId: actionContext.agentId,
-          error,
-        });
-      }
-
-      await this.engine.decideNextAction(actionContext, scores);
-    } catch (error) {
-      console.error("Error processing community interactions", {
-        agentId: actionContext.agentId,
-        error,
-      });
-    }
-  }
-
-  private async processTweetInteractions(
-    actionContext: ActionContext,
-    tweet: TweetV2 | null
-  ): Promise<InfluenceScore[]> {
-    console.info(
-      `📱 Processing tweet interactions for agent ${actionContext.agentId}`
-    );
-    if (!tweet) {
-      console.error("No tweet found for agent in the past hour", {
-        agentId: actionContext.agentId,
-      });
-      return [];
-    }
-    // Get new interactions from Twitter
-    const newInteractions = await this.twitter.fetchTweetInteractions(tweet.id);
-    // Process each interaction
-    const scores = await Promise.all(
-      newInteractions.map(async (interaction) => {
-        // Generate deterministic UUID for interaction based on its content
-        const interactionId = stringToUuid(
-          `${tweet.id}-${interaction.userId}-${interaction.timestamp}`
-        );
-        // Check cache first
-        const cached = await this.cache.getCachedInteraction(interactionId);
-        if (cached) return cached;
-
-        // Calculate new score
-        const score = await this.calculator.calculateScore(interaction);
-
-        await this.cache.cacheInteraction({
-          id: interactionId,
-          score,
-        });
-
-        return score;
-      })
-    );
-    return scores;
   }
 
   private async handleActionExecutionFailure(error: Error): Promise<void> {

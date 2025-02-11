@@ -6,7 +6,6 @@ import router from "./routes";
 import { GameOrchestrator } from "./agent/GameOrchestrator";
 import { BattleResolver } from "./agent/BattleResolver";
 import EventEmitter from "events";
-import { InfluenceCalculator } from "./agent/InfluenceCalculator";
 import CacheManager from "./agent/CacheManager";
 import TwitterManager from "./agent/TwitterManager";
 import { DecisionEngine } from "./agent/DecisionEngine";
@@ -15,9 +14,15 @@ import { getProgramWithWallet } from "./utils/program";
 import { PrismaClient } from "@prisma/client";
 import { ActionManager } from "./agent/ActionManager";
 import { GameManager } from "./agent/GameManager";
-import { serverConfig } from "./config/env";
+import { createServer } from "http";
+import { logManager } from "./agent/LogManager";
+import { TwitterInteractionManager } from "./agent/TwitterInteractionManager";
 
 const app = express();
+const server = createServer(app);
+
+// Initialize log manager with HTTP server
+logManager.initialize(server);
 
 // Security middleware
 app.use(
@@ -104,10 +109,11 @@ export async function startServer() {
     process.exit(1);
   }
 
-  const twitter = new TwitterManager();
-  const cache = new CacheManager();
-  const calculator = new InfluenceCalculator();
   const eventEmitter = new EventEmitter();
+  const engine = new DecisionEngine(prisma, eventEmitter, program);
+  const twitter = new TwitterManager();
+  const twitterInteractions = new TwitterInteractionManager(prisma, twitter);
+  const cache = new CacheManager();
 
   const battleResolver = new BattleResolver(program, gameManager, prisma);
   const actionManager = new ActionManager(
@@ -115,15 +121,14 @@ export async function startServer() {
     gameInfo.gameAccount.gameId,
     prisma
   );
-  const engine = new DecisionEngine(prisma, eventEmitter, program);
 
   const orchestrator = new GameOrchestrator(
     gameInfo.gameAccount.gameId,
     gameInfo.dbGame.id,
     actionManager,
     twitter,
+    twitterInteractions,
     cache,
-    calculator,
     engine,
     prisma,
     eventEmitter,
@@ -138,10 +143,10 @@ export async function startServer() {
   }
 
   try {
-    const server = app.listen(serverConfig.port, () => {
-      console.info(
-        `Server running on port ${serverConfig.port} in development mode`
-      );
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      logManager.log("SYSTEM", "INFO", `Server started on port ${PORT}`);
     });
 
     // Graceful shutdown

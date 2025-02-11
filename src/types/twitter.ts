@@ -59,3 +59,62 @@ export interface UserMetrics {
   verified: boolean;
   reputationScore: number;
 }
+
+// Log types for different game events
+export type LogType =
+  | "BATTLE"
+  | "MOVEMENT"
+  | "ALLIANCE"
+  | "SYSTEM"
+  | "ERROR"
+  | "AGENT_ACTION";
+
+// Log levels for filtering
+export type LogLevel = "INFO" | "WARNING" | "ERROR" | "DEBUG";
+
+// Structure for game logs
+export interface GameLog {
+  id: string;
+  timestamp: number;
+  type: LogType;
+  level: LogLevel;
+  message: string;
+  data?: any;
+  agentId?: string;
+  gameId?: string;
+}
+
+// Log filter options
+export interface LogFilter {
+  types?: LogType[];
+  levels?: LogLevel[];
+  agentId?: string;
+  gameId?: string;
+  startTime?: number;
+  endTime?: number;
+}
+
+// WebSocket message types
+export type WSMessageType = "FILTER" | "FILTERED_LOGS" | "LOG";
+
+export interface WSMessage {
+  type: WSMessageType;
+  payload: any;
+}
+
+export interface FilterMessage extends WSMessage {
+  type: "FILTER";
+  payload: LogFilter;
+}
+
+export interface FilteredLogsMessage extends WSMessage {
+  type: "FILTERED_LOGS";
+  payload: {
+    logs: GameLog[];
+  };
+}
+
+export interface LogMessage extends WSMessage {
+  type: "LOG";
+  payload: GameLog;
+}

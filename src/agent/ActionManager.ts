@@ -17,6 +17,7 @@ import {
   GameAction,
 } from "@/types";
 import { gameConfig } from "@/config/env";
+import { logManager } from "./LogManager";
 
 /**
  * Manages the execution and validation of game actions
@@ -53,11 +54,12 @@ export class ActionManager {
     ctx: ActionContext,
     action: GameAction
   ): Promise<ActionResult> {
-    console.log("🎯 Executing game action", {
-      agentId: ctx.agentId,
-      agentOnchainId: ctx.agentOnchainId,
-      actionType: action.type,
-    });
+    console.log(
+      `Agent ${ctx.agentId} executing ${action.type}`,
+      { action, context: ctx },
+      ctx.agentId,
+      ctx.gameId
+    );
 
     try {
       console.log("🔍 Validating game state...");
@@ -73,15 +75,36 @@ export class ActionManager {
 
       switch (action.type) {
         case "MOVE":
-          console.log("🚶 Processing movement action");
+          logManager.log(
+            "MOVEMENT",
+            "INFO",
+            `Agent ${ctx.agentId} moving to position (${action.position.x}, ${action.position.y})`,
+            { position: action.position },
+            ctx.agentId,
+            ctx.gameId
+          );
           result = await this.handleMove(ctx, action);
           break;
         case "BATTLE":
-          console.log("🦋 Processing battle action");
+          logManager.log(
+            "BATTLE",
+            "INFO",
+            `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
+            { target: action.targetId },
+            ctx.agentId,
+            ctx.gameId
+          );
           result = await this.handleBattle(ctx, action);
           break;
         case "FORM_ALLIANCE":
-          console.log("🤝 Processing alliance formation action");
+          logManager.log(
+            "ALLIANCE",
+            "INFO",
+            `Agent ${ctx.agentId} forming alliance with ${action.targetId}`,
+            { target: action.targetId },
+            ctx.agentId,
+            ctx.gameId
+          );
           result = await this.handleFormAlliance(ctx, action);
           break;
         case "BREAK_ALLIANCE":
@@ -96,20 +119,16 @@ export class ActionManager {
           throw new Error("Invalid action type");
       }
 
-      if (!result.success && result.feedback) {
-        console.log("🔄 Action validation failed, providing feedback", {
-          feedback: result.feedback,
-          actionType: action.type,
-        });
-      }
-
       return result;
     } catch (error) {
-      console.error("💥 Failed to execute action", {
-        agentId: ctx.agentId,
-        action,
-        error,
-      });
+      logManager.log(
+        "ERROR",
+        "ERROR",
+        `Action execution failed for agent ${ctx.agentId}`,
+        { error, action },
+        ctx.agentId,
+        ctx.gameId
+      );
 
       return {
         success: false,
@@ -182,7 +201,7 @@ export class ActionManager {
           ignoredAgentId: targetAgent.id,
           gameId: ctx.gameId,
           timestamp: new Date(),
-          duration: 14400, // 4 hours in seconds
+          duration: gameConfig.mechanics.cooldowns.ignore,
         },
       });
 
@@ -280,11 +299,14 @@ export class ActionManager {
         },
       });
 
-      console.log("✅ Agent movement completed successfully", {
-        agentId: ctx.agentId,
-        x: action.position.x,
-        y: action.position.y,
-      });
+      logManager.log(
+        "MOVEMENT",
+        "INFO",
+        `Agent ${ctx.agentId} successfully moved to (${action.position.x}, ${action.position.y})`,
+        { newPosition: action.position },
+        ctx.agentId,
+        ctx.gameId
+      );
 
       return {
         success: true,
@@ -293,11 +315,14 @@ export class ActionManager {
         },
       };
     } catch (error) {
-      console.error("💥 Movement failed", {
-        error,
-        agentId: ctx.agentId,
-        action,
-      });
+      logManager.log(
+        "MOVEMENT",
+        "ERROR",
+        `Movement failed for agent ${ctx.agentId}`,
+        { error, action },
+        ctx.agentId,
+        ctx.gameId
+      );
       console.log("Error", error);
       return {
         success: false,

@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2017",
     "module": "commonjs",
-    "lib": ["es2020"],
+    "lib": ["es2017", "dom"],
+    "jsx": "react",
+    "declaration": true,
+    "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "moduleResolution": "node",
+    "baseUrl": "src",
     "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../archive/InfluenceCalculator.ts"],
   "exclude": ["node_modules", "dist"]
 }

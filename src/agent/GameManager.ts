@@ -7,6 +7,7 @@ import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
+import { getFourTiles } from "@/utils/map-helpers";
 const { BN } = anchor;
 
 interface GameInfo {
@@ -175,7 +176,7 @@ export class GameManager implements IGameManager {
     await this.prisma.$transaction([
       this.prisma.agent.updateMany({
         where: { gameId },
-        data: { health: 100, isAlive: true },
+        data: { isAlive: true },
       }),
       this.prisma.coolDown.deleteMany({
         where: { gameId },
@@ -267,7 +268,7 @@ export class GameManager implements IGameManager {
     console.info("🎭 Starting agent initialization process...");
     const profiles = await this.prisma.agentProfile.findMany();
     return Promise.all(
-      profiles.map(async (profile) => {
+      profiles.map(async (profile, index) => {
         console.info(`👤 Initializing agent for profile: ${profile.name}`);
         const [agentPda] = getAgentPDA(
           this.program.programId,
@@ -321,7 +322,7 @@ export class GameManager implements IGameManager {
             mapTileId: spawnTile.id,
             profileId: profile.id,
             authority: this.program.programId.toString(),
-            health: 100,
+
             isAlive: true,
           },
           include: {
