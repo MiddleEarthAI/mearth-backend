@@ -14,15 +14,11 @@ import { PrismaClient } from "@prisma/client";
 import { ActionManager } from "./agent/ActionManager";
 import { GameManager } from "./agent/GameManager";
 import { createServer } from "http";
-import { logManager } from "./agent/LogManager";
 
 import { expressCspHeader, NONE, SELF } from "express-csp-header";
 
 const app = express();
 const server = createServer(app);
-
-// Initialize log manager with HTTP server
-logManager.initialize(server);
 
 // Security middleware
 app.use(
@@ -252,7 +248,11 @@ export async function startServer() {
     const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      logManager.log("SYSTEM", "INFO", `Server started on port ${PORT}`);
+      console.log({
+        level: "INFO",
+        message: `Server started on port ${PORT}`,
+        type: "SYSTEM",
+      });
     });
 
     // Graceful shutdown

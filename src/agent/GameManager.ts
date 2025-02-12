@@ -7,7 +7,6 @@ import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
-import { getFourTiles } from "@/utils/map-helpers";
 const { BN } = anchor;
 
 interface GameInfo {

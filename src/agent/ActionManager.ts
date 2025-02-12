@@ -17,7 +17,7 @@ import {
   GameAction,
 } from "@/types";
 import { gameConfig } from "@/config/env";
-import { logManager } from "./LogManager";
+import { logger } from "@/utils/logger";
 
 /**
  * Manages the execution and validation of game actions
@@ -75,44 +75,53 @@ export class ActionManager {
 
       switch (action.type) {
         case "MOVE":
-          logManager.log(
-            "MOVEMENT",
-            "INFO",
-            `Agent ${ctx.agentId} moving to position (${action.position.x}, ${action.position.y})`,
-            { position: action.position },
-            ctx.agentId,
-            ctx.gameId
-          );
+          logger.log({
+            level: "INFO",
+            message: `Agent ${ctx.agentId} moving to position (${action.position.x}, ${action.position.y})`,
+            type: "MOVEMENT",
+            agentId: ctx.agentId,
+            gameId: ctx.gameId,
+          });
           result = await this.handleMove(ctx, action);
           break;
         case "BATTLE":
-          logManager.log(
-            "BATTLE",
-            "INFO",
-            `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
-            { target: action.targetId },
-            ctx.agentId,
-            ctx.gameId
-          );
+          logger.log({
+            level: "INFO",
+            message: `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
+            type: "BATTLE",
+            agentId: ctx.agentId,
+            gameId: ctx.gameId,
+          });
           result = await this.handleBattle(ctx, action);
           break;
         case "FORM_ALLIANCE":
-          logManager.log(
-            "ALLIANCE",
-            "INFO",
-            `Agent ${ctx.agentId} forming alliance with ${action.targetId}`,
-            { target: action.targetId },
-            ctx.agentId,
-            ctx.gameId
-          );
+          logger.log({
+            level: "INFO",
+            message: `Agent ${ctx.agentId} forming alliance with ${action.targetId}`,
+            type: "ALLIANCE",
+            agentId: ctx.agentId,
+            gameId: ctx.gameId,
+          });
           result = await this.handleFormAlliance(ctx, action);
           break;
         case "BREAK_ALLIANCE":
-          console.log("🤝 Processing alliance breaking action");
+          logger.log({
+            level: "INFO",
+            message: `Agent ${ctx.agentId} breaking alliance with ${action.targetId}`,
+            type: "ALLIANCE",
+            agentId: ctx.agentId,
+            gameId: ctx.gameId,
+          });
           result = await this.handleBreakAlliance(ctx, action);
           break;
         case "IGNORE":
-          console.log("🚫 Processing ignore action");
+          logger.log({
+            level: "INFO",
+            message: `Agent ${ctx.agentId} ignoring ${action.targetId}`,
+            type: "SYSTEM",
+            agentId: ctx.agentId,
+            gameId: ctx.gameId,
+          });
           result = await this.handleIgnore(ctx, action);
           break;
         default:
@@ -121,14 +130,13 @@ export class ActionManager {
 
       return result;
     } catch (error) {
-      logManager.log(
-        "ERROR",
-        "ERROR",
-        `Action execution failed for agent ${ctx.agentId}`,
-        { error, action },
-        ctx.agentId,
-        ctx.gameId
-      );
+      logger.log({
+        level: "ERROR",
+        message: `Action execution failed for agent ${ctx.agentId}`,
+        type: "SYSTEM",
+        agentId: ctx.agentId,
+        gameId: ctx.gameId,
+      });
 
       return {
         success: false,
@@ -299,14 +307,13 @@ export class ActionManager {
         },
       });
 
-      logManager.log(
-        "MOVEMENT",
-        "INFO",
-        `Agent ${ctx.agentId} successfully moved to (${action.position.x}, ${action.position.y})`,
-        { newPosition: action.position },
-        ctx.agentId,
-        ctx.gameId
-      );
+      logger.log({
+        level: "INFO",
+        message: `Agent ${ctx.agentId} successfully moved to (${action.position.x}, ${action.position.y})`,
+        type: "MOVEMENT",
+        agentId: ctx.agentId,
+        gameId: ctx.gameId,
+      });
 
       return {
         success: true,
@@ -315,14 +322,13 @@ export class ActionManager {
         },
       };
     } catch (error) {
-      logManager.log(
-        "MOVEMENT",
-        "ERROR",
-        `Movement failed for agent ${ctx.agentId}`,
-        { error, action },
-        ctx.agentId,
-        ctx.gameId
-      );
+      logger.log({
+        level: "ERROR",
+        message: `Movement failed for agent ${ctx.agentId}`,
+        type: "MOVEMENT",
+        agentId: ctx.agentId,
+        gameId: ctx.gameId,
+      });
       console.log("Error", error);
       return {
         success: false,
@@ -367,15 +373,15 @@ export class ActionManager {
         this.program.account.agent.fetch(defenderPda),
       ]);
 
-      // Validate battle cooldowns onchain
-      if (attackerAccount.lastBattle.gt(currentTime)) {
-        console.error("⏳ Battle rejected - Attacker on cooldown");
-        throw new Error("Attacker is on battle cooldown onchain");
-      }
-      if (defenderAccount.lastBattle.gt(currentTime)) {
-        console.error("⏳ Battle rejected - Defender on cooldown");
-        throw new Error("Defender is on battle cooldown onchain");
-      }
+      // // Validate battle cooldowns onchain
+      // if (attackerAccount.lastBattle.gt(currentTime)) {
+      //   console.error("⏳ Battle rejected - Attacker on cooldown");
+      //   throw new Error("Attacker is on battle cooldown onchain");
+      // }
+      // if (defenderAccount.lastBattle.gt(currentTime)) {
+      //   console.error("⏳ Battle rejected - Defender on cooldown");
+      //   throw new Error("Defender is on battle cooldown onchain");
+      // }
 
       let tx: string;
       // Handle different battle types based on ally status
@@ -479,7 +485,6 @@ export class ActionManager {
     attackerAccount: AgentAccount,
     defenderAccount: AgentAccount
   ): Promise<string> {
-    const currentTime = Date.now();
     console.log("⚔️ Setting up Alliance vs Alliance battle");
 
     const attackerAllyPda = attackerAccount.allianceWith;
@@ -496,21 +501,21 @@ export class ActionManager {
         defenderAllyPda
       );
 
-      if (attackerAccount.lastBattle.gt(currentTime)) {
-        throw new Error("Attacker is on cooldown");
-      }
+      // if (attackerAccount.lastBattle.gt(currentTime)) {
+      //   throw new Error("Attacker is on cooldown");
+      // }
 
-      if (defenderAccount.lastBattle.gt(currentTime)) {
-        throw new Error("Defender is on cooldown");
-      }
+      // if (defenderAccount.lastBattle.gt(currentTime)) {
+      //   throw new Error("Defender is on cooldown");
+      // }
 
-      if (attackerAllyAccount.lastBattle.gt(currentTime)) {
-        throw new Error("Attacker's ally is on cooldown");
-      }
+      // if (attackerAllyAccount.lastBattle.gt(currentTime)) {
+      //   throw new Error("Attacker's ally is on cooldown");
+      // }
 
-      if (defenderAllyAccount.lastBattle.gt(currentTime)) {
-        throw new Error("Defender's ally is on cooldown");
-      }
+      // if (defenderAllyAccount.lastBattle.gt(currentTime)) {
+      //   throw new Error("Defender's ally is on cooldown");
+      // }
       const [
         attackerAgent,
         defenderAgent,
@@ -943,18 +948,18 @@ export class ActionManager {
         throw new Error("Initiator not found in database");
       }
 
-      // Fetch and verify initial state
-      const initiatorBefore = await this.program.account.agent.fetch(
-        initiatorPda
-      );
-      const targetBefore = await this.program.account.agent.fetch(targetPda);
+      // // Fetch and verify initial state
+      // const initiatorBefore = await this.program.account.agent.fetch(
+      //   initiatorPda
+      // );
+      // const targetBefore = await this.program.account.agent.fetch(targetPda);
 
-      if (initiatorBefore.allianceWith === targetPda) {
-        throw new Error("Initiator is already allied with target");
-      }
-      if (targetBefore.allianceWith === initiatorPda) {
-        throw new Error("Target is already allied with initiator");
-      }
+      // if (initiatorBefore.allianceWith === targetPda) {
+      //   throw new Error("Initiator is already allied with target");
+      // }
+      // if (targetBefore.allianceWith === initiatorPda) {
+      //   throw new Error("Target is already allied with initiator");
+      // }
 
       // Execute the breakAlliance instruction
       const tx = await this.program.methods
