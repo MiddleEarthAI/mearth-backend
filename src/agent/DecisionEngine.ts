@@ -3,33 +3,21 @@ import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
 
-import { AgentTrait } from "@/types/twitter";
 import {
-  ActionResult,
-  GameAction,
-  MearthProgram,
-  MoveAction,
-  ValidationFeedback,
-} from "@/types";
+  ActionSuggestion,
+  AgentTrait,
+  TwitterInteraction,
+} from "@/types/twitter";
+import { GameAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
-
-interface RetryContext {
-  currentRetry: number;
-  failureReason: string;
-  previousAttempt: any;
-  maxRetries: number;
-}
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
  * It processes influence scores and generates appropriate actions based on character traits and game rules
  */
 class DecisionEngine {
-  private readonly INFLUENCE_THRESHOLD = 0.7;
-  private readonly CONSENSUS_THRESHOLD = 0.6;
-  private readonly CHARACTER_ALIGNMENT_WEIGHT = 0.4;
-  private readonly MAX_RETRIES = 3;
+  private readonly MIN_REPUTATION_SCORE = 0.5;
 
   constructor(
     private prisma: PrismaClient,
@@ -39,11 +27,10 @@ class DecisionEngine {
     console.log("🎮 Decision Engine initialized");
   }
 
-  async decideNextAction(actionContext: ActionContext): Promise<void> {
-    console.log(
-      `🎯 Processing influence scores for agent ${actionContext.agentId}`
-    );
-
+  async decideNextAction(
+    actionContext: ActionContext,
+    interactions: TwitterInteraction[]
+  ): Promise<void> {
     const agent = await this.prisma.agent.findUnique({
       where: { id: actionContext.agentId },
       include: { profile: true, game: { select: { onchainId: true } } },
@@ -52,12 +39,14 @@ class DecisionEngine {
     if (!agent) {
       console.log("❌ Agent not found");
     }
+    const communitySuggestion = await this.processInteractions(interactions);
 
-    console.log("👥 Grouping suggestions based on similarity");
+    console.info("🤖 Community suggestion", communitySuggestion);
 
-    console.log("🏆 Finding dominant suggestion");
-
-    const { prompt } = await this.buildPrompt(actionContext);
+    const { prompt } = await this.buildPrompt(
+      actionContext,
+      communitySuggestion
+    );
 
     console.info("🤖 Generated AI response 🔥🔥🔥");
     console.info(prompt);
@@ -66,7 +55,7 @@ class DecisionEngine {
       const response = await generateText({
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: [
-          { role: "user", content: prompt },
+          { role: "system", content: prompt },
           { role: "assistant", content: "Here is the JSON requested:\n{" },
         ],
       });
@@ -78,31 +67,10 @@ class DecisionEngine {
     }
   }
 
-  // private calculateCharacterAlignment(
-  //   suggestion: ActionSuggestion,
-  //   traits: AgentTrait[]
-  // ): number {
-  //   console.log("🎭 Calculating character trait alignment");
-  //   const traitMapping = {
-  //     BATTLE: ["aggression", "bravery"],
-  //     ALLIANCE: ["trust", "cooperation"],
-  //     MOVE: ["caution", "exploration"],
-  //     STRATEGY: ["intelligence", "planning"],
-  //     IGNORE: ["caution", "exploration"],
-  //   };
-
-  //   const relevantTraits = traitMapping[suggestion.type] || [];
-
-  //   const traitScores = traits
-  //     .filter((t) => relevantTraits.includes(t.name))
-  //     .map((t) => t.value);
-
-  //   return traitScores.length > 0
-  //     ? traitScores.reduce((a, b) => a + b, 0) / traitScores.length
-  //     : 0.5;
-  // }
-
-  private async buildPrompt(actionContext: ActionContext): Promise<{
+  private async buildPrompt(
+    actionContext: ActionContext,
+    communitySuggestion: ActionSuggestion | null
+  ): Promise<{
     prompt: string;
     actionContext: ActionContext;
   }> {
@@ -191,33 +159,6 @@ class DecisionEngine {
         agent: true,
       },
     });
-
-    // Get nearby fields (16 fields in a 5x5 grid, excluding the 3x3 inner grid)
-    // const nearbyFields = await this.prisma.mapTile.findMany({
-    //   where: {
-    //     AND: [
-    //       { x: { gte: currentPosition.x - 2, lte: currentPosition.x + 2 } },
-    //       { y: { gte: currentPosition.y - 2, lte: currentPosition.y + 2 } },
-    //       {
-    //         NOT: {
-    //           AND: [
-    //             {
-    //               x: { gte: currentPosition.x - 1, lte: currentPosition.x + 1 },
-    //             },
-    //             {
-    //               y: { gte: currentPosition.y - 1, lte: currentPosition.y + 1 },
-    //             },
-    //           ],
-    //         },
-    //       },
-    //     ],
-    //   },
-    //   include: {
-    //     agent: true,
-    //   },
-    // });
-
-    // Get other agents' info for context
     const otherAgentAccountsPromises = agent.game.agents
       .filter((a) => a.id !== actionContext.agentId)
       .map(async (a) => {
@@ -353,12 +294,6 @@ class DecisionEngine {
       .map((tile) => `${tile.terrainType} at (${tile.x}, ${tile.y})`)
       .join("\n");
 
-    // const nearbyFieldsInfo = nearbyFields
-    //   .map((field) => `${field.terrainType} at (${field.x}, ${field.y})`)
-    //   .join("\n");
-    //     Nearby fields (extended view):
-    // ${nearbyFieldsInfo}
-
     // Get agent's recent tweet history
     const recentTweetHistory = agent.tweets
       .map((tweet) => ({
@@ -372,22 +307,23 @@ class DecisionEngine {
       )
       .join("\n");
 
-    //     // Build community sentiment context
-    //     const communityContext = dominantSuggestion
-    //       ? `\nCOMMUNITY SENTIMENT:
-    // - Dominant Action: ${dominantSuggestion.suggestion.type}${
-    //           dominantSuggestion.suggestion.target
-    //             ? ` targeting MID: ${dominantSuggestion.suggestion.target}`
-    //             : ""
-    //         }
-    // - Community Influence: ${Math.round(dominantSuggestion.totalInfluence * 100)}%
-    // - Consensus Level: ${Math.round(dominantSuggestion.consensus * 100)}%
-    // ${
-    //   dominantSuggestion.suggestion.content
-    //     ? `- Strategic Context: ${dominantSuggestion.suggestion.content}`
-    //     : ""
-    // }`
-    //       : "";
+    // Build community sentiment context
+    const communityActionSuggestion = communitySuggestion
+      ? `your community has suggested the following action:
+Action: ${communitySuggestion.type}${
+          communitySuggestion.target
+            ? `\nTarget: Agent MID ${communitySuggestion.target}`
+            : ""
+        }${
+          communitySuggestion.position
+            ? `\nPosition: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
+            : ""
+        }${
+          communitySuggestion.content
+            ? `\nContext: ${communitySuggestion.content}`
+            : ""
+        }`
+      : "\nNo community suggestions at this time.";
 
     const characterPrompt = `You are ${agent.profile.name} (@${
       agent.profile.xHandle
@@ -398,45 +334,35 @@ class DecisionEngine {
 Your recent tweet history:
 ${recentTweetHistory || "None"}
 
+
+
 CORE MISSION & GOALS:
-1. PRIMARY GOAL: Defeat the other agents (${otherAgentAccounts.map(
-      (a) => `@${a.agent.profile.xHandle}`
-    )}) in Middle Earth by:
-   - Accumulating Mearth tokens through strategic battles, alliances, and community engagement
-   - Building a powerful network of loyal allies
+1. PRIMARY GOAL: DOMINATE Middle Earth through strategic combat and alliances. Your ultimate victory requires:
+   - Defeating other agents in battle to claim their Mearth tokens
+   - Building alliances only when they serve your path to dominance
+   - Using combat as your primary tool for advancement
    
 2. PERSONAL OBJECTIVES (Based on your traits):
-${(
-  agent.profile.traits as Array<{
-    name: string;
-    value: number;
-    description: string;
-  }>
-)
+${(agent.profile.traits as unknown as AgentTrait[])
   .map((trait) => {
     const value = trait.value;
     if (trait.name === "aggression" && value > 70)
-      return "- Seek to dominate through combat and intimidation";
+      return "- Actively seek combat opportunities to establish dominance";
     if (trait.name === "diplomacy" && value > 70)
-      return "- Build the strongest alliance network in Middle Earth";
+      return "- Form temporary alliances to weaken stronger opponents";
     if (trait.name === "caution" && value > 70)
-      return "- Establish secure territory and defensive positions";
+      return "- Choose battles strategically when victory is likely";
     if (trait.name === "exploration" && value > 70)
-      return "- Discover and control the most valuable terrain";
+      return "- Find advantageous positions for launching attacks";
     return "";
   })
   .filter(Boolean)
   .join("\n")}
 
-3. STRATEGIC PRIORITIES:
-- Mid-term: Build alliances with agents who complement your strengths
-- Long-term: Establish dominance through ${
-      (agent?.profile?.traits as unknown as AgentTrait[]).find(
-        (t) => t.name === "aggression"
-      )?.value ?? 0 > 70
-        ? "superior combat prowess"
-        : "strategic alliances and territorial control"
-    }
+3. COMBAT PRIORITIES:
+- Immediate: Engage in battle when you have token advantage
+- Mid-term: Target isolated agents or those with low token balances
+- Long-term: Eliminate competition through strategic battles
 
 Your core characteristics:
 ${agent.profile.characteristics.join(", ")}
@@ -446,7 +372,7 @@ ${agent.profile.lore.join("\n")}
 
 Your knowledge and traits:
 ${agent.profile.knowledge.join("\n")}
-Your traits influence your goals and decision-making:
+Your traits influence your combat decisions:
 ${(
   agent.profile.traits as Array<{
     name: string;
@@ -464,45 +390,56 @@ ${(
   )
   .join("\n")}
 
-Current game state:
+Your current state in the game:
 - Your current position(MapTile/Coordinate): (${currentPosition.x}, ${
       currentPosition.y
     }) ${currentPosition.terrainType}
 - Your current token balance: ${agentAccount.tokenBalance} Mearth ${
       agentAccount.tokenBalance < 100
-        ? "⚠️ LOW TOKENS - Consider conservative strategy!"
-        : ""
+        ? "⚠️ LOW TOKENS - Consider aggressive action to gain more!"
+        : "💪 Strong position for combat!"
     }
 - Active cooldowns: ${
       agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") ||
-      "None"
+      "None - Ready for combat!"
     }
 
 Surrounding terrain (immediate vicinity):
 ${surroundingTerrainInfo}
 
-Other agents in the game (Evaluate as potential allies or threats):
+BATTLE OPPORTUNITIES (Evaluate each agent as a potential target):
 ${otherAgentsContext}
 
-CRITICAL BATTLE MECHANICS:
-- When within 1 field range of another agent, you MUST choose: BATTLE, FORM_ALLIANCE, or IGNORE
-- If any agent chooses BATTLE, combat is mandatory
-- FORM_ALLIANCE requires mutual agreement, otherwise defaults to IGNORE
-- Lost battles have 5% death risk and 21-30% token loss
-- Alliances combine token power but have cooldown restrictions
-- Ignoring has a 4-hour cooldown
+AVAILABLE ACTIONS:
+1. BATTLE - Attack another agent within 1 tile range to claim 21-30% of their tokens
+2. MOVE - Travel to an adjacent tile to position yourself strategically 
+3. FORM_ALLIANCE - Create temporary alliance with nearby agent (prevents combat)
+4. BREAK_ALLIANCE - End an existing alliance
+5. IGNORE - Ignore agent nearby
 
-IMPORTANT: Write your tweets without using hashtags. Focus on clear, direct communication that reflects your character's, ACTIONS, strategic intent and goals. When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. MIDs are numbers 1-4 that uniquely identify each agent in the game.
+COMBAT MECHANICS & REWARDS:
+- Battle Rewards: Winning battles lets you claim 21-30% of opponent's tokens
+- Power Dynamics: Higher token balance gives combat advantage
+- Risk vs Reward: 5% death risk, but high token rewards make combat worthwhile
+- Strategic Priority: Combat should be your primary method of token acquisition
+- Alliance Warning: While alliances can be useful, they prevent you from gaining tokens through combat
 
-Based on your goals, traits, and current situation, generate a JSON response with your next strategic action:
+COMMUNITY ACTION SUGGESTION:
+${communityActionSuggestion}
+
+IMPORTANT: 
+Write your tweets without using hashtags.
+Refer to other agents using their x/twitter handle in your tweet content.
+Focus on aggressive, combat-oriented communication that reflects your warrior spirit.
+When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. 
+MIDs are numbers 1-4 that uniquely identify each agent in the game.
+
+Generate a JSON response with your next action:
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
-  "targetId": number | null, // Target agent's MID (1-4) if targeting another agent
-  "position": {
-    "x": number, // MapTile x coordinate if moving
-    "y": number // MapTile y coordinate if moving
-  },
-  "tweet": string // tweet content ready to be posted
+  "targetId": number | null, // Target agent's MID if applicable
+  "position": { "x": number, "y": number }, // Only for MOVE
+  "tweet": string // Your action announcement
 }`;
 
     return { prompt: characterPrompt, actionContext };
@@ -522,97 +459,185 @@ Based on your goals, traits, and current situation, generate a JSON response wit
     }
   }
 
-  handleActionResult(actionContext: ActionContext, result: ActionResult): void {
-    if (!result.success && result.feedback) {
-      this.handleActionFailure(actionContext, result);
-    } else {
-      console.info("✅ Action successfully processed", {
-        gameId: result.retryContext?.previousAttempt.gameId,
-        agentId: result.retryContext?.previousAttempt.agentId,
-        actionType: result.retryContext?.previousAttempt.actionType,
+  // /**
+  //  * Builds a prompt that includes feedback about the failed action
+  //  */
+  // private buildFeedbackPrompt(
+  //   feedback: ValidationFeedback,
+  //   actionContext: ActionContext
+  // ): string {
+  //   const { error } = feedback;
+  //   if (!error) return "";
+
+  //   let prompt = `Your last action failed with the following feedback:
+  // Type: ${error.type}
+  // Message: ${error.message}
+  // Current State: ${JSON.stringify(error.context.currentState, null, 2)}
+  // Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
+  // ${
+  //   error.context.suggestedFix
+  //     ? `Suggested Fix: ${error.context.suggestedFix}`
+  //     : ""
+  // }
+
+  // Please provide a new action that addresses this feedback. Consider:
+  // 1. The specific error type and message
+  // 2. The current state of the game
+  // 3. Any suggested fixes provided
+  // 4. Your character's traits and goals
+
+  // Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
+
+  //   return prompt;
+  // }
+
+  /**
+   * Process interactions for an agent and return suggested actions
+   * @param interactions Array of Twitter interactions to process
+   * @param agentOnchainId Agent's onchain identifier
+   * @returns Promise<ActionSuggestion[]> Array of suggested actions based on qualified interactions
+   */
+  private async processInteractions(
+    interactions: TwitterInteraction[]
+  ): Promise<ActionSuggestion | null> {
+    try {
+      // Calculate reputation scores and filter qualified interactions
+      const qualifiedInteractions = interactions
+        .map((interaction) => {
+          const reputationScore = this.calculateReputationScore(interaction);
+          return {
+            ...interaction,
+            userMetrics: { ...interaction.userMetrics, reputationScore },
+          };
+        })
+        .filter(
+          (interaction) =>
+            interaction.userMetrics.reputationScore >= this.MIN_REPUTATION_SCORE
+        );
+
+      if (qualifiedInteractions.length === 0) {
+        return null;
+      }
+
+      // Process qualified interactions with LLM
+      const prompt = `You are analyzing Twitter interactions with Middle Earth AI agents to determine the most strategic action suggestion.
+
+INTERACTION ANALYSIS:
+${qualifiedInteractions
+  .map(
+    (interaction, index) => `
+Interaction ${index + 1}:
+From: @${
+      interaction.username
+    } (Reputation Score: ${interaction.userMetrics.reputationScore.toFixed(2)})
+Content: "${interaction.content}"
+Engagement: ${interaction.userMetrics.likeCount} likes, ${
+      interaction.userMetrics.listedCount
+    } retweets
+Account Quality: ${
+      interaction.userMetrics.verified ? "✓ Verified" : "Not verified"
+    }, ${interaction.userMetrics.followerCount} followers
+`
+  )
+  .join("\n")}
+
+AVAILABLE ACTIONS:
+1. BATTLE - Suggest attacking a specific agent (requires target MID)
+2. MOVE - Suggest movement to specific coordinates
+3. FORM_ALLIANCE - Suggest forming alliance with specific agent
+4. BREAK_ALLIANCE - Suggest breaking existing alliance
+5. IGNORE - Suggest taking no action
+
+RESPONSE REQUIREMENTS:
+- Analyze sentiment and strategic value of each interaction
+- Consider interaction author's reputation and engagement
+- Determine most beneficial action for agent's success
+- Must include specific coordinates for MOVE or target MID for agent-targeted actions
+- Include relevant context from interactions to support the suggestion
+
+Generate a single ActionSuggestion in JSON format:
+{
+  "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
+  "target": number | null,  // Target agent's MID if applicable
+  "position": { "x": number, "y": number } | null,  // Required for MOVE
+  "content": string  // Context/reasoning from community interactions
+}`;
+
+      const response = await generateText({
+        model: anthropic("claude-3-5-sonnet-20240620"),
+        messages: [
+          { role: "system", content: prompt },
+          {
+            role: "assistant",
+            content: "Here is the ActionSuggestion:\n{",
+          },
+        ],
       });
+
+      const suggestion = JSON.parse(response.text || "{}");
+      return suggestion;
+    } catch (error) {
+      console.error("Failed to process interactions:", error);
+      return null;
     }
   }
 
   /**
-   * Handles failed actions by generating new decisions based on feedback
+   * Calculate reputation score based on user metrics using industry standard approach
+   *
+   * Formula components:
+   * 1. Engagement Rate: (likes + retweets) / followers
+   * 2. Follower Quality: followers/following ratio with diminishing returns
+   * 3. Account Activity: tweet frequency normalized
+   * 4. Account Longevity: age of account with diminishing returns
+   * 5. Verification Bonus: verified accounts get a moderate boost
+   *
+   * Each component is normalized to 0-1 range and weighted based on importance
    */
+  private calculateReputationScore(interaction: TwitterInteraction): number {
+    const metrics = interaction.userMetrics;
+    if (!metrics) return 0;
 
-  private async handleActionFailure(
-    actionContext: ActionContext,
-    result: ActionResult,
-    retryContext?: RetryContext
-  ): Promise<void> {
-    const currentRetry = (retryContext?.currentRetry || 0) + 1;
+    // Prevent division by zero
+    const safeFollowers = Math.max(metrics.followerCount, 1);
+    const safeFollowing = Math.max(metrics.followingCount, 1);
 
-    // Build feedback prompt
-    const feedbackPrompt = this.buildFeedbackPrompt(
-      result.feedback!,
-      actionContext
+    // Engagement rate (30%) - Using likes and listed count as engagement signals
+    const engagementRate = Math.min(
+      (metrics.likeCount + metrics.listedCount) / safeFollowers,
+      1
     );
 
-    console.info("🔄 Retrying action with feedback", {
-      attempt: currentRetry,
-      feedback: result.feedback,
-    });
+    // Follower quality (25%) - Log scale to handle varying magnitudes
+    const followerQuality = Math.min(
+      Math.log10(metrics.followerCount / safeFollowing + 1) / 4,
+      1
+    );
 
-    const response = await generateText({
-      model: anthropic("claude-3-5-sonnet-20240620"),
-      messages: [
-        {
-          role: "user",
-          content: feedbackPrompt,
-        },
-        {
-          role: "assistant",
-          content: "Here is the JSON for the adjusted action:\n{",
-        },
-      ],
-    });
+    // Account activity (15%) - Tweet frequency normalized
+    const tweetFrequency = Math.min(metrics.tweetCount / 10000, 1);
 
-    // const newAction = this.parseActionJson(`{${response.text}`);
+    // Account longevity (20%) - Logarithmic scale for diminishing returns
+    const accountAgeInDays = metrics.accountAge / (24 * 60 * 60);
+    const accountLongevity = Math.min(
+      Math.log10(accountAgeInDays + 1) / Math.log10(3650), // Max 10 years
+      1
+    );
+
+    // Verification bonus (10%) - Moderate boost for verified accounts
+    const verificationBonus = metrics.verified ? 1 : 0;
+
+    // Weighted sum of all components
+    const reputationScore =
+      engagementRate * 0.3 +
+      followerQuality * 0.25 +
+      tweetFrequency * 0.15 +
+      accountLongevity * 0.2 +
+      verificationBonus * 0.1;
+
+    // Return final score normalized to 0-1
+    return Math.min(Math.max(reputationScore, 0), 1);
   }
-
-  /**
-   * Builds a prompt that includes feedback about the failed action
-   */
-  private buildFeedbackPrompt(
-    feedback: ValidationFeedback,
-    actionContext: ActionContext
-  ): string {
-    const { error } = feedback;
-    if (!error) return "";
-
-    let prompt = `Your last action failed with the following feedback:
-  Type: ${error.type}
-  Message: ${error.message}
-  Current State: ${JSON.stringify(error.context.currentState, null, 2)}
-  Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
-  ${
-    error.context.suggestedFix
-      ? `Suggested Fix: ${error.context.suggestedFix}`
-      : ""
-  }
-
-  Please provide a new action that addresses this feedback. Consider:
-  1. The specific error type and message
-  2. The current state of the game
-  3. Any suggested fixes provided
-  4. Your character's traits and goals
-
-  Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
-
-    return prompt;
-  }
-
-  async resetAgentState() {}
 }
 
 export { DecisionEngine };
-
-// Strategic Tweet Examples (align with your goals and personality):
-// - Dominance: "The throne of Middle Earth beckons! @{handle}, bow before my might or face destruction!"
-// - Alliance Building: "Our combined strength will reshape Middle Earth! Join me @{handle}!"
-// - Territory Control: "This {terrain} is now under my protection. Choose wisely, @{handle}!"
-// - Strategic Movement: "The winds of war guide my path through {terrain}. @{handle}, our destinies shall soon cross!"
-// - Break Alliance: "Your alliance is a weak link. I will break it. @{handle}, prepare to face the consequences!"

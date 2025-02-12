@@ -2,7 +2,6 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
-import router from "./routes";
 import { GameOrchestrator } from "./agent/GameOrchestrator";
 import { BattleResolver } from "./agent/BattleResolver";
 import EventEmitter from "events";
@@ -16,7 +15,8 @@ import { ActionManager } from "./agent/ActionManager";
 import { GameManager } from "./agent/GameManager";
 import { createServer } from "http";
 import { logManager } from "./agent/LogManager";
-import { TwitterInteractionManager } from "./agent/TwitterInteractionManager";
+
+import { expressCspHeader, NONE, SELF } from "express-csp-header";
 
 const app = express();
 const server = createServer(app);
@@ -30,18 +30,33 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
+        sandbox: ["allow-forms", "allow-scripts", "allow-same-origin"],
+        reportUri: "/api/csp-report",
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
       },
+      reportOnly: false,
     },
     crossOriginEmbedderPolicy: true,
     crossOriginOpenerPolicy: true,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginResourcePolicy: { policy: "same-site" },
     dnsPrefetchControl: true,
     frameguard: { action: "deny" },
     hidePoweredBy: true,
-    hsts: true,
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
     ieNoOpen: true,
     noSniff: true,
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
@@ -49,24 +64,113 @@ app.use(
   })
 );
 
-// CORS configuration
+// Additional CSP headers
+app.use(
+  expressCspHeader({
+    directives: {
+      "default-src": [SELF],
+      "script-src": [SELF],
+      "style-src": [SELF],
+      "img-src": [SELF],
+      "connect-src": [SELF],
+      "font-src": [SELF],
+      "object-src": [NONE],
+      "media-src": [SELF],
+      "frame-src": [NONE],
+      sandbox: [
+        "allow-forms",
+        "allow-same-origin",
+        "allow-popups-to-escape-sandbox",
+        "allow-popups",
+        "allow-modals",
+        "allow-pointer-lock",
+      ],
+      "report-uri": "/api/csp-report",
+      "base-uri": [SELF],
+      "form-action": [SELF],
+      "frame-ancestors": [NONE],
+    },
+  })
+);
+
+// SQL Injection Prevention Middleware
+app.use((req, res, next) => {
+  // Sanitize request body and parameters
+  const sanitizeValue = (value: any): any => {
+    if (typeof value === "string") {
+      // Remove SQL injection patterns
+      return value.replace(/['";\\]/g, "");
+    }
+    if (typeof value === "object" && value !== null) {
+      return Object.keys(value).reduce(
+        (acc: any, key) => {
+          acc[key] = sanitizeValue(value[key]);
+          return acc;
+        },
+        Array.isArray(value) ? [] : {}
+      );
+    }
+    return value;
+  };
+
+  if (req.body) req.body = sanitizeValue(req.body);
+  if (req.query) req.query = sanitizeValue(req.query);
+  if (req.params) req.params = sanitizeValue(req.params);
+
+  next();
+});
+
+// CORS configuration - Strict
 app.use(
   cors({
-    origin: "*",
+    origin: process.env.ALLOWED_ORIGINS?.split(",") || [
+      "http://localhost:3000",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    maxAge: 86400, // 24 hours
+    maxAge: 86400,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
-// Body parsing middleware
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
-// Rate limiting
+// Body parsing middleware with strict limits
+app.use(
+  express.json({
+    limit: "10kb",
+    verify: (req: express.Request, res: express.Response, buf: Buffer) => {
+      try {
+        JSON.parse(buf.toString());
+      } catch (e) {
+        res.status(400).json({ error: "Invalid JSON" });
+        throw new Error("Invalid JSON");
+      }
+    },
+  })
+);
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Route-specific rate limiting
 app.use(defaultRateLimiter);
 
-app.use("/api", router);
+// Security headers check middleware
+app.use((req, res, next) => {
+  // Set security headers
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  res.setHeader("X-Download-Options", "noopen");
+
+  // Remove sensitive headers
+  res.removeHeader("X-Powered-By");
+
+  // Prevent clickjacking
+  res.setHeader("Content-Security-Policy", "frame-ancestors 'none'");
+
+  next();
+});
 
 // 404 handler
 app.use((_req, res) => {
@@ -76,7 +180,7 @@ app.use((_req, res) => {
   });
 });
 
-// Global error handler
+// Global error handler with security in mind
 app.use(
   (
     err: Error,
@@ -85,14 +189,17 @@ app.use(
     _next: express.NextFunction
   ) => {
     console.error("Unhandled error:", {
-      error: err.message,
-      stack: err.stack,
+      name: err.name,
+      message: err.message,
     });
 
+    // Don't expose error details in production
     res.status(500).json({
       success: false,
-      error: "Internal server error",
-      details: err.message,
+      error:
+        process.env.NODE_ENV === "production"
+          ? "Internal server error"
+          : err.message,
     });
   }
 );
@@ -112,7 +219,7 @@ export async function startServer() {
   const eventEmitter = new EventEmitter();
   const engine = new DecisionEngine(prisma, eventEmitter, program);
   const twitter = new TwitterManager();
-  const twitterInteractions = new TwitterInteractionManager(prisma, twitter);
+
   const cache = new CacheManager();
 
   const battleResolver = new BattleResolver(program, gameManager, prisma);
@@ -127,7 +234,6 @@ export async function startServer() {
     gameInfo.dbGame.id,
     actionManager,
     twitter,
-    twitterInteractions,
     cache,
     engine,
     prisma,

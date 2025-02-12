@@ -6,12 +6,6 @@ export interface AgentTrait {
   description: string;
 }
 
-export interface InfluenceScore {
-  interactionId: string;
-  score: number;
-  suggestion: ActionSuggestion;
-}
-
 export interface ActionSuggestion {
   type: "MOVE" | "BATTLE" | "ALLIANCE" | "IGNORE" | "STRATEGY";
   target?: string; // agentId

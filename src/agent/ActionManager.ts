@@ -181,18 +181,18 @@ export class ActionManager {
       }
 
       // Check if ignore relationship already exists
-      const existingIgnore = await this.prisma.ignore.findUnique({
-        where: {
-          agentId_ignoredAgentId: {
-            agentId: ctx.agentId,
-            ignoredAgentId: targetAgent.id,
-          },
-        },
-      });
+      // const existingIgnore = await this.prisma.ignore.findUnique({
+      //   where: {
+      //     agentId_ignoredAgentId: {
+      //       agentId: ctx.agentId,
+      //       ignoredAgentId: targetAgent.id,
+      //     },
+      //   },
+      // });
 
-      if (existingIgnore) {
-        throw new Error("Already ignoring this agent");
-      }
+      // if (existingIgnore) {
+      //   throw new Error("Already ignoring this agent");
+      // }
 
       // Create new ignore relationship
       await this.prisma.ignore.create({
@@ -786,15 +786,15 @@ export class ActionManager {
         this.program.account.agent.fetch(joinerPda),
       ]);
 
-      // Validate ally status onchain
-      if (initiatorAccount.allianceWith !== null) {
-        console.error("🚫 Alliance rejected - Initiator already allied");
-        throw new Error("Initiator already has an ally");
-      }
-      if (joinerAccount.allianceWith !== null) {
-        console.error("🚫 Alliance rejected - Joiner already allied");
-        throw new Error("Joiner already has an ally");
-      }
+      // // Validate ally status onchain
+      // if (initiatorAccount.allianceWith !== null) {
+      //   console.error("🚫 Alliance rejected - Initiator already allied");
+      //   throw new Error("Initiator already has an ally");
+      // }
+      // if (joinerAccount.allianceWith !== null) {
+      //   console.error("🚫 Alliance rejected - Joiner already allied");
+      //   throw new Error("Joiner already has an ally");
+      // }
 
       // Execute onchain alliance
       console.log("🎯 Executing onchain alliance formation");

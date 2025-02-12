@@ -75,16 +75,6 @@ export interface AllianceInfo {
   formedAt: BN;
 }
 
-export interface BattleAccount {
-  attacker: PublicKey;
-  defender: PublicKey;
-  startTime: BN;
-  endTime: BN | null;
-  result: BattleResult | null;
-  tokensBurned: BN;
-  isActive: boolean;
-}
-
 export interface ProgramError {
   code: number;
   name: string;

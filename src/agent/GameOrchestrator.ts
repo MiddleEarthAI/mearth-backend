@@ -17,7 +17,7 @@ import {
 import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./ActionManager";
 import { gameConfig } from "@/config/env";
-import { TwitterInteractionManager } from "./TwitterInteractionManager";
+import { TwitterInteraction } from "@/types/twitter";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -38,7 +38,6 @@ export class GameOrchestrator {
     private readonly gameId: string,
     private readonly actionManager: ActionManager,
     private readonly twitter: TwitterManager,
-    private readonly twitterInteractions: TwitterInteractionManager,
     private readonly cache: CacheManager,
     private readonly engine: DecisionEngine,
     private readonly prisma: PrismaClient,
@@ -318,7 +317,7 @@ export class GameOrchestrator {
       if (error instanceof MearthError) {
         switch (error.code) {
           case "AGENT_ERROR":
-            await this.engine.resetAgentState();
+            // await this.engine.resetAgentState();
             break;
           case "TWITTER_ERROR":
             await this.twitter.reconnect();
@@ -411,31 +410,31 @@ export class GameOrchestrator {
     // Process aliveAgents sequentially with delay
     for (const agent of aliveAgents) {
       try {
-        // Check for new interactions
-        const lastChecked = new Date(Date.now() - 3600000); // 1 hour ago
-        const interactions =
-          await this.twitterInteractions.fetchRecentInteractions(
-            agent.id,
-            lastChecked
-          );
-
-        if (interactions.length > 0) {
-          await this.twitterInteractions.processInteractions(
-            interactions,
-            agent.id
-          );
-          console.info(
-            `Processed ${interactions.length} interactions for agent ${agent.id}`
+        const agentTweet = await prisma.tweet.findFirst({
+          where: {
+            agentId: agent.id,
+          },
+          orderBy: {
+            timestamp: "desc",
+          },
+        });
+        let interactions: TwitterInteraction[] = [];
+        if (agentTweet?.conversationId) {
+          // Check for new interactions
+          interactions = await this.twitter.fetchTweetInteractions(
+            agentTweet?.conversationId
           );
         }
-
         // Decide next action based on processed interactions
-        await this.engine.decideNextAction({
-          agentId: agent.id,
-          agentOnchainId: agent.onchainId,
-          gameId: agent.game.id,
-          gameOnchainId: agent.game.onchainId,
-        });
+        await this.engine.decideNextAction(
+          {
+            agentId: agent.id,
+            agentOnchainId: agent.onchainId,
+            gameId: agent.game.id,
+            gameOnchainId: agent.game.onchainId,
+          },
+          interactions
+        );
       } catch (error) {
         console.error("Error processing agent interactions", {
           agentId: agent.id,
