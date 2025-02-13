@@ -116,7 +116,7 @@ export class BattleHandler {
                   ? "AgentVsAlliance"
                   : "Simple",
               status: "Active",
-              tokensStaked: totalTokensAtStake,
+              tokensStaked: parseInt(totalTokensAtStake.toString()),
               gameId: ctx.gameId,
               attackerId: attacker.id,
               defenderId: defender.id,

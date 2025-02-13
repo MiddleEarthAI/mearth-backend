@@ -115,10 +115,34 @@ class DecisionEngine {
               include: {
                 profile: true,
                 mapTile: true,
-                battlesAsAttacker: true,
-                battlesAsDefender: true,
-                initiatedAlliances: true,
-                joinedAlliances: true,
+                battlesAsAttacker: {
+                  where: { status: "Active" },
+                  include: {
+                    defender: { include: { profile: true } },
+                    attacker: { include: { profile: true } },
+                  },
+                },
+                battlesAsDefender: {
+                  where: { status: "Active" },
+                  include: {
+                    defender: { include: { profile: true } },
+                    attacker: { include: { profile: true } },
+                  },
+                },
+                initiatedAlliances: {
+                  where: { status: "Active" },
+                  include: {
+                    joiner: { include: { profile: true } },
+                    initiator: { include: { profile: true } },
+                  },
+                },
+                joinedAlliances: {
+                  where: { status: "Active" },
+                  include: {
+                    joiner: { include: { profile: true } },
+                    initiator: { include: { profile: true } },
+                  },
+                },
                 tweets: {
                   take: 2,
                   orderBy: {
@@ -130,8 +154,26 @@ class DecisionEngine {
           },
         },
         mapTile: true,
-
-        // get Active cooldowns
+        battlesAsAttacker: {
+          where: { status: "Active" },
+          include: { defender: { include: { profile: true } } },
+        },
+        battlesAsDefender: {
+          where: { status: "Active" },
+          include: { attacker: { include: { profile: true } } },
+        },
+        joinedAlliances: {
+          where: { status: "Active" },
+          include: {
+            initiator: { include: { profile: true } },
+          },
+        },
+        initiatedAlliances: {
+          where: { status: "Active" },
+          include: {
+            joiner: { include: { profile: true } },
+          },
+        },
         coolDown: {
           where: {
             endsAt: {
@@ -167,125 +209,127 @@ class DecisionEngine {
         ],
       },
       include: {
-        agent: true,
+        agent: { include: { profile: { select: { xHandle: true } } } },
       },
     });
-    const otherAgentAccountsPromises = agent.game.agents
-      .filter((a) => a.id !== actionContext.agentId)
-      .map(async (a) => {
-        const [otherAgentPda] = getAgentPDA(
-          this.program.programId,
-          gamePda,
-          a.onchainId
-        );
-        const agentAccount = await this.program.account.agent.fetch(
-          otherAgentPda
-        );
-        return {
-          agent: a,
-          account: agentAccount,
-        };
-      });
 
-    const otherAgentAccounts = await Promise.all(otherAgentAccountsPromises);
-
-    const otherAgentsContextPromises = otherAgentAccounts.map(async (a) => {
-      const agentPosition = a.agent.mapTile;
-      const distance = agentPosition
-        ? Math.sqrt(
-            Math.pow(currentPosition.x - agentPosition.x, 2) +
-              Math.pow(currentPosition.y - agentPosition.y, 2)
-          )
-        : Infinity;
-
-      // Calculate direction vector to other agent
-      const directionX = agentPosition
-        ? agentPosition.x - currentPosition.x
-        : 0;
-      const directionY = agentPosition
-        ? agentPosition.y - currentPosition.y
-        : 0;
-
-      // Calculate optimal path coordinates
-      const pathCoords = [];
-      if (agentPosition) {
-        const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
-        for (let i = 1; i <= steps; i++) {
-          const stepX = Math.round(
-            currentPosition.x + (directionX * i) / steps
+    const otherAgentInfo = await Promise.all(
+      agent.game.agents
+        .filter((agent) => agent.id !== actionContext.agentId)
+        .map(async (agent) => {
+          const [otherAgentPda] = getAgentPDA(
+            this.program.programId,
+            gamePda,
+            agent.onchainId
           );
-          const stepY = Math.round(
-            currentPosition.y + (directionY * i) / steps
+          const agentAccount = await this.program.account.agent.fetch(
+            otherAgentPda
           );
-          pathCoords.push(`(${stepX}, ${stepY})`);
+          return {
+            agent: agent,
+            account: agentAccount,
+          };
+        })
+    );
+
+    const otherAgentsContext = await Promise.all(
+      otherAgentInfo.map(async (agentInfo) => {
+        const agentPosition = agentInfo.agent.mapTile;
+        const distance = agentPosition
+          ? Math.sqrt(
+              Math.pow(currentPosition.x - agentPosition.x, 2) +
+                Math.pow(currentPosition.y - agentPosition.y, 2)
+            )
+          : Infinity;
+
+        // Calculate direction vector to other agent
+        const directionX = agentPosition
+          ? agentPosition.x - currentPosition.x
+          : 0;
+        const directionY = agentPosition
+          ? agentPosition.y - currentPosition.y
+          : 0;
+
+        // Calculate optimal path coordinates
+        const pathCoords = [];
+        if (agentPosition) {
+          const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
+          for (let i = 1; i <= steps; i++) {
+            const stepX = Math.round(
+              currentPosition.x + (directionX * i) / steps
+            );
+            const stepY = Math.round(
+              currentPosition.y + (directionY * i) / steps
+            );
+            pathCoords.push(`(${stepX}, ${stepY})`);
+          }
         }
-      }
 
-      // Get compass direction
-      const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
-      const compassDirection =
-        angle >= -22.5 && angle < 22.5
-          ? "East"
-          : angle >= 22.5 && angle < 67.5
-          ? "Northeast"
-          : angle >= 67.5 && angle < 112.5
-          ? "North"
-          : angle >= 112.5 && angle < 157.5
-          ? "Northwest"
-          : angle >= 157.5 || angle < -157.5
-          ? "West"
-          : angle >= -157.5 && angle < -112.5
-          ? "Southwest"
-          : angle >= -112.5 && angle < -67.5
-          ? "South"
-          : "Southeast";
+        // Get compass direction
+        const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
+        const compassDirection =
+          angle >= -22.5 && angle < 22.5
+            ? "East"
+            : angle >= 22.5 && angle < 67.5
+            ? "Northeast"
+            : angle >= 67.5 && angle < 112.5
+            ? "North"
+            : angle >= 112.5 && angle < 157.5
+            ? "Northwest"
+            : angle >= 157.5 || angle < -157.5
+            ? "West"
+            : angle >= -157.5 && angle < -112.5
+            ? "Southwest"
+            : angle >= -112.5 && angle < -67.5
+            ? "South"
+            : "Southeast";
 
-      // Get active alliances
-      const activeAlliances = [
-        ...a.agent.initiatedAlliances.filter(
-          (alliance) => alliance.status === AllianceStatus.Active
-        ),
-        ...a.agent.joinedAlliances.filter(
-          (alliance) => alliance.status === AllianceStatus.Active
-        ),
-      ];
+        // Get active alliances
+        const activeAlliances = [
+          ...agentInfo.agent.initiatedAlliances.filter(
+            (alliance) => alliance.status === AllianceStatus.Active
+          ),
+          ...agentInfo.agent.joinedAlliances.filter(
+            (alliance) => alliance.status === AllianceStatus.Active
+          ),
+        ];
 
-      const recentBattles = [
-        ...a.agent.battlesAsAttacker.slice(-2),
-        ...a.agent.battlesAsDefender.slice(-2),
-      ].map((b) => b.type);
+        const recentBattles = [
+          ...agentInfo.agent.battlesAsAttacker.slice(-2),
+          ...agentInfo.agent.battlesAsDefender.slice(-2),
+        ].map((b) => b.type);
 
-      // Get recent tweets for context
-      const recentTweets = a.agent.tweets
-        .slice(0, 2)
-        .map((t) => `"${t.content}"`)
-        .join(", ");
+        // Get recent tweets for context
+        const recentTweets = agentInfo.agent.tweets
+          .slice(0, 2)
+          .map((t) => `"${t.content}"`)
+          .join(", ");
 
-      const allianceInfo =
-        activeAlliances.length > 0
-          ? `Active alliances: ${activeAlliances
-              .map(
-                (alliance) =>
-                  `with ${
-                    alliance.joinerId === a.agent.id
-                      ? alliance.initiatorId
-                      : alliance.joinerId
-                  }`
-              )
-              .join(", ")}`
-          : "";
+        const allianceInfo =
+          activeAlliances.length > 0
+            ? `Active alliances: ${activeAlliances
+                .map(
+                  (alliance) =>
+                    `with ${
+                      alliance.joinerId === agentInfo.agent.id
+                        ? alliance.initiatorId
+                        : alliance.joinerId
+                    }`
+                )
+                .join(", ")}`
+            : "";
 
-      return `
-- ${a.agent.profile.name} (@${a.agent.profile.xHandle}) [MID: ${
-        a.agent.onchainId
-      }]
+        return `
+- ${agentInfo.agent.profile.name} (@${agentInfo.agent.profile.xHandle}) [MID: ${
+          agentInfo.agent.onchainId
+        }]
   Position: ${compassDirection} (${agentPosition?.x}, ${agentPosition?.y}) ${
-        agentPosition?.terrainType
-      } (${
-        distance <= 1
-          ? "⚠️ CRITICAL: Within battle range!"
-          : `${distance.toFixed(1)} fields away`
-      })
+          agentPosition?.terrainType
+        } (${
+          distance <= 1
+            ? "⚠️ CRITICAL: Within battle range!"
+            : `${distance.toFixed(1)} fields away`
+        })
   Recent tweets: ${recentTweets || "None"}
   Path to target: ${pathCoords.join(" → ")}
   Recent actions: ${[...recentBattles].join(", ") || "None"}
@@ -295,17 +339,20 @@ class DecisionEngine {
       ? "⚠️ INTERACTION REQUIRED - BATTLE/FORM_ALLIANCE/BREAK_ALLIANCE/IGNORE!"
       : ""
   }`;
-    });
+      })
+    );
 
-    const otherAgentsContext = (
-      await Promise.all(otherAgentsContextPromises)
-    ).join("\n");
-
+    // Build surrounding terrain info
     const surroundingTerrainInfo = nearbyTiles
-      .map((tile) => `${tile.terrainType} at (${tile.x}, ${tile.y})`)
+      .map((tile) => {
+        const occupiedBy = tile.agent?.profile?.xHandle
+          ? `@${tile.agent.profile.xHandle}`
+          : "Empty";
+        return `(${tile.x}, ${tile.y}) ${tile.terrainType} - ${occupiedBy}`;
+      })
       .join("\n");
 
-    // Get agent's recent tweet history
+    // Get recent tweet history
     const recentTweetHistory = agent.tweets
       .map((tweet) => ({
         content: tweet.content,
@@ -317,6 +364,27 @@ class DecisionEngine {
           `- ${t.content} (${t.interactions} interactions, type: ${t.type})`
       )
       .join("\n");
+
+    // Get active battles context
+    const activeBattles = [
+      ...agent.battlesAsAttacker.map(
+        (battle) => `⚔️ You are attacking @${battle.defender.profile.xHandle}`
+      ),
+      ...agent.battlesAsDefender.map(
+        (battle) =>
+          `⚔️ You are being attacked by @${battle.attacker.profile.xHandle}`
+      ),
+    ].join("\n");
+
+    // Get active alliances context
+    const activeAlliances = [
+      ...agent.initiatedAlliances.map(
+        (alliance) => `🤝 Allied with @${alliance.joiner.profile.xHandle}`
+      ),
+      ...agent.joinedAlliances.map(
+        (alliance) => `🤝 Allied with @${alliance.initiator.profile.xHandle}`
+      ),
+    ].join("\n");
 
     // Build community sentiment context
     const communityActionSuggestion = communitySuggestion
@@ -345,13 +413,18 @@ Action: ${communitySuggestion.type}${
 Your recent tweet history:
 ${recentTweetHistory || "None"}
 
+ACTIVE BATTLES:
+${activeBattles || "No active battles"}
 
+ACTIVE ALLIANCES:
+${activeAlliances || "No active alliances"}
 
 CORE MISSION & GOALS:
 1. PRIMARY GOAL: DOMINATE Middle Earth through strategic combat and alliances. Your ultimate victory requires:
-   - Defeating other agents in battle to claim their Mearth tokens
+   - Defeating other agents in battle to claim 21-30% of their Mearth tokens
    - Building alliances only when they serve your path to dominance
    - Using combat as your primary tool for advancement
+   - Being mindful that every battle carries a 10% risk of permanent death
    
 2. PERSONAL OBJECTIVES (Based on your traits):
 ${(agent.profile.traits as unknown as AgentTrait[])
@@ -418,22 +491,22 @@ Your current state in the game:
 Surrounding terrain (immediate vicinity):
 ${surroundingTerrainInfo}
 
-BATTLE OPPORTUNITIES (Evaluate each agent as a potential target):
-${otherAgentsContext}
+BATTLE OPPORTUNITIES & ONGOING CONFLICTS:
+${otherAgentsContext.join("\n\n")}
 
 AVAILABLE ACTIONS:
-1. BATTLE - Attack another agent within 1 tile range to claim 21-30% of their tokens
+1. BATTLE - Attack another agent within 1 tile range to claim 21-30% of their tokens (5% death risk)
 2. MOVE - Travel to an adjacent tile to position yourself strategically 
-3. FORM_ALLIANCE - Create temporary alliance with nearby agent (prevents combat)
-4. BREAK_ALLIANCE - End an existing alliance
-5. IGNORE - Ignore agent nearby
+3. FORM_ALLIANCE - Create temporary alliance with nearby agent (combines token pools)
+4. BREAK_ALLIANCE - End an existing alliance (4h battle cooldown, 24h alliance cooldown)
+5. IGNORE - Ignore agent nearby (4h interaction cooldown)
 
 COMBAT MECHANICS & REWARDS:
-- Battle Rewards: Winning battles lets you claim 21-30% of opponent's tokens
-- Power Dynamics: Higher token balance gives combat advantage
-- Risk vs Reward: 5% death risk, but high token rewards make combat worthwhile
-- Strategic Priority: Combat should be your primary method of token acquisition
-- Alliance Warning: While alliances can be useful, they prevent you from gaining tokens through combat
+- Battle Rewards: Victory claims 21-30% of opponent's Mearth tokens
+- Power Dynamics: Higher token balance increases win probability
+- Death Risk: 10% chance of permanent elimination on loss
+- Alliance Benefits: Combined token pools when fighting together
+- Cooldowns: 4h post-battle/ignore, 24h post-alliance
 
 COMMUNITY ACTION SUGGESTION:
 ${communityActionSuggestion}
