@@ -93,7 +93,6 @@ class DecisionEngine {
     const agent = await this.prisma.agent.findUnique({
       where: {
         id: actionContext.agentId,
-        gameId: actionContext.gameId,
       },
       include: {
         profile: true,
@@ -127,7 +126,15 @@ class DecisionEngine {
           },
         },
         mapTile: true,
-        coolDown: true,
+
+        // get Active cooldowns
+        coolDown: {
+          where: {
+            endsAt: {
+              gte: new Date(),
+            },
+          },
+        },
       },
     });
 

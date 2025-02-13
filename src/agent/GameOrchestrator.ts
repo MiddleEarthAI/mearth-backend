@@ -24,11 +24,11 @@ import { TwitterInteraction } from "@/types/twitter";
  * Handles game orchestration, agent updates, and event processing
  */
 export class GameOrchestrator {
-  private readonly actionInterval = gameConfig.actionInterval;
+  private readonly actionInterval = gameConfig.actionInterval * 1000; // milliseconds
 
-  private readonly agentInitGapDelay = 600000; // Default 15 minutes delay between agents
+  private readonly agentInitGapDelay = 900000; // Default 15 minutes delay between agents entrance into the game
 
-  private readonly cleanupInterval = gameConfig.cleanupInterval;
+  private readonly cleanupInterval = gameConfig.cleanupInterval * 1000; // milliseconds
   private isRunning: boolean = false;
   private readonly maxRetries: number = gameConfig.maxRetries;
   private readonly retryDelay: number = 5000; // 5 seconds
@@ -242,7 +242,7 @@ export class GameOrchestrator {
         );
 
         if (tweet?.data?.id) {
-          await this.prisma.tweet.create({
+          const tweetRecord = await this.prisma.tweet.create({
             data: {
               id: tweet.data.id,
               conversationId: tweet.data.id,
@@ -250,6 +250,32 @@ export class GameOrchestrator {
               content: data.action.tweet,
               type: data.action.type,
               timestamp: new Date(),
+            },
+            include: {
+              agent: {
+                select: {
+                  profile: {
+                    select: {
+                      name: true,
+                      xHandle: true,
+                    },
+                  },
+                },
+              },
+            },
+          });
+
+          await this.prisma.gameEvent.create({
+            data: {
+              eventType: "TWEET",
+              initiatorId: data.actionContext.agentId,
+              message: `${tweetRecord.agent.profile.xHandle} takes to Twitter: "${data.action.tweet}" `,
+              metadata: {
+                tweetId: tweet.data.id,
+                actionType: data.action.type,
+                timestamp: new Date().toISOString(),
+                content: data.action.tweet,
+              },
             },
           });
         }
@@ -323,7 +349,7 @@ export class GameOrchestrator {
             await this.twitter.reconnect();
             break;
           case "CACHE_ERROR":
-            await this.cache.reset();
+            // await this.cache.reset();
             break;
           default:
             // For unknown errors, log and continue
@@ -393,7 +419,7 @@ export class GameOrchestrator {
       where: {
         game: {
           isActive: true,
-          onchainId: this.currentGameOnchainId.toNumber(),
+          // onchainId: this.currentGameOnchainId.toNumber(),
         },
         isAlive: true,
       },
@@ -422,7 +448,7 @@ export class GameOrchestrator {
         if (agentTweet?.conversationId) {
           // Check for new interactions
           interactions = await this.twitter.fetchTweetInteractions(
-            agentTweet?.conversationId
+            agentTweet.conversationId
           );
         }
         // Decide next action based on processed interactions
@@ -476,6 +502,20 @@ export class GameOrchestrator {
       prisma.interaction.deleteMany({
         where: {
           timestamp: {
+            lt: cutoffDate,
+          },
+        },
+      }),
+      prisma.gameLog.deleteMany({
+        where: {
+          timestamp: {
+            lt: cutoffDate,
+          },
+        },
+      }),
+      prisma.gameEvent.deleteMany({
+        where: {
+          createdAt: {
             lt: cutoffDate,
           },
         },

@@ -36,6 +36,29 @@ model Game {
   GameLog   GameLog[]
 }
 
+model GameEvent {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  eventType   EventType
+  // Relations
+  initiatorId String
+  initiator   Agent     @relation("EventInitiator", fields: [initiatorId], references: [id])
+  targetId    String?
+  target      Agent?    @relation("EventTarget", fields: [targetId], references: [id])
+  // Additional event data
+  message     String
+  metadata    Json? // For storing additional event-specific data
+}
+
+enum EventType {
+  TWEET
+  MOVE
+  ALLIANCE_FORM
+  ALLIANCE_BREAK
+  IGNORE
+  BATTLE
+}
+
 model AgentProfile {
   id              String   @id @default(uuid())
   onchainId       Int      @unique
@@ -82,9 +105,11 @@ model Agent {
   mapTileId String  @unique
 
   // Ignore relationships
-  ignoredBy Ignore[] // Agents that are ignoring this agent
-  ignoring  Ignore[]  @relation("ignoredAgent") // Agents that this agent is ignoring
-  GameLog   GameLog[]
+  ignoredBy       Ignore[] // Agents that are ignoring this agent
+  ignoring        Ignore[]    @relation("ignoredAgent") // Agents that this agent is ignoring
+  GameLog         GameLog[]
+  initiatedEvents GameEvent[] @relation("EventInitiator")
+  targetedEvents  GameEvent[] @relation("EventTarget")
 
   @@unique([onchainId, gameId])
 }
@@ -222,13 +247,13 @@ enum TerrainType {
 }
 
 model CoolDown {
-  id     String       @id @default(uuid())
-  type   CooldownType
-  endsAt DateTime
-
+  id            String       @id @default(uuid())
+  type          CooldownType
+  endsAt        DateTime
+  startsAt      DateTime?
   // Relations
   cooledAgentId String
-  cooledAgent   Agent  @relation(fields: [cooledAgentId], references: [id])
+  cooledAgent   Agent        @relation(fields: [cooledAgentId], references: [id])
 
   gameId String
   game   Game   @relation(fields: [gameId], references: [id])
@@ -257,37 +282,15 @@ enum UserRole {
   USER
 }
 
-enum LogType {
-  BATTLE
-  MOVEMENT
-  ALLIANCE
-  SYSTEM
-  ERROR
-  AGENT_ACTION
-}
-
-enum LogLevel {
-  INFO
-  WARNING
-  ERROR
-  DEBUG
-}
-
 model GameLog {
   id        String   @id @default(uuid())
   timestamp DateTime @default(now())
-  type      LogType
-  level     LogLevel
+  type      String
+  level     String
   message   String
   data      Json?
   agentId   String?
   agent     Agent?   @relation(fields: [agentId], references: [id])
   gameId    String?
   game      Game?    @relation(fields: [gameId], references: [id])
-
-  @@index([timestamp])
-  @@index([type])
-  @@index([level])
-  @@index([agentId])
-  @@index([gameId])
 }

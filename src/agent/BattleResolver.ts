@@ -3,16 +3,13 @@ import { Program, BN } from "@coral-xyz/anchor";
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { AgentAccount } from "@/types/program";
-import { Agent, Prisma, PrismaClient } from "@prisma/client";
+import { Agent, BattleType, Prisma, PrismaClient } from "@prisma/client";
 import { getAgentAta } from "../utils/program";
 import { gameConfig } from "@/config/env";
-import { GameManager } from "./GameManager";
+import { logger } from "@/utils/logger";
 
 // Battle cooldown constant (in seconds)
 const BATTLE_COOLDOWN = gameConfig.mechanics.cooldowns.battle; // 1hr
-
-// Battle types
-type BattleType = "SIMPLE" | "AGENT_VS_ALLIANCE" | "ALLIANCE_VS_ALLIANCE";
 
 // Battle participant
 type BattleParticipant = {
@@ -46,10 +43,9 @@ export class BattleResolver {
 
   constructor(
     private readonly program: Program<MiddleEarthAiProgram>,
-    private readonly gameManager: GameManager,
     private readonly prisma: PrismaClient
   ) {
-    console.log("🎮 Battle Resolution Service initialized");
+    logger.info("🎮 Battle Resolution Service initialized");
   }
 
   /**
@@ -79,11 +75,11 @@ export class BattleResolver {
       });
 
       if (!activeGame) {
-        console.log("⚠️ No active game found");
+        logger.warn("⚠️ No active game found");
         return null;
       }
 
-      console.log("🎮 Processing active game", {
+      logger.info("🎮 Processing active game", {
         gameId: activeGame.id,
         onchainId: activeGame.onchainId,
         agentCount: activeGame._count.agents,
@@ -91,7 +87,7 @@ export class BattleResolver {
 
       return activeGame;
     } catch (error) {
-      console.error("❌ Failed to fetch active game", error);
+      logger.error("❌ Failed to fetch active game", { error });
       return null;
     }
   }
@@ -113,7 +109,7 @@ export class BattleResolver {
       checkIntervalMs
     );
 
-    console.log("🎯 Battle resolution service started", { checkIntervalMs });
+    logger.info("🎯 Battle resolution service started", { checkIntervalMs });
   }
 
   /**
@@ -123,7 +119,7 @@ export class BattleResolver {
     if (this.resolutionInterval) {
       clearInterval(this.resolutionInterval);
       this.resolutionInterval = null;
-      console.log("✋ Battle resolution service stopped");
+      logger.info("✋ Battle resolution service stopped");
     }
   }
 
@@ -152,7 +148,7 @@ export class BattleResolver {
 
       if (!activeBattles.length) return;
 
-      console.log("⚔️ Processing active battles", {
+      logger.info("⚔️ Processing active battles", {
         count: activeBattles.length,
         gameId: activeGame.id,
       });
@@ -173,7 +169,7 @@ export class BattleResolver {
 
             await this.resolveBattle(battleGroup, activeGame);
           } catch (error) {
-            console.error("❌ Failed to process battle", {
+            logger.error("❌ Failed to process battle", {
               battleId: battle.id,
               error,
             });
@@ -181,7 +177,7 @@ export class BattleResolver {
         })
       );
     } catch (error) {
-      console.error("❌ Battle resolution cycle failed", error);
+      logger.error("❌ Battle resolution cycle failed", { error });
     }
   }
 
@@ -242,7 +238,7 @@ export class BattleResolver {
         sideB,
       };
     } catch (error) {
-      console.error("❌ Failed to create battle group", error);
+      logger.error("❌ Failed to create battle group", { error });
       return null;
     }
   }
@@ -254,9 +250,9 @@ export class BattleResolver {
     sideACount: number,
     sideBCount: number
   ): BattleType {
-    if (sideACount === 1 && sideBCount === 1) return "SIMPLE";
-    if (sideACount === 2 && sideBCount === 2) return "ALLIANCE_VS_ALLIANCE";
-    return "AGENT_VS_ALLIANCE";
+    if (sideACount === 1 && sideBCount === 1) return "Simple";
+    if (sideACount === 2 && sideBCount === 2) return "AllianceVsAlliance";
+    return "AgentVsAlliance";
   }
 
   /**
@@ -322,7 +318,7 @@ export class BattleResolver {
 
     try {
       switch (battle.type) {
-        case "SIMPLE":
+        case "Simple":
           await this.resolveSimpleBattle(
             gamePda,
             battle.sideA[0],
@@ -331,7 +327,7 @@ export class BattleResolver {
           );
           break;
 
-        case "AGENT_VS_ALLIANCE":
+        case "AgentVsAlliance":
           const [single, alliance] =
             battle.sideA.length === 1
               ? [battle.sideA[0], battle.sideB]
@@ -347,7 +343,7 @@ export class BattleResolver {
           );
           break;
 
-        case "ALLIANCE_VS_ALLIANCE":
+        case "AllianceVsAlliance":
           await this.resolveAllianceVsAllianceBattle(
             gamePda,
             battle.sideA[0],
@@ -367,7 +363,7 @@ export class BattleResolver {
         game
       );
     } catch (error) {
-      console.error("❌ Battle resolution failed", error);
+      logger.error("❌ Battle resolution failed", { error });
       throw error;
     }
   }
@@ -512,6 +508,64 @@ export class BattleResolver {
   ) {
     try {
       await this.prisma.$transaction(async (prisma) => {
+        // Get profiles for all participants
+        const participants = [...winners, ...losers];
+        const profiles = await Promise.all(
+          participants.map((participant) =>
+            prisma.agent.findUnique({
+              where: {
+                onchainId_gameId: {
+                  onchainId: participant.agent.onchainId,
+                  gameId: game.id,
+                },
+              },
+              include: { profile: true },
+            })
+          )
+        );
+
+        const winnerProfiles = profiles.slice(0, winners.length);
+        const loserProfiles = profiles.slice(winners.length);
+
+        // Create battle resolution event
+        let battleMessage = "";
+        let eventMetadata: any = {
+          timestamp: new Date().toISOString(),
+          winners: winnerProfiles.map((w) => w?.profile.xHandle),
+          losers: loserProfiles.map((l) => l?.profile.xHandle),
+        };
+
+        if (winners.length === 1 && losers.length === 1) {
+          // Simple battle
+          battleMessage = `⚔️ Victory! @${winnerProfiles[0]?.profile.xHandle} emerges triumphant over @${loserProfiles[0]?.profile.xHandle} in single combat!`;
+          eventMetadata.battleType = "simple";
+        } else if (winners.length === 2 && losers.length === 2) {
+          // Alliance vs Alliance
+          battleMessage = `⚔️ Alliance Victory! The alliance of @${winnerProfiles[0]?.profile.xHandle} and @${winnerProfiles[1]?.profile.xHandle} triumphs over @${loserProfiles[0]?.profile.xHandle} and @${loserProfiles[1]?.profile.xHandle}!`;
+          eventMetadata.battleType = "alliance_vs_alliance";
+        } else {
+          // Agent vs Alliance
+          const singleAgent =
+            winners.length === 1 ? winnerProfiles[0] : loserProfiles[0];
+          const alliance =
+            winners.length === 2 ? winnerProfiles : loserProfiles;
+          battleMessage =
+            winners.length === 1
+              ? `⚔️ Legendary Victory! @${singleAgent?.profile.xHandle} defeats the alliance of @${alliance[0]?.profile.xHandle} and @${alliance[1]?.profile.xHandle}!`
+              : `⚔️ Alliance Victory! The alliance of @${alliance[0]?.profile.xHandle} and @${alliance[1]?.profile.xHandle} overwhelms @${singleAgent?.profile.xHandle}!`;
+          eventMetadata.battleType = "agent_vs_alliance";
+        }
+
+        await prisma.gameEvent.create({
+          data: {
+            eventType: "BATTLE",
+            initiatorId: winners[0].agent.id,
+            targetId: losers[0].agent.id,
+            message: battleMessage,
+            metadata: eventMetadata,
+          },
+        });
+
         // Update battle status
         await prisma.battle.updateMany({
           where: {
@@ -528,25 +582,44 @@ export class BattleResolver {
           },
         });
 
-        // Kill any agent that happen to have a death chance in the range 5% - 10%
+        // Handle deaths with dramatic events
         await Promise.all(
-          losers.map(async (loser) => {
+          losers.map(async (loser, index) => {
             const shouldDie = Math.random() <= 0.1; // 10% chance of death
+            const loserProfile = loserProfiles[index];
 
-            await prisma.agent.update({
-              where: {
-                onchainId_gameId: {
-                  onchainId: loser.agent.onchainId,
-                  gameId: game.id,
+            if (shouldDie && loserProfile) {
+              // Create death event
+              await prisma.gameEvent.create({
+                data: {
+                  eventType: "BATTLE",
+                  initiatorId: winners[0].agent.id,
+                  targetId: loser.agent.id,
+                  message: `☠️ A warrior falls! @${loserProfile.profile.xHandle} has been defeated in glorious battle by @${winnerProfiles[0]?.profile.xHandle}!`,
+                  metadata: {
+                    type: "death",
+                    timestamp: new Date().toISOString(),
+                    slainAgent: loserProfile.profile.xHandle,
+                    slayedBy: winnerProfiles[0]?.profile.xHandle,
+                  },
                 },
-              },
-              data: {
-                isAlive: !shouldDie,
-                ...(shouldDie ? { deathTimestamp: new Date() } : {}),
-              },
-            });
+              });
 
-            if (shouldDie) {
+              // Update agent status
+              await prisma.agent.update({
+                where: {
+                  onchainId_gameId: {
+                    onchainId: loser.agent.onchainId,
+                    gameId: game.id,
+                  },
+                },
+                data: {
+                  isAlive: false,
+                  deathTimestamp: new Date(),
+                },
+              });
+
+              // Execute onchain death
               const [gamePda] = getGamePDA(
                 this.program.programId,
                 game.onchainId
@@ -563,12 +636,48 @@ export class BattleResolver {
                   agent: agentPda,
                 })
                 .rpc();
+
+              logger.log({
+                level: "INFO",
+                message: `Agent ${loserProfile.profile.xHandle} has fallen in battle`,
+                type: "BATTLE_DEATH",
+                agentId: loser.agent.id,
+                gameId: game.id,
+              });
             }
           })
         );
+
+        // Create victory spoils event
+        const tokensWon = winners.reduce(
+          (sum, winner) => sum + winner.agentAccount.tokenBalance.toNumber(),
+          0
+        );
+
+        const winnerHandles = winnerProfiles
+          .map((w) => w?.profile.xHandle)
+          .filter((handle): handle is string => handle !== undefined);
+
+        await prisma.gameEvent.create({
+          data: {
+            eventType: "BATTLE",
+            initiatorId: winners[0].agent.id,
+            targetId: losers[0].agent.id,
+            message:
+              winners.length === 1
+                ? `💰 @${winnerProfiles[0]?.profile.xHandle} claims ${tokensWon} tokens in victory!`
+                : `💰 The alliance of @${winnerProfiles[0]?.profile.xHandle} and @${winnerProfiles[1]?.profile.xHandle} share ${tokensWon} tokens in victory!`,
+            metadata: {
+              type: "spoils",
+              timestamp: new Date().toISOString(),
+              tokensWon,
+              winners: winnerHandles,
+            },
+          },
+        });
       });
     } catch (error) {
-      console.error("❌ Failed to finalize battle", error);
+      logger.error("❌ Failed to finalize battle", { error });
       throw error;
     }
   }

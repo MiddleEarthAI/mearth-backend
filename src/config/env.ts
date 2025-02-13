@@ -47,7 +47,7 @@ const env = cleanEnv(process.env, {
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: num({
-    default: 900000,
+    default: 900, // 15 minutes in seconds
     desc: "Rate limit window in milliseconds (default: 15 minutes)",
   }),
   RATE_LIMIT_MAX_REQUESTS: num({
@@ -58,7 +58,7 @@ const env = cleanEnv(process.env, {
   // Database Configuration
   DATABASE_URL: url({
     desc: "PostgreSQL database connection URL",
-    example: "postgresql://user:password@localhost:5432/dbname",
+    example: "postgresql://postgres:postgres@localhost:5432/middle_earth_ai",
   }),
 
   // Redis Configuration
@@ -75,7 +75,7 @@ const env = cleanEnv(process.env, {
     desc: "Redis port number",
   }),
   REDIS_PASSWORD: str({
-    default: "your_redis_password",
+    default: "redis",
     desc: "Redis authentication password",
   }),
   REDIS_DB: num({
@@ -109,6 +109,7 @@ const env = cleanEnv(process.env, {
   JWT_SECRET: str({
     desc: "Secret key for JWT token generation",
   }),
+
   CORS_ORIGIN: str({
     default: "*",
     desc: "Allowed CORS origin",
@@ -156,15 +157,15 @@ const env = cleanEnv(process.env, {
 
   // Game Configuration
   GAME_MAP_DIAMETER: num({
-    default: 30,
+    default: 60,
     desc: "Diameter of the game map",
   }),
   AGENT_ACTION_INTERVAL: num({
-    default: 3600000, // 1 hour
+    default: 3600, // 1 hour in seconds
     desc: "Game state update interval in milliseconds",
   }),
   GAME_CLEANUP_INTERVAL: num({
-    default: 300000, // 15 minutes
+    default: 900, // 15 minutes in seconds
     desc: "Game cleanup interval in milliseconds",
   }),
   DAILY_REWARD_TOKENS: num({
@@ -176,45 +177,45 @@ const env = cleanEnv(process.env, {
     desc: "Maximum number of retry attempts for operations",
   }),
   BATTLE_CHECK_INTERVAL: num({
-    default: 300000, // 5 minutes
+    default: 300, // 5 minutes in seconds
     desc: "Interval in milliseconds for checking battles",
   }),
 
   // Game Mechanics Configuration
   TOKEN_BURN_MIN: percentage({
-    default: 31,
-    desc: "Minimum percentage of tokens to burn in battle (31-50%)",
+    default: 21,
+    desc: "Minimum percentage of tokens to burn in battle (21-30%)",
   }),
   TOKEN_BURN_MAX: percentage({
-    default: 50,
-    desc: "Maximum percentage of tokens to burn in battle (31-50%)",
+    default: 30,
+    desc: "Maximum percentage of tokens to burn in battle (21-30%)",
   }),
   DEATH_CHANCE: percentage({
-    default: 5,
+    default: 10,
     desc: "Percentage chance of agent death in battle",
   }),
   BATTLE_COOLDOWN: num({
-    default: 14400,
+    default: 14400, // 4 hours in seconds
     desc: "Cooldown period after battle in seconds (default: 4 hours)",
   }),
   BATTLE_DURATION: num({
-    default: 3600,
+    default: 3600, // 1 hour in seconds
     desc: "Duration of a battle in seconds (default: 1 hour)",
   }),
   MOVE_COOLDOWN_MS: num({
-    default: 3600000,
-    desc: "Movement cooldown in milliseconds (default: 1 hour)",
+    default: 3600, // 1 hour in seconds
+    desc: "Movement cooldown in seconds (default: 1 hour)",
   }),
   BATTLE_AFTER_ALLIANCE_COOLDOWN: num({
-    default: 14400,
+    default: 14400, // 4 hours in seconds
     desc: "Cooldown period for battles after alliance in seconds (default: 4 hours)",
   }),
   NEW_ALLIANCE_COOLDOWN: num({
-    default: 86400,
+    default: 86400, // 24 hours in seconds
     desc: "Cooldown period before forming new alliance in seconds (default: 24 hours)",
   }),
   IGNORE_COOLDOWN: num({
-    default: 14400,
+    default: 14400, // 4 hours in seconds
     desc: "Cooldown period after ignoring interaction in seconds (default: 4 hours)",
   }),
 
@@ -334,7 +335,7 @@ export const gameConfig = {
     cooldowns: {
       battle: env.BATTLE_COOLDOWN,
       battleDuration: env.BATTLE_DURATION,
-      movement: env.MOVE_COOLDOWN_MS,
+      movement: env.MOVE_COOLDOWN_MS, // Base cooldown for movement
       battleAfterAlliance: env.BATTLE_AFTER_ALLIANCE_COOLDOWN,
       newAlliance: env.NEW_ALLIANCE_COOLDOWN,
       ignore: env.IGNORE_COOLDOWN,

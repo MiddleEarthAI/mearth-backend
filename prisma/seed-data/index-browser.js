@@ -132,6 +132,16 @@ exports.Prisma.GameScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.GameEventScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  eventType: 'eventType',
+  initiatorId: 'initiatorId',
+  targetId: 'targetId',
+  message: 'message',
+  metadata: 'metadata'
+};
+
 exports.Prisma.AgentProfileScalarFieldEnum = {
   id: 'id',
   onchainId: 'onchainId',
@@ -223,6 +233,7 @@ exports.Prisma.CoolDownScalarFieldEnum = {
   id: 'id',
   type: 'type',
   endsAt: 'endsAt',
+  startsAt: 'startsAt',
   cooledAgentId: 'cooledAgentId',
   gameId: 'gameId'
 };
@@ -253,12 +264,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -277,6 +288,15 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.EventType = exports.$Enums.EventType = {
+  TWEET: 'TWEET',
+  MOVE: 'MOVE',
+  ALLIANCE_FORM: 'ALLIANCE_FORM',
+  ALLIANCE_BREAK: 'ALLIANCE_BREAK',
+  IGNORE: 'IGNORE',
+  BATTLE: 'BATTLE'
+};
+
 exports.TerrainType = exports.$Enums.TerrainType = {
   plain: 'plain',
   mountain: 'mountain',
@@ -320,24 +340,9 @@ exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER'
 };
 
-exports.LogType = exports.$Enums.LogType = {
-  BATTLE: 'BATTLE',
-  MOVEMENT: 'MOVEMENT',
-  ALLIANCE: 'ALLIANCE',
-  SYSTEM: 'SYSTEM',
-  ERROR: 'ERROR',
-  AGENT_ACTION: 'AGENT_ACTION'
-};
-
-exports.LogLevel = exports.$Enums.LogLevel = {
-  INFO: 'INFO',
-  WARNING: 'WARNING',
-  ERROR: 'ERROR',
-  DEBUG: 'DEBUG'
-};
-
 exports.Prisma.ModelName = {
   Game: 'Game',
+  GameEvent: 'GameEvent',
   AgentProfile: 'AgentProfile',
   Agent: 'Agent',
   Ignore: 'Ignore',
