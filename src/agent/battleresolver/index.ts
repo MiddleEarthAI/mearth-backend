@@ -10,9 +10,9 @@ import { PrismaClient } from "@prisma/client";
 import { GameManager } from "../GameManager";
 import { getGamePDA } from "@/utils/pda";
 import { logger } from "@/utils/logger";
-import { BattleHandlers } from "./battle-handlers";
+import { BattleHandlers } from "./battleHandlers";
 import { BattleGroup, BattleParticipant } from "./types/battle";
-import { organizeBattles, calculateBattleOutcome } from "./battle-utils";
+import { organizeBattles, calculateBattleOutcome } from "./battleUtils";
 import { BattleType } from "@prisma/client";
 
 /**
@@ -245,6 +245,7 @@ export class BattleResolver {
             targetId: losers[0].agent.id,
             message: battleMessage,
             metadata: eventMetadata,
+            gameId: game.id,
           },
         });
 
@@ -268,6 +269,7 @@ export class BattleResolver {
               // Create death event
               await prisma.gameEvent.create({
                 data: {
+                  gameId: game.id,
                   eventType: "BATTLE",
                   initiatorId: winners[0].agent.id,
                   targetId: loser.agent.id,
@@ -319,6 +321,7 @@ export class BattleResolver {
 
         await prisma.gameEvent.create({
           data: {
+            gameId: game.id,
             eventType: "BATTLE",
             initiatorId: winners[0].agent.id,
             targetId: losers[0].agent.id,

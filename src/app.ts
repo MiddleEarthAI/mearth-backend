@@ -3,7 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import { defaultRateLimiter } from "./middleware/rateLimiter";
 import { GameOrchestrator } from "./agent/GameOrchestrator";
-import { BattleResolver } from "./agent/BattleResolver";
+import { BattleResolver } from "./agent/battleResolver";
 import EventEmitter from "events";
 import CacheManager from "./agent/CacheManager";
 import TwitterManager from "./agent/TwitterManager";
@@ -16,7 +16,7 @@ import { GameManager } from "./agent/GameManager";
 import { createServer } from "http";
 
 import { expressCspHeader, NONE, SELF } from "express-csp-header";
-import { ActionManager } from "./agent/actionmanager";
+import { ActionManager } from "./agent/actionManager";
 
 const app = express();
 const server = createServer(app);
@@ -219,7 +219,7 @@ export async function startServer() {
 
   const cache = new CacheManager();
 
-  const battleResolver = new BattleResolver(program, prisma);
+  const battleResolver = new BattleResolver(program, prisma, gameManager);
   const actionManager = new ActionManager(program, prisma);
 
   const orchestrator = new GameOrchestrator(

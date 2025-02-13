@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "EventType" AS ENUM ('TWEET', 'MOVE', 'ALLIANCE_FORM', 'ALLIANCE_BREAK', 'IGNORE', 'BATTLE');
+
+-- CreateEnum
 CREATE TYPE "AllianceStatus" AS ENUM ('Active', 'Pending', 'Broken');
 
 -- CreateEnum
@@ -19,12 +22,6 @@ CREATE TYPE "CooldownType" AS ENUM ('Alliance', 'Battle', 'Ignore', 'Move');
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'MANAGER', 'USER');
 
--- CreateEnum
-CREATE TYPE "LogType" AS ENUM ('BATTLE', 'MOVEMENT', 'ALLIANCE', 'SYSTEM', 'ERROR', 'AGENT_ACTION');
-
--- CreateEnum
-CREATE TYPE "LogLevel" AS ENUM ('INFO', 'WARNING', 'ERROR', 'DEBUG');
-
 -- CreateTable
 CREATE TABLE "Game" (
     "id" TEXT NOT NULL,
@@ -41,6 +38,20 @@ CREATE TABLE "Game" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "GameEvent" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "eventType" "EventType" NOT NULL,
+    "initiatorId" TEXT NOT NULL,
+    "targetId" TEXT,
+    "message" TEXT NOT NULL,
+    "metadata" JSONB,
+    "gameId" TEXT NOT NULL,
+
+    CONSTRAINT "GameEvent_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -159,6 +170,7 @@ CREATE TABLE "CoolDown" (
     "id" TEXT NOT NULL,
     "type" "CooldownType" NOT NULL,
     "endsAt" TIMESTAMP(3) NOT NULL,
+    "startsAt" TIMESTAMP(3),
     "cooledAgentId" TEXT NOT NULL,
     "gameId" TEXT NOT NULL,
 
@@ -182,8 +194,8 @@ CREATE TABLE "User" (
 CREATE TABLE "GameLog" (
     "id" TEXT NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "type" "LogType" NOT NULL,
-    "level" "LogLevel" NOT NULL,
+    "type" TEXT NOT NULL,
+    "level" TEXT NOT NULL,
     "message" TEXT NOT NULL,
     "data" JSONB,
     "agentId" TEXT,
@@ -222,20 +234,14 @@ CREATE UNIQUE INDEX "User_privyUserId_key" ON "User"("privyUserId");
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
--- CreateIndex
-CREATE INDEX "GameLog_timestamp_idx" ON "GameLog"("timestamp");
+-- AddForeignKey
+ALTER TABLE "GameEvent" ADD CONSTRAINT "GameEvent_initiatorId_fkey" FOREIGN KEY ("initiatorId") REFERENCES "Agent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- CreateIndex
-CREATE INDEX "GameLog_type_idx" ON "GameLog"("type");
+-- AddForeignKey
+ALTER TABLE "GameEvent" ADD CONSTRAINT "GameEvent_targetId_fkey" FOREIGN KEY ("targetId") REFERENCES "Agent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- CreateIndex
-CREATE INDEX "GameLog_level_idx" ON "GameLog"("level");
-
--- CreateIndex
-CREATE INDEX "GameLog_agentId_idx" ON "GameLog"("agentId");
-
--- CreateIndex
-CREATE INDEX "GameLog_gameId_idx" ON "GameLog"("gameId");
+-- AddForeignKey
+ALTER TABLE "GameEvent" ADD CONSTRAINT "GameEvent_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Agent" ADD CONSTRAINT "Agent_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

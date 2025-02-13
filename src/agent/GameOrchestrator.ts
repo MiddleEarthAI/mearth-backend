@@ -5,7 +5,7 @@ import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
 import EventEmitter from "events";
-import { BattleResolver } from "./BattleResolver";
+import { BattleResolver } from "./battleResolver";
 import { ActionContext, GameAction } from "@/types";
 import {
   InitializationError,
@@ -15,7 +15,7 @@ import {
   ShutdownError,
 } from "@/utils/error";
 import { BN } from "@coral-xyz/anchor";
-import { ActionManager } from "./actionmanager";
+import { ActionManager } from "./actionManager";
 import { gameConfig } from "@/config/env";
 import { TwitterInteraction } from "@/types/twitter";
 
@@ -269,7 +269,7 @@ export class GameOrchestrator {
             data: {
               eventType: "TWEET",
               initiatorId: data.actionContext.agentId,
-              message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/status/${tweetRecord.agent.profile.xHandle}/${tweet.data.id}`,
+              message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/${tweetRecord.agent.profile.xHandle}/status/${tweet.data.id}`,
               metadata: {
                 tweetId: tweet.data.id,
                 actionType: data.action.type,

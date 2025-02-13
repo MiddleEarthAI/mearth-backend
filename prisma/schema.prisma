@@ -34,6 +34,7 @@ model Game {
   coolDown  CoolDown[]
   Ignore    Ignore[]
   GameLog   GameLog[]
+  GameEvent GameEvent[]
 }
 
 model GameEvent {
@@ -48,6 +49,8 @@ model GameEvent {
   // Additional event data
   message     String
   metadata    Json? // For storing additional event-specific data
+  gameId      String
+  game        Game      @relation(fields: [gameId], references: [id])
 }
 
 enum EventType {

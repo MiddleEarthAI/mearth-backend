@@ -139,7 +139,8 @@ exports.Prisma.GameEventScalarFieldEnum = {
   initiatorId: 'initiatorId',
   targetId: 'targetId',
   message: 'message',
-  metadata: 'metadata'
+  metadata: 'metadata',
+  gameId: 'gameId'
 };
 
 exports.Prisma.AgentProfileScalarFieldEnum = {
