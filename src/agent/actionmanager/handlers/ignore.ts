@@ -51,6 +51,7 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
         // Create event
         this.prisma.gameEvent.create({
           data: {
+            gameId: ctx.gameId,
             eventType: "IGNORE",
             initiatorId: ctx.agentId,
             targetId: targetAgent.id,

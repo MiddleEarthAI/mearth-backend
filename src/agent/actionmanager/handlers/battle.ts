@@ -129,6 +129,7 @@ export class BattleHandler {
           // Step 2: Create battle event
           const battleEvent = await prisma.gameEvent.create({
             data: {
+              gameId: ctx.gameId,
               eventType: "BATTLE",
               initiatorId: ctx.agentId,
               targetId: targetId,

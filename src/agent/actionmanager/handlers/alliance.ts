@@ -87,6 +87,7 @@ export class AllianceHandler
           // Step 5: Create alliance event
           const event = await prisma.gameEvent.create({
             data: {
+              gameId: ctx.gameId,
               eventType: "ALLIANCE_FORM",
               initiatorId: ctx.agentId,
               targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
@@ -242,6 +243,7 @@ export class AllianceHandler
           // Step 4: Create alliance break event
           const event = await prisma.gameEvent.create({
             data: {
+              gameId: ctx.gameId,
               eventType: "ALLIANCE_BREAK",
               initiatorId: ctx.agentId,
               targetId: stringToUuid(action.targetId + ctx.gameOnchainId),

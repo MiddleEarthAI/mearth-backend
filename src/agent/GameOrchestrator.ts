@@ -267,6 +267,7 @@ export class GameOrchestrator {
 
           await this.prisma.gameEvent.create({
             data: {
+              gameId: data.actionContext.gameId,
               eventType: "TWEET",
               initiatorId: data.actionContext.agentId,
               message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/${tweetRecord.agent.profile.xHandle}/status/${tweet.data.id}`,

@@ -76,6 +76,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
           // Step 3: Create movement event
           const event = await prisma.gameEvent.create({
             data: {
+              gameId: ctx.gameId,
               eventType: "MOVE",
               initiatorId: ctx.agentId,
               message: `@${agent.profile.xHandle} ventures ${
