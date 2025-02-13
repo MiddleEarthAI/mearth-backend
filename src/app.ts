@@ -11,11 +11,12 @@ import { DecisionEngine } from "./agent/DecisionEngine";
 import { checkDatabaseConnection } from "./utils";
 import { getProgramWithWallet } from "./utils/program";
 import { PrismaClient } from "@prisma/client";
-import { ActionManager } from "./agent/ActionManager";
+
 import { GameManager } from "./agent/GameManager";
 import { createServer } from "http";
 
 import { expressCspHeader, NONE, SELF } from "express-csp-header";
+import { ActionManager } from "./agent/actionmanager";
 
 const app = express();
 const server = createServer(app);

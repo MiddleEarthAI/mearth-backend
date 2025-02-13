@@ -1,4 +1,11 @@
-import { ActionContext, GameAction } from "@/types";
+import { ActionContext, ActionResult, GameAction } from "@/types";
+
+/**
+ * Base interface for all action handlers
+ */
+export interface ActionHandler<T extends GameAction> {
+  handle(ctx: ActionContext, action: T): Promise<ActionResult>;
+}
 
 export interface ValidationFeedback {
   isValid: boolean;
@@ -14,9 +21,4 @@ export interface ValidationFeedback {
     transactionHash?: string;
     message?: string;
   };
-}
-
-export interface ActionResult {
-  success: boolean;
-  feedback: ValidationFeedback;
 }

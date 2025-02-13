@@ -2,12 +2,13 @@ import {
   ActionContext,
   FormAllianceAction,
   BreakAllianceAction,
+  ActionResult,
 } from "@/types";
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { ActionResult } from "../types/feedback";
-import { ActionHandler } from "../types/handler";
+import { ActionHandler } from "../types";
+
 import { gameConfig } from "@/config/env";
 
 export class AllianceHandler
@@ -143,10 +144,6 @@ export class AllianceHandler
         success: true,
         feedback: {
           isValid: true,
-          data: {
-            transactionHash: tx,
-            message: `Alliance formed successfully with @${joiner.profile.xHandle}`,
-          },
         },
       };
     } catch (error) {
@@ -286,10 +283,6 @@ export class AllianceHandler
         success: true,
         feedback: {
           isValid: true,
-          data: {
-            transactionHash: tx,
-            message: `Alliance broken successfully with @${target.profile.xHandle}`,
-          },
         },
       };
     } catch (error) {

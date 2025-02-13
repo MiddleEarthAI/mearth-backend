@@ -1,12 +1,16 @@
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { ActionContext, BattleAction } from "@/types";
+import { ActionContext, BattleAction, ActionResult } from "@/types";
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { ActionResult } from "../types/feedback";
-import { createBattleMessage } from "../utils/battle-messages";
-import { calculateTotalTokens } from "../utils/token-calculations";
+
+import {
+  generateBattleId,
+  calculateTotalTokens,
+  createBattleInitiationMessage,
+} from "@/utils/battle";
+import { logger } from "@/utils/logger";
 
 export class BattleHandler {
   constructor(
@@ -22,8 +26,9 @@ export class BattleHandler {
     action: BattleAction
   ): Promise<ActionResult> {
     try {
-      console.info(
-        `Agent ${ctx.agentId} initiating battle with ${action.targetId}`
+      logger.info(
+        `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
+        { ctx, action }
       );
 
       // Get PDAs and accounts
@@ -81,6 +86,13 @@ export class BattleHandler {
         defenderAllyAccount
       );
 
+      // Generate deterministic battle ID
+      const battleId = generateBattleId(
+        [attacker, defender],
+        Date.now(),
+        ctx.gameOnchainId
+      );
+
       // Execute battle transaction
       const tx = await this.executeBattleTransaction(
         attackerPda,
@@ -93,6 +105,7 @@ export class BattleHandler {
 
       // Create battle record and event
       await this.createBattleRecords(
+        battleId,
         ctx,
         action,
         attacker,
@@ -107,14 +120,10 @@ export class BattleHandler {
         success: true,
         feedback: {
           isValid: true,
-          data: {
-            transactionHash: tx,
-            message: `Battle initiated successfully with ${totalTokensAtStake.toNumber()} tokens at stake!`,
-          },
         },
       };
     } catch (error) {
-      console.error("💥 Battle initiation failed", { error, ctx, action });
+      logger.error("💥 Battle initiation failed", { error, ctx, action });
       return {
         success: false,
         feedback: {
@@ -180,13 +189,14 @@ export class BattleHandler {
    * Create battle records in database
    */
   private async createBattleRecords(
+    battleId: string,
     ctx: ActionContext,
     action: BattleAction,
     attacker: any,
     defender: any,
     attackerAlly: any,
     defenderAlly: any,
-    totalTokensAtStake: BN,
+    totalTokensAtStake: number,
     tx: string
   ) {
     const battleType =
@@ -199,9 +209,10 @@ export class BattleHandler {
     await this.prisma.$transaction([
       this.prisma.battle.create({
         data: {
+          id: battleId,
           type: battleType,
           status: "Active",
-          tokensStaked: totalTokensAtStake.toNumber(),
+          tokensStaked: totalTokensAtStake,
           gameId: ctx.gameId,
           attackerId: attacker.id,
           defenderId: defender.id,
@@ -215,19 +226,20 @@ export class BattleHandler {
           eventType: "BATTLE",
           initiatorId: ctx.agentId.toString(),
           targetId: action.targetId.toString(),
-          message: createBattleMessage(
+          message: createBattleInitiationMessage(
             attacker.profile.xHandle,
             defender.profile.xHandle,
-            totalTokensAtStake.toNumber(),
+            totalTokensAtStake,
             attackerAlly,
             defenderAlly
           ),
           metadata: {
             battleType,
-            tokensAtStake: totalTokensAtStake.toNumber(),
+            tokensAtStake: totalTokensAtStake,
             timestamp: new Date().toISOString(),
             attackerHandle: attacker.profile.xHandle,
             defenderHandle: defender.profile.xHandle,
+            transactionHash: tx,
           },
         },
       }),

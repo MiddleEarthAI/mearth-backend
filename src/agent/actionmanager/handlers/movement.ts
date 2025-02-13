@@ -1,10 +1,10 @@
-import { ActionContext, MoveAction } from "@/types";
+import { ActionContext, ActionResult, MoveAction } from "@/types";
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { ActionResult } from "../types/feedback";
-import { ActionHandler } from "../types/handler";
+
 import { gameConfig } from "@/config/env";
+import { ActionHandler } from "../types";
 
 export class MovementHandler implements ActionHandler<MoveAction> {
   constructor(
@@ -103,10 +103,6 @@ export class MovementHandler implements ActionHandler<MoveAction> {
         success: true,
         feedback: {
           isValid: true,
-          data: {
-            transactionHash: tx,
-            message: `Successfully moved to (${action.position.x}, ${action.position.y})`,
-          },
         },
       };
     } catch (error) {

@@ -1,13 +1,13 @@
-import { MearthProgram } from "@/types";
+import { ActionResult, MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { ActionContext, GameAction } from "@/types";
-import { ActionResult } from "./types/feedback";
+
 import { BattleHandler } from "./handlers/battle";
 import { MovementHandler } from "./handlers/movement";
 import { AllianceHandler } from "./handlers/alliance";
 import { IgnoreHandler } from "./handlers/ignore";
 import { getGamePDA } from "@/utils/pda";
-// Import other handlers as they are created
+import { logger } from "@/utils/logger";
 
 /**
  * Manages the execution and validation of game actions
@@ -17,7 +17,6 @@ export class ActionManager {
   private readonly movementHandler: MovementHandler;
   private readonly allianceHandler: AllianceHandler;
   private readonly ignoreHandler: IgnoreHandler;
-  // Add other handlers as they are created
 
   /**
    * Creates an instance of ActionManager
@@ -32,8 +31,8 @@ export class ActionManager {
     this.movementHandler = new MovementHandler(program, prisma);
     this.allianceHandler = new AllianceHandler(program, prisma);
     this.ignoreHandler = new IgnoreHandler(program, prisma);
-    // Initialize other handlers
-    console.log("🎮 Action Manager initialized");
+
+    logger.info("🎮 Action Manager initialized");
   }
 
   /**
@@ -43,9 +42,12 @@ export class ActionManager {
     ctx: ActionContext,
     action: GameAction
   ): Promise<ActionResult> {
-    console.info(
-      `Agent ${ctx.agentId} executing ${action.type} | Game: ${ctx.gameId} | OnchainGame: ${ctx.gameOnchainId} | OnchainAgent: ${ctx.agentOnchainId}`
-    );
+    logger.info(`Agent ${ctx.agentId} executing ${action.type}`, {
+      gameId: ctx.gameId,
+      onchainGameId: ctx.gameOnchainId,
+      onchainAgentId: ctx.agentOnchainId,
+      actionType: action.type,
+    });
 
     try {
       // Validate game state
@@ -62,22 +64,25 @@ export class ActionManager {
           return this.allianceHandler.handle(ctx, action);
         case "IGNORE":
           return this.ignoreHandler.handle(ctx, action);
-        // Add other action types as handlers are created
         default:
           throw new Error(
             `Invalid action type: ${(action as GameAction).type}`
           );
       }
     } catch (error) {
-      console.error(`Action execution failed for agent ${ctx.agentId}`, {
+      logger.error(`Action execution failed for agent ${ctx.agentId}`, {
         error,
+        actionType: action.type,
+        gameId: ctx.gameId,
+        agentId: ctx.agentId,
       });
+
       return {
         success: false,
         feedback: {
           isValid: false,
           error: {
-            type: (action as GameAction).type,
+            type: action.type,
             message: error instanceof Error ? error.message : String(error),
             context: { currentState: ctx, attemptedAction: action },
           },
@@ -90,13 +95,35 @@ export class ActionManager {
    * Validate game state before executing actions
    */
   private async validateGameState(ctx: ActionContext): Promise<void> {
-    console.log("🔍 Validating game state...");
-    const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
-    const gameAccount = await this.program.account.game.fetch(gamePda);
+    logger.debug("🔍 Validating game state...", {
+      gameId: ctx.gameId,
+      onchainGameId: ctx.gameOnchainId,
+    });
 
-    if (!gameAccount.isActive) {
-      console.error("❌ Game validation failed - Game is not active");
-      throw new Error("Game is not active");
+    try {
+      const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
+      const gameAccount = await this.program.account.game.fetch(gamePda);
+
+      if (!gameAccount.isActive) {
+        logger.error("❌ Game validation failed - Game is not active", {
+          gameId: ctx.gameId,
+          onchainGameId: ctx.gameOnchainId,
+        });
+        throw new Error("Game is not active");
+      }
+
+      // Additional validations could be added here
+      // - Check if agent is alive
+      // - Check if agent has required tokens
+      // - Check cooldowns
+      // etc.
+    } catch (error) {
+      logger.error("❌ Game state validation failed", {
+        error,
+        gameId: ctx.gameId,
+        onchainGameId: ctx.gameOnchainId,
+      });
+      throw error;
     }
   }
 }

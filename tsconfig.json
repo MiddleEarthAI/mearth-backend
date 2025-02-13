@@ -20,6 +20,10 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*", "../archive/InfluenceCalculator.ts"],
+  "include": [
+    "src/**/*",
+    "../archive/InfluenceCalculator.ts",
+    "../archive/br.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

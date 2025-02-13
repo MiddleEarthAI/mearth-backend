@@ -61,7 +61,7 @@ async function getAccessTokens(
 // npx ts-node src/scripts/generate-twitter-auth.ts
 
 // Comment out the URL generation since we already have the verifier
-// generateAuthUrls();
+generateAuthUrls();
 
 // // Get access tokens for Scootles
 // getAccessTokens(

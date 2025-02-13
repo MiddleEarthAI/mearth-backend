@@ -15,7 +15,7 @@ import {
   ShutdownError,
 } from "@/utils/error";
 import { BN } from "@coral-xyz/anchor";
-import { ActionManager } from "./ActionManager";
+import { ActionManager } from "./actionmanager";
 import { gameConfig } from "@/config/env";
 import { TwitterInteraction } from "@/types/twitter";
 

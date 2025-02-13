@@ -1,8 +1,7 @@
 import { ActionContext, IgnoreAction } from "@/types";
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
-import { ActionResult } from "../types/feedback";
-import { ActionHandler } from "../types/handler";
+import { ActionResult, ActionHandler } from "../types";
 import { gameConfig } from "@/config/env";
 import { stringToUuid } from "@/utils/uuid";
 
