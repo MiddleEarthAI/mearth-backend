@@ -269,7 +269,7 @@ export class GameOrchestrator {
             data: {
               eventType: "TWEET",
               initiatorId: data.actionContext.agentId,
-              message: `${tweetRecord.agent.profile.xHandle} takes to Twitter: "${data.action.tweet}" `,
+              message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/status/${tweetRecord.agent.profile.xHandle}/${tweet.data.id}`,
               metadata: {
                 tweetId: tweet.data.id,
                 actionType: data.action.type,

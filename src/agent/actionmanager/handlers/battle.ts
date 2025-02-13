@@ -1,4 +1,3 @@
-import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { ActionContext, BattleAction, ActionResult } from "@/types";
 import { MearthProgram } from "@/types";
@@ -106,7 +105,7 @@ export class BattleHandler {
       // Perform all operations (both database and onchain) in a single transaction
       const result = await this.prisma.$transaction(
         async (prisma) => {
-          // Step 1: Create initial battle record
+          // Step 1: Create battle record
           const battle = await prisma.battle.create({
             data: {
               id: battleId,
@@ -116,7 +115,7 @@ export class BattleHandler {
                   : attackerAllyAccount || defenderAllyAccount
                   ? "AgentVsAlliance"
                   : "Simple",
-              status: "Cancelled", // Start with cancelled status
+              status: "Active",
               tokensStaked: totalTokensAtStake,
               gameId: ctx.gameId,
               attackerId: attacker.id,
@@ -127,7 +126,30 @@ export class BattleHandler {
             },
           });
 
-          // Step 2: Execute onchain transaction
+          // Step 2: Create battle event
+          const battleEvent = await prisma.gameEvent.create({
+            data: {
+              eventType: "BATTLE",
+              initiatorId: ctx.agentId,
+              targetId: targetId,
+              message: createBattleInitiationMessage(
+                attacker.profile.xHandle,
+                defender.profile.xHandle,
+                totalTokensAtStake,
+                attackerAllyAccount,
+                defenderAllyAccount
+              ),
+              metadata: {
+                battleType: battle.type,
+                tokensAtStake: totalTokensAtStake,
+                timestamp: new Date(timestamp).toISOString(),
+                attackerHandle: attacker.profile.xHandle,
+                defenderHandle: defender.profile.xHandle,
+              },
+            },
+          });
+
+          // Step 3: Execute onchain transaction
           let tx: string;
           try {
             tx = await this.executeBattleTransaction(
@@ -154,33 +176,12 @@ export class BattleHandler {
             throw error; // Re-throw to trigger transaction rollback
           }
 
-          // Step 3: Update battle status to Active after successful onchain tx
-          await prisma.battle.update({
-            where: { id: battleId },
+          // step 4: update game event with tx hash
+          await prisma.gameEvent.update({
+            where: { id: battleEvent.id },
             data: {
-              status: "Active",
-            },
-          });
-
-          // Step 4: Create battle event
-          await prisma.gameEvent.create({
-            data: {
-              eventType: "BATTLE",
-              initiatorId: ctx.agentId,
-              targetId: targetId,
-              message: createBattleInitiationMessage(
-                attacker.profile.xHandle,
-                defender.profile.xHandle,
-                totalTokensAtStake,
-                attackerAllyAccount,
-                defenderAllyAccount
-              ),
               metadata: {
-                battleType: battle.type,
-                tokensAtStake: totalTokensAtStake,
-                timestamp: new Date(timestamp).toISOString(),
-                attackerHandle: attacker.profile.xHandle,
-                defenderHandle: defender.profile.xHandle,
+                ...(battleEvent.metadata as Record<string, any>),
                 transactionHash: tx,
               },
             },
@@ -190,7 +191,7 @@ export class BattleHandler {
         },
         {
           maxWait: 10000, // 10s max wait time
-          timeout: 30000, // 30s timeout
+          timeout: 60000, // 60s timeout
         }
       );
 
@@ -237,9 +238,9 @@ export class BattleHandler {
         .startBattleAlliances()
         .accounts({
           leaderA: attackerPda,
-          partnerA: attackerAccount.allianceWith ?? "",
+          partnerA: attackerAccount.allianceWith!,
           leaderB: defenderPda,
-          partnerB: defenderAccount.allianceWith ?? "",
+          partnerB: defenderAccount.allianceWith!,
         })
         .rpc();
     }

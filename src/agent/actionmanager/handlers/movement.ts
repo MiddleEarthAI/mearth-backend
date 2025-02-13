@@ -73,7 +73,29 @@ export class MovementHandler implements ActionHandler<MoveAction> {
             },
           });
 
-          // Step 3: Execute onchain movement
+          // Step 3: Create movement event
+          const event = await prisma.gameEvent.create({
+            data: {
+              eventType: "MOVE",
+              initiatorId: ctx.agentId,
+              message: `@${agent.profile.xHandle} ventures ${
+                mapTile.terrainType === "mountain"
+                  ? "into treacherous mountains"
+                  : mapTile.terrainType === "river"
+                  ? "across rushing waters"
+                  : "across the plains"
+              } at (${action.position.x}, ${action.position.y})`,
+              metadata: {
+                terrain: mapTile.terrainType,
+                position: { x: action.position.x, y: action.position.y },
+                agentHandle: agent.profile.xHandle,
+                // transactionHash: tx,
+                timestamp: new Date(timestamp).toISOString(),
+              },
+            },
+          });
+
+          // Step 4: Execute onchain movement
           let tx: string;
           try {
             tx = await this.program.methods
@@ -95,28 +117,6 @@ export class MovementHandler implements ActionHandler<MoveAction> {
             });
             throw error;
           }
-
-          // Step 4: Create movement event
-          const event = await prisma.gameEvent.create({
-            data: {
-              eventType: "MOVE",
-              initiatorId: ctx.agentId,
-              message: `@${agent.profile.xHandle} ventures ${
-                mapTile.terrainType === "mountain"
-                  ? "into treacherous mountains"
-                  : mapTile.terrainType === "river"
-                  ? "across rushing waters"
-                  : "across the plains"
-              } at (${action.position.x}, ${action.position.y})`,
-              metadata: {
-                terrain: mapTile.terrainType,
-                position: { x: action.position.x, y: action.position.y },
-                agentHandle: agent.profile.xHandle,
-                transactionHash: tx,
-                timestamp: new Date(timestamp).toISOString(),
-              },
-            },
-          });
 
           return { agent: updatedAgent, cooldown, event, tx };
         },

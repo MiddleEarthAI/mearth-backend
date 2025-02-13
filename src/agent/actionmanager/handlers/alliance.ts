@@ -20,7 +20,7 @@ export class AllianceHandler
     private readonly prisma: PrismaClient
   ) {}
 
-  async handleFormAlliance(
+  private async handleFormAlliance(
     ctx: ActionContext,
     action: FormAllianceAction
   ): Promise<ActionResult> {
@@ -65,7 +65,7 @@ export class AllianceHandler
           // Step 1: Create alliance record
           const alliance = await prisma.alliance.create({
             data: {
-              status: "Pending",
+              status: "Active",
               initiatorId: ctx.agentId,
               joinerId: stringToUuid(action.targetId + ctx.gameOnchainId),
               gameId: ctx.gameId,
@@ -77,10 +77,26 @@ export class AllianceHandler
             data: {
               type: "Alliance",
               endsAt: new Date(
-                timestamp + gameConfig.mechanics.cooldowns.newAlliance * 1000
+                timestamp + gameConfig.mechanics.cooldowns.newAlliance * 1000 // convert to ms
               ),
               cooledAgentId: ctx.agentId,
               gameId: ctx.gameId,
+            },
+          });
+
+          // Step 5: Create alliance event
+          const event = await prisma.gameEvent.create({
+            data: {
+              eventType: "ALLIANCE_FORM",
+              initiatorId: ctx.agentId,
+              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              message: `@${initiator.profile.xHandle} forms an alliance with @${target.profile.xHandle}`,
+              metadata: {
+                initiatorHandle: initiator.profile.xHandle,
+                targetHandle: target.profile.xHandle,
+                // transactionHash: tx,
+                timestamp: new Date(timestamp).toISOString(),
+              },
             },
           });
 
@@ -106,29 +122,7 @@ export class AllianceHandler
             throw error;
           }
 
-          // Step 4: Update alliance status
-          const updatedAlliance = await prisma.alliance.update({
-            where: { id: alliance.id },
-            data: { status: "Active" },
-          });
-
-          // Step 5: Create alliance event
-          const event = await prisma.gameEvent.create({
-            data: {
-              eventType: "ALLIANCE_FORM",
-              initiatorId: ctx.agentId,
-              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
-              message: `@${initiator.profile.xHandle} forms an alliance with @${target.profile.xHandle}`,
-              metadata: {
-                initiatorHandle: initiator.profile.xHandle,
-                targetHandle: target.profile.xHandle,
-                transactionHash: tx,
-                timestamp: new Date(timestamp).toISOString(),
-              },
-            },
-          });
-
-          return { alliance: updatedAlliance, cooldown, event, tx };
+          return { alliance, cooldown, event, tx };
         },
         {
           maxWait: 10000, // 10s max wait time
@@ -166,7 +160,7 @@ export class AllianceHandler
     }
   }
 
-  async handleBreakAlliance(
+  private async handleBreakAlliance(
     ctx: ActionContext,
     action: BreakAllianceAction
   ): Promise<ActionResult> {
@@ -245,6 +239,22 @@ export class AllianceHandler
             },
           });
 
+          // Step 4: Create alliance break event
+          const event = await prisma.gameEvent.create({
+            data: {
+              eventType: "ALLIANCE_BREAK",
+              initiatorId: ctx.agentId,
+              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              message: `@${initiator.profile.xHandle} breaks their alliance with @${target.profile.xHandle}`,
+              metadata: {
+                initiatorHandle: initiator.profile.xHandle,
+                targetHandle: target.profile.xHandle,
+                // transactionHash: tx,
+                timestamp: new Date(timestamp).toISOString(),
+              },
+            },
+          });
+
           // Step 3: Execute onchain alliance break
           let tx: string;
           try {
@@ -266,22 +276,6 @@ export class AllianceHandler
             });
             throw error;
           }
-
-          // Step 4: Create alliance break event
-          const event = await prisma.gameEvent.create({
-            data: {
-              eventType: "ALLIANCE_BREAK",
-              initiatorId: ctx.agentId,
-              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
-              message: `@${initiator.profile.xHandle} breaks their alliance with @${target.profile.xHandle}`,
-              metadata: {
-                initiatorHandle: initiator.profile.xHandle,
-                targetHandle: target.profile.xHandle,
-                transactionHash: tx,
-                timestamp: new Date(timestamp).toISOString(),
-              },
-            },
-          });
 
           return { alliance: updatedAlliance, cooldown, event, tx };
         },

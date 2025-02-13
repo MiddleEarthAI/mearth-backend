@@ -202,7 +202,7 @@ const env = cleanEnv(process.env, {
     default: 3600, // 1 hour in seconds
     desc: "Duration of a battle in seconds (default: 1 hour)",
   }),
-  MOVE_COOLDOWN_MS: num({
+  MOVE_COOLDOWN: num({
     default: 3600, // 1 hour in seconds
     desc: "Movement cooldown in seconds (default: 1 hour)",
   }),
@@ -335,7 +335,7 @@ export const gameConfig = {
     cooldowns: {
       battle: env.BATTLE_COOLDOWN,
       battleDuration: env.BATTLE_DURATION,
-      movement: env.MOVE_COOLDOWN_MS, // Base cooldown for movement
+      movement: env.MOVE_COOLDOWN, // Base cooldown for movement
       battleAfterAlliance: env.BATTLE_AFTER_ALLIANCE_COOLDOWN,
       newAlliance: env.NEW_ALLIANCE_COOLDOWN,
       ignore: env.IGNORE_COOLDOWN,

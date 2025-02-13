@@ -121,7 +121,7 @@ importers:
         specifier: ^29.5.12
         version: 29.5.14
       '@types/node':
-        specifier: ^20.11.24
+        specifier: ^20.17.16
         version: 20.17.16
       jest:
         specifier: ^29.7.0
