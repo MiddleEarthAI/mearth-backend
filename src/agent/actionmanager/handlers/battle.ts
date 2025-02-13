@@ -31,13 +31,14 @@ export class BattleHandler {
     ctx: ActionContext,
     action: BattleAction
   ): Promise<ActionResult> {
+    const timestamp = Date.now();
     try {
       logger.info(
         `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
         { ctx, action }
       );
 
-      // Get PDAs and accounts
+      // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
       const [attackerPda] = getAgentPDA(
         this.program.programId,
@@ -95,32 +96,108 @@ export class BattleHandler {
       // Generate deterministic battle ID
       const battleId = generateBattleId(
         [attacker, defender],
-        Date.now(),
+        timestamp,
         ctx.gameOnchainId
       );
 
-      // Execute battle transaction
-      const tx = await this.executeBattleTransaction(
-        attackerPda,
-        defenderPda,
-        attackerAccountData,
-        defenderAccountData,
-        attackerAllyAccount ?? undefined,
-        defenderAllyAccount ?? undefined
+      // Convert target onchain ID to database UUID
+      const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
+
+      // Perform all operations (both database and onchain) in a single transaction
+      const result = await this.prisma.$transaction(
+        async (prisma) => {
+          // Step 1: Create initial battle record
+          const battle = await prisma.battle.create({
+            data: {
+              id: battleId,
+              type:
+                attackerAllyAccount && defenderAllyAccount
+                  ? "AllianceVsAlliance"
+                  : attackerAllyAccount || defenderAllyAccount
+                  ? "AgentVsAlliance"
+                  : "Simple",
+              status: "Cancelled", // Start with cancelled status
+              tokensStaked: totalTokensAtStake,
+              gameId: ctx.gameId,
+              attackerId: attacker.id,
+              defenderId: defender.id,
+              attackerAllyId: attackerAllyAccount ? attacker.id : null,
+              defenderAllyId: defenderAllyAccount ? defender.id : null,
+              startTime: new Date(timestamp),
+            },
+          });
+
+          // Step 2: Execute onchain transaction
+          let tx: string;
+          try {
+            tx = await this.executeBattleTransaction(
+              attackerPda,
+              defenderPda,
+              attackerAccountData,
+              defenderAccountData,
+              attackerAllyAccount ?? undefined,
+              defenderAllyAccount ?? undefined
+            );
+          } catch (error) {
+            // Log the error and update battle status to Cancelled
+            logger.error("Onchain battle initiation failed", {
+              error,
+              battleId,
+            });
+            await prisma.battle.update({
+              where: { id: battleId },
+              data: {
+                status: "Cancelled",
+                endTime: new Date(),
+              },
+            });
+            throw error; // Re-throw to trigger transaction rollback
+          }
+
+          // Step 3: Update battle status to Active after successful onchain tx
+          await prisma.battle.update({
+            where: { id: battleId },
+            data: {
+              status: "Active",
+            },
+          });
+
+          // Step 4: Create battle event
+          await prisma.gameEvent.create({
+            data: {
+              eventType: "BATTLE",
+              initiatorId: ctx.agentId,
+              targetId: targetId,
+              message: createBattleInitiationMessage(
+                attacker.profile.xHandle,
+                defender.profile.xHandle,
+                totalTokensAtStake,
+                attackerAllyAccount,
+                defenderAllyAccount
+              ),
+              metadata: {
+                battleType: battle.type,
+                tokensAtStake: totalTokensAtStake,
+                timestamp: new Date(timestamp).toISOString(),
+                attackerHandle: attacker.profile.xHandle,
+                defenderHandle: defender.profile.xHandle,
+                transactionHash: tx,
+              },
+            },
+          });
+
+          return { battle, tx };
+        },
+        {
+          maxWait: 10000, // 10s max wait time
+          timeout: 30000, // 30s timeout
+        }
       );
 
-      // Create battle record and event
-      await this.createBattleRecords(
-        battleId,
-        ctx,
-        action,
-        attacker,
-        defender,
-        attackerAllyAccount,
-        defenderAllyAccount,
-        totalTokensAtStake,
-        tx
-      );
+      logger.info("Battle initiated successfully", {
+        battleId: result.battle.id,
+        tx: result.tx,
+      });
 
       return {
         success: true,
@@ -189,69 +266,5 @@ export class BattleHandler {
         loser: defenderPda,
       })
       .rpc();
-  }
-
-  /**
-   * Create battle records in database
-   */
-  private async createBattleRecords(
-    battleId: string,
-    ctx: ActionContext,
-    action: BattleAction,
-    attacker: AgentWithProfile,
-    defender: AgentWithProfile,
-    attackerAlly: AgentAccount | null,
-    defenderAlly: AgentAccount | null,
-    totalTokensAtStake: number,
-    tx: string
-  ) {
-    const battleType =
-      attackerAlly && defenderAlly
-        ? "AllianceVsAlliance"
-        : attackerAlly || defenderAlly
-        ? "AgentVsAlliance"
-        : "Simple";
-
-    // Convert onchain ID to database UUID for the target
-    const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
-
-    await this.prisma.$transaction([
-      this.prisma.battle.create({
-        data: {
-          id: battleId,
-          type: battleType,
-          status: "Active",
-          tokensStaked: totalTokensAtStake,
-          gameId: ctx.gameId,
-          attackerId: attacker.id,
-          defenderId: defender.id,
-          attackerAllyId: attackerAlly ? attacker.id : null,
-          defenderAllyId: defenderAlly ? defender.id : null,
-          startTime: new Date(),
-        },
-      }),
-      this.prisma.gameEvent.create({
-        data: {
-          eventType: "BATTLE",
-          initiatorId: ctx.agentId,
-          targetId: targetId,
-          message: createBattleInitiationMessage(
-            attacker.profile.xHandle,
-            defender.profile.xHandle,
-            totalTokensAtStake,
-            attackerAlly,
-            defenderAlly
-          ),
-          metadata: {
-            battleType,
-            tokensAtStake: totalTokensAtStake,
-            timestamp: new Date().toISOString(),
-            attackerHandle: attacker.profile.xHandle,
-            defenderHandle: defender.profile.xHandle,
-            transactionHash: tx,
-          },
-        },
-      }),
-    ]);
   }
 }
