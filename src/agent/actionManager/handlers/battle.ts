@@ -5,13 +5,11 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import {
-  generateBattleId,
   calculateTotalTokens,
   createBattleInitiationMessage,
 } from "@/utils/battle";
 
 import { AgentAccount } from "@/types/program";
-import { stringToUuid } from "@/utils/uuid";
 
 type AgentWithProfile = Prisma.AgentGetPayload<{
   include: { profile: true };
@@ -92,23 +90,12 @@ export class BattleHandler {
         defenderAllyAccount
       );
 
-      // Generate deterministic battle ID
-      const battleId = generateBattleId(
-        [attacker, defender],
-        timestamp,
-        ctx.gameOnchainId
-      );
-
-      // Convert target onchain ID to database UUID
-      const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
-
       // Perform all operations (both database and onchain) in a single transaction
       const result = await this.prisma.$transaction(
         async (prisma) => {
           // Step 1: Create battle record
           const battle = await prisma.battle.create({
             data: {
-              id: battleId,
               type:
                 attackerAllyAccount && defenderAllyAccount
                   ? "AllianceVsAlliance"
@@ -132,14 +119,14 @@ export class BattleHandler {
               gameId: ctx.gameId,
               eventType: "BATTLE",
               initiatorId: ctx.agentId,
-              targetId: targetId,
-              message: createBattleInitiationMessage(
-                attacker.profile.xHandle,
-                defender.profile.xHandle,
-                totalTokensAtStake,
-                attackerAllyAccount,
-                defenderAllyAccount
-              ),
+              message:
+                createBattleInitiationMessage(
+                  attacker.profile.xHandle,
+                  defender.profile.xHandle,
+                  totalTokensAtStake,
+                  attackerAllyAccount,
+                  defenderAllyAccount
+                ) ?? "",
               metadata: {
                 toJSON: () => ({
                   attackerHandle: attacker.profile.xHandle,
@@ -167,10 +154,9 @@ export class BattleHandler {
             // Log the error and update battle status to Cancelled
             console.error("Onchain battle initiation failed", {
               error,
-              battleId,
             });
             await prisma.battle.update({
-              where: { id: battleId },
+              where: { id: battle.id },
               data: {
                 status: "Cancelled",
                 endTime: new Date(),

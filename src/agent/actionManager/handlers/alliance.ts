@@ -7,7 +7,7 @@ import {
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { stringToUuid } from "@/utils/uuid";
+
 import { gameConfig } from "@/config/env";
 import { ActionHandler } from "../types";
 import { logger } from "@/utils/logger";
@@ -50,7 +50,12 @@ export class AllianceHandler
           include: { profile: true },
         }),
         this.prisma.agent.findUnique({
-          where: { id: stringToUuid(action.targetId + ctx.gameOnchainId) },
+          where: {
+            onchainId_gameId: {
+              onchainId: action.targetId,
+              gameId: ctx.gameId,
+            },
+          },
           include: { profile: true },
         }),
       ]);
@@ -67,7 +72,7 @@ export class AllianceHandler
             data: {
               status: "Active",
               initiatorId: ctx.agentId,
-              joinerId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              joinerId: target.id,
               gameId: ctx.gameId,
             },
           });
@@ -90,7 +95,7 @@ export class AllianceHandler
               gameId: ctx.gameId,
               eventType: "ALLIANCE_FORM",
               initiatorId: ctx.agentId,
-              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              targetId: target.id,
               message: `@${initiator.profile.xHandle} forms an alliance with @${target.profile.xHandle}`,
               metadata: {
                 toJSON: () => ({
@@ -187,35 +192,41 @@ export class AllianceHandler
       );
 
       // Get agents with profiles and existing alliance
-      const [initiator, target, existingAlliance] = await Promise.all([
+      const [initiator, target] = await Promise.all([
         this.prisma.agent.findUnique({
           where: { id: ctx.agentId },
           include: { profile: true },
         }),
         this.prisma.agent.findUnique({
-          where: { id: stringToUuid(action.targetId + ctx.gameOnchainId) },
-          include: { profile: true },
-        }),
-        this.prisma.alliance.findFirst({
           where: {
-            OR: [
-              {
-                initiatorId: ctx.agentId,
-                joinerId: stringToUuid(action.targetId + ctx.gameOnchainId),
-              },
-              {
-                initiatorId: stringToUuid(action.targetId + ctx.gameOnchainId),
-                joinerId: ctx.agentId,
-              },
-            ],
-            status: "Active",
+            onchainId_gameId: {
+              onchainId: action.targetId,
+              gameId: ctx.gameId,
+            },
           },
+          include: { profile: true },
         }),
       ]);
 
       if (!initiator || !target) {
         throw new Error("Agent not found");
       }
+
+      const existingAlliance = await this.prisma.alliance.findFirst({
+        where: {
+          OR: [
+            {
+              initiatorId: ctx.agentId,
+              joinerId: target.id,
+            },
+            {
+              initiatorId: target.id,
+              joinerId: ctx.agentId,
+            },
+          ],
+          status: "Active",
+        },
+      });
 
       if (!existingAlliance) {
         throw new Error("No active alliance found between agents");
@@ -248,7 +259,7 @@ export class AllianceHandler
               gameId: ctx.gameId,
               eventType: "ALLIANCE_BREAK",
               initiatorId: ctx.agentId,
-              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              targetId: target.id,
               message: `@${initiator.profile.xHandle} breaks their alliance with @${target.profile.xHandle}`,
               metadata: {
                 toJSON: () => ({

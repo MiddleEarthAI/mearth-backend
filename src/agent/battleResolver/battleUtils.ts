@@ -1,6 +1,5 @@
 import { BattleGroup, BattleOutcome, BattleParticipant } from "./types/battle";
 import { AgentAccount } from "@/types/program";
-import { generateBattleId } from "@/utils/battle";
 import { gameConfig } from "@/config/env";
 import { logger } from "@/utils/logger";
 
@@ -118,11 +117,9 @@ export function organizeBattles(
 
       // Only create valid battle groups
       if (sideA.length > 0 && sideB.length > 0) {
-        const battleId = generateBattleId(battleAgents, startTime, gameId);
         const type = determineBattleType(sideA.length, sideB.length);
 
         battles.push({
-          id: battleId,
           type,
           sideA,
           sideB,

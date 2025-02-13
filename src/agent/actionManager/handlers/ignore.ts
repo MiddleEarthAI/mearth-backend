@@ -3,7 +3,6 @@ import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { ActionHandler } from "../types";
 import { gameConfig } from "@/config/env";
-import { stringToUuid } from "@/utils/uuid";
 
 export class IgnoreHandler implements ActionHandler<IgnoreAction> {
   constructor(
@@ -26,7 +25,10 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
         }),
         this.prisma.agent.findUnique({
           where: {
-            id: stringToUuid(action.targetId + ctx.gameOnchainId),
+            onchainId_gameId: {
+              onchainId: action.targetId,
+              gameId: ctx.gameId,
+            },
           },
           include: { profile: true },
         }),

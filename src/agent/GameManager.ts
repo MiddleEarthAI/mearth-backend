@@ -7,7 +7,7 @@ import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
-import { stringToUuid } from "@/utils/uuid";
+
 const { BN } = anchor;
 
 interface GameInfo {
@@ -220,10 +220,9 @@ export class GameManager implements IGameManager {
           console.info("✅ Game account fetched from chain");
 
           console.info("💾 Creating game record in database...");
-          const deterministicGameId = stringToUuid(nextGameId);
+
           const dbGame = await this.prisma.game.create({
             data: {
-              id: deterministicGameId,
               onchainId: nextGameId,
               authority: this.program.provider.publicKey?.toString() ?? "",
               tokenMint: solanaConfig.tokenMint,
@@ -317,12 +316,9 @@ export class GameManager implements IGameManager {
         const agentAccount = await this.program.account.agent.fetch(agentPda);
 
         console.info(`💾 Creating agent database record...`);
-        const deterministicAgentId = stringToUuid(
-          profile.onchainId + dbGame.onchainId
-        );
+
         const agentDb = await this.prisma.agent.create({
           data: {
-            id: deterministicAgentId,
             onchainId: profile.onchainId,
             gameId: dbGame.id,
             mapTileId: spawnTile.id,

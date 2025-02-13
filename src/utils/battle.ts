@@ -1,26 +1,4 @@
 import { AgentAccount } from "@/types/program";
-import { stringToUuid } from "./uuid";
-
-/**
- * Generate a deterministic battle ID from participants and start time
- * This is used across the system to ensure consistent battle IDs between
- * battle creation (ActionManager) and resolution (BattleResolver)
- */
-export function generateBattleId(
-  participants: { id: string | number }[],
-  startTime: string | number,
-  gameId: number
-): string {
-  // Sort agent IDs to ensure consistent order
-  const sortedIds = participants
-    .map((p) => p.id.toString())
-    .sort()
-    .join("-");
-
-  // Combine key factors for uniqueness
-  const uniqueKey = `battle-${sortedIds}-${startTime}-${gameId}`;
-  return stringToUuid(uniqueKey);
-}
 
 /**
  * Calculate total tokens at stake in a battle

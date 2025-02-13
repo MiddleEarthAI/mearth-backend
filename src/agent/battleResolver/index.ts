@@ -93,7 +93,6 @@ export class BattleResolver {
           } catch (error) {
             console.error("❌ Failed to process battle", {
               error,
-              battleId: battle.id,
             });
           }
         })
@@ -167,7 +166,6 @@ export class BattleResolver {
 
       // Update battle status and apply health penalties
       await this.finalizeBattle(
-        battle.id,
         sideAWins ? battle.sideA : battle.sideB,
         sideAWins ? battle.sideB : battle.sideA,
         game
@@ -175,7 +173,6 @@ export class BattleResolver {
     } catch (error) {
       console.error("❌ Battle resolution failed", {
         error,
-        battleId: battle.id,
       });
       throw error;
     }
@@ -185,7 +182,6 @@ export class BattleResolver {
    * Finalize battle by updating status and applying health penalties
    */
   private async finalizeBattle(
-    battleId: string,
     winners: BattleParticipant[],
     losers: BattleParticipant[],
     game: { id: string; onchainId: number }
@@ -251,15 +247,15 @@ export class BattleResolver {
           },
         });
 
-        // Update battle status
-        await prisma.battle.update({
-          where: { id: battleId },
-          data: {
-            status: "Resolved",
-            endTime: new Date(),
-            winnerId: winners[0].agent.id,
-          },
-        });
+        // // Update battle status
+        // await prisma.battle.update({
+        //   where: { id: battleId, status: "Active" },
+        //   data: {
+        //     status: "Resolved",
+        //     endTime: new Date(),
+        //     winnerId: winners[0].agent.id,
+        //   },
+        // });
 
         // Handle deaths with dramatic events
         await Promise.all(

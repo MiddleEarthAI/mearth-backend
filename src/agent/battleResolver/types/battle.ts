@@ -18,7 +18,6 @@ export interface BattleParticipant {
  * Represents a group of agents in battle
  */
 export interface BattleGroup {
-  id: string;
   type: "Simple" | "AgentVsAlliance" | "AllianceVsAlliance";
   sideA: BattleParticipant[];
   sideB: BattleParticipant[];
