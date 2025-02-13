@@ -26,7 +26,7 @@ export class AllianceHandler
   ): Promise<ActionResult> {
     const timestamp = Date.now();
     try {
-      logger.info(
+      console.info(
         `Agent ${ctx.agentId} forming alliance with ${action.targetId}`
       );
 
@@ -93,10 +93,12 @@ export class AllianceHandler
               targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
               message: `@${initiator.profile.xHandle} forms an alliance with @${target.profile.xHandle}`,
               metadata: {
-                initiatorHandle: initiator.profile.xHandle,
-                targetHandle: target.profile.xHandle,
-                // transactionHash: tx,
-                timestamp: new Date(timestamp).toISOString(),
+                toJSON: () => ({
+                  initiatorHandle: initiator.profile.xHandle,
+                  targetHandle: target.profile.xHandle,
+                  // transactionHash: tx,
+                  timestamp: new Date(timestamp).toISOString(),
+                }),
               },
             },
           });
@@ -115,7 +117,7 @@ export class AllianceHandler
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback
-            logger.error("Onchain alliance formation failed", {
+            console.error("Onchain alliance formation failed", {
               error,
               initiatorId: ctx.agentId,
               targetId: action.targetId,
@@ -131,7 +133,7 @@ export class AllianceHandler
         }
       );
 
-      logger.info("Alliance formation completed successfully", {
+      console.info("Alliance formation completed successfully", {
         initiatorId: ctx.agentId,
         targetId: action.targetId,
         tx: result.tx,
@@ -144,7 +146,7 @@ export class AllianceHandler
         },
       };
     } catch (error) {
-      logger.error(`Alliance formation failed for agent ${ctx.agentId}`, {
+      console.error(`Alliance formation failed for agent ${ctx.agentId}`, {
         error,
       });
       return {
@@ -167,7 +169,7 @@ export class AllianceHandler
   ): Promise<ActionResult> {
     const timestamp = Date.now();
     try {
-      logger.info(
+      console.info(
         `Agent ${ctx.agentId} breaking alliance with ${action.targetId}`
       );
 
@@ -249,10 +251,12 @@ export class AllianceHandler
               targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
               message: `@${initiator.profile.xHandle} breaks their alliance with @${target.profile.xHandle}`,
               metadata: {
-                initiatorHandle: initiator.profile.xHandle,
-                targetHandle: target.profile.xHandle,
-                // transactionHash: tx,
-                timestamp: new Date(timestamp).toISOString(),
+                toJSON: () => ({
+                  initiatorHandle: initiator.profile.xHandle,
+                  targetHandle: target.profile.xHandle,
+                  // transactionHash: tx,
+                  timestamp: new Date(timestamp).toISOString(),
+                }),
               },
             },
           });
@@ -271,7 +275,7 @@ export class AllianceHandler
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback
-            logger.error("Onchain alliance break failed", {
+            console.error("Onchain alliance break failed", {
               error,
               initiatorId: ctx.agentId,
               targetId: action.targetId,
@@ -287,7 +291,7 @@ export class AllianceHandler
         }
       );
 
-      logger.info("Alliance break completed successfully", {
+      console.info("Alliance break completed successfully", {
         initiatorId: ctx.agentId,
         targetId: action.targetId,
         tx: result.tx,
@@ -300,7 +304,9 @@ export class AllianceHandler
         },
       };
     } catch (error) {
-      logger.error(`Alliance break failed for agent ${ctx.agentId}`, { error });
+      console.error(`Alliance break failed for agent ${ctx.agentId}`, {
+        error,
+      });
       return {
         success: false,
         feedback: {

@@ -16,7 +16,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
   async handle(ctx: ActionContext, action: MoveAction): Promise<ActionResult> {
     const timestamp = Date.now();
     try {
-      logger.info(
+      console.info(
         `Agent ${ctx.agentId} moving to (${action.position.x}, ${action.position.y})`
       );
 
@@ -87,11 +87,13 @@ export class MovementHandler implements ActionHandler<MoveAction> {
                   : "across the plains"
               } at (${action.position.x}, ${action.position.y})`,
               metadata: {
-                terrain: mapTile.terrainType,
-                position: { x: action.position.x, y: action.position.y },
-                agentHandle: agent.profile.xHandle,
-                // transactionHash: tx,
-                timestamp: new Date(timestamp).toISOString(),
+                toJSON: () => ({
+                  terrain: mapTile.terrainType,
+                  position: { x: action.position.x, y: action.position.y },
+                  agentHandle: agent.profile.xHandle,
+                  // transactionHash: tx,
+                  timestamp: new Date(timestamp).toISOString(),
+                }),
               },
             },
           });
@@ -111,7 +113,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback
-            logger.error("Onchain movement failed", {
+            console.error("Onchain movement failed", {
               error,
               agentId: ctx.agentId,
               position: action.position,
@@ -127,7 +129,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
         }
       );
 
-      logger.info("Movement completed successfully", {
+      console.info("Movement completed successfully", {
         agentId: ctx.agentId,
         position: action.position,
         tx: result.tx,
@@ -140,7 +142,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
         },
       };
     } catch (error) {
-      logger.error(`Movement failed for agent ${ctx.agentId}`, { error });
+      console.error(`Movement failed for agent ${ctx.agentId}`, { error });
       return {
         success: false,
         feedback: {

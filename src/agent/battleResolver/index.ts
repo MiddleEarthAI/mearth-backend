@@ -28,7 +28,7 @@ export class BattleResolver {
     private readonly gameManager: GameManager
   ) {
     this.battleHandlers = new BattleHandlers(program, prisma);
-    logger.info("🎮 Battle Resolution Service initialized");
+    console.info("🎮 Battle Resolution Service initialized");
   }
 
   /**
@@ -48,7 +48,7 @@ export class BattleResolver {
       checkIntervalMs
     );
 
-    logger.info("🎯 Battle resolution service started", { checkIntervalMs });
+    console.info("🎯 Battle resolution service started", { checkIntervalMs });
   }
 
   /**
@@ -58,7 +58,7 @@ export class BattleResolver {
     if (this.resolutionInterval) {
       clearInterval(this.resolutionInterval);
       this.resolutionInterval = null;
-      logger.info("✋ Battle resolution service stopped");
+      console.info("✋ Battle resolution service stopped");
     }
   }
 
@@ -69,14 +69,14 @@ export class BattleResolver {
     try {
       const game = await this.gameManager.getActiveGame();
       if (!game) {
-        logger.warn("⚠️ No active game found");
+        console.warn("⚠️ No active game found");
         return;
       }
 
       const agents = game.agents.map((a) => a.account);
       const battles = organizeBattles(agents, game.dbGame.onchainId);
 
-      logger.info("⚔️ Processing battles", {
+      console.info("⚔️ Processing battles", {
         count: battles.length,
         gameId: game.dbGame.id,
       });
@@ -91,7 +91,7 @@ export class BattleResolver {
 
             await this.resolveBattle(battle, game.dbGame);
           } catch (error) {
-            logger.error("❌ Failed to process battle", {
+            console.error("❌ Failed to process battle", {
               error,
               battleId: battle.id,
             });
@@ -99,7 +99,7 @@ export class BattleResolver {
         })
       );
     } catch (error) {
-      logger.error("❌ Battle resolution cycle failed", { error });
+      console.error("❌ Battle resolution cycle failed", { error });
     }
   }
 
@@ -173,7 +173,7 @@ export class BattleResolver {
         game
       );
     } catch (error) {
-      logger.error("❌ Battle resolution failed", {
+      console.error("❌ Battle resolution failed", {
         error,
         battleId: battle.id,
       });
@@ -214,9 +214,11 @@ export class BattleResolver {
         // Create battle resolution event
         let battleMessage = "";
         let eventMetadata: any = {
-          timestamp: new Date().toISOString(),
-          winners: winnerProfiles.map((w) => w?.profile.xHandle),
-          losers: loserProfiles.map((l) => l?.profile.xHandle),
+          toJSON: () => ({
+            timestamp: new Date().toISOString(),
+            winners: winnerProfiles.map((w) => w?.profile.xHandle),
+            losers: loserProfiles.map((l) => l?.profile.xHandle),
+          }),
         };
 
         if (winners.length === 1 && losers.length === 1) {
@@ -275,10 +277,12 @@ export class BattleResolver {
                   targetId: loser.agent.id,
                   message: `☠️ A warrior falls! @${loserProfile.profile.xHandle} has been defeated in glorious battle by @${winnerProfiles[0]?.profile.xHandle}!`,
                   metadata: {
-                    type: "death",
-                    timestamp: new Date().toISOString(),
-                    slainAgent: loserProfile.profile.xHandle,
-                    slayedBy: winnerProfiles[0]?.profile.xHandle,
+                    toJSON: () => ({
+                      type: "death",
+                      timestamp: new Date().toISOString(),
+                      slainAgent: loserProfile.profile.xHandle,
+                      slayedBy: winnerProfiles[0]?.profile.xHandle,
+                    }),
                   },
                 },
               });
@@ -297,7 +301,7 @@ export class BattleResolver {
                 },
               });
 
-              logger.info(
+              console.info(
                 `Agent ${loserProfile.profile.xHandle} has fallen in battle`,
                 {
                   type: "BATTLE_DEATH",
@@ -330,16 +334,18 @@ export class BattleResolver {
                 ? `💰 @${winnerProfiles[0]?.profile.xHandle} claims ${tokensWon} tokens in victory!`
                 : `💰 The alliance of @${winnerProfiles[0]?.profile.xHandle} and @${winnerProfiles[1]?.profile.xHandle} share ${tokensWon} tokens in victory!`,
             metadata: {
-              type: "spoils",
-              timestamp: new Date().toISOString(),
-              tokensWon,
-              winners: winnerHandles,
+              toJSON: () => ({
+                type: "spoils",
+                timestamp: new Date().toISOString(),
+                tokensWon,
+                winners: winnerHandles,
+              }),
             },
           },
         });
       });
     } catch (error) {
-      logger.error("❌ Failed to finalize battle", { error });
+      console.error("❌ Failed to finalize battle", { error });
       throw error;
     }
   }

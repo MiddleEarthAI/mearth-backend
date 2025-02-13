@@ -57,10 +57,12 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
             targetId: targetAgent.id,
             message: `🚫 @${agent.profile.xHandle} turns their back on @${targetAgent.profile.xHandle}!`,
             metadata: {
-              duration: gameConfig.mechanics.cooldowns.ignore,
-              timestamp: new Date().toISOString(),
-              initiatorHandle: agent.profile.xHandle,
-              targetHandle: targetAgent.profile.xHandle,
+              toJSON: () => ({
+                duration: gameConfig.mechanics.cooldowns.ignore,
+                timestamp: new Date().toISOString(),
+                initiatorHandle: agent.profile.xHandle,
+                targetHandle: targetAgent.profile.xHandle,
+              }),
             },
           },
         }),

@@ -32,7 +32,7 @@ export class ActionManager {
     this.allianceHandler = new AllianceHandler(program, prisma);
     this.ignoreHandler = new IgnoreHandler(program, prisma);
 
-    logger.info("🎮 Action Manager initialized");
+    console.info("🎮 Action Manager initialized");
   }
 
   /**
@@ -42,7 +42,7 @@ export class ActionManager {
     ctx: ActionContext,
     action: GameAction
   ): Promise<ActionResult> {
-    logger.info(`Agent ${ctx.agentId} executing ${action.type}`, {
+    console.info(`Agent ${ctx.agentId} executing ${action.type}`, {
       gameId: ctx.gameId,
       onchainGameId: ctx.gameOnchainId,
       onchainAgentId: ctx.agentOnchainId,
@@ -70,7 +70,7 @@ export class ActionManager {
           );
       }
     } catch (error) {
-      logger.error(`Action execution failed for agent ${ctx.agentId}`, {
+      console.error(`Action execution failed for agent ${ctx.agentId}`, {
         error,
         actionType: action.type,
         gameId: ctx.gameId,
@@ -95,7 +95,7 @@ export class ActionManager {
    * Validate game state before executing actions
    */
   private async validateGameState(ctx: ActionContext): Promise<void> {
-    logger.debug("🔍 Validating game state...", {
+    console.debug("🔍 Validating game state...", {
       gameId: ctx.gameId,
       onchainGameId: ctx.gameOnchainId,
     });
@@ -105,7 +105,7 @@ export class ActionManager {
       const gameAccount = await this.program.account.game.fetch(gamePda);
 
       if (!gameAccount.isActive) {
-        logger.error("❌ Game validation failed - Game is not active", {
+        console.error("❌ Game validation failed - Game is not active", {
           gameId: ctx.gameId,
           onchainGameId: ctx.gameOnchainId,
         });
@@ -118,7 +118,7 @@ export class ActionManager {
       // - Check cooldowns
       // etc.
     } catch (error) {
-      logger.error("❌ Game state validation failed", {
+      console.error("❌ Game state validation failed", {
         error,
         gameId: ctx.gameId,
         onchainGameId: ctx.gameOnchainId,

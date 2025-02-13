@@ -60,13 +60,13 @@ export class BattleHandlers {
         })
         .rpc();
 
-      logger.info("Simple battle resolved successfully", {
+      console.info("Simple battle resolved successfully", {
         winnerId: winner.agent.id,
         loserId: loser.agent.id,
         percentLoss,
       });
     } catch (error) {
-      logger.error("Failed to resolve simple battle", {
+      console.error("Failed to resolve simple battle", {
         error,
         winnerId: winner.agent.id,
         loserId: loser.agent.id,
@@ -132,7 +132,7 @@ export class BattleHandlers {
         })
         .rpc();
 
-      logger.info("Agent vs Alliance battle resolved successfully", {
+      console.info("Agent vs Alliance battle resolved successfully", {
         singleId: single.agent.id,
         leaderId: leader.agent.id,
         partnerId: partner.agent.id,
@@ -140,7 +140,7 @@ export class BattleHandlers {
         percentLoss,
       });
     } catch (error) {
-      logger.error("Failed to resolve agent vs alliance battle", {
+      console.error("Failed to resolve agent vs alliance battle", {
         error,
         singleId: single.agent.id,
         leaderId: leader.agent.id,
@@ -226,7 +226,7 @@ export class BattleHandlers {
         })
         .rpc();
 
-      logger.info("Alliance vs Alliance battle resolved successfully", {
+      console.info("Alliance vs Alliance battle resolved successfully", {
         leaderAId: leaderA.agent.id,
         partnerAId: partnerA.agent.id,
         leaderBId: leaderB.agent.id,
@@ -235,7 +235,7 @@ export class BattleHandlers {
         percentLoss,
       });
     } catch (error) {
-      logger.error("Failed to resolve alliance vs alliance battle", {
+      console.error("Failed to resolve alliance vs alliance battle", {
         error,
         leaderAId: leaderA.agent.id,
         partnerAId: partnerA.agent.id,

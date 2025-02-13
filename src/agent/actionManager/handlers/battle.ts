@@ -9,7 +9,7 @@ import {
   calculateTotalTokens,
   createBattleInitiationMessage,
 } from "@/utils/battle";
-import { logger } from "@/utils/logger";
+
 import { AgentAccount } from "@/types/program";
 import { stringToUuid } from "@/utils/uuid";
 
@@ -32,7 +32,7 @@ export class BattleHandler {
   ): Promise<ActionResult> {
     const timestamp = Date.now();
     try {
-      logger.info(
+      console.info(
         `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
         { ctx, action }
       );
@@ -141,11 +141,13 @@ export class BattleHandler {
                 defenderAllyAccount
               ),
               metadata: {
-                battleType: battle.type,
-                tokensAtStake: totalTokensAtStake,
-                timestamp: new Date(timestamp).toISOString(),
-                attackerHandle: attacker.profile.xHandle,
-                defenderHandle: defender.profile.xHandle,
+                toJSON: () => ({
+                  attackerHandle: attacker.profile.xHandle,
+                  defenderHandle: defender.profile.xHandle,
+                  tokensAtStake: totalTokensAtStake,
+                  attackerAlly: attackerAllyAccount,
+                  defenderAlly: defenderAllyAccount,
+                }),
               },
             },
           });
@@ -163,7 +165,7 @@ export class BattleHandler {
             );
           } catch (error) {
             // Log the error and update battle status to Cancelled
-            logger.error("Onchain battle initiation failed", {
+            console.error("Onchain battle initiation failed", {
               error,
               battleId,
             });
@@ -182,8 +184,10 @@ export class BattleHandler {
             where: { id: battleEvent.id },
             data: {
               metadata: {
-                ...(battleEvent.metadata as Record<string, any>),
-                transactionHash: tx,
+                toJSON: () => ({
+                  ...(battleEvent.metadata as Record<string, any>),
+                  transactionHash: tx,
+                }),
               },
             },
           });
@@ -196,7 +200,7 @@ export class BattleHandler {
         }
       );
 
-      logger.info("Battle initiated successfully", {
+      console.info("Battle initiated successfully", {
         battleId: result.battle.id,
         tx: result.tx,
       });
@@ -208,7 +212,7 @@ export class BattleHandler {
         },
       };
     } catch (error) {
-      logger.error("💥 Battle initiation failed", { error, ctx, action });
+      console.error("💥 Battle initiation failed", { error, ctx, action });
       return {
         success: false,
         feedback: {

@@ -272,10 +272,12 @@ export class GameOrchestrator {
               initiatorId: data.actionContext.agentId,
               message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/${tweetRecord.agent.profile.xHandle}/status/${tweet.data.id}`,
               metadata: {
-                tweetId: tweet.data.id,
-                actionType: data.action.type,
-                timestamp: new Date().toISOString(),
-                content: data.action.tweet,
+                toJSON: () => ({
+                  tweetId: tweet.data.id,
+                  actionType: data.action.type,
+                  timestamp: new Date().toISOString(),
+                  content: data.action.tweet,
+                }),
               },
             },
           });

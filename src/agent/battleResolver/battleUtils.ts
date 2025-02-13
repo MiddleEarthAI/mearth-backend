@@ -132,14 +132,14 @@ export function organizeBattles(
       }
     }
 
-    logger.info("Battle groups organized successfully", {
+    console.info("Battle groups organized successfully", {
       totalBattles: battles.length,
       gameId,
     });
 
     return battles;
   } catch (error) {
-    logger.error("Failed to organize battles", { error, gameId });
+    console.error("Failed to organize battles", { error, gameId });
     throw error;
   }
 }
