@@ -62,6 +62,10 @@ class DecisionEngine {
       console.info("🤖 Generated AI response 🔥🔥🔥");
       console.info(response.text);
       const action = this.parseActionJson(`{${response.text}`);
+      if (!action) {
+        console.log("🔥❌🔥No valid action extracted from AI response");
+        return;
+      }
 
       this.eventEmitter.emit("newAction", { actionContext, action });
     }

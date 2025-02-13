@@ -26,7 +26,7 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
         }),
         this.prisma.agent.findUnique({
           where: {
-            id: stringToUuid(action.targetId + ctx.gameOnchainId.toNumber()),
+            id: stringToUuid(action.targetId + ctx.gameOnchainId),
           },
           include: { profile: true },
         }),

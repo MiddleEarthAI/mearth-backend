@@ -15,7 +15,7 @@ export function toBattleParticipant(agent: AgentAccount): BattleParticipant {
       authority: agent.authority,
     },
     agentAccount: agent,
-    tokenBalance: agent.tokenBalance.toNumber(),
+    tokenBalance: agent.tokenBalance,
   };
 }
 

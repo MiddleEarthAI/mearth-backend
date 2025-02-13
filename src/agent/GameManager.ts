@@ -232,7 +232,7 @@ export class GameManager implements IGameManager {
               bump: bump,
               dailyRewardTokens: gameConfig.dailyRewardTokens,
               isActive: true,
-              lastUpdate: new Date(gameAccount.lastUpdate.toNumber() * 1000),
+              lastUpdate: new Date(gameAccount.lastUpdate * 1000),
             },
             include: {
               agents: {

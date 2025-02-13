@@ -48,7 +48,7 @@ export class GameOrchestrator {
     this.setupErrorBoundary();
     console.log("🎮 Game Orchestrator initialized", {
       gameId: this.gameId,
-      onchainId: this.currentGameOnchainId.toNumber(),
+      onchainId: this.currentGameOnchainId,
     });
   }
 

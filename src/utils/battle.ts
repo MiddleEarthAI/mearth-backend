@@ -30,7 +30,7 @@ export function calculateTotalTokens(
 ): number {
   return accounts
     .filter((account): account is AgentAccount => account !== null)
-    .reduce((sum, account) => sum + account.tokenBalance.toNumber(), 0);
+    .reduce((sum, account) => sum + account.tokenBalance, 0);
 }
 
 /**
