@@ -1,22 +1,22 @@
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import { defaultRateLimiter } from "./middleware/rateLimiter";
-import { GameOrchestrator } from "./agent/GameOrchestrator";
-import { BattleResolver } from "./agent/battleResolver";
+import { defaultRateLimiter } from "@/middleware/rateLimiter";
+import { GameOrchestrator } from "@/agent/GameOrchestrator";
+import { BattleResolver } from "@/agent/battleResolver";
 import EventEmitter from "events";
-import CacheManager from "./agent/CacheManager";
-import TwitterManager from "./agent/TwitterManager";
-import { DecisionEngine } from "./agent/DecisionEngine";
-import { checkDatabaseConnection } from "./utils";
-import { getProgramWithWallet } from "./utils/program";
+import CacheManager from "@/agent/CacheManager";
+import TwitterManager from "@/agent/TwitterManager";
+import { DecisionEngine } from "@/agent/DecisionEngine";
+import { checkDatabaseConnection } from "@/utils";
+import { getProgramWithWallet } from "@/utils/program";
 import { PrismaClient } from "@prisma/client";
 
-import { GameManager } from "./agent/GameManager";
+import { GameManager } from "@/agent/GameManager";
 import { createServer } from "http";
 
 import { expressCspHeader, NONE, SELF } from "express-csp-header";
-import { ActionManager } from "./agent/actionManager";
+import { ActionManager } from "@/agent/actionManager";
 
 const app = express();
 const server = createServer(app);
