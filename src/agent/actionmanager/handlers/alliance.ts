@@ -8,6 +8,7 @@ import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionHandler } from "../types";
+import { stringToUuid } from "@/utils/uuid";
 
 import { gameConfig } from "@/config/env";
 
@@ -87,6 +88,9 @@ export class AllianceHandler
         throw new Error("One or more agents not found in database");
       }
 
+      // Convert target onchain ID to database UUID
+      const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
+
       // Update database in transaction
       await this.prisma.$transaction([
         // Create alliance record
@@ -127,8 +131,8 @@ export class AllianceHandler
         this.prisma.gameEvent.create({
           data: {
             eventType: "ALLIANCE_FORM",
-            initiatorId: ctx.agentId.toString(),
-            targetId: action.targetId.toString(),
+            initiatorId: ctx.agentId,
+            targetId: targetId,
             message: `🤝 A powerful alliance forms between @${initiator.profile.xHandle} and @${joiner.profile.xHandle}!`,
             metadata: {
               allianceType: "formation",
@@ -231,6 +235,9 @@ export class AllianceHandler
         throw new Error("Required records not found in database");
       }
 
+      // Convert target onchain ID to database UUID
+      const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
+
       // Update database in transaction
       await this.prisma.$transaction([
         // Update alliance status
@@ -266,8 +273,8 @@ export class AllianceHandler
         this.prisma.gameEvent.create({
           data: {
             eventType: "ALLIANCE_BREAK",
-            initiatorId: ctx.agentId.toString(),
-            targetId: action.targetId.toString(),
+            initiatorId: ctx.agentId,
+            targetId: targetId,
             message: `💔 The alliance shatters! @${initiator.profile.xHandle} breaks ties with @${target.profile.xHandle}!`,
             metadata: {
               reason: "voluntary_break",

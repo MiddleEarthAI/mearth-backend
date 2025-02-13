@@ -82,7 +82,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
         this.prisma.gameEvent.create({
           data: {
             eventType: "MOVE",
-            initiatorId: ctx.agentId.toString(),
+            initiatorId: ctx.agentId,
             message: `@${agent.profile.xHandle} ventures ${
               mapTile.terrainType === "mountain"
                 ? "into treacherous mountains"
