@@ -1,7 +1,7 @@
-import { ActionContext, IgnoreAction } from "@/types";
+import { ActionContext, ActionResult, IgnoreAction } from "@/types";
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
-import { ActionResult, ActionHandler } from "../types";
+import { ActionHandler } from "../types";
 import { gameConfig } from "@/config/env";
 import { stringToUuid } from "@/utils/uuid";
 
@@ -69,9 +69,6 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
         success: true,
         feedback: {
           isValid: true,
-          data: {
-            message: `Successfully ignoring @${targetAgent.profile.xHandle} for ${gameConfig.mechanics.cooldowns.ignore} seconds`,
-          },
         },
       };
     } catch (error) {

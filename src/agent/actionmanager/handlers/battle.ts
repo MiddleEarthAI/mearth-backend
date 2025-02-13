@@ -2,7 +2,7 @@ import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { ActionContext, BattleAction, ActionResult } from "@/types";
 import { MearthProgram } from "@/types";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import {
@@ -11,6 +11,12 @@ import {
   createBattleInitiationMessage,
 } from "@/utils/battle";
 import { logger } from "@/utils/logger";
+import { AgentAccount } from "@/types/program";
+import { stringToUuid } from "@/utils/uuid";
+
+type AgentWithProfile = Prisma.AgentGetPayload<{
+  include: { profile: true };
+}>;
 
 export class BattleHandler {
   constructor(
@@ -99,8 +105,8 @@ export class BattleHandler {
         defenderPda,
         attackerAccountData,
         defenderAccountData,
-        attackerAllyAccount,
-        defenderAllyAccount
+        attackerAllyAccount ?? undefined,
+        defenderAllyAccount ?? undefined
       );
 
       // Create battle record and event
@@ -144,10 +150,10 @@ export class BattleHandler {
   private async executeBattleTransaction(
     attackerPda: PublicKey,
     defenderPda: PublicKey,
-    attackerAccount: any,
-    defenderAccount: any,
-    attackerAlly?: any,
-    defenderAlly?: any
+    attackerAccount: AgentAccount,
+    defenderAccount: AgentAccount,
+    attackerAlly?: AgentAccount,
+    defenderAlly?: AgentAccount
   ): Promise<string> {
     if (attackerAlly && defenderAlly) {
       return this.program.methods
@@ -171,7 +177,7 @@ export class BattleHandler {
         .accounts({
           attacker: singlePda,
           allianceLeader: allianceLeaderPda,
-          alliancePartner: alliancePartnerPda ?? "",
+          alliancePartner: alliancePartnerPda!,
         })
         .rpc();
     }
@@ -192,10 +198,10 @@ export class BattleHandler {
     battleId: string,
     ctx: ActionContext,
     action: BattleAction,
-    attacker: any,
-    defender: any,
-    attackerAlly: any,
-    defenderAlly: any,
+    attacker: AgentWithProfile,
+    defender: AgentWithProfile,
+    attackerAlly: AgentAccount | null,
+    defenderAlly: AgentAccount | null,
     totalTokensAtStake: number,
     tx: string
   ) {
@@ -205,6 +211,9 @@ export class BattleHandler {
         : attackerAlly || defenderAlly
         ? "AgentVsAlliance"
         : "Simple";
+
+    // Convert onchain ID to database UUID for the target
+    const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
 
     await this.prisma.$transaction([
       this.prisma.battle.create({
@@ -224,8 +233,8 @@ export class BattleHandler {
       this.prisma.gameEvent.create({
         data: {
           eventType: "BATTLE",
-          initiatorId: ctx.agentId.toString(),
-          targetId: action.targetId.toString(),
+          initiatorId: ctx.agentId,
+          targetId: targetId,
           message: createBattleInitiationMessage(
             attacker.profile.xHandle,
             defender.profile.xHandle,

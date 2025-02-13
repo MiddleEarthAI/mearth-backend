@@ -83,7 +83,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
           data: {
             eventType: "MOVE",
             initiatorId: ctx.agentId.toString(),
-            message: `🚶 @${agent.profile.xHandle} ventures ${
+            message: `@${agent.profile.xHandle} ventures ${
               mapTile.terrainType === "mountain"
                 ? "into treacherous mountains"
                 : mapTile.terrainType === "river"
