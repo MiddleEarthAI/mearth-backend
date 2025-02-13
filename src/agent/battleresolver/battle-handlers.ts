@@ -1,7 +1,7 @@
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { PrismaClient } from "@prisma/client";
 import { PublicKey } from "@solana/web3.js";
-import { BattleParticipant } from "../types/battle";
+import { BattleParticipant } from "./types/battle";
 import { getAgentAta } from "@/utils/program";
 import { getAgentPDA } from "@/utils/pda";
 import * as anchor from "@coral-xyz/anchor";

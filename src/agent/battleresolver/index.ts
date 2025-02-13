@@ -8,16 +8,11 @@ import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import * as anchor from "@coral-xyz/anchor";
 import { PrismaClient } from "@prisma/client";
 import { GameManager } from "../GameManager";
-
-import { getAgentPDA, getGamePDA } from "@/utils/pda";
-
+import { getGamePDA } from "@/utils/pda";
 import { logger } from "@/utils/logger";
-import { SimpleBattleHandler } from "./handlers/simple";
-import { AgentVsAllianceHandler } from "./handlers/agentVsAlliance";
-import { AllianceVsAllianceHandler } from "./handlers/allianceVsAlliance";
+import { BattleHandlers } from "./battle-handlers";
 import { BattleGroup, BattleParticipant } from "./types/battle";
-import { groupAgentsInBattles } from "./utils/battle-organization";
-import { calculateBattleOutcome } from "./utils/battle-calculations";
+import { organizeBattles, calculateBattleOutcome } from "./battle-utils";
 import { BattleType } from "@prisma/client";
 
 /**
@@ -25,21 +20,14 @@ import { BattleType } from "@prisma/client";
  */
 export class BattleResolver {
   private resolutionInterval: NodeJS.Timeout | null = null;
-  private readonly simpleBattleHandler: SimpleBattleHandler;
-  private readonly agentVsAllianceHandler: AgentVsAllianceHandler;
-  private readonly allianceVsAllianceHandler: AllianceVsAllianceHandler;
+  private readonly battleHandlers: BattleHandlers;
 
   constructor(
     private readonly program: anchor.Program<MiddleEarthAiProgram>,
     private readonly prisma: PrismaClient,
     private readonly gameManager: GameManager
   ) {
-    this.simpleBattleHandler = new SimpleBattleHandler(program, prisma);
-    this.agentVsAllianceHandler = new AgentVsAllianceHandler(program, prisma);
-    this.allianceVsAllianceHandler = new AllianceVsAllianceHandler(
-      program,
-      prisma
-    );
+    this.battleHandlers = new BattleHandlers(program, prisma);
     logger.info("🎮 Battle Resolution Service initialized");
   }
 
@@ -86,7 +74,7 @@ export class BattleResolver {
       }
 
       const agents = game.agents.map((a) => a.account);
-      const battles = groupAgentsInBattles(agents, game.dbGame.onchainId);
+      const battles = organizeBattles(agents, game.dbGame.onchainId);
 
       logger.info("⚔️ Processing battles", {
         count: battles.length,
@@ -105,7 +93,7 @@ export class BattleResolver {
           } catch (error) {
             logger.error("❌ Failed to process battle", {
               error,
-              // battleId: battle.,
+              battleId: battle.id,
             });
           }
         })
@@ -140,10 +128,10 @@ export class BattleResolver {
       // Execute onchain battle resolution
       switch (battle.type) {
         case BattleType.Simple:
-          await this.simpleBattleHandler.handle(
+          await this.battleHandlers.handleSimpleBattle(
             gamePda,
-            battle.sideA[0],
-            battle.sideB[0],
+            sideAWins ? battle.sideA[0] : battle.sideB[0],
+            sideAWins ? battle.sideB[0] : battle.sideA[0],
             percentLoss
           );
           break;
@@ -154,7 +142,7 @@ export class BattleResolver {
               ? [battle.sideA[0], battle.sideB]
               : [battle.sideB[0], battle.sideA];
 
-          await this.agentVsAllianceHandler.handle(
+          await this.battleHandlers.handleAgentVsAlliance(
             gamePda,
             single,
             alliance[0],
@@ -165,7 +153,7 @@ export class BattleResolver {
           break;
 
         case BattleType.AllianceVsAlliance:
-          await this.allianceVsAllianceHandler.handle(
+          await this.battleHandlers.handleAllianceVsAlliance(
             gamePda,
             battle.sideA[0],
             battle.sideA[1],
@@ -187,7 +175,7 @@ export class BattleResolver {
     } catch (error) {
       logger.error("❌ Battle resolution failed", {
         error,
-        // battleId: battle.id,
+        battleId: battle.id,
       });
       throw error;
     }
@@ -249,16 +237,6 @@ export class BattleResolver {
           eventMetadata.battleType = "agent_vs_alliance";
         }
 
-        // Update battle record with winner
-        await prisma.battle.update({
-          where: { id: battleId },
-          data: {
-            status: "Resolved",
-            endTime: new Date(),
-            winnerId: winners[0].agent.id,
-          },
-        });
-
         // Create battle resolution event
         await prisma.gameEvent.create({
           data: {
@@ -267,6 +245,16 @@ export class BattleResolver {
             targetId: losers[0].agent.id,
             message: battleMessage,
             metadata: eventMetadata,
+          },
+        });
+
+        // Update battle status
+        await prisma.battle.update({
+          where: { id: battleId },
+          data: {
+            status: "Resolved",
+            endTime: new Date(),
+            winnerId: winners[0].agent.id,
           },
         });
 
@@ -307,37 +295,21 @@ export class BattleResolver {
                 },
               });
 
-              // Execute onchain death
-              const [gamePda] = getGamePDA(
-                this.program.programId,
-                game.onchainId
+              logger.info(
+                `Agent ${loserProfile.profile.xHandle} has fallen in battle`,
+                {
+                  type: "BATTLE_DEATH",
+                  agentId: loser.agent.id,
+                  gameId: game.id,
+                }
               );
-              const [agentPda] = getAgentPDA(
-                this.program.programId,
-                gamePda,
-                loser.agent.onchainId
-              );
-
-              await this.program.methods
-                .killAgent()
-                .accounts({
-                  agent: agentPda,
-                })
-                .rpc();
-
-              logger.info("Agent has fallen in battle", {
-                type: "BATTLE_DEATH",
-                agentId: loser.agent.id,
-                gameId: game.id,
-                handle: loserProfile.profile.xHandle,
-              });
             }
           })
         );
 
         // Create victory spoils event
         const tokensWon = winners.reduce(
-          (sum, winner) => sum + winner.agentAccount.tokenBalance.toNumber(),
+          (sum, winner) => sum + winner.tokenBalance,
           0
         );
 
@@ -364,7 +336,7 @@ export class BattleResolver {
         });
       });
     } catch (error) {
-      logger.error("❌ Failed to finalize battle", { error, battleId });
+      logger.error("❌ Failed to finalize battle", { error });
       throw error;
     }
   }

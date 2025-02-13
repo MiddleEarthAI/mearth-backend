@@ -1,4 +1,4 @@
-import { BattleGroup, BattleOutcome, BattleParticipant } from "../types/battle";
+import { BattleGroup, BattleOutcome, BattleParticipant } from "./types/battle";
 import { AgentAccount } from "@/types/program";
 import { generateBattleId } from "@/utils/battle";
 import { gameConfig } from "@/config/env";
