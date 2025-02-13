@@ -5,6 +5,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import { gameConfig } from "@/config/env";
 import { ActionHandler } from "../types";
+import { logger } from "@/utils/logger";
 
 export class MovementHandler implements ActionHandler<MoveAction> {
   constructor(
@@ -13,8 +14,9 @@ export class MovementHandler implements ActionHandler<MoveAction> {
   ) {}
 
   async handle(ctx: ActionContext, action: MoveAction): Promise<ActionResult> {
+    const timestamp = Date.now();
     try {
-      console.info(
+      logger.info(
         `Agent ${ctx.agentId} moving to (${action.position.x}, ${action.position.y})`
       );
 
@@ -44,60 +46,91 @@ export class MovementHandler implements ActionHandler<MoveAction> {
         throw new Error("Invalid map tile");
       }
 
-      // Execute movement onchain
-      const tx = await this.program.methods
-        .moveAgent(action.position.x, action.position.y, {
-          [mapTile.terrainType]: {},
-        })
-        .accountsStrict({
-          agent: agentPda,
-          game: gamePda,
-          authority: this.program.provider.publicKey,
-        })
-        .rpc();
-
-      // Update database in transaction
-      await this.prisma.$transaction([
-        // Update agent position
-        this.prisma.agent.update({
-          where: { id: ctx.agentId },
-          data: { mapTileId: mapTile.id },
-        }),
-        // Create cooldown
-        this.prisma.coolDown.create({
-          data: {
-            type: "Move",
-            endsAt: new Date(
-              Date.now() +
-                (mapTile.terrainType === "mountain"
-                  ? gameConfig.mechanics.cooldowns.movement * 2
-                  : gameConfig.mechanics.cooldowns.movement) *
-                  1000
-            ),
-            cooledAgentId: ctx.agentId,
-            gameId: ctx.gameId,
-          },
-        }),
-        // Create movement event
-        this.prisma.gameEvent.create({
-          data: {
-            eventType: "MOVE",
-            initiatorId: ctx.agentId,
-            message: `@${agent.profile.xHandle} ventures ${
-              mapTile.terrainType === "mountain"
-                ? "into treacherous mountains"
-                : mapTile.terrainType === "river"
-                ? "across rushing waters"
-                : "across the plains"
-            } at (${action.position.x}, ${action.position.y})`,
-            metadata: {
-              terrain: mapTile.terrainType,
-              position: { x: action.position.x, y: action.position.y },
-              agentHandle: agent.profile.xHandle,
+      // Perform all operations in a single transaction
+      const result = await this.prisma.$transaction(
+        async (prisma) => {
+          // Step 1: Update agent position
+          const updatedAgent = await prisma.agent.update({
+            where: { id: ctx.agentId },
+            data: {
+              mapTileId: mapTile.id,
             },
-          },
-        }),
-      ]);
+          });
+
+          // Step 2: Create cooldown
+          const cooldown = await prisma.coolDown.create({
+            data: {
+              type: "Move",
+              endsAt: new Date(
+                timestamp +
+                  (mapTile.terrainType === "mountain"
+                    ? gameConfig.mechanics.cooldowns.movement * 2
+                    : gameConfig.mechanics.cooldowns.movement) *
+                    1000
+              ),
+              cooledAgentId: ctx.agentId,
+              gameId: ctx.gameId,
+            },
+          });
+
+          // Step 3: Execute onchain movement
+          let tx: string;
+          try {
+            tx = await this.program.methods
+              .moveAgent(action.position.x, action.position.y, {
+                [mapTile.terrainType]: {},
+              })
+              .accountsStrict({
+                agent: agentPda,
+                game: gamePda,
+                authority: this.program.provider.publicKey,
+              })
+              .rpc();
+          } catch (error) {
+            // If onchain operation fails, log and throw to trigger rollback
+            logger.error("Onchain movement failed", {
+              error,
+              agentId: ctx.agentId,
+              position: action.position,
+            });
+            throw error;
+          }
+
+          // Step 4: Create movement event
+          const event = await prisma.gameEvent.create({
+            data: {
+              eventType: "MOVE",
+              initiatorId: ctx.agentId,
+              message: `@${agent.profile.xHandle} ventures ${
+                mapTile.terrainType === "mountain"
+                  ? "into treacherous mountains"
+                  : mapTile.terrainType === "river"
+                  ? "across rushing waters"
+                  : "across the plains"
+              } at (${action.position.x}, ${action.position.y})`,
+              metadata: {
+                terrain: mapTile.terrainType,
+                position: { x: action.position.x, y: action.position.y },
+                agentHandle: agent.profile.xHandle,
+                transactionHash: tx,
+                timestamp: new Date(timestamp).toISOString(),
+              },
+            },
+          });
+
+          return { agent: updatedAgent, cooldown, event, tx };
+        },
+        {
+          maxWait: 10000, // 10s max wait time
+          timeout: 30000, // 30s timeout
+        }
+      );
+
+      logger.info("Movement completed successfully", {
+        agentId: ctx.agentId,
+        position: action.position,
+        tx: result.tx,
+      });
 
       return {
         success: true,
@@ -106,7 +139,7 @@ export class MovementHandler implements ActionHandler<MoveAction> {
         },
       };
     } catch (error) {
-      console.error(`Movement failed for agent ${ctx.agentId}`, { error });
+      logger.error(`Movement failed for agent ${ctx.agentId}`, { error });
       return {
         success: false,
         feedback: {

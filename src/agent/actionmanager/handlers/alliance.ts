@@ -7,10 +7,10 @@ import {
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { ActionHandler } from "../types";
 import { stringToUuid } from "@/utils/uuid";
-
 import { gameConfig } from "@/config/env";
+import { ActionHandler } from "../types";
+import { logger } from "@/utils/logger";
 
 export class AllianceHandler
   implements ActionHandler<FormAllianceAction | BreakAllianceAction>
@@ -20,129 +20,127 @@ export class AllianceHandler
     private readonly prisma: PrismaClient
   ) {}
 
-  async handle(
-    ctx: ActionContext,
-    action: FormAllianceAction | BreakAllianceAction
-  ): Promise<ActionResult> {
-    return action.type === "FORM_ALLIANCE"
-      ? this.handleFormAlliance(ctx, action)
-      : this.handleBreakAlliance(ctx, action);
-  }
-
-  private async handleFormAlliance(
+  async handleFormAlliance(
     ctx: ActionContext,
     action: FormAllianceAction
   ): Promise<ActionResult> {
+    const timestamp = Date.now();
     try {
-      console.info("🤝 Processing ally request", {
-        initiatorId: ctx.agentId,
-        joinerId: action.targetId,
-      });
+      logger.info(
+        `Agent ${ctx.agentId} forming alliance with ${action.targetId}`
+      );
 
       // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
-      const [initiatorPda] = getAgentPDA(
+      const [agentPda] = getAgentPDA(
         this.program.programId,
         gamePda,
         ctx.agentOnchainId
       );
-      const [joinerPda] = getAgentPDA(
+      const [targetAgentPda] = getAgentPDA(
         this.program.programId,
         gamePda,
         action.targetId
       );
 
-      // Fetch accounts
-      const [initiatorAccount, joinerAccount] = await Promise.all([
-        this.program.account.agent.fetch(initiatorPda),
-        this.program.account.agent.fetch(joinerPda),
-      ]);
-
-      // Execute onchain alliance
-      const tx = await this.program.methods
-        .formAlliance()
-        .accounts({
-          initiator: initiatorPda,
-          targetAgent: joinerPda,
-        })
-        .rpc();
-
-      // Get database records
-      const [initiator, joiner] = await Promise.all([
+      // Get agents with profiles
+      const [initiator, target] = await Promise.all([
         this.prisma.agent.findUnique({
           where: { id: ctx.agentId },
           include: { profile: true },
         }),
         this.prisma.agent.findUnique({
-          where: {
-            onchainId_gameId: {
-              onchainId: action.targetId,
-              gameId: ctx.gameId,
-            },
-          },
+          where: { id: stringToUuid(action.targetId + ctx.gameOnchainId) },
           include: { profile: true },
         }),
       ]);
 
-      if (!initiator || !joiner) {
-        throw new Error("One or more agents not found in database");
+      if (!initiator || !target) {
+        throw new Error("Agent not found");
       }
 
-      // Convert target onchain ID to database UUID
-      const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
-
-      // Update database in transaction
-      await this.prisma.$transaction([
-        // Create alliance record
-        this.prisma.alliance.create({
-          data: {
-            combinedTokens: initiatorAccount.tokenBalance.add(
-              joinerAccount.tokenBalance
-            ),
-            gameId: ctx.gameId,
-            initiatorId: initiator.id,
-            joinerId: joiner.id,
-            status: "Active",
-            timestamp: new Date(),
-          },
-        }),
-        // Create cooldowns
-        this.prisma.coolDown.create({
-          data: {
-            type: "Alliance",
-            endsAt: new Date(
-              Date.now() + gameConfig.mechanics.cooldowns.newAlliance
-            ),
-            cooledAgentId: initiator.id,
-            gameId: ctx.gameId,
-          },
-        }),
-        this.prisma.coolDown.create({
-          data: {
-            type: "Alliance",
-            endsAt: new Date(
-              Date.now() + gameConfig.mechanics.cooldowns.newAlliance
-            ),
-            cooledAgentId: joiner.id,
-            gameId: ctx.gameId,
-          },
-        }),
-        // Create event
-        this.prisma.gameEvent.create({
-          data: {
-            eventType: "ALLIANCE_FORM",
-            initiatorId: ctx.agentId,
-            targetId: targetId,
-            message: `🤝 A powerful alliance forms between @${initiator.profile.xHandle} and @${joiner.profile.xHandle}!`,
-            metadata: {
-              allianceType: "formation",
-              timestamp: new Date().toISOString(),
-              initiatorHandle: initiator.profile.xHandle,
-              joinerHandle: joiner.profile.xHandle,
+      // Perform all operations in a single transaction
+      const result = await this.prisma.$transaction(
+        async (prisma) => {
+          // Step 1: Create alliance record
+          const alliance = await prisma.alliance.create({
+            data: {
+              status: "Pending",
+              initiatorId: ctx.agentId,
+              joinerId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              gameId: ctx.gameId,
             },
-          },
-        }),
-      ]);
+          });
+
+          // Step 2: Create cooldown
+          const cooldown = await prisma.coolDown.create({
+            data: {
+              type: "Alliance",
+              endsAt: new Date(
+                timestamp + gameConfig.mechanics.cooldowns.newAlliance * 1000
+              ),
+              cooledAgentId: ctx.agentId,
+              gameId: ctx.gameId,
+            },
+          });
+
+          // Step 3: Execute onchain alliance formation
+          let tx: string;
+          try {
+            tx = await this.program.methods
+              .formAlliance()
+              .accountsStrict({
+                initiator: agentPda,
+                targetAgent: targetAgentPda,
+                game: gamePda,
+                authority: this.program.provider.publicKey,
+              })
+              .rpc();
+          } catch (error) {
+            // If onchain operation fails, log and throw to trigger rollback
+            logger.error("Onchain alliance formation failed", {
+              error,
+              initiatorId: ctx.agentId,
+              targetId: action.targetId,
+            });
+            throw error;
+          }
+
+          // Step 4: Update alliance status
+          const updatedAlliance = await prisma.alliance.update({
+            where: { id: alliance.id },
+            data: { status: "Active" },
+          });
+
+          // Step 5: Create alliance event
+          const event = await prisma.gameEvent.create({
+            data: {
+              eventType: "ALLIANCE_FORM",
+              initiatorId: ctx.agentId,
+              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              message: `@${initiator.profile.xHandle} forms an alliance with @${target.profile.xHandle}`,
+              metadata: {
+                initiatorHandle: initiator.profile.xHandle,
+                targetHandle: target.profile.xHandle,
+                transactionHash: tx,
+                timestamp: new Date(timestamp).toISOString(),
+              },
+            },
+          });
+
+          return { alliance: updatedAlliance, cooldown, event, tx };
+        },
+        {
+          maxWait: 10000, // 10s max wait time
+          timeout: 30000, // 30s timeout
+        }
+      );
+
+      logger.info("Alliance formation completed successfully", {
+        initiatorId: ctx.agentId,
+        targetId: action.targetId,
+        tx: result.tx,
+      });
 
       return {
         success: true,
@@ -151,7 +149,9 @@ export class AllianceHandler
         },
       };
     } catch (error) {
-      console.error("Alliance formation failed", { error });
+      logger.error(`Alliance formation failed for agent ${ctx.agentId}`, {
+        error,
+      });
       return {
         success: false,
         feedback: {
@@ -166,125 +166,136 @@ export class AllianceHandler
     }
   }
 
-  private async handleBreakAlliance(
+  async handleBreakAlliance(
     ctx: ActionContext,
     action: BreakAllianceAction
   ): Promise<ActionResult> {
+    const timestamp = Date.now();
     try {
-      console.info("🔨 Processing alliance breaking action");
+      logger.info(
+        `Agent ${ctx.agentId} breaking alliance with ${action.targetId}`
+      );
 
       // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
-      const [initiatorPda] = getAgentPDA(
+      const [agentPda] = getAgentPDA(
         this.program.programId,
         gamePda,
         ctx.agentOnchainId
       );
-      const [targetPda] = getAgentPDA(
+      const [targetAgentPda] = getAgentPDA(
         this.program.programId,
         gamePda,
         action.targetId
       );
 
-      // Execute onchain break
-      const tx = await this.program.methods
-        .breakAlliance()
-        .accounts({
-          initiator: initiatorPda,
-          targetAgent: targetPda,
-        })
-        .rpc();
-
-      // Get database records
-      const [initiator, target, alliance] = await Promise.all([
+      // Get agents with profiles and existing alliance
+      const [initiator, target, existingAlliance] = await Promise.all([
         this.prisma.agent.findUnique({
           where: { id: ctx.agentId },
           include: { profile: true },
         }),
         this.prisma.agent.findUnique({
-          where: {
-            onchainId_gameId: {
-              onchainId: action.targetId,
-              gameId: ctx.gameId,
-            },
-          },
+          where: { id: stringToUuid(action.targetId + ctx.gameOnchainId) },
           include: { profile: true },
         }),
         this.prisma.alliance.findFirst({
           where: {
-            AND: [
+            OR: [
               {
-                OR: [
-                  {
-                    initiatorId: ctx.agentId,
-                    joinerId: action.targetId.toString(),
-                  },
-                  {
-                    initiatorId: action.targetId.toString(),
-                    joinerId: ctx.agentId,
-                  },
-                ],
+                initiatorId: ctx.agentId,
+                joinerId: stringToUuid(action.targetId + ctx.gameOnchainId),
               },
-              { status: "Active" },
+              {
+                initiatorId: stringToUuid(action.targetId + ctx.gameOnchainId),
+                joinerId: ctx.agentId,
+              },
             ],
+            status: "Active",
           },
         }),
       ]);
 
-      if (!initiator || !target || !alliance) {
-        throw new Error("Required records not found in database");
+      if (!initiator || !target) {
+        throw new Error("Agent not found");
       }
 
-      // Convert target onchain ID to database UUID
-      const targetId = stringToUuid(action.targetId + ctx.gameOnchainId);
+      if (!existingAlliance) {
+        throw new Error("No active alliance found between agents");
+      }
 
-      // Update database in transaction
-      await this.prisma.$transaction([
-        // Update alliance status
-        this.prisma.alliance.update({
-          where: { id: alliance.id },
-          data: {
-            status: "Broken",
-            endedAt: new Date(),
-          },
-        }),
-        // Create cooldowns
-        this.prisma.coolDown.create({
-          data: {
-            type: "Alliance",
-            endsAt: new Date(
-              Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000
-            ),
-            cooledAgentId: initiator.id,
-            gameId: ctx.gameId,
-          },
-        }),
-        this.prisma.coolDown.create({
-          data: {
-            type: "Alliance",
-            endsAt: new Date(
-              Date.now() + gameConfig.mechanics.cooldowns.newAlliance * 1000
-            ),
-            cooledAgentId: target.id,
-            gameId: ctx.gameId,
-          },
-        }),
-        // Create event
-        this.prisma.gameEvent.create({
-          data: {
-            eventType: "ALLIANCE_BREAK",
-            initiatorId: ctx.agentId,
-            targetId: targetId,
-            message: `💔 The alliance shatters! @${initiator.profile.xHandle} breaks ties with @${target.profile.xHandle}!`,
-            metadata: {
-              reason: "voluntary_break",
-              timestamp: new Date().toISOString(),
-              initiatorHandle: initiator.profile.xHandle,
-              targetHandle: target.profile.xHandle,
+      // Perform all operations in a single transaction
+      const result = await this.prisma.$transaction(
+        async (prisma) => {
+          // Step 1: Update alliance status
+          const updatedAlliance = await prisma.alliance.update({
+            where: { id: existingAlliance.id },
+            data: { status: "Broken" },
+          });
+
+          // Step 2: Create cooldown
+          const cooldown = await prisma.coolDown.create({
+            data: {
+              type: "Alliance",
+              endsAt: new Date(
+                timestamp + gameConfig.mechanics.cooldowns.newAlliance * 1000
+              ),
+              cooledAgentId: ctx.agentId,
+              gameId: ctx.gameId,
             },
-          },
-        }),
-      ]);
+          });
+
+          // Step 3: Execute onchain alliance break
+          let tx: string;
+          try {
+            tx = await this.program.methods
+              .breakAlliance()
+              .accountsStrict({
+                initiator: agentPda,
+                targetAgent: targetAgentPda,
+                game: gamePda,
+                authority: this.program.provider.publicKey,
+              })
+              .rpc();
+          } catch (error) {
+            // If onchain operation fails, log and throw to trigger rollback
+            logger.error("Onchain alliance break failed", {
+              error,
+              initiatorId: ctx.agentId,
+              targetId: action.targetId,
+            });
+            throw error;
+          }
+
+          // Step 4: Create alliance break event
+          const event = await prisma.gameEvent.create({
+            data: {
+              eventType: "ALLIANCE_BREAK",
+              initiatorId: ctx.agentId,
+              targetId: stringToUuid(action.targetId + ctx.gameOnchainId),
+              message: `@${initiator.profile.xHandle} breaks their alliance with @${target.profile.xHandle}`,
+              metadata: {
+                initiatorHandle: initiator.profile.xHandle,
+                targetHandle: target.profile.xHandle,
+                transactionHash: tx,
+                timestamp: new Date(timestamp).toISOString(),
+              },
+            },
+          });
+
+          return { alliance: updatedAlliance, cooldown, event, tx };
+        },
+        {
+          maxWait: 10000, // 10s max wait time
+          timeout: 30000, // 30s timeout
+        }
+      );
+
+      logger.info("Alliance break completed successfully", {
+        initiatorId: ctx.agentId,
+        targetId: action.targetId,
+        tx: result.tx,
+      });
 
       return {
         success: true,
@@ -293,7 +304,7 @@ export class AllianceHandler
         },
       };
     } catch (error) {
-      console.error("Alliance breaking failed", { error });
+      logger.error(`Alliance break failed for agent ${ctx.agentId}`, { error });
       return {
         success: false,
         feedback: {
@@ -305,6 +316,17 @@ export class AllianceHandler
           },
         },
       };
+    }
+  }
+
+  async handle(
+    ctx: ActionContext,
+    action: FormAllianceAction | BreakAllianceAction
+  ): Promise<ActionResult> {
+    if (action.type === "FORM_ALLIANCE") {
+      return this.handleFormAlliance(ctx, action);
+    } else {
+      return this.handleBreakAlliance(ctx, action);
     }
   }
 }
