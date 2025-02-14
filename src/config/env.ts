@@ -327,6 +327,9 @@ export const gameConfig = {
   dailyRewardTokens: env.DAILY_REWARD_TOKENS,
   maxRetries: env.MAX_RETRIES,
   mechanics: {
+    battle: {
+      duration: env.BATTLE_DURATION,
+    },
     tokenBurn: {
       min: env.TOKEN_BURN_MIN,
       max: env.TOKEN_BURN_MAX,
@@ -334,7 +337,6 @@ export const gameConfig = {
     deathChance: env.DEATH_CHANCE,
     cooldowns: {
       battle: env.BATTLE_COOLDOWN,
-      battleDuration: env.BATTLE_DURATION,
       movement: env.MOVE_COOLDOWN, // Base cooldown for movement
       battleAfterAlliance: env.BATTLE_AFTER_ALLIANCE_COOLDOWN,
       newAlliance: env.NEW_ALLIANCE_COOLDOWN,

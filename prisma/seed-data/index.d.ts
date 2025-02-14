@@ -89,7 +89,9 @@ export namespace $Enums {
   ALLIANCE_FORM: 'ALLIANCE_FORM',
   ALLIANCE_BREAK: 'ALLIANCE_BREAK',
   IGNORE: 'IGNORE',
-  BATTLE: 'BATTLE'
+  BATTLE_STARTED: 'BATTLE_STARTED',
+  BATTLE_RESOLVED: 'BATTLE_RESOLVED',
+  AGENT_DEATH: 'AGENT_DEATH'
 };
 
 export type EventType = (typeof EventType)[keyof typeof EventType]
@@ -18628,6 +18630,7 @@ export namespace Prisma {
 
   export type BattleWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    startTime_type?: BattleStartTimeTypeCompoundUniqueInput
     AND?: BattleWhereInput | BattleWhereInput[]
     OR?: BattleWhereInput[]
     NOT?: BattleWhereInput | BattleWhereInput[]
@@ -18648,7 +18651,7 @@ export namespace Prisma {
     attackerAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
     defenderAlly?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
     winner?: XOR<AgentNullableScalarRelationFilter, AgentWhereInput> | null
-  }, "id">
+  }, "id" | "startTime_type">
 
   export type BattleOrderByWithAggregationInput = {
     id?: SortOrder
@@ -20847,6 +20850,11 @@ export namespace Prisma {
     in?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBattleStatusFilter<$PrismaModel> | $Enums.BattleStatus
+  }
+
+  export type BattleStartTimeTypeCompoundUniqueInput = {
+    startTime: Date | string
+    type: $Enums.BattleType
   }
 
   export type BattleCountOrderByAggregateInput = {

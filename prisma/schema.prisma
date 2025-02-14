@@ -59,7 +59,9 @@ enum EventType {
   ALLIANCE_FORM
   ALLIANCE_BREAK
   IGNORE
-  BATTLE
+  BATTLE_STARTED
+  BATTLE_RESOLVED
+  AGENT_DEATH
 }
 
 model AgentProfile {
@@ -211,6 +213,8 @@ model Battle {
   // Winner reference
   winner   Agent?  @relation("winner", fields: [winnerId], references: [id])
   winnerId String?
+
+  @@unique([startTime, type])
 }
 
 enum BattleStatus {

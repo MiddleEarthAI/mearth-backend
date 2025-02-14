@@ -295,7 +295,9 @@ exports.EventType = exports.$Enums.EventType = {
   ALLIANCE_FORM: 'ALLIANCE_FORM',
   ALLIANCE_BREAK: 'ALLIANCE_BREAK',
   IGNORE: 'IGNORE',
-  BATTLE: 'BATTLE'
+  BATTLE_STARTED: 'BATTLE_STARTED',
+  BATTLE_RESOLVED: 'BATTLE_RESOLVED',
+  AGENT_DEATH: 'AGENT_DEATH'
 };
 
 exports.TerrainType = exports.$Enums.TerrainType = {

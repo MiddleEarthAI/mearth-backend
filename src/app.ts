@@ -219,7 +219,7 @@ export async function startServer() {
 
   const cache = new CacheManager();
 
-  const battleResolver = new BattleResolver(program, prisma, gameManager);
+  const battleResolver = new BattleResolver(program, prisma);
   const actionManager = new ActionManager(program, prisma);
 
   const orchestrator = new GameOrchestrator(

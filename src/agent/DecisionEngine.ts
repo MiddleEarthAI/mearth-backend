@@ -312,8 +312,8 @@ class DecisionEngine {
                   (alliance) =>
                     `with ${
                       alliance.joinerId === agentInfo.agent.id
-                        ? alliance.initiatorId
-                        : alliance.joinerId
+                        ? alliance.joiner.profile.xHandle
+                        : alliance.joiner.profile.xHandle
                     }`
                 )
                 .join(", ")}`
