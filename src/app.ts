@@ -3,7 +3,6 @@ import express from "express";
 import helmet from "helmet";
 import { defaultRateLimiter } from "@/middleware/rateLimiter";
 import { GameOrchestrator } from "@/agent/GameOrchestrator";
-import { BattleResolver } from "@/agent/battleResolver";
 import EventEmitter from "events";
 import CacheManager from "@/agent/CacheManager";
 import TwitterManager from "@/agent/TwitterManager";
@@ -146,6 +145,7 @@ app.use(
     },
   })
 );
+
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 // Route-specific rate limiting
@@ -219,7 +219,6 @@ export async function startServer() {
 
   const cache = new CacheManager();
 
-  const battleResolver = new BattleResolver(program, prisma);
   const actionManager = new ActionManager(program, prisma);
 
   const orchestrator = new GameOrchestrator(
@@ -230,8 +229,7 @@ export async function startServer() {
     cache,
     engine,
     prisma,
-    eventEmitter,
-    battleResolver
+    eventEmitter
   );
 
   try {

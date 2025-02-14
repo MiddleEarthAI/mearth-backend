@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/middle_earth_ai_program.json`.
  */
 export type MiddleEarthAiProgram = {
-  address: "HZSzpKJruUn16E5pEiyTGGK7hrdJg2n7mf71T9KpuRNd";
+  address: "J4CmuPzjKmGnqbwLyAuAkWJQq7dJvA2gViQg8D52HG19";
   metadata: {
     name: "middleEarthAiProgram";
     version: "0.1.0";
@@ -406,33 +406,6 @@ export type MiddleEarthAiProgram = {
       ];
     },
     {
-      name: "resetBattleTimes";
-      discriminator: [146, 108, 240, 41, 237, 80, 28, 102];
-      accounts: [
-        {
-          name: "agent1";
-          writable: true;
-        },
-        {
-          name: "agent2";
-          writable: true;
-        },
-        {
-          name: "agent3";
-          writable: true;
-        },
-        {
-          name: "agent4";
-          writable: true;
-        },
-        {
-          name: "authority";
-          signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
       name: "resolveBattleAgentVsAlliance";
       discriminator: [59, 240, 150, 171, 245, 203, 23, 134];
       accounts: [
@@ -705,92 +678,6 @@ export type MiddleEarthAiProgram = {
           type: "u64";
         }
       ];
-    },
-    {
-      name: "startBattleAgentVsAlliance";
-      docs: ["Starts a battle between an agent and an alliance."];
-      discriminator: [29, 18, 137, 62, 26, 102, 56, 46];
-      accounts: [
-        {
-          name: "attacker";
-          writable: true;
-        },
-        {
-          name: "allianceLeader";
-          writable: true;
-        },
-        {
-          name: "alliancePartner";
-          writable: true;
-        },
-        {
-          name: "game";
-          relations: ["attacker", "allianceLeader", "alliancePartner"];
-        },
-        {
-          name: "authority";
-          writable: true;
-          signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "startBattleAlliances";
-      docs: ["Starts a battle between two alliances."];
-      discriminator: [246, 90, 25, 201, 196, 166, 220, 54];
-      accounts: [
-        {
-          name: "leaderA";
-          writable: true;
-        },
-        {
-          name: "partnerA";
-          writable: true;
-        },
-        {
-          name: "leaderB";
-          writable: true;
-        },
-        {
-          name: "partnerB";
-          writable: true;
-        },
-        {
-          name: "game";
-          relations: ["leaderA", "partnerA", "leaderB", "partnerB"];
-        },
-        {
-          name: "authority";
-          writable: true;
-          signer: true;
-        }
-      ];
-      args: [];
-    },
-    {
-      name: "startBattleSimple";
-      discriminator: [32, 12, 65, 240, 219, 11, 225, 62];
-      accounts: [
-        {
-          name: "winner";
-          writable: true;
-        },
-        {
-          name: "loser";
-          writable: true;
-        },
-        {
-          name: "game";
-          relations: ["winner", "loser"];
-        },
-        {
-          name: "authority";
-          writable: true;
-          signer: true;
-        }
-      ];
-      args: [];
     },
     {
       name: "unstakeTokens";
@@ -1113,12 +1000,6 @@ export type MiddleEarthAiProgram = {
             type: "i64";
           },
           {
-            name: "currentBattleStart";
-            type: {
-              option: "i64";
-            };
-          },
-          {
             name: "allianceWith";
             type: {
               option: "pubkey";
@@ -1349,10 +1230,6 @@ export type MiddleEarthAiProgram = {
           {
             name: "lastUpdate";
             type: "i64";
-          },
-          {
-            name: "reentrancyGuard";
-            type: "bool";
           },
           {
             name: "bump";

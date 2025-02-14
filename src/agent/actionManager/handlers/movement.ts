@@ -5,7 +5,6 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import { gameConfig } from "@/config/env";
 import { ActionHandler } from "../types";
-import { logger } from "@/utils/logger";
 
 export class MovementHandler implements ActionHandler<MoveAction> {
   constructor(

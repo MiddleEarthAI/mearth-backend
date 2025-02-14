@@ -1,5 +1,5 @@
 export const mearthIdl = {
-  address: "HZSzpKJruUn16E5pEiyTGGK7hrdJg2n7mf71T9KpuRNd",
+  address: "J4CmuPzjKmGnqbwLyAuAkWJQq7dJvA2gViQg8D52HG19",
   metadata: {
     name: "middle_earth_ai_program",
     version: "0.1.0",
@@ -400,33 +400,6 @@ export const mearthIdl = {
       ],
     },
     {
-      name: "reset_battle_times",
-      discriminator: [146, 108, 240, 41, 237, 80, 28, 102],
-      accounts: [
-        {
-          name: "agent1",
-          writable: true,
-        },
-        {
-          name: "agent2",
-          writable: true,
-        },
-        {
-          name: "agent3",
-          writable: true,
-        },
-        {
-          name: "agent4",
-          writable: true,
-        },
-        {
-          name: "authority",
-          signer: true,
-        },
-      ],
-      args: [],
-    },
-    {
       name: "resolve_battle_agent_vs_alliance",
       discriminator: [59, 240, 150, 171, 245, 203, 23, 134],
       accounts: [
@@ -699,92 +672,6 @@ export const mearthIdl = {
           type: "u64",
         },
       ],
-    },
-    {
-      name: "start_battle_agent_vs_alliance",
-      docs: ["Starts a battle between an agent and an alliance."],
-      discriminator: [29, 18, 137, 62, 26, 102, 56, 46],
-      accounts: [
-        {
-          name: "attacker",
-          writable: true,
-        },
-        {
-          name: "alliance_leader",
-          writable: true,
-        },
-        {
-          name: "alliance_partner",
-          writable: true,
-        },
-        {
-          name: "game",
-          relations: ["attacker", "alliance_leader", "alliance_partner"],
-        },
-        {
-          name: "authority",
-          writable: true,
-          signer: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "start_battle_alliances",
-      docs: ["Starts a battle between two alliances."],
-      discriminator: [246, 90, 25, 201, 196, 166, 220, 54],
-      accounts: [
-        {
-          name: "leader_a",
-          writable: true,
-        },
-        {
-          name: "partner_a",
-          writable: true,
-        },
-        {
-          name: "leader_b",
-          writable: true,
-        },
-        {
-          name: "partner_b",
-          writable: true,
-        },
-        {
-          name: "game",
-          relations: ["leader_a", "partner_a", "leader_b", "partner_b"],
-        },
-        {
-          name: "authority",
-          writable: true,
-          signer: true,
-        },
-      ],
-      args: [],
-    },
-    {
-      name: "start_battle_simple",
-      discriminator: [32, 12, 65, 240, 219, 11, 225, 62],
-      accounts: [
-        {
-          name: "winner",
-          writable: true,
-        },
-        {
-          name: "loser",
-          writable: true,
-        },
-        {
-          name: "game",
-          relations: ["winner", "loser"],
-        },
-        {
-          name: "authority",
-          writable: true,
-          signer: true,
-        },
-      ],
-      args: [],
     },
     {
       name: "unstake_tokens",
@@ -1107,12 +994,6 @@ export const mearthIdl = {
             type: "i64",
           },
           {
-            name: "current_battle_start",
-            type: {
-              option: "i64",
-            },
-          },
-          {
             name: "alliance_with",
             type: {
               option: "pubkey",
@@ -1343,10 +1224,6 @@ export const mearthIdl = {
           {
             name: "last_update",
             type: "i64",
-          },
-          {
-            name: "reentrancy_guard",
-            type: "bool",
           },
           {
             name: "bump",

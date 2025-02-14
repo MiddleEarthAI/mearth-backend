@@ -5,7 +5,6 @@ import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
 import EventEmitter from "events";
-import { BattleResolver } from "@/agent/BattleResolver";
 import { ActionContext, GameAction } from "@/types";
 import {
   InitializationError,
@@ -41,8 +40,7 @@ export class GameOrchestrator {
     private readonly cache: CacheManager,
     private readonly engine: DecisionEngine,
     private readonly prisma: PrismaClient,
-    private readonly eventEmitter: EventEmitter,
-    private readonly battleResolver: BattleResolver
+    private readonly eventEmitter: EventEmitter
   ) {
     this.setupEventHandlers();
     this.setupErrorBoundary();
@@ -65,8 +63,6 @@ export class GameOrchestrator {
       this.isRunning = true;
       this.startCleanupLoop();
       this.startAgentActions_mainLoop();
-
-      await this.battleResolver.start();
 
       console.info("🚀 Game Orchestrator successfully started", {
         gameId: this.currentGameOnchainId,

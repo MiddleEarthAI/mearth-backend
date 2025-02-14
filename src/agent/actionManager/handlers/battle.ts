@@ -1,15 +1,9 @@
-import { PublicKey } from "@solana/web3.js";
 import { ActionContext, BattleAction, ActionResult } from "@/types";
 import { MearthProgram } from "@/types";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-
-import {
-  calculateTotalTokens,
-  createBattleInitiationMessage,
-} from "@/utils/battle";
-
-import { AgentAccount } from "@/types/program";
+import { calculateBattleOutcome } from "@/utils/battle";
+import { getAgentAta } from "@/utils/program";
 
 export class BattleHandler {
   constructor(
@@ -17,14 +11,10 @@ export class BattleHandler {
     private readonly prisma: PrismaClient
   ) {}
 
-  /**
-   * Handle battle initiation with validation
-   */
   async handle(
     ctx: ActionContext,
     action: BattleAction
   ): Promise<ActionResult> {
-    const timestamp = Date.now();
     try {
       console.info(
         `Agent ${ctx.agentId} initiating battle with ${action.targetId}`,
@@ -44,157 +34,196 @@ export class BattleHandler {
         action.targetId
       );
 
-      // First fetch the main accounts
+      // Get associated token accounts
+      const attackerAta = await getAgentAta(attackerPda);
+      const defenderAta = await getAgentAta(defenderPda);
+
       const [attackerAccountData, defenderAccountData] = await Promise.all([
         this.program.account.agent.fetch(attackerPda),
         this.program.account.agent.fetch(defenderPda),
       ]);
 
-      // Then fetch everything else
-      const [attacker, defender, attackerAllyAccount, defenderAllyAccount] =
-        await Promise.all([
-          this.prisma.agent.findUnique({
-            where: { id: ctx.agentId },
-            include: { profile: true },
-          }),
-          this.prisma.agent.findUnique({
-            where: {
-              onchainId_gameId: {
-                onchainId: action.targetId,
-                gameId: ctx.gameId,
-              },
+      const [
+        attackerRecord,
+        defenderRecord,
+        attackerAllyAccount,
+        defenderAllyAccount,
+      ] = await Promise.all([
+        this.prisma.agent.findUnique({
+          where: { id: ctx.agentId },
+          include: { profile: true },
+        }),
+        this.prisma.agent.findUnique({
+          where: {
+            onchainId_gameId: {
+              onchainId: action.targetId,
+              gameId: ctx.gameId,
             },
-            include: { profile: true },
-          }),
-          attackerAccountData?.allianceWith
-            ? this.program.account.agent.fetch(attackerAccountData.allianceWith)
-            : null,
-          defenderAccountData?.allianceWith
-            ? this.program.account.agent.fetch(defenderAccountData.allianceWith)
-            : null,
-        ]);
+          },
+          include: { profile: true },
+        }),
+        attackerAccountData.allianceWith
+          ? this.program.account.agent.fetch(attackerAccountData.allianceWith)
+          : null,
+        defenderAccountData.allianceWith
+          ? this.program.account.agent.fetch(defenderAccountData.allianceWith)
+          : null,
+      ]);
 
-      if (!attacker || !defender) {
-        throw new Error("One or more agents not found in database");
+      // Get ally ATAs if they exist
+      const [attackerAllyAta, defenderAllyAta] = await Promise.all([
+        attackerAccountData.allianceWith
+          ? getAgentAta(attackerAccountData.allianceWith)
+          : null,
+        defenderAccountData.allianceWith
+          ? getAgentAta(defenderAccountData.allianceWith)
+          : null,
+      ]);
+
+      if (!attackerRecord || !defenderRecord) {
+        throw new Error("One or more agents not found");
       }
 
-      // Calculate total tokens at stake
-      const totalTokensAtStake = calculateTotalTokens(
-        attackerAccountData,
-        defenderAccountData,
-        attackerAllyAccount,
-        defenderAllyAccount
-      );
+      const sideA = {
+        agent: attackerAccountData,
+        ally: attackerAllyAccount,
+      };
+      const sideB = {
+        agent: defenderAccountData,
+        ally: defenderAllyAccount,
+      };
 
-      // Perform all operations (both database and onchain) in a single transaction
-      const result = await this.prisma.$transaction(
-        async (prisma) => {
-          // Step 1: Create battle record
-          const battle = await prisma.battle.create({
-            data: {
-              type:
-                attackerAllyAccount && defenderAllyAccount
-                  ? "AllianceVsAlliance"
-                  : attackerAllyAccount || defenderAllyAccount
-                  ? "AgentVsAlliance"
-                  : "Simple",
-              status: "Active",
-              tokensStaked: parseInt(totalTokensAtStake.toString()),
-              gameId: ctx.gameId,
-              attackerId: attacker.id,
-              defenderId: defender.id,
-              attackerAllyId: attackerAllyAccount ? attacker.id : null,
-              defenderAllyId: defenderAllyAccount ? defender.id : null,
-              startTime: new Date(timestamp),
+      // Calculate battle outcome
+      const outcome = calculateBattleOutcome(sideA, sideB);
+
+      const battleType =
+        attackerAllyAccount && defenderAllyAccount
+          ? "AllianceVsAlliance"
+          : attackerAllyAccount || defenderAllyAccount
+          ? "AgentVsAlliance"
+          : "Simple";
+      const startTime = new Date();
+
+      // Execute everything in a transaction
+      await this.prisma.$transaction(async (prisma) => {
+        // Create battle record
+        const battle = await prisma.battle.create({
+          data: {
+            type: battleType,
+            status: "Resolved",
+            tokensStaked: Math.floor(outcome.totalTokensAtStake),
+            gameId: ctx.gameId,
+            attackerId: attackerRecord.id,
+            defenderId: defenderRecord.id,
+            attackerAllyId: attackerAllyAccount ? attackerRecord.id : null,
+            defenderAllyId: defenderAllyAccount ? defenderRecord.id : null,
+            startTime,
+            endTime: startTime,
+            winnerId:
+              outcome.winner === "sideA"
+                ? attackerRecord.id
+                : defenderRecord.id,
+          },
+        });
+
+        // Create battle event
+        const battleEvent = await prisma.gameEvent.create({
+          data: {
+            gameId: ctx.gameId,
+            eventType: "BATTLE",
+            initiatorId: ctx.agentId,
+            targetId: defenderRecord.id,
+            message: this.createBattleMessage(
+              attackerRecord.profile.xHandle,
+              defenderRecord.profile.xHandle,
+              outcome
+            ),
+            metadata: {
+              battleId: battle.id,
+              battleType: battleType,
+              tokensAtStake: outcome.totalTokensAtStake,
+              percentageLost: outcome.percentageLost,
+              winner: outcome.winner,
+              timestamp: new Date().toISOString(),
             },
-          });
+          },
+        });
 
-          // Step 2: Create battle event
-          const battleEvent = await prisma.gameEvent.create({
-            data: {
-              gameId: ctx.gameId,
-              eventType: "BATTLE_STARTED",
-              initiatorId: ctx.agentId,
-              message:
-                createBattleInitiationMessage(
-                  attacker.profile.xHandle,
-                  defender.profile.xHandle,
-                  totalTokensAtStake,
-                  attackerAllyAccount,
-                  defenderAllyAccount
-                ) ?? "",
-              metadata: {
-                toJSON: () => ({
-                  attackerHandle: attacker.profile.xHandle,
-                  defenderHandle: defender.profile.xHandle,
-                  tokensAtStake: totalTokensAtStake,
-                  attackerAlly: attackerAllyAccount,
-                  defenderAlly: defenderAllyAccount,
-                }),
-              },
-            },
-          });
+        // Execute onchain battle resolution
+        let tx: string;
 
-          // Step 3: Execute onchain transaction
-          let tx: string;
-          try {
-            tx = await this.executeBattleTransaction(
-              attackerPda,
-              defenderPda,
-              attackerAccountData,
-              defenderAccountData,
-              attackerAllyAccount ?? undefined,
-              defenderAllyAccount ?? undefined
-            );
-          } catch (error) {
-            // Log the error and update battle status to Cancelled
-            console.error("Onchain battle initiation failed", {
-              error,
-            });
-            await prisma.battle.update({
-              where: { id: battle.id },
-              data: {
-                status: "Cancelled",
-                endTime: new Date(),
-              },
-            });
-            throw error; // Re-throw to trigger transaction rollback
-          }
+        if (battleType === "AllianceVsAlliance") {
+          tx = await this.program.methods
+            .resolveBattleAllianceVsAlliance(
+              outcome.percentageLost,
+              outcome.winner === "sideA"
+            )
+            .accounts({
+              leaderA: attackerPda,
+              partnerA: attackerAccountData.allianceWith!,
+              leaderB: defenderPda,
+              partnerB: defenderAccountData.allianceWith!,
+              leaderAToken: attackerAta.address,
+              partnerAToken: attackerAllyAta?.address!,
+              leaderBToken: defenderAta.address,
+              partnerBToken: defenderAllyAta?.address!,
+              leaderAAuthority: this.program.provider.publicKey,
+              partnerAAuthority: this.program.provider.publicKey,
+              leaderBAuthority: this.program.provider.publicKey,
+              partnerBAuthority: this.program.provider.publicKey,
+            })
+            .rpc();
+        } else if (battleType === "AgentVsAlliance") {
+          const isAttackerSingle = !attackerAllyAccount;
+          tx = await this.program.methods
+            .resolveBattleAgentVsAlliance(
+              outcome.percentageLost,
+              isAttackerSingle
+                ? outcome.winner === "sideA"
+                : outcome.winner === "sideB"
+            )
+            .accounts({
+              singleAgent: isAttackerSingle ? attackerPda : defenderPda,
+              singleAgentToken: isAttackerSingle
+                ? attackerAta.address
+                : defenderAta.address,
+              allianceLeader: isAttackerSingle ? defenderPda : attackerPda,
+              allianceLeaderToken: isAttackerSingle
+                ? defenderAta.address
+                : attackerAta.address,
+              alliancePartner: isAttackerSingle
+                ? defenderAccountData.allianceWith!
+                : attackerAccountData.allianceWith!,
+              alliancePartnerToken: isAttackerSingle
+                ? attackerAllyAta?.address!
+                : defenderAllyAta?.address!,
+              singleAgentAuthority: this.program.provider.publicKey,
+              allianceLeaderAuthority: this.program.provider.publicKey,
+              alliancePartnerAuthority: this.program.provider.publicKey,
 
-          // step 4: update game event with tx hash
-          await prisma.gameEvent.update({
-            where: { id: battleEvent.id },
-            data: {
-              metadata: {
-                toJSON: () => ({
-                  ...(battleEvent.metadata as Record<string, any>),
-                  transactionHash: tx,
-                }),
-              },
-            },
-          });
-          // so we can get the onchain battle startime
-          const attackerAccount = await this.program.account.agent.fetch(
-            attackerPda
-          );
-          await prisma.battle.update({
-            where: { id: battle.id },
-            data: {
-              startTime: new Date(attackerAccount.battleStartTime),
-            },
-          });
-
-          return { battle, tx };
-        },
-        {
-          maxWait: 10000, // 10s max wait time
-          timeout: 60000, // 60s timeout
+              authority: this.program.provider.publicKey,
+            })
+            .rpc();
+        } else {
+          tx = await this.program.methods
+            .resolveBattleSimple(outcome.percentageLost)
+            .accounts({
+              winner: outcome.winner === "sideA" ? attackerPda : defenderPda,
+              loser: outcome.winner === "sideA" ? defenderPda : attackerPda,
+              winnerToken:
+                outcome.winner === "sideA"
+                  ? attackerAta.address
+                  : defenderAta.address,
+              loserToken:
+                outcome.winner === "sideA"
+                  ? defenderAta.address
+                  : attackerAta.address,
+              loserAuthority: this.program.provider.publicKey,
+            })
+            .rpc();
         }
-      );
 
-      console.info("Battle initiated successfully", {
-        battleId: result.battle.id,
-        tx: result.tx,
+        return { battle, battleEvent, tx };
       });
 
       return {
@@ -204,7 +233,7 @@ export class BattleHandler {
         },
       };
     } catch (error) {
-      console.error("💥 Battle initiation failed", { error, ctx, action });
+      console.error("💥 Battle failed", { error, ctx, action });
       return {
         success: false,
         feedback: {
@@ -219,50 +248,18 @@ export class BattleHandler {
     }
   }
 
-  /**
-   * Execute the appropriate battle transaction based on participant types
-   */
-  private async executeBattleTransaction(
-    attackerPda: PublicKey,
-    defenderPda: PublicKey,
-    attackerAccount: AgentAccount,
-    defenderAccount: AgentAccount,
-    attackerAlly?: AgentAccount,
-    defenderAlly?: AgentAccount
-  ): Promise<string> {
-    if (attackerAlly && defenderAlly) {
-      return this.program.methods
-        .startBattleAlliances()
-        .accounts({
-          leaderA: attackerPda,
-          partnerA: attackerAccount.allianceWith!,
-          leaderB: defenderPda,
-          partnerB: defenderAccount.allianceWith!,
-        })
-        .rpc();
+  private createBattleMessage(
+    attackerHandle: string,
+    defenderHandle: string,
+    outcome: {
+      winner: "sideA" | "sideB";
+      percentageLost: number;
+      totalTokensAtStake: number;
     }
+  ): string {
+    const winner = outcome.winner === "sideA" ? attackerHandle : defenderHandle;
+    const loser = outcome.winner === "sideA" ? defenderHandle : attackerHandle;
 
-    if (attackerAlly || defenderAlly) {
-      const [singlePda, allianceLeaderPda, alliancePartnerPda] = attackerAlly
-        ? [defenderPda, attackerPda, attackerAccount.allianceWith]
-        : [attackerPda, defenderPda, defenderAccount.allianceWith];
-
-      return this.program.methods
-        .startBattleAgentVsAlliance()
-        .accounts({
-          attacker: singlePda,
-          allianceLeader: allianceLeaderPda,
-          alliancePartner: alliancePartnerPda!,
-        })
-        .rpc();
-    }
-
-    return this.program.methods
-      .startBattleSimple()
-      .accounts({
-        winner: attackerPda,
-        loser: defenderPda,
-      })
-      .rpc();
+    return `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of ${outcome.totalTokensAtStake} tokens lost in the clash!`;
   }
 }

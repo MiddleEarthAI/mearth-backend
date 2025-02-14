@@ -34,19 +34,39 @@ export interface AgentInfo {
 }
 
 export interface AgentAccount {
-  game: PublicKey;
-  authority: PublicKey;
-  id: BN;
-  x: BN;
-  y: BN;
-  isAlive: boolean;
-  lastMove: BN;
-  lastBattle: BN;
-  currentBattleStart: BN | null;
-  allianceWith: PublicKey | null;
-  tokenBalance: BN;
+  // Basic references
+  game: PublicKey; // The Game this Agent belongs to
+  authority: PublicKey; // Who can control this Agent
+  id: BN; // Unique Agent ID
+
+  // Position and state
+  x: BN; // X coordinate
+  y: BN; // Y coordinate
+  isAlive: boolean; // Whether Agent is alive
+  lastMove: BN; // Timestamp of last movement
+  lastBattle: BN; // Timestamp of last battle
+
+  // Alliance/ignore info
+  allianceWith: PublicKey | null; // ID of agent allied with
+  allianceTimestamp: BN; // When alliance was formed
+  lastAllianceAgent: PublicKey | null; // Pubkey of the last allied agent
+  lastAllianceBroken: BN; // When last alliance was broken
+
+  // Token/staking info
+  tokenBalance: BN; // Deprecated if querying real-time vault balance
+  stakedBalance: BN; // Total tokens staked
+  lastRewardClaim: BN; // Last reward claim timestamp
+  totalShares: BN; // Total shares representing staking pool ownership
+
+  // Action timestamps
+  lastAttack: BN;
+  lastIgnore: BN;
+  lastAlliance: BN;
   nextMoveTime: BN;
-  vaultBump: number;
+  battleStartTime: BN | null; // Store battle start time (null if not in battle)
+
+  // PDA-related info
+  vaultBump: number; // Bump seed for the PDA representing the agent's vault
 }
 
 export interface StakeInfo {

@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "EventType" AS ENUM ('TWEET', 'MOVE', 'ALLIANCE_FORM', 'ALLIANCE_BREAK', 'IGNORE', 'BATTLE');
+CREATE TYPE "EventType" AS ENUM ('TWEET', 'MOVE', 'ALLIANCE_FORM', 'ALLIANCE_BREAK', 'IGNORE', 'BATTLE', 'AGENT_DEATH');
 
 -- CreateEnum
 CREATE TYPE "AllianceStatus" AS ENUM ('Active', 'Pending', 'Broken');
@@ -227,6 +227,9 @@ CREATE UNIQUE INDEX "MapTile_x_y_key" ON "MapTile"("x", "y");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Alliance_initiatorId_joinerId_key" ON "Alliance"("initiatorId", "joinerId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Battle_startTime_type_key" ON "Battle"("startTime", "type");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_privyUserId_key" ON "User"("privyUserId");
