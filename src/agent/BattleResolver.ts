@@ -299,7 +299,7 @@ export class BattleResolver {
 
     return {
       sideAWins: finalProbability > 0.5,
-      percentLoss: Math.min(percentLoss, 50), // Cap at 50%
+      percentLoss: Math.min(percentLoss, 30), // Cap at 30%
     };
   }
 

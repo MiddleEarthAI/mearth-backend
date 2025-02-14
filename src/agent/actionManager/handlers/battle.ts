@@ -11,10 +11,6 @@ import {
 
 import { AgentAccount } from "@/types/program";
 
-type AgentWithProfile = Prisma.AgentGetPayload<{
-  include: { profile: true };
-}>;
-
 export class BattleHandler {
   constructor(
     private readonly program: MearthProgram,
@@ -117,7 +113,7 @@ export class BattleHandler {
           const battleEvent = await prisma.gameEvent.create({
             data: {
               gameId: ctx.gameId,
-              eventType: "BATTLE",
+              eventType: "BATTLE_STARTED",
               initiatorId: ctx.agentId,
               message:
                 createBattleInitiationMessage(
@@ -175,6 +171,16 @@ export class BattleHandler {
                   transactionHash: tx,
                 }),
               },
+            },
+          });
+          // so we can get the onchain battle startime
+          const attackerAccount = await this.program.account.agent.fetch(
+            attackerPda
+          );
+          await prisma.battle.update({
+            where: { id: battle.id },
+            data: {
+              startTime: new Date(attackerAccount.battleStartTime),
             },
           });
 

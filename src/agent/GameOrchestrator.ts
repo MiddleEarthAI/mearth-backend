@@ -5,7 +5,7 @@ import TwitterManager, { AgentId } from "@/agent/TwitterManager";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import CacheManager from "@/agent/CacheManager";
 import EventEmitter from "events";
-import { BattleResolver } from "./battleResolver";
+import { BattleResolver } from "@/agent/BattleResolver";
 import { ActionContext, GameAction } from "@/types";
 import {
   InitializationError,
