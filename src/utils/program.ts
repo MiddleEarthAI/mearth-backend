@@ -6,13 +6,16 @@ import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { solanaConfig } from "@/config/env";
 
-export async function getProgram() {
-  const conn = connection();
-  const program = new anchor.Program(mearthIdl as MiddleEarthAiProgram, {
-    connection: conn,
-  });
-  return program;
-}
+// export async function getProgram() {
+//   const conn = connection();
+//   // const authorityWallet = await getMiddleEarthAiAuthorityWallet();
+
+//   const program = new anchor.Program(mearthIdl as MiddleEarthAiProgram, {
+//     connection: conn,
+//   });
+
+//   return program;
+// }
 
 export async function getMiddleEarthAiAuthorityWallet() {
   const privateKeyString = solanaConfig.middleEarthAiAuthorityPrivateKey;
@@ -27,35 +30,34 @@ export async function getMiddleEarthAiAuthorityWallet() {
   };
 }
 
-// export async function getProgramWithWallet() {
-//   // Validate environment variables
-//   const rpcUrl = solanaConfig.rpcUrl;
+export async function getProgram() {
+  // Validate environment variables
+  const rpcUrl = solanaConfig.rpcUrl;
 
-//   if (!rpcUrl) {
-//     throw new Error("Missing required environment variables: SOLANA_RPC_URL");
-//   }
-//   const connection = new Connection(rpcUrl, {
-//     commitment: "confirmed",
-//     confirmTransactionInitialTimeout: 120000, // 2 minutes
-//   });
+  if (!rpcUrl) {
+    throw new Error("Missing required environment variables: SOLANA_RPC_URL");
+  }
+  const connection = new Connection(rpcUrl, {
+    commitment: "confirmed",
+  });
 
-//   const authorityWallet = await getMiddleEarthAiAuthorityWallet();
+  const authorityWallet = await getMiddleEarthAiAuthorityWallet();
 
-//   const provider = new anchor.AnchorProvider(
-//     connection,
-//     authorityWallet.wallet,
-//     {
-//       commitment: "confirmed",
-//     }
-//   );
+  const provider = new anchor.AnchorProvider(
+    connection,
+    authorityWallet.wallet,
+    {
+      commitment: "confirmed",
+    }
+  );
 
-//   const program = new anchor.Program(
-//     mearthIdl as MiddleEarthAiProgram,
-//     provider
-//   );
+  const program = new anchor.Program(
+    mearthIdl as MiddleEarthAiProgram,
+    provider
+  );
 
-//   return program;
-// }
+  return program;
+}
 
 export async function getAgentAuthorityAta(agentOnchainId: number) {
   const mearthTokenMint = solanaConfig.tokenMint;

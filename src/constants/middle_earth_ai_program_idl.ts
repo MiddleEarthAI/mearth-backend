@@ -1,5 +1,5 @@
 export const mearthIdl = {
-  address: "J4CmuPzjKmGnqbwLyAuAkWJQq7dJvA2gViQg8D52HG19",
+  address: "8nSSZdZ2FEY3ShuPm5pLBLm2Ta1uvjj8HoRuyiGiUtJ9",
   metadata: {
     name: "middle_earth_ai_program",
     version: "0.1.0",

@@ -230,60 +230,57 @@ export class GameOrchestrator {
 
       // if action is successful, post a tweet
       if (result.success) {
-        const tweet = await this.twitter.postTweet(
-          data.actionContext.agentOnchainId.toString() as AgentId,
-          `${getTwitterUserNameByAgentId(
-            data.actionContext.agentOnchainId.toString() as AgentId
-          )} => ${data.action.tweet}`
-        );
-
-        if (tweet?.data?.id) {
-          const tweetRecord = await this.prisma.tweet.create({
-            data: {
-              id: tweet.data.id,
-              conversationId: tweet.data.id,
-              agentId: data.actionContext.agentId,
-              content: data.action.tweet,
-              type: data.action.type,
-              timestamp: new Date(),
-            },
-            include: {
-              agent: {
-                select: {
-                  profile: {
-                    select: {
-                      name: true,
-                      xHandle: true,
-                    },
-                  },
-                },
-              },
-            },
-          });
-
-          await this.prisma.gameEvent.create({
-            data: {
-              gameId: data.actionContext.gameId,
-              eventType: "TWEET",
-              initiatorId: data.actionContext.agentId,
-              message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/${tweetRecord.agent.profile.xHandle}/status/${tweet.data.id}`,
-              metadata: {
-                toJSON: () => ({
-                  tweetId: tweet.data.id,
-                  actionType: data.action.type,
-                  timestamp: new Date().toISOString(),
-                  content: data.action.tweet,
-                }),
-              },
-            },
-          });
-        }
-
-        console.info("✅ Action successfully processed", {
-          gameId: this.currentGameOnchainId,
-          agentId: data.actionContext.agentId,
-          actionType: data.action.type,
-        });
+        // const tweet = await this.twitter.postTweet(
+        //   data.actionContext.agentOnchainId.toString() as AgentId,
+        //   `${getTwitterUserNameByAgentId(
+        //     data.actionContext.agentOnchainId.toString() as AgentId
+        //   )} => ${data.action.tweet}`
+        // );
+        // if (tweet?.data?.id) {
+        //   const tweetRecord = await this.prisma.tweet.create({
+        //     data: {
+        //       id: tweet.data.id,
+        //       conversationId: tweet.data.id,
+        //       agentId: data.actionContext.agentId,
+        //       content: data.action.tweet,
+        //       type: data.action.type,
+        //       timestamp: new Date(),
+        //     },
+        //     include: {
+        //       agent: {
+        //         select: {
+        //           profile: {
+        //             select: {
+        //               name: true,
+        //               xHandle: true,
+        //             },
+        //           },
+        //         },
+        //       },
+        //     },
+        //   });
+        //   await this.prisma.gameEvent.create({
+        //     data: {
+        //       gameId: data.actionContext.gameId,
+        //       eventType: "TWEET",
+        //       initiatorId: data.actionContext.agentId,
+        //       message: `${tweetRecord.agent.profile.xHandle} posted https://x.com/${tweetRecord.agent.profile.xHandle}/status/${tweet.data.id}`,
+        //       metadata: {
+        //         toJSON: () => ({
+        //           tweetId: tweet.data.id,
+        //           actionType: data.action.type,
+        //           timestamp: new Date().toISOString(),
+        //           content: data.action.tweet,
+        //         }),
+        //       },
+        //     },
+        //   });
+        // }
+        // console.info("✅ Action successfully processed", {
+        //   gameId: this.currentGameOnchainId,
+        //   agentId: data.actionContext.agentId,
+        //   actionType: data.action.type,
+        // });
       }
 
       // TODO: remove this after testing

@@ -18,6 +18,7 @@ model Game {
   id                String   @id @default(uuid())
   onchainId         Int      @unique
   authority         String
+  pda               String
   tokenMint         String
   rewardsVault      String
   mapDiameter       Int      @db.Integer
@@ -84,6 +85,7 @@ model Agent {
   onchainId                       Int
   authority                       String
   authorityAssociatedTokenAddress String
+  pda                             String
   tweets                          Tweet[]
   game                            Game       @relation(fields: [gameId], references: [id])
   gameId                          String

@@ -5,7 +5,7 @@ import { Program } from "@coral-xyz/anchor";
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
 import {
   getAgentAuthorityAta,
@@ -212,6 +212,7 @@ export class GameManager implements IGameManager {
 
           const dbGame = await this.prisma.game.create({
             data: {
+              pda: gamePda.toString(),
               onchainId: nextGameId,
               authority: gameAuthWallet.keypair.publicKey.toString(),
               tokenMint: solanaConfig.tokenMint,
@@ -302,9 +303,11 @@ export class GameManager implements IGameManager {
             new BN(spawnTile.y),
             profile.name
           )
-          .accounts({
+          .accountsStrict({
             game: gamePda,
             agent: agentPda,
+            authority: agentAuthKeypair.publicKey,
+            systemProgram: SystemProgram.programId,
           })
           .signers([agentAuthKeypair])
           .rpc();
@@ -316,6 +319,7 @@ export class GameManager implements IGameManager {
         const agentDb = await this.prisma.agent.create({
           data: {
             onchainId: profile.onchainId,
+            pda: agentPda.toString(),
             gameId: dbGame.id,
             mapTileId: spawnTile.id,
             profileId: profile.id,

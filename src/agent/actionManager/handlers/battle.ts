@@ -5,6 +5,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { calculateBattleOutcome } from "@/utils/battle";
 import {
   getAgentAuthorityAta,
+  getAgentAuthorityKeypair,
   getMiddleEarthAiAuthorityWallet,
 } from "@/utils/program";
 
@@ -78,6 +79,7 @@ export class BattleHandler {
                   gameId: ctx.gameId,
                 },
               },
+              include: { profile: true },
             })
           : null,
         defenderAllyAccount
@@ -88,6 +90,7 @@ export class BattleHandler {
                   gameId: ctx.gameId,
                 },
               },
+              include: { profile: true },
             })
           : null,
       ]);
@@ -114,9 +117,18 @@ export class BattleHandler {
           : attackerAllyAccount || defenderAllyAccount
           ? "AgentVsAlliance"
           : "Simple";
+
+      console.info(`Battle type: ${battleType}`);
       const startTime = new Date();
 
       const gameAuthorityWallet = await getMiddleEarthAiAuthorityWallet();
+
+      const attackerAuthorityKeypair = await getAgentAuthorityKeypair(
+        attackerRecord.profile.onchainId
+      );
+      const defenderAuthorityKeypair = await getAgentAuthorityKeypair(
+        defenderRecord.profile.onchainId
+      );
 
       // Execute everything in a transaction
       await this.prisma.$transaction(async (prisma) => {
@@ -171,6 +183,13 @@ export class BattleHandler {
             throw new Error("Could not find the alliance records");
           }
 
+          const attackerAllyAuthority = await getAgentAuthorityKeypair(
+            attackerAllyRecord.profile.onchainId
+          );
+          const defenderAllyAuthority = await getAgentAuthorityKeypair(
+            defenderAllyRecord.profile.onchainId
+          );
+
           const isAttackerWinner = outcome.winner === "sideA";
           tx = await this.program.methods
             .resolveBattleAllianceVsAlliance(
@@ -178,50 +197,76 @@ export class BattleHandler {
               isAttackerWinner
             )
             .accounts({
-              leaderA: attackerPda,
-              partnerA: attackerAccountData.allianceWith!,
-              leaderB: defenderPda,
-              partnerB: defenderAccountData.allianceWith!,
-              leaderAToken: attackerRecord?.authorityAssociatedTokenAddress,
-              partnerAToken:
-                attackerAllyRecord?.authorityAssociatedTokenAddress,
-              leaderBToken: defenderRecord?.authorityAssociatedTokenAddress,
-              partnerBToken:
-                defenderAllyRecord?.authorityAssociatedTokenAddress,
-              leaderAAuthority: attackerRecord.authority,
-              partnerAAuthority: attackerAllyRecord?.authority,
-              leaderBAuthority: defenderRecord.authority,
-              partnerBAuthority: defenderAllyRecord?.authority,
+              leaderA: isAttackerWinner ? attackerPda : defenderPda,
+              partnerA: isAttackerWinner
+                ? attackerAccountData.allianceWith!
+                : defenderAccountData.allianceWith!,
+              leaderB: isAttackerWinner ? defenderPda : attackerPda,
+              partnerB: isAttackerWinner
+                ? defenderAccountData.allianceWith!
+                : attackerAccountData.allianceWith!,
+              leaderAToken: isAttackerWinner
+                ? attackerRecord?.authorityAssociatedTokenAddress
+                : defenderRecord?.authorityAssociatedTokenAddress,
+              partnerAToken: isAttackerWinner
+                ? attackerAllyRecord?.authorityAssociatedTokenAddress
+                : defenderAllyRecord?.authorityAssociatedTokenAddress,
+              leaderBToken: isAttackerWinner
+                ? defenderRecord?.authorityAssociatedTokenAddress
+                : attackerRecord?.authorityAssociatedTokenAddress,
+              partnerBToken: isAttackerWinner
+                ? defenderAllyRecord?.authorityAssociatedTokenAddress
+                : attackerAllyRecord?.authorityAssociatedTokenAddress,
+              leaderAAuthority: isAttackerWinner
+                ? attackerAuthorityKeypair.publicKey
+                : defenderAuthorityKeypair.publicKey,
+              partnerAAuthority: isAttackerWinner
+                ? attackerAllyAuthority.publicKey
+                : defenderAllyAuthority.publicKey,
+              leaderBAuthority: isAttackerWinner
+                ? defenderAuthorityKeypair.publicKey
+                : attackerAuthorityKeypair.publicKey,
+              partnerBAuthority: isAttackerWinner
+                ? defenderAllyAuthority.publicKey
+                : attackerAllyAuthority.publicKey,
+              authority: gameAuthorityWallet.keypair.publicKey,
             })
-            .signers([gameAuthorityWallet.keypair])
+            .signers([
+              attackerAuthorityKeypair,
+              defenderAuthorityKeypair,
+              attackerAllyAuthority,
+              defenderAllyAuthority,
+              gameAuthorityWallet.keypair,
+            ])
             .rpc();
         } else if (battleType === "AgentVsAlliance") {
           const isAttackerSingle = !attackerAllyAccount;
 
           const singleAgent = isAttackerSingle ? attackerPda : defenderPda;
+
           const singleAgentToken = isAttackerSingle
             ? attackerRecord.authorityAssociatedTokenAddress
             : defenderRecord.authorityAssociatedTokenAddress;
-          const singleAgentAuthority = isAttackerSingle
-            ? attackerRecord.authority
-            : defenderRecord.authority;
+          const singleAgentAuthorityKeypair = isAttackerSingle
+            ? attackerAuthorityKeypair
+            : defenderAuthorityKeypair;
+          const allianceLeaderAuthorityKeypair = isAttackerSingle
+            ? defenderAuthorityKeypair
+            : attackerAuthorityKeypair;
+          const alliancePartnerAuthorityKeypair = isAttackerSingle
+            ? attackerAuthorityKeypair
+            : defenderAuthorityKeypair;
           const allianceLeader = isAttackerSingle ? defenderPda : attackerPda;
           const alliancePartner = isAttackerSingle
-            ? attackerAccountData.allianceWith!
-            : defenderAccountData.allianceWith!;
+            ? defenderAccountData.allianceWith!
+            : attackerAccountData.allianceWith!;
 
           const allianceLeaderToken = isAttackerSingle
             ? defenderRecord.authorityAssociatedTokenAddress
             : attackerRecord.authorityAssociatedTokenAddress;
           const alliancePartnerToken = isAttackerSingle
-            ? attackerAllyRecord?.authorityAssociatedTokenAddress!
-            : defenderAllyRecord?.authorityAssociatedTokenAddress!;
-          const allianceLeaderAuthority = isAttackerSingle
-            ? defenderRecord.authority
-            : attackerRecord.authority;
-          const alliancePartnerAuthority = isAttackerSingle
-            ? attackerRecord.authority
-            : defenderRecord.authority;
+            ? defenderAllyRecord?.authorityAssociatedTokenAddress!
+            : attackerAllyRecord?.authorityAssociatedTokenAddress!;
 
           tx = await this.program.methods
             .resolveBattleAgentVsAlliance(
@@ -237,13 +282,19 @@ export class BattleHandler {
               allianceLeaderToken: allianceLeaderToken,
               alliancePartner: alliancePartner,
               alliancePartnerToken: alliancePartnerToken,
-              singleAgentAuthority: singleAgentAuthority,
-              allianceLeaderAuthority: allianceLeaderAuthority,
-              alliancePartnerAuthority: alliancePartnerAuthority,
+              singleAgentAuthority: singleAgentAuthorityKeypair.publicKey,
+              allianceLeaderAuthority: allianceLeaderAuthorityKeypair.publicKey,
+              alliancePartnerAuthority:
+                alliancePartnerAuthorityKeypair.publicKey,
 
               authority: gameAuthorityWallet.keypair.publicKey,
             })
-            .signers([gameAuthorityWallet.keypair])
+            .signers([
+              gameAuthorityWallet.keypair,
+              singleAgentAuthorityKeypair,
+              allianceLeaderAuthorityKeypair,
+              alliancePartnerAuthorityKeypair,
+            ])
             .rpc();
         } else {
           const isAttackerWinner = outcome.winner === "sideA";
@@ -259,10 +310,17 @@ export class BattleHandler {
                 ? defenderRecord.authorityAssociatedTokenAddress
                 : attackerRecord.authorityAssociatedTokenAddress,
               loserAuthority: isAttackerWinner
-                ? defenderRecord.authority
-                : attackerRecord.authority,
+                ? defenderAuthorityKeypair.publicKey
+                : attackerAuthorityKeypair.publicKey,
+              authority: gameAuthorityWallet.keypair.publicKey,
             })
-            .signers([gameAuthorityWallet.keypair])
+            .signers([
+              gameAuthorityWallet.keypair,
+              // the loser authority keypair
+              isAttackerWinner
+                ? defenderAuthorityKeypair
+                : attackerAuthorityKeypair,
+            ])
             .rpc();
         }
 

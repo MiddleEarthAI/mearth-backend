@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/middle_earth_ai_program.json`.
  */
 export type MiddleEarthAiProgram = {
-  address: "J4CmuPzjKmGnqbwLyAuAkWJQq7dJvA2gViQg8D52HG19";
+  address: "8nSSZdZ2FEY3ShuPm5pLBLm2Ta1uvjj8HoRuyiGiUtJ9";
   metadata: {
     name: "middleEarthAiProgram";
     version: "0.1.0";
