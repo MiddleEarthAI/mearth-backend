@@ -161,6 +161,7 @@ exports.Prisma.AgentScalarFieldEnum = {
   id: 'id',
   onchainId: 'onchainId',
   authority: 'authority',
+  authorityAssociatedTokenAddress: 'authorityAssociatedTokenAddress',
   gameId: 'gameId',
   isAlive: 'isAlive',
   profileId: 'profileId',

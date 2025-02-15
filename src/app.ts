@@ -8,7 +8,7 @@ import CacheManager from "@/agent/CacheManager";
 import TwitterManager from "@/agent/TwitterManager";
 import { DecisionEngine } from "@/agent/DecisionEngine";
 import { checkDatabaseConnection } from "@/utils";
-import { getProgramWithWallet } from "@/utils/program";
+import { getProgram } from "@/utils/program";
 import { PrismaClient } from "@prisma/client";
 
 import { GameManager } from "@/agent/GameManager";
@@ -16,6 +16,7 @@ import { createServer } from "http";
 
 import { expressCspHeader, NONE, SELF } from "express-csp-header";
 import { ActionManager } from "@/agent/actionManager";
+import { authConfig, serverConfig } from "./config/env";
 
 const app = express();
 const server = createServer(app);
@@ -119,10 +120,8 @@ app.use((req, res, next) => {
 // CORS configuration - Strict
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") || [
-      "http://localhost:3000",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: authConfig.corsOrigin?.split(","),
+    methods: ["GET"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
     maxAge: 86400,
@@ -204,7 +203,7 @@ app.use(
 export async function startServer() {
   await checkDatabaseConnection();
 
-  const program = await getProgramWithWallet();
+  const program = await getProgram();
   const prisma = new PrismaClient();
   const gameManager = new GameManager(program, prisma);
   const gameInfo = await gameManager.getOrCreateActiveGame();
@@ -240,7 +239,7 @@ export async function startServer() {
   }
 
   try {
-    const PORT = process.env.PORT || 3000;
+    const PORT = serverConfig.port;
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log({

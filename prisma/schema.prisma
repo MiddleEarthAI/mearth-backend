@@ -80,20 +80,21 @@ model AgentProfile {
 }
 
 model Agent {
-  id                    String     @id @default(uuid())
-  onchainId             Int
-  authority             String
-  tweets                Tweet[]
-  game                  Game       @relation(fields: [gameId], references: [id])
-  gameId                String
+  id                              String     @id @default(uuid())
+  onchainId                       Int
+  authority                       String
+  authorityAssociatedTokenAddress String
+  tweets                          Tweet[]
+  game                            Game       @relation(fields: [gameId], references: [id])
+  gameId                          String
   // An agent can be involved in many battles, either as attacker or defender
-  battlesAsAttacker     Battle[]   @relation("attacker")
-  battlesAsDefender     Battle[]   @relation("defender")
-  battlesAsAttackerAlly Battle[]   @relation("attackerAlly")
-  battlesAsDefenderAlly Battle[]   @relation("defenderAlly")
-  wonBattles            Battle[]   @relation("winner")
-  coolDown              CoolDown[]
-  isAlive               Boolean    @default(true)
+  battlesAsAttacker               Battle[]   @relation("attacker")
+  battlesAsDefender               Battle[]   @relation("defender")
+  battlesAsAttackerAlly           Battle[]   @relation("attackerAlly")
+  battlesAsDefenderAlly           Battle[]   @relation("defenderAlly")
+  wonBattles                      Battle[]   @relation("winner")
+  coolDown                        CoolDown[]
+  isAlive                         Boolean    @default(true)
 
   // Alliance relationships
   initiatedAlliances Alliance[] @relation("AllianceInitiator") // Alliances initiated by this agent

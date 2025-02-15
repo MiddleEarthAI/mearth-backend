@@ -7,6 +7,11 @@ import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
+import {
+  getAgentAuthorityAta,
+  getAgentAuthorityKeypair,
+  getMiddleEarthAiAuthorityWallet,
+} from "@/utils/program";
 
 const { BN } = anchor;
 
@@ -25,7 +30,6 @@ interface IGameManager {
   endGame(gameId: string): Promise<void>;
   getOrCreateActiveGame(): Promise<GameInfo>;
   getActiveGame(): Promise<GameInfo>;
-  resetGameState(gameId: string): Promise<void>;
 }
 
 export class GameManager implements IGameManager {
@@ -152,6 +156,7 @@ export class GameManager implements IGameManager {
    * Ends a specific game
    */
   public async endGame(gameOnchainId: typeof BN): Promise<void> {
+    const gameAuthWallet = await getMiddleEarthAiAuthorityWallet();
     console.info(`🔄 Initiating end game process for game ${gameOnchainId}`);
     const [gamePda] = getGamePDA(this.program.programId, gameOnchainId);
     await this.program.methods
@@ -159,6 +164,7 @@ export class GameManager implements IGameManager {
       .accounts({
         game: gamePda,
       })
+      .signers([gameAuthWallet.keypair])
       .rpc();
 
     await this.prisma.game.update({
@@ -166,26 +172,6 @@ export class GameManager implements IGameManager {
       data: { isActive: false },
     });
     console.info(`🏁 Game ${gameOnchainId} successfully ended`);
-  }
-
-  /**
-   * Resets game state for a specific game
-   */
-  public async resetGameState(gameId: string): Promise<void> {
-    console.info(`🔄 Initiating game state reset for game ${gameId}`);
-    await this.prisma.$transaction([
-      this.prisma.agent.updateMany({
-        where: { gameId },
-        data: { isAlive: true },
-      }),
-      this.prisma.coolDown.deleteMany({
-        where: { gameId },
-      }),
-      this.prisma.battle.deleteMany({
-        where: { gameId },
-      }),
-    ]);
-    console.info(`✅ Game ${gameId} state successfully reset`);
   }
 
   /**
@@ -202,6 +188,8 @@ export class GameManager implements IGameManager {
             data: { isActive: false },
           });
 
+          const gameAuthWallet = await getMiddleEarthAiAuthorityWallet();
+
           const nextGameId = await generateGameId();
           console.info(`🎲 Generated new game ID: ${nextGameId}`);
 
@@ -214,6 +202,7 @@ export class GameManager implements IGameManager {
           const tx = await this.program.methods
             .initializeGame(new BN(nextGameId), bump)
             .accounts({})
+            .signers([gameAuthWallet.keypair])
             .rpc();
 
           const gameAccount = await this.program.account.game.fetch(gamePda);
@@ -224,7 +213,7 @@ export class GameManager implements IGameManager {
           const dbGame = await this.prisma.game.create({
             data: {
               onchainId: nextGameId,
-              authority: this.program.provider.publicKey?.toString() ?? "",
+              authority: gameAuthWallet.keypair.publicKey.toString(),
               tokenMint: solanaConfig.tokenMint,
               rewardsVault: gameAccount.rewardsVault.toString(),
               mapDiameter: gameConfig.mapDiameter,
@@ -277,6 +266,8 @@ export class GameManager implements IGameManager {
           new BN(profile.onchainId)
         );
 
+        const ata = await getAgentAuthorityAta(profile.onchainId);
+
         console.info("🎯 Finding spawn location...");
         const spawnTile = await this.prisma.mapTile
           .findMany({
@@ -300,6 +291,10 @@ export class GameManager implements IGameManager {
 
         console.info(`🔗 Registering agent on-chain...`);
 
+        const agentAuthKeypair = await getAgentAuthorityKeypair(
+          profile.onchainId
+        );
+
         await this.program.methods
           .registerAgent(
             new BN(profile.onchainId),
@@ -311,6 +306,7 @@ export class GameManager implements IGameManager {
             game: gamePda,
             agent: agentPda,
           })
+          .signers([agentAuthKeypair])
           .rpc();
 
         const agentAccount = await this.program.account.agent.fetch(agentPda);
@@ -323,8 +319,8 @@ export class GameManager implements IGameManager {
             gameId: dbGame.id,
             mapTileId: spawnTile.id,
             profileId: profile.id,
-            authority: this.program.programId.toString(),
-
+            authority: agentAuthKeypair.publicKey.toString(),
+            authorityAssociatedTokenAddress: ata.address.toString(),
             isAlive: true,
           },
           include: {

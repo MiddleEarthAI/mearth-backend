@@ -6019,6 +6019,7 @@ export namespace Prisma {
     id: string | null
     onchainId: number | null
     authority: string | null
+    authorityAssociatedTokenAddress: string | null
     gameId: string | null
     isAlive: boolean | null
     profileId: string | null
@@ -6030,6 +6031,7 @@ export namespace Prisma {
     id: string | null
     onchainId: number | null
     authority: string | null
+    authorityAssociatedTokenAddress: string | null
     gameId: string | null
     isAlive: boolean | null
     profileId: string | null
@@ -6041,6 +6043,7 @@ export namespace Prisma {
     id: number
     onchainId: number
     authority: number
+    authorityAssociatedTokenAddress: number
     gameId: number
     isAlive: number
     profileId: number
@@ -6062,6 +6065,7 @@ export namespace Prisma {
     id?: true
     onchainId?: true
     authority?: true
+    authorityAssociatedTokenAddress?: true
     gameId?: true
     isAlive?: true
     profileId?: true
@@ -6073,6 +6077,7 @@ export namespace Prisma {
     id?: true
     onchainId?: true
     authority?: true
+    authorityAssociatedTokenAddress?: true
     gameId?: true
     isAlive?: true
     profileId?: true
@@ -6084,6 +6089,7 @@ export namespace Prisma {
     id?: true
     onchainId?: true
     authority?: true
+    authorityAssociatedTokenAddress?: true
     gameId?: true
     isAlive?: true
     profileId?: true
@@ -6182,6 +6188,7 @@ export namespace Prisma {
     id: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive: boolean
     profileId: string
@@ -6212,6 +6219,7 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
+    authorityAssociatedTokenAddress?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -6241,6 +6249,7 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
+    authorityAssociatedTokenAddress?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -6255,6 +6264,7 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
+    authorityAssociatedTokenAddress?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -6269,6 +6279,7 @@ export namespace Prisma {
     id?: boolean
     onchainId?: boolean
     authority?: boolean
+    authorityAssociatedTokenAddress?: boolean
     gameId?: boolean
     isAlive?: boolean
     profileId?: boolean
@@ -6276,7 +6287,7 @@ export namespace Prisma {
     mapTileId?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "authorityAssociatedTokenAddress" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
@@ -6333,6 +6344,7 @@ export namespace Prisma {
       id: string
       onchainId: number
       authority: string
+      authorityAssociatedTokenAddress: string
       gameId: string
       isAlive: boolean
       profileId: string
@@ -6781,6 +6793,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Agent", 'String'>
     readonly onchainId: FieldRef<"Agent", 'Int'>
     readonly authority: FieldRef<"Agent", 'String'>
+    readonly authorityAssociatedTokenAddress: FieldRef<"Agent", 'String'>
     readonly gameId: FieldRef<"Agent", 'String'>
     readonly isAlive: FieldRef<"Agent", 'Boolean'>
     readonly profileId: FieldRef<"Agent", 'String'>
@@ -17552,6 +17565,7 @@ export namespace Prisma {
     id: 'id',
     onchainId: 'onchainId',
     authority: 'authority',
+    authorityAssociatedTokenAddress: 'authorityAssociatedTokenAddress',
     gameId: 'gameId',
     isAlive: 'isAlive',
     profileId: 'profileId',
@@ -18199,6 +18213,7 @@ export namespace Prisma {
     id?: StringFilter<"Agent"> | string
     onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
+    authorityAssociatedTokenAddress?: StringFilter<"Agent"> | string
     gameId?: StringFilter<"Agent"> | string
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
@@ -18227,6 +18242,7 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
+    authorityAssociatedTokenAddress?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -18260,6 +18276,7 @@ export namespace Prisma {
     NOT?: AgentWhereInput | AgentWhereInput[]
     onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
+    authorityAssociatedTokenAddress?: StringFilter<"Agent"> | string
     gameId?: StringFilter<"Agent"> | string
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
@@ -18287,6 +18304,7 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
+    authorityAssociatedTokenAddress?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -18306,6 +18324,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Agent"> | string
     onchainId?: IntWithAggregatesFilter<"Agent"> | number
     authority?: StringWithAggregatesFilter<"Agent"> | string
+    authorityAssociatedTokenAddress?: StringWithAggregatesFilter<"Agent"> | string
     gameId?: StringWithAggregatesFilter<"Agent"> | string
     isAlive?: BoolWithAggregatesFilter<"Agent"> | boolean
     profileId?: StringWithAggregatesFilter<"Agent"> | string
@@ -19266,6 +19285,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -19291,6 +19311,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -19316,6 +19337,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -19341,6 +19363,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -19366,6 +19389,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -19377,6 +19401,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -19385,6 +19410,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -20563,6 +20589,7 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
+    authorityAssociatedTokenAddress?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -20578,6 +20605,7 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
+    authorityAssociatedTokenAddress?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -20589,6 +20617,7 @@ export namespace Prisma {
     id?: SortOrder
     onchainId?: SortOrder
     authority?: SortOrder
+    authorityAssociatedTokenAddress?: SortOrder
     gameId?: SortOrder
     isAlive?: SortOrder
     profileId?: SortOrder
@@ -22974,6 +23003,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -22998,6 +23028,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
@@ -23231,6 +23262,7 @@ export namespace Prisma {
     id?: StringFilter<"Agent"> | string
     onchainId?: IntFilter<"Agent"> | number
     authority?: StringFilter<"Agent"> | string
+    authorityAssociatedTokenAddress?: StringFilter<"Agent"> | string
     gameId?: StringFilter<"Agent"> | string
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
@@ -23422,6 +23454,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -23446,6 +23479,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -23475,6 +23509,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -23499,6 +23534,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -23586,6 +23622,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -23610,6 +23647,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -23645,6 +23683,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -23669,6 +23708,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -23746,6 +23786,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -23770,6 +23811,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
@@ -24722,6 +24764,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -24746,6 +24789,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -24822,6 +24866,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -24846,6 +24891,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -24886,6 +24932,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -24910,6 +24957,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -24998,6 +25046,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -25022,6 +25071,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -25046,6 +25096,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25070,6 +25121,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25110,6 +25162,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -25134,6 +25187,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -25158,6 +25212,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     game: GameCreateNestedOneWithoutAgentsInput
@@ -25182,6 +25237,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25250,6 +25306,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
@@ -25274,6 +25331,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -25374,6 +25432,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25398,6 +25457,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25427,6 +25487,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25451,6 +25512,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25544,6 +25606,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -25568,6 +25631,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -25603,6 +25667,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -25627,6 +25692,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -25698,6 +25764,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25722,6 +25789,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25751,6 +25819,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25775,6 +25844,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25804,6 +25874,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25828,6 +25899,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25857,6 +25929,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25881,6 +25954,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -25910,6 +25984,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -25934,6 +26009,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -26027,6 +26103,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26051,6 +26128,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26086,6 +26164,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26110,6 +26189,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26145,6 +26225,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26169,6 +26250,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26204,6 +26286,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26228,6 +26311,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26263,6 +26347,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26287,6 +26372,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26363,6 +26449,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -26387,6 +26474,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -26474,6 +26562,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26498,6 +26587,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26575,6 +26665,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     tweets?: TweetCreateNestedManyWithoutAgentInput
@@ -26599,6 +26690,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     profileId: string
@@ -26686,6 +26778,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26710,6 +26803,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
@@ -26787,6 +26881,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
@@ -26857,6 +26952,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -26881,6 +26977,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26905,6 +27002,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27095,6 +27193,7 @@ export namespace Prisma {
     id?: string
     onchainId: number
     authority: string
+    authorityAssociatedTokenAddress: string
     gameId: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
@@ -27105,6 +27204,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tweets?: TweetUpdateManyWithoutAgentNestedInput
@@ -27129,6 +27229,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27153,6 +27254,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     onchainId?: IntFieldUpdateOperationsInput | number
     authority?: StringFieldUpdateOperationsInput | string
+    authorityAssociatedTokenAddress?: StringFieldUpdateOperationsInput | string
     gameId?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

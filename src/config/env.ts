@@ -97,12 +97,24 @@ const env = cleanEnv(process.env, {
     desc: "Solana program ID for the game contract",
     example: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
   }),
-  WALLET_PRIVATE_KEY: str({
+  MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY: str({
     desc: "Private key for the game wallet",
   }),
   MEARTH_TOKEN_MINT: str({
     desc: "Token mint address for the Middle Earth game token",
     example: "6xxtS3cfzTAmuEQGHEh1CUUQwfDUPx5DZuAiyv32hous",
+  }),
+  AGENT_AUTHORITY_1: str({
+    desc: "Private key for agent 1 (purrlockpaws)",
+  }),
+  AGENT_AUTHORITY_2: str({
+    desc: "Private key for agent 2 (scootles)",
+  }),
+  AGENT_AUTHORITY_3: str({
+    desc: "Private key for agent 3 (sirgullihop)",
+  }),
+  AGENT_AUTHORITY_4: str({
+    desc: "Private key for agent 4 (wanderleaf)",
   }),
 
   // Authentication & Security
@@ -285,8 +297,12 @@ export const solanaConfig = {
   network: env.SOLANA_NETWORK,
   rpcUrl: env.SOLANA_RPC_URL,
   programId: env.PROGRAM_ID,
-  walletPrivateKey: env.WALLET_PRIVATE_KEY,
+  middleEarthAiAuthorityPrivateKey: env.MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY,
   tokenMint: env.MEARTH_TOKEN_MINT,
+  agentAuthority1: env.AGENT_AUTHORITY_1,
+  agentAuthority2: env.AGENT_AUTHORITY_2,
+  agentAuthority3: env.AGENT_AUTHORITY_3,
+  agentAuthority4: env.AGENT_AUTHORITY_4,
 };
 
 export const authConfig = {

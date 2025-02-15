@@ -4,11 +4,20 @@ import * as anchor from "@coral-xyz/anchor";
 import { mearthIdl } from "@/constants/middle_earth_ai_program_idl";
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { solanaConfig } from "@/config/env";
 
-export async function getWallet() {
-  const privateKeyString = process.env.WALLET_PRIVATE_KEY;
+export async function getProgram() {
+  const conn = connection();
+  const program = new anchor.Program(mearthIdl as MiddleEarthAiProgram, {
+    connection: conn,
+  });
+  return program;
+}
+
+export async function getMiddleEarthAiAuthorityWallet() {
+  const privateKeyString = solanaConfig.middleEarthAiAuthorityPrivateKey;
   if (!privateKeyString) {
-    throw new Error("WALLET_PRIVATE_KEY is not set");
+    throw new Error("MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY is not set");
   }
   const privateKey = bs58.decode(privateKeyString);
   const keypair = Keypair.fromSecretKey(privateKey);
@@ -18,60 +27,91 @@ export async function getWallet() {
   };
 }
 
-export async function getProgramWithWallet() {
-  // Validate environment variables
-  const rpcUrl = process.env.SOLANA_RPC_URL;
+// export async function getProgramWithWallet() {
+//   // Validate environment variables
+//   const rpcUrl = solanaConfig.rpcUrl;
 
-  const privateKeyString = process.env.WALLET_PRIVATE_KEY;
+//   if (!rpcUrl) {
+//     throw new Error("Missing required environment variables: SOLANA_RPC_URL");
+//   }
+//   const connection = new Connection(rpcUrl, {
+//     commitment: "confirmed",
+//     confirmTransactionInitialTimeout: 120000, // 2 minutes
+//   });
 
-  if (!rpcUrl || !privateKeyString) {
-    throw new Error(
-      "Missing required environment variables: SOLANA_RPC_URL or WALLET_PRIVATE_KEY"
-    );
+//   const authorityWallet = await getMiddleEarthAiAuthorityWallet();
+
+//   const provider = new anchor.AnchorProvider(
+//     connection,
+//     authorityWallet.wallet,
+//     {
+//       commitment: "confirmed",
+//     }
+//   );
+
+//   const program = new anchor.Program(
+//     mearthIdl as MiddleEarthAiProgram,
+//     provider
+//   );
+
+//   return program;
+// }
+
+export async function getAgentAuthorityAta(agentOnchainId: number) {
+  const mearthTokenMint = solanaConfig.tokenMint;
+
+  if (!mearthTokenMint) {
+    throw new Error("MEARTH_TOKEN_MINT is not set");
   }
-  const connection = new Connection(rpcUrl, {
+  const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
+  const mintPubKey = new PublicKey(mearthTokenMint);
+  const conn = connection();
+  const ata = await getOrCreateAssociatedTokenAccount(
+    conn,
+    agentAuthorityKeypair,
+    mintPubKey,
+    agentAuthorityKeypair.publicKey,
+    false
+  );
+
+  return ata;
+}
+
+const connection = () => {
+  const rpcUrl = solanaConfig.rpcUrl;
+  if (!rpcUrl) {
+    throw new Error("SOLANA_RPC_URL is not set");
+  }
+  return new Connection(rpcUrl, {
     commitment: "confirmed",
     confirmTransactionInitialTimeout: 120000, // 2 minutes
   });
+};
+
+export async function getAgentAuthorityKeypair(agentOnchainId: number) {
+  let privateKeyString = "";
+  switch (agentOnchainId) {
+    case 1:
+      privateKeyString = solanaConfig.agentAuthority1;
+      break;
+    case 2:
+      privateKeyString = solanaConfig.agentAuthority2;
+      break;
+    case 3:
+      privateKeyString = solanaConfig.agentAuthority3;
+      break;
+    case 4:
+      privateKeyString = solanaConfig.agentAuthority4;
+      break;
+    default:
+      throw new Error(`Invalid agent onchain ID: ${agentOnchainId}`);
+  }
+
+  if (!privateKeyString) {
+    throw new Error(`AGENT_AUTHORITY_${agentOnchainId} is not set`);
+  }
 
   const privateKey = bs58.decode(privateKeyString);
   const keypair = Keypair.fromSecretKey(privateKey);
-
-  // Set up Anchor with optimized configuration
-  const wallet = new anchor.Wallet(keypair);
-
-  const provider = new anchor.AnchorProvider(connection, wallet, {
-    commitment: "confirmed",
-  });
-
-  const program = new anchor.Program(
-    mearthIdl as MiddleEarthAiProgram,
-    provider
-  );
-
-  return program;
-}
-
-export async function getAgentAta(agentPda: PublicKey) {
-  const mearthTokenMint = process.env.MEARTH_TOKEN_MINT;
-  const rpcUrl = process.env.SOLANA_RPC_URL;
-  if (!mearthTokenMint || !rpcUrl) {
-    throw new Error("MEARTH_TOKEN_MINT or SOLANA_RPC_URL is not set");
-  }
-  const wallet = await getWallet();
-  const connection = new Connection(rpcUrl, {
-    commitment: "confirmed",
-    confirmTransactionInitialTimeout: 120000, // 2 minutes
-  });
-
-  const mearthTokenMintKey = new PublicKey(mearthTokenMint);
-
-  const ata = await getOrCreateAssociatedTokenAccount(
-    connection,
-    wallet.keypair,
-    mearthTokenMintKey,
-    new PublicKey(agentPda),
-    false
-  );
-  return ata;
+  return keypair;
 }

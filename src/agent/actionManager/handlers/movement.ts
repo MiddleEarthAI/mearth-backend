@@ -5,6 +5,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import { gameConfig } from "@/config/env";
 import { ActionHandler } from "../types";
+import { getMiddleEarthAiAuthorityWallet } from "@/utils/program";
 
 export class MovementHandler implements ActionHandler<MoveAction> {
   constructor(
@@ -14,6 +15,8 @@ export class MovementHandler implements ActionHandler<MoveAction> {
 
   async handle(ctx: ActionContext, action: MoveAction): Promise<ActionResult> {
     const timestamp = Date.now();
+    const gameAuthWallet = await getMiddleEarthAiAuthorityWallet();
+
     try {
       console.info(
         `Agent ${ctx.agentId} moving to (${action.position.x}, ${action.position.y})`
@@ -107,8 +110,9 @@ export class MovementHandler implements ActionHandler<MoveAction> {
               .accountsStrict({
                 agent: agentPda,
                 game: gamePda,
-                authority: this.program.provider.publicKey,
+                authority: gameAuthWallet.keypair.publicKey,
               })
+              .signers([gameAuthWallet.keypair])
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback
