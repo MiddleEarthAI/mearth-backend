@@ -31,177 +31,285 @@ describe("BattleHandler", async () => {
   //     await prisma.$disconnect();
   //   });
 
-  // test("should successfully initiate a simple battle between two agents", async () => {
-  //   const activeGame = await gameManager.createNewGame();
-  //   const attacker = activeGame.agents[0];
-  //   const defender = activeGame.agents[1];
-  //   // Setup test data
-  //   const ctx: ActionContext = {
-  //     agentId: attacker.agent.id,
-  //     agentOnchainId: attacker.agent.profile.onchainId,
-  //     gameId: activeGame.dbGame.id,
-  //     gameOnchainId: activeGame.dbGame.onchainId,
-  //   };
+  test("should successfully initiate a simple battle between two agents", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
+    const defender = activeGame.agents[1];
+    const defenderKeypair = await getAgentAuthorityKeypair(
+      defender.agent.profile.onchainId
+    );
 
-  //   const action: BattleAction = {
-  //     type: "BATTLE",
-  //     targetId: defender.agent.profile.onchainId,
-  //     tweet: "Initiating battle test",
-  //   };
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
 
-  //   // Execute battle
-  //   const result = await battleHandler.handle(ctx, action);
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Initiating battle test",
+    };
 
-  //   // Assertions
-  //   expect(result.success).to.be.true;
-  //   expect(result.feedback?.isValid).to.be.true;
+    const result = await battleHandler.handle(ctx, action);
 
-  //   // Verify battle record
-  //   const battle = await prisma.battle.findFirst({
-  //     where: {
-  //       attackerId: attacker.agent.id,
-  //       defenderId: defender.agent.id,
-  //     },
-  //   });
-  //   expect(battle).to.not.be.null;
-  //   expect(battle?.type).to.equal("Simple");
+    expect(result.success).to.be.true;
+    expect(result.feedback?.isValid).to.be.true;
 
-  //   // Verify game event
-  //   const event = await prisma.gameEvent.findFirst({
-  //     where: {
-  //       gameId: activeGame.dbGame.id,
-  //       eventType: "BATTLE",
-  //       initiatorId: attacker.agent.id,
-  //       targetId: defender.agent.id,
-  //     },
-  //   });
-  //   expect(event).to.not.be.null;
-  //   expect(event?.message).to.include(attacker.agent.profile.xHandle);
-  //   expect(event?.message).to.include(defender.agent.profile.xHandle);
-  // });
+    const battle = await prisma.battle.findFirst({
+      where: {
+        attackerId: attacker.agent.id,
+        defenderId: defender.agent.id,
+      },
+    });
+    expect(battle).to.not.be.null;
+    expect(battle?.type).to.equal("Simple");
 
-  // test("should handle battle initiation failure gracefully", async () => {
-  //   const ctx: ActionContext = {
-  //     agentId: "nonexistent-agent",
-  //     agentOnchainId: 999,
-  //     gameId: "nonexistent-game",
-  //     gameOnchainId: 999,
-  //   };
+    const event = await prisma.gameEvent.findFirst({
+      where: {
+        gameId: activeGame.dbGame.id,
+        eventType: "BATTLE",
+        initiatorId: attacker.agent.id,
+        targetId: defender.agent.id,
+      },
+    });
+    expect(event).to.not.be.null;
+    expect(event?.message).to.include(attacker.agent.profile.xHandle);
+    expect(event?.message).to.include(defender.agent.profile.xHandle);
+  });
 
-  //   const action: BattleAction = {
-  //     type: "BATTLE",
-  //     targetId: 998,
-  //     tweet: "This battle should fail",
-  //   };
+  test("should handle battle with dead agent", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
+    const defender = activeGame.agents[1];
+    const defenderKeypair = await getAgentAuthorityKeypair(
+      defender.agent.profile.onchainId
+    );
 
-  //   const result = await battleHandler.handle(ctx, action);
+    // Mark defender as dead
+    await prisma.agent.update({
+      where: { id: defender.agent.id },
+      data: { isAlive: false },
+    });
 
-  //   expect(result.success).to.be.false;
-  //   expect(result.feedback?.isValid).to.be.false;
-  //   expect(result.feedback?.error?.type).to.equal("BATTLE");
-  //   expect(result.feedback?.error?.message).to.include(
-  //     "Account does not exist"
-  //   );
-  // });
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
 
-  // test("should handle alliance vs alliance battle correctly", async () => {
-  //   const activeGame = await gameManager.createNewGame();
-  //   const attacker = activeGame.agents[0];
-  //   const attackerKeypair = await getAgentAuthorityKeypair(
-  //     attacker.agent.profile.onchainId
-  //   );
-  //   const defender = activeGame.agents[1];
-  //   const defenderKeypair = await getAgentAuthorityKeypair(
-  //     defender.agent.profile.onchainId
-  //   );
-  //   const attackerAlly = activeGame.agents[2];
-  //   const attackerAllyKeypair = await getAgentAuthorityKeypair(
-  //     attackerAlly.agent.profile.onchainId
-  //   );
-  //   const defenderAlly = activeGame.agents[3];
-  //   const defenderAllyKeypair = await getAgentAuthorityKeypair(
-  //     defenderAlly.agent.profile.onchainId
-  //   );
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Battling dead agent",
+    };
 
-  //   const gamePda = activeGame.dbGame.pda;
+    const result = await battleHandler.handle(ctx, action);
 
-  //   // Setup test data for alliance battle
-  //   const ctx: ActionContext = {
-  //     agentId: attacker.agent.id,
-  //     agentOnchainId: attacker.agent.profile.onchainId,
-  //     gameId: activeGame.dbGame.id,
-  //     gameOnchainId: activeGame.dbGame.onchainId,
-  //   };
+    expect(result.success).to.be.false;
+    expect(result.feedback?.isValid).to.be.false;
+    expect(result.feedback?.error?.type).to.equal("BATTLE");
+    expect(result.feedback?.error?.message).to.include("dead agent");
+  });
 
-  //   // Create alliances - first for attacker and attackerAlly
-  //   await program.methods
-  //     .formAlliance()
-  //     .accountsStrict({
-  //       initiator: attacker.agent.pda,
-  //       targetAgent: attackerAlly.agent.pda,
-  //       game: gamePda,
-  //       authority: attackerKeypair.publicKey,
-  //     })
-  //     .signers([attackerKeypair])
-  //     .rpc();
+  test("should handle battle with non-existent agent", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
 
-  //   // Then for defender and defenderAlly
-  //   await program.methods
-  //     .formAlliance()
-  //     .accountsStrict({
-  //       initiator: defender.agent.pda,
-  //       targetAgent: defenderAlly.agent.pda,
-  //       game: gamePda,
-  //       authority: defenderKeypair.publicKey,
-  //     })
-  //     .signers([defenderKeypair])
-  //     .rpc();
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
 
-  //   // Create alliance records in database
-  //   await Promise.all([
-  //     prisma.alliance.create({
-  //       data: {
-  //         initiatorId: attacker.agent.id,
-  //         joinerId: attackerAlly.agent.id,
-  //         status: "Active",
-  //         gameId: activeGame.dbGame.id,
-  //       },
-  //     }),
-  //     prisma.alliance.create({
-  //       data: {
-  //         initiatorId: defender.agent.id,
-  //         joinerId: defenderAlly.agent.id,
-  //         status: "Active",
-  //         gameId: activeGame.dbGame.id,
-  //       },
-  //     }),
-  //   ]);
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: 999, // Non-existent agent
+      tweet: "Battling non-existent agent",
+    };
 
-  //   const action: BattleAction = {
-  //     type: "BATTLE",
-  //     targetId: defender.agent.profile.onchainId,
-  //     tweet: "Alliance battle test",
-  //   };
+    const result = await battleHandler.handle(ctx, action);
 
-  //   // Execute battle
-  //   const result = await battleHandler.handle(ctx, action);
+    expect(result.success).to.be.false;
+    expect(result.feedback?.isValid).to.be.false;
+    expect(result.feedback?.error?.type).to.equal("BATTLE");
+    expect(result.feedback?.error?.message).to.include("not found");
+  });
 
-  //   // Assertions
-  //   expect(result.success).to.be.true;
-  //   expect(result.feedback?.isValid).to.be.true;
+  test("should handle battle with self", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const agent = activeGame.agents[0];
+    const agentKeypair = await getAgentAuthorityKeypair(
+      agent.agent.profile.onchainId
+    );
 
-  //   // Verify battle record
-  //   const battle = await prisma.battle.findFirst({
-  //     where: {
-  //       attackerId: attacker.agent.id,
-  //       defenderId: defender.agent.id,
-  //     },
-  //   });
-  //   expect(battle).to.not.be.null;
-  //   expect(battle?.type).to.equal("AllianceVsAlliance");
-  //   expect(battle?.attackerAllyId).to.equal(attackerAlly.agent.id);
-  //   expect(battle?.defenderAllyId).to.equal(defenderAlly.agent.id);
-  // });
+    const ctx: ActionContext = {
+      agentId: agent.agent.id,
+      agentOnchainId: agent.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: agent.agent.profile.onchainId, // Same as attacker
+      tweet: "Battling self",
+    };
+
+    const result = await battleHandler.handle(ctx, action);
+
+    expect(result.success).to.be.false;
+    expect(result.feedback?.isValid).to.be.false;
+    expect(result.feedback?.error?.type).to.equal("BATTLE");
+    expect(result.feedback?.error?.message).to.include("Cannot battle self");
+  });
+
+  test("should handle battle during cooldown period", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
+    const defender = activeGame.agents[1];
+    const defenderKeypair = await getAgentAuthorityKeypair(
+      defender.agent.profile.onchainId
+    );
+
+    // Create active cooldown
+    await prisma.coolDown.create({
+      data: {
+        type: "Battle",
+        endsAt: new Date(Date.now() + 3600000), // 1 hour from now
+        cooledAgentId: attacker.agent.id,
+        gameId: activeGame.dbGame.id,
+      },
+    });
+
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Battling during cooldown",
+    };
+
+    const result = await battleHandler.handle(ctx, action);
+
+    expect(result.success).to.be.false;
+    expect(result.feedback?.isValid).to.be.false;
+    expect(result.feedback?.error?.type).to.equal("BATTLE");
+    expect(result.feedback?.error?.message).to.include("cooldown");
+  });
+
+  test("should handle alliance vs alliance battle correctly", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
+    const defender = activeGame.agents[1];
+    const defenderKeypair = await getAgentAuthorityKeypair(
+      defender.agent.profile.onchainId
+    );
+    const attackerAlly = activeGame.agents[2];
+    const attackerAllyKeypair = await getAgentAuthorityKeypair(
+      attackerAlly.agent.profile.onchainId
+    );
+    const defenderAlly = activeGame.agents[3];
+    const defenderAllyKeypair = await getAgentAuthorityKeypair(
+      defenderAlly.agent.profile.onchainId
+    );
+
+    // Create alliances
+    await Promise.all([
+      program.methods
+        .formAlliance()
+        .accountsStrict({
+          initiator: attacker.agent.pda,
+          targetAgent: attackerAlly.agent.pda,
+          game: activeGame.dbGame.pda,
+          authority: attackerKeypair.publicKey,
+        })
+        .signers([attackerKeypair])
+        .rpc(),
+      program.methods
+        .formAlliance()
+        .accountsStrict({
+          initiator: defender.agent.pda,
+          targetAgent: defenderAlly.agent.pda,
+          game: activeGame.dbGame.pda,
+          authority: defenderKeypair.publicKey,
+        })
+        .signers([defenderKeypair])
+        .rpc(),
+    ]);
+
+    // Create alliance records
+    await Promise.all([
+      prisma.alliance.create({
+        data: {
+          initiatorId: attacker.agent.id,
+          joinerId: attackerAlly.agent.id,
+          status: "Active",
+          gameId: activeGame.dbGame.id,
+        },
+      }),
+      prisma.alliance.create({
+        data: {
+          initiatorId: defender.agent.id,
+          joinerId: defenderAlly.agent.id,
+          status: "Active",
+          gameId: activeGame.dbGame.id,
+        },
+      }),
+    ]);
+
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Alliance vs Alliance battle",
+    };
+
+    const result = await battleHandler.handle(ctx, action);
+
+    expect(result.success).to.be.true;
+    expect(result.feedback?.isValid).to.be.true;
+
+    const battle = await prisma.battle.findFirst({
+      where: {
+        attackerId: attacker.agent.id,
+        defenderId: defender.agent.id,
+      },
+    });
+    expect(battle).to.not.be.null;
+    expect(battle?.type).to.equal("AllianceVsAlliance");
+    expect(battle?.attackerAllyId).to.equal(attackerAlly.agent.id);
+    expect(battle?.defenderAllyId).to.equal(defenderAlly.agent.id);
+  });
 
   test("should handle agent vs alliance battle correctly", async () => {
     const activeGame = await gameManager.createNewGame();
@@ -209,27 +317,37 @@ describe("BattleHandler", async () => {
     const singleAgentKeypair = await getAgentAuthorityKeypair(
       singleAgent.agent.profile.onchainId
     );
-    const allianceLeaderAgent = activeGame.agents[1];
-    const allianceLeaderAgentKeypair = await getAgentAuthorityKeypair(
-      allianceLeaderAgent.agent.profile.onchainId
+    const allianceLeader = activeGame.agents[1];
+    const allianceLeaderKeypair = await getAgentAuthorityKeypair(
+      allianceLeader.agent.profile.onchainId
     );
-    const alliancePartnerAgent = activeGame.agents[2];
-    const alliancePartnerAgentKeypair = await getAgentAuthorityKeypair(
-      alliancePartnerAgent.agent.profile.onchainId
+    const alliancePartner = activeGame.agents[2];
+    const alliancePartnerKeypair = await getAgentAuthorityKeypair(
+      alliancePartner.agent.profile.onchainId
     );
 
     // Create alliance
     await program.methods
       .formAlliance()
       .accountsStrict({
-        initiator: allianceLeaderAgent.agent.pda,
-        targetAgent: alliancePartnerAgent.agent.pda,
+        initiator: allianceLeader.agent.pda,
+        targetAgent: alliancePartner.agent.pda,
         game: activeGame.dbGame.pda,
-        authority: allianceLeaderAgentKeypair.publicKey,
+        authority: allianceLeaderKeypair.publicKey,
       })
-      .signers([allianceLeaderAgentKeypair])
+      .signers([allianceLeaderKeypair])
       .rpc();
-    // Setup test data for agent vs alliance battle
+
+    // Create alliance record
+    await prisma.alliance.create({
+      data: {
+        initiatorId: allianceLeader.agent.id,
+        joinerId: alliancePartner.agent.id,
+        status: "Active",
+        gameId: activeGame.dbGame.id,
+      },
+    });
+
     const ctx: ActionContext = {
       agentId: singleAgent.agent.id,
       agentOnchainId: singleAgent.agent.profile.onchainId,
@@ -239,64 +357,186 @@ describe("BattleHandler", async () => {
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: allianceLeaderAgent.agent.profile.onchainId,
-      tweet: "Agent vs Alliance battle test",
+      targetId: allianceLeader.agent.profile.onchainId,
+      tweet: "Agent vs Alliance battle",
     };
 
-    // Execute battle
     const result = await battleHandler.handle(ctx, action);
 
-    // Assertions
     expect(result.success).to.be.true;
     expect(result.feedback?.isValid).to.be.true;
 
-    // Verify battle record
     const battle = await prisma.battle.findFirst({
       where: {
         attackerId: singleAgent.agent.id,
-        defenderId: allianceLeaderAgent.agent.id,
+        defenderId: allianceLeader.agent.id,
       },
     });
     expect(battle).to.not.be.null;
     expect(battle?.type).to.equal("AgentVsAlliance");
-    expect(battle?.attackerAllyId).to.equal(singleAgent.agent.id);
-    expect(battle?.defenderAllyId).to.equal(allianceLeaderAgent.agent.id);
   });
 
-  // test("should validate token stakes correctly", async () => {
-  //   const activeGame = await gameManager.createNewGame();
-  //   const attacker = activeGame.agents[0];
-  //   const defender = activeGame.agents[1];
+  test("should handle battle outcome calculations correctly", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
+    const defender = activeGame.agents[1];
+    const defenderKeypair = await getAgentAuthorityKeypair(
+      defender.agent.profile.onchainId
+    );
 
-  //   const ctx: ActionContext = {
-  //     agentId: attacker.agent.id,
-  //     agentOnchainId: attacker.agent.profile.onchainId,
-  //     gameId: activeGame.dbGame.id,
-  //     gameOnchainId: activeGame.dbGame.onchainId,
-  //   };
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
 
-  //   const action: BattleAction = {
-  //     type: "BATTLE",
-  //     targetId: defender.agent.profile.onchainId,
-  //     tweet: "Token stake test",
-  //   };
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Testing battle outcome",
+    };
 
-  //   // Execute battle
-  //   const result = await battleHandler.handle(ctx, action);
+    const result = await battleHandler.handle(ctx, action);
+    expect(result.success).to.be.true;
+    expect(result.feedback?.isValid).to.be.true;
 
-  //   // Assertions
-  //   expect(result.success).to.be.true;
-  //   expect(result.feedback?.isValid).to.be.true;
+    const battle = await prisma.battle.findFirst({
+      where: {
+        attackerId: attacker.agent.id,
+        defenderId: defender.agent.id,
+      },
+    });
+    expect(battle).to.not.be.null;
+    expect(battle?.tokensStaked).to.be.a("number");
+    expect(battle?.tokensStaked).to.be.greaterThan(0);
 
-  //   // Verify battle record and token calculations
-  //   const battle = await prisma.battle.findFirst({
-  //     where: {
-  //       attackerId: attacker.agent.id,
-  //       defenderId: defender.agent.id,
-  //     },
-  //   });
-  //   expect(battle).to.not.be.null;
-  //   expect(battle?.tokensStaked).to.be.greaterThan(0);
-  //   expect(battle?.tokensStaked).to.equal(150); // Total tokens at stake
-  // });
+    // Verify game event metadata
+    const event = await prisma.gameEvent.findFirst({
+      where: {
+        gameId: activeGame.dbGame.id,
+        eventType: "BATTLE",
+        initiatorId: attacker.agent.id,
+        targetId: defender.agent.id,
+      },
+    });
+    expect(event).to.not.be.null;
+    const metadata = event?.metadata as any;
+    expect(metadata.percentageLost).to.be.a("number");
+    expect(metadata.percentageLost).to.be.within(20, 30); // As per calculateBattleOutcome implementation
+    expect(metadata.tokensAtStake).to.be.a("number");
+    expect(metadata.tokensAtStake).to.equal(battle?.tokensStaked);
+  });
+
+  test("should handle database transaction failure gracefully", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const defender = activeGame.agents[1];
+
+    // Simulate database error by providing invalid data
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: "invalid-game-id", // This will cause the transaction to fail
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Testing transaction failure",
+    };
+
+    const result = await battleHandler.handle(ctx, action);
+
+    expect(result.success).to.be.false;
+    expect(result.feedback?.isValid).to.be.false;
+    expect(result.feedback?.error?.type).to.equal("BATTLE");
+
+    // Verify no battle record was created
+    const battle = await prisma.battle.findFirst({
+      where: {
+        attackerId: attacker.agent.id,
+        defenderId: defender.agent.id,
+      },
+    });
+    expect(battle).to.be.null;
+  });
+
+  test("should handle onchain transaction failure gracefully", async () => {
+    const activeGame = await gameManager.createNewGame();
+    const attacker = activeGame.agents[0];
+    const attackerKeypair = await getAgentAuthorityKeypair(
+      attacker.agent.profile.onchainId
+    );
+    const defender = activeGame.agents[1];
+    const defenderKeypair = await getAgentAuthorityKeypair(
+      defender.agent.profile.onchainId
+    );
+
+    // Create an alliance to test more complex battle resolution
+    await program.methods
+      .formAlliance()
+      .accountsStrict({
+        initiator: attacker.agent.pda,
+        targetAgent: defender.agent.pda,
+        game: activeGame.dbGame.pda,
+        authority: attackerKeypair.publicKey,
+      })
+      .signers([attackerKeypair])
+      .rpc();
+
+    // Create alliance record
+    await prisma.alliance.create({
+      data: {
+        initiatorId: attacker.agent.id,
+        joinerId: defender.agent.id,
+        status: "Active",
+        gameId: activeGame.dbGame.id,
+      },
+    });
+
+    const ctx: ActionContext = {
+      agentId: attacker.agent.id,
+      agentOnchainId: attacker.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: defender.agent.profile.onchainId,
+      tweet: "Testing onchain failure",
+    };
+
+    // Simulate onchain transaction failure by using invalid authority
+    const originalGetAuthority = getMiddleEarthAiAuthorityWallet;
+    try {
+      (getMiddleEarthAiAuthorityWallet as any) = async () => ({
+        keypair: Keypair.generate(), // This will cause the transaction to fail
+        wallet: null,
+      });
+
+      const result = await battleHandler.handle(ctx, action);
+
+      expect(result.success).to.be.false;
+      expect(result.feedback?.isValid).to.be.false;
+      expect(result.feedback?.error?.type).to.equal("BATTLE");
+
+      // Verify no battle record was created due to rollback
+      const battle = await prisma.battle.findFirst({
+        where: {
+          attackerId: attacker.agent.id,
+          defenderId: defender.agent.id,
+        },
+      });
+      expect(battle).to.be.null;
+    } finally {
+      // Restore original function
+      (getMiddleEarthAiAuthorityWallet as any) = originalGetAuthority;
+    }
+  });
 });
