@@ -7,6 +7,7 @@ import { ActionSuggestion, TwitterInteraction } from "@/types/twitter";
 import { GameAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
+import { formatDate } from "@/utils";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -424,24 +425,36 @@ class DecisionEngine {
         }),
       ].join("\n") || "No battles recorded yet";
 
-    function formatDate(date: Date) {
-      return new Date(date).toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-
-    // Get active alliances context
-    const activeAlliances = [
-      ...agent.initiatedAlliances.map(
-        (alliance) => `🤝 Allied with @${alliance.joiner.profile.xHandle}`
-      ),
-      ...agent.joinedAlliances.map(
-        (alliance) => `🤝 Allied with @${alliance.initiator.profile.xHandle}`
-      ),
-    ].join("\n");
+    // Get comprehensive alliance context with metadata
+    const activeAlliances =
+      [
+        ...agent.initiatedAlliances.map((alliance) => {
+          const allyHandle = alliance.joiner.profile.xHandle;
+          const allianceAge = Math.floor(
+            (new Date().getTime() - alliance.timestamp.getTime()) /
+              (1000 * 60 * 60)
+          ); // Hours
+          const combinedStrength = alliance.combinedTokens || 0;
+          return `🤝 INITIATED ALLIANCE
+           Partner: @${allyHandle}
+           Status: ${alliance.status}
+           Duration: ${allianceAge}h old
+           Combined Strength: ${combinedStrength} tokens`;
+        }),
+        ...agent.joinedAlliances.map((alliance) => {
+          const allyHandle = alliance.initiator.profile.xHandle;
+          const allianceAge = Math.floor(
+            (new Date().getTime() - alliance.timestamp.getTime()) /
+              (1000 * 60 * 60)
+          ); // Hours
+          const combinedStrength = alliance.combinedTokens || 0;
+          return `🤝 JOINED ALLIANCE
+           Partner: @${allyHandle} 
+           Status: ${alliance.status}
+           Duration: ${allianceAge}h old
+           Combined Strength: ${combinedStrength} tokens`;
+        }),
+      ].join("\n\n") || "No active alliances - Operating independently";
 
     // Organize data into structured sections
     const AGENT_IDENTITY = {
@@ -597,7 +610,7 @@ Generate a JSON response:
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null,  // Target agent's MID if applicable
   "position": { "x": number, "y": number },  // Only for MOVE
-  "tweet": string  // Action announcement (no hashtags, use @handles)
+  "tweet": string  // Action announcement (no hashtags, ONLY use @handles to refer to other agents)
 }
 
 Remember:
