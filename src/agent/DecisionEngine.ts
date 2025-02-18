@@ -75,6 +75,9 @@ class DecisionEngine {
     prompt: string;
     actionContext: ActionContext;
   }> {
+    // Get available actions
+    const availableActions = await this.getAvailableActions(actionContext);
+
     const [gamePda] = getGamePDA(
       this.program.programId,
       actionContext.gameOnchainId
@@ -607,7 +610,7 @@ ${communitySuggestion.content ? `Context: ${communitySuggestion.content}` : ""}`
 ## RESPONSE FORMAT
 Generate a JSON response:
 {
-  "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
+  "type": "${availableActions.join(" | ")}",
   "targetId": number | null,  // Target agent's MID if applicable
   "position": { "x": number, "y": number },  // Only for MOVE
   "tweet": string  // Action announcement (no hashtags, use @handles, NO MID in tweet)
@@ -814,6 +817,105 @@ Generate a single ActionSuggestion in JSON format:
 
     // Return final score normalized to 0-1
     return Math.min(Math.max(reputationScore, 0), 1);
+  }
+
+  private async getAvailableActions(
+    actionContext: ActionContext
+  ): Promise<string[]> {
+    const availableActions: string[] = [];
+
+    // Get agent with all necessary relations
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: actionContext.agentId },
+      include: {
+        mapTile: true,
+        coolDown: {
+          where: {
+            endsAt: {
+              gt: new Date(),
+            },
+          },
+        },
+        initiatedAlliances: {
+          where: { status: "Active" },
+        },
+        joinedAlliances: {
+          where: { status: "Active" },
+        },
+        battlesAsAttacker: {
+          where: { status: "Active" },
+        },
+        battlesAsDefender: {
+          where: { status: "Active" },
+        },
+      },
+    });
+
+    if (!agent || !agent.isAlive) return availableActions;
+
+    // Check for active cooldowns
+    const activeCooldowns = new Set(agent.coolDown.map((cd) => cd.type));
+
+    // Check if agent is in active battle
+    const isInBattle =
+      agent.battlesAsAttacker.length > 0 || agent.battlesAsDefender.length > 0;
+
+    // Check if agent is in alliance
+    const isInAlliance =
+      agent.initiatedAlliances.length > 0 || agent.joinedAlliances.length > 0;
+
+    // Get nearby agents (within interaction range)
+    const nearbyAgents = await this.prisma.agent.findMany({
+      where: {
+        mapTile: {
+          OR: [
+            {
+              x: {
+                in: [agent.mapTile.x - 1, agent.mapTile.x, agent.mapTile.x + 1],
+              },
+            },
+            {
+              y: {
+                in: [agent.mapTile.y - 1, agent.mapTile.y, agent.mapTile.y + 1],
+              },
+            },
+          ],
+        },
+        id: { not: agent.id },
+        isAlive: true,
+        gameId: actionContext.gameId,
+      },
+    });
+
+    // MOVE action
+    if (!activeCooldowns.has("Move") && !isInBattle) {
+      availableActions.push("MOVE");
+    }
+
+    // Only add interaction actions if there are nearby agents
+    if (nearbyAgents.length > 0) {
+      // BATTLE action
+      if (!activeCooldowns.has("Battle") && !isInBattle) {
+        availableActions.push("BATTLE");
+      }
+
+      // FORM_ALLIANCE action
+      if (!activeCooldowns.has("Alliance") && !isInBattle && !isInAlliance) {
+        availableActions.push("FORM_ALLIANCE");
+      }
+
+      // IGNORE action
+      if (!activeCooldowns.has("Ignore") && !isInBattle) {
+        availableActions.push("IGNORE");
+      }
+    }
+
+    // BREAK_ALLIANCE action
+    if (isInAlliance && !isInBattle) {
+      availableActions.push("BREAK_ALLIANCE");
+    }
+
+    return availableActions;
   }
 }
 
