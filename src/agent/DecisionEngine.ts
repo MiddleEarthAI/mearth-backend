@@ -66,6 +66,7 @@ class DecisionEngine {
       this.eventEmitter.emit("newAction", { actionContext, action });
     }
   }
+
   private async buildPrompt(
     actionContext: ActionContext,
     communitySuggestion: ActionSuggestion | null
@@ -150,12 +151,22 @@ class DecisionEngine {
         },
         mapTile: true,
         battlesAsAttacker: {
-          where: { status: "Active" },
-          include: { defender: { include: { profile: true } } },
+          where: { status: "Resolved" },
+          include: {
+            defender: { include: { profile: true } },
+            attacker: { include: { profile: true } },
+            attackerAlly: { include: { profile: true } },
+            defenderAlly: { include: { profile: true } },
+          },
         },
         battlesAsDefender: {
-          where: { status: "Active" },
-          include: { attacker: { include: { profile: true } } },
+          where: { status: "Resolved" },
+          include: {
+            defender: { include: { profile: true } },
+            attacker: { include: { profile: true } },
+            attackerAlly: { include: { profile: true } },
+            defenderAlly: { include: { profile: true } },
+          },
         },
         joinedAlliances: {
           where: { status: "Active" },
@@ -361,15 +372,66 @@ class DecisionEngine {
       .join("\n");
 
     // Get active battles context
-    const activeBattles = [
-      ...agent.battlesAsAttacker.map(
-        (battle) => `⚔️ You are attacking @${battle.defender.profile.xHandle}`
-      ),
-      ...agent.battlesAsDefender.map(
-        (battle) =>
-          `⚔️ You are being attacked by @${battle.attacker.profile.xHandle}`
-      ),
-    ].join("\n");
+    const activeBattles =
+      [
+        ...agent.battlesAsAttacker.map((battle) => {
+          const isResolved = battle.status === "Resolved";
+          const isWinner = battle.winnerId === agent.id;
+          const result = isResolved
+            ? isWinner
+              ? "🏆 Victory"
+              : "💀 Defeat"
+            : "⚔️ Ongoing";
+
+          // Get ally information for both sides
+          const attackerAllyInfo = battle.attackerAllyId
+            ? `Allied with @${battle.attackerAlly?.profile.xHandle}`
+            : "Fighting solo";
+          const defenderAllyInfo = battle.defenderAllyId
+            ? `Enemy allied with @${battle.defenderAlly?.profile.xHandle}`
+            : "Enemy fought alone";
+
+          // Build battle summary with timing
+          const battleTime = isResolved
+            ? `Battle concluded on ${formatDate(battle.endTime!)}`
+            : `Battle ongoing since ${formatDate(battle.startTime)}`;
+
+          return `${result} | As Attacker vs @${battle.defender.profile.xHandle} | ${attackerAllyInfo} | ${defenderAllyInfo} | ${battleTime}`;
+        }),
+        ...agent.battlesAsDefender.map((battle) => {
+          const isResolved = battle.status === "Resolved";
+          const isWinner = battle.winnerId === agent.id;
+          const result = isResolved
+            ? isWinner
+              ? "🏆 Victory"
+              : "💀 Defeat"
+            : "⚔️ Ongoing";
+
+          // Get ally information for both sides
+          const defenderAllyInfo = battle.defenderAllyId
+            ? `Allied with @${battle.defenderAlly?.profile.xHandle}`
+            : "Fighting solo";
+          const attackerAllyInfo = battle.attackerAllyId
+            ? `Enemy allied with @${battle.attackerAlly?.profile.xHandle}`
+            : "Enemy fought alone";
+
+          // Build battle summary with timing
+          const battleTime = isResolved
+            ? `Battle concluded on ${formatDate(battle.endTime!)}`
+            : `Battle ongoing since ${formatDate(battle.startTime)}`;
+
+          return `${result} | As Defender vs @${battle.attacker.profile.xHandle} | ${defenderAllyInfo} | ${attackerAllyInfo} | ${battleTime}`;
+        }),
+      ].join("\n") || "No battles recorded yet";
+
+    function formatDate(date: Date) {
+      return new Date(date).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
 
     // Get active alliances context
     const activeAlliances = [
