@@ -10,14 +10,43 @@ import {
 } from "@/utils/program";
 import { test, describe } from "node:test";
 import { GameManager } from "@/agent/GameManager";
-import { Keypair } from "@solana/web3.js";
-
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { BN } from "@coral-xyz/anchor";
+import {
+  Account,
+  getAssociatedTokenAddressSync,
+  getOrCreateAssociatedTokenAccount,
+} from "@solana/spl-token";
 describe("BattleHandler", async () => {
+  let program: MearthProgram;
+  let mint = new PublicKey("7SW467MLwRuYSpMbvjLJcy8igeK7Qk6hwSPzTFQotw2N");
+  const connection = new Connection(process.env.SOLANA_RPC_URL!);
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
-  let program: MearthProgram;
   let gameManager: GameManager;
   let gameAuthority: Keypair;
+  let agent1Authority: Keypair;
+  let agent2Authority: Keypair;
+  let agent3Authority: Keypair;
+  let agent4Authority: Keypair;
+  let user1 = Keypair.generate();
+  let user2 = Keypair.generate();
+  // let user1Ata = await getOrCreateAssociatedTokenAccount(
+  //   connection,
+  //   user1,
+  //   mint,
+  //   user1.publicKey,
+  //   false,
+  //   "confirmed"
+  // );
+  // let user2Ata = await getOrCreateAssociatedTokenAccount(
+  //   connection,
+  //   user2,
+  //   mint,
+  //   user2.publicKey,
+  //   false,
+  //   "confirmed"
+  // );
 
   test("setup", async () => {
     prisma = new PrismaClient();
@@ -25,13 +54,28 @@ describe("BattleHandler", async () => {
     battleHandler = new BattleHandler(program, prisma);
     gameManager = new GameManager(program, prisma);
     gameAuthority = (await getMiddleEarthAiAuthorityWallet()).keypair;
+
+    agent1Authority = await getAgentAuthorityKeypair(1);
+    agent2Authority = await getAgentAuthorityKeypair(2);
+    agent3Authority = await getAgentAuthorityKeypair(3);
+    agent4Authority = await getAgentAuthorityKeypair(4);
+
+    // airdrop tokens to users
+    await program.provider.connection.requestAirdrop(
+      user1.publicKey,
+      new BN(1000000000000)
+    );
+    await program.provider.connection.requestAirdrop(
+      user2.publicKey,
+      new BN(100000000000)
+    );
   });
 
   //   test("cleanup", async () => {
   //     await prisma.$disconnect();
   //   });
 
-  test("should successfully initiate a simple battle between two agents", async () => {
+  test("should successfully resolve a simple battle between two agents", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -41,6 +85,18 @@ describe("BattleHandler", async () => {
     const defenderKeypair = await getAgentAuthorityKeypair(
       defender.agent.profile.onchainId
     );
+
+    // // stake tokens on agents
+    // await program.methods
+    //   .stakeTokens(new BN(1000000))
+    //   .accounts({
+    //     agent: attacker.agent.pda,
+    //     authority: user1.publicKey,
+    //     stakerSource: user1Ata.address,
+    //     agentVault: new PublicKey(attacker.agent.vault),
+    //   })
+    //   .signers([user1])
+    //   .rpc();
 
     const ctx: ActionContext = {
       agentId: attacker.agent.id,

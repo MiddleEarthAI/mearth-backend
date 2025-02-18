@@ -6039,6 +6039,7 @@ export namespace Prisma {
     profileId: string | null
     deathTimestamp: Date | null
     mapTileId: string | null
+    vault: string | null
   }
 
   export type AgentMaxAggregateOutputType = {
@@ -6052,6 +6053,7 @@ export namespace Prisma {
     profileId: string | null
     deathTimestamp: Date | null
     mapTileId: string | null
+    vault: string | null
   }
 
   export type AgentCountAggregateOutputType = {
@@ -6065,6 +6067,7 @@ export namespace Prisma {
     profileId: number
     deathTimestamp: number
     mapTileId: number
+    vault: number
     _all: number
   }
 
@@ -6088,6 +6091,7 @@ export namespace Prisma {
     profileId?: true
     deathTimestamp?: true
     mapTileId?: true
+    vault?: true
   }
 
   export type AgentMaxAggregateInputType = {
@@ -6101,6 +6105,7 @@ export namespace Prisma {
     profileId?: true
     deathTimestamp?: true
     mapTileId?: true
+    vault?: true
   }
 
   export type AgentCountAggregateInputType = {
@@ -6114,6 +6119,7 @@ export namespace Prisma {
     profileId?: true
     deathTimestamp?: true
     mapTileId?: true
+    vault?: true
     _all?: true
   }
 
@@ -6214,6 +6220,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp: Date | null
     mapTileId: string
+    vault: string
     _count: AgentCountAggregateOutputType | null
     _avg: AgentAvgAggregateOutputType | null
     _sum: AgentSumAggregateOutputType | null
@@ -6246,6 +6253,7 @@ export namespace Prisma {
     profileId?: boolean
     deathTimestamp?: boolean
     mapTileId?: boolean
+    vault?: boolean
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
     battlesAsAttacker?: boolean | Agent$battlesAsAttackerArgs<ExtArgs>
@@ -6277,6 +6285,7 @@ export namespace Prisma {
     profileId?: boolean
     deathTimestamp?: boolean
     mapTileId?: boolean
+    vault?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
@@ -6293,6 +6302,7 @@ export namespace Prisma {
     profileId?: boolean
     deathTimestamp?: boolean
     mapTileId?: boolean
+    vault?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     profile?: boolean | AgentProfileDefaultArgs<ExtArgs>
     mapTile?: boolean | MapTileDefaultArgs<ExtArgs>
@@ -6309,9 +6319,10 @@ export namespace Prisma {
     profileId?: boolean
     deathTimestamp?: boolean
     mapTileId?: boolean
+    vault?: boolean
   }
 
-  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "authorityAssociatedTokenAddress" | "pda" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId", ExtArgs["result"]["agent"]>
+  export type AgentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "authority" | "authorityAssociatedTokenAddress" | "pda" | "gameId" | "isAlive" | "profileId" | "deathTimestamp" | "mapTileId" | "vault", ExtArgs["result"]["agent"]>
   export type AgentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tweets?: boolean | Agent$tweetsArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
@@ -6375,6 +6386,7 @@ export namespace Prisma {
       profileId: string
       deathTimestamp: Date | null
       mapTileId: string
+      vault: string
     }, ExtArgs["result"]["agent"]>
     composites: {}
   }
@@ -6825,6 +6837,7 @@ export namespace Prisma {
     readonly profileId: FieldRef<"Agent", 'String'>
     readonly deathTimestamp: FieldRef<"Agent", 'DateTime'>
     readonly mapTileId: FieldRef<"Agent", 'String'>
+    readonly vault: FieldRef<"Agent", 'String'>
   }
     
 
@@ -17598,7 +17611,8 @@ export namespace Prisma {
     isAlive: 'isAlive',
     profileId: 'profileId',
     deathTimestamp: 'deathTimestamp',
-    mapTileId: 'mapTileId'
+    mapTileId: 'mapTileId',
+    vault: 'vault'
   };
 
   export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
@@ -18253,6 +18267,7 @@ export namespace Prisma {
     profileId?: StringFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
     mapTileId?: StringFilter<"Agent"> | string
+    vault?: StringFilter<"Agent"> | string
     tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     battlesAsAttacker?: BattleListRelationFilter
@@ -18283,6 +18298,7 @@ export namespace Prisma {
     profileId?: SortOrder
     deathTimestamp?: SortOrderInput | SortOrder
     mapTileId?: SortOrder
+    vault?: SortOrder
     tweets?: TweetOrderByRelationAggregateInput
     game?: GameOrderByWithRelationInput
     battlesAsAttacker?: BattleOrderByRelationAggregateInput
@@ -18317,6 +18333,7 @@ export namespace Prisma {
     isAlive?: BoolFilter<"Agent"> | boolean
     profileId?: StringFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
+    vault?: StringFilter<"Agent"> | string
     tweets?: TweetListRelationFilter
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
     battlesAsAttacker?: BattleListRelationFilter
@@ -18347,6 +18364,7 @@ export namespace Prisma {
     profileId?: SortOrder
     deathTimestamp?: SortOrderInput | SortOrder
     mapTileId?: SortOrder
+    vault?: SortOrder
     _count?: AgentCountOrderByAggregateInput
     _avg?: AgentAvgOrderByAggregateInput
     _max?: AgentMaxOrderByAggregateInput
@@ -18368,6 +18386,7 @@ export namespace Prisma {
     profileId?: StringWithAggregatesFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableWithAggregatesFilter<"Agent"> | Date | string | null
     mapTileId?: StringWithAggregatesFilter<"Agent"> | string
+    vault?: StringWithAggregatesFilter<"Agent"> | string
   }
 
   export type IgnoreWhereInput = {
@@ -19334,6 +19353,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -19364,6 +19384,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -19388,6 +19409,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -19418,6 +19440,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -19445,6 +19468,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
   }
 
   export type AgentUpdateManyMutationInput = {
@@ -19455,6 +19479,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
   }
 
   export type AgentUncheckedUpdateManyInput = {
@@ -19468,6 +19493,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
   }
 
   export type IgnoreCreateInput = {
@@ -20651,6 +20677,7 @@ export namespace Prisma {
     profileId?: SortOrder
     deathTimestamp?: SortOrder
     mapTileId?: SortOrder
+    vault?: SortOrder
   }
 
   export type AgentAvgOrderByAggregateInput = {
@@ -20668,6 +20695,7 @@ export namespace Prisma {
     profileId?: SortOrder
     deathTimestamp?: SortOrder
     mapTileId?: SortOrder
+    vault?: SortOrder
   }
 
   export type AgentMinOrderByAggregateInput = {
@@ -20681,6 +20709,7 @@ export namespace Prisma {
     profileId?: SortOrder
     deathTimestamp?: SortOrder
     mapTileId?: SortOrder
+    vault?: SortOrder
   }
 
   export type AgentSumOrderByAggregateInput = {
@@ -23065,6 +23094,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
@@ -23093,6 +23123,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -23329,6 +23360,7 @@ export namespace Prisma {
     profileId?: StringFilter<"Agent"> | string
     deathTimestamp?: DateTimeNullableFilter<"Agent"> | Date | string | null
     mapTileId?: StringFilter<"Agent"> | string
+    vault?: StringFilter<"Agent"> | string
   }
 
   export type AllianceUpsertWithWhereUniqueWithoutGameInput = {
@@ -23519,6 +23551,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -23548,6 +23581,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -23576,6 +23610,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -23605,6 +23640,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -23693,6 +23729,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -23722,6 +23759,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -23756,6 +23794,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -23785,6 +23824,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -23863,6 +23903,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -23891,6 +23932,7 @@ export namespace Prisma {
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -24847,6 +24889,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -24876,6 +24919,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -24953,6 +24997,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -24982,6 +25027,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -25021,6 +25067,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -25050,6 +25097,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -25139,6 +25187,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -25168,6 +25217,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -25191,6 +25241,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -25219,6 +25270,7 @@ export namespace Prisma {
     isAlive?: boolean
     profileId: string
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -25259,6 +25311,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -25287,6 +25340,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -25311,6 +25365,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
@@ -25340,6 +25395,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
@@ -25407,6 +25463,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
@@ -25436,6 +25493,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
@@ -25537,6 +25595,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -25566,6 +25625,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -25594,6 +25654,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -25623,6 +25684,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -25717,6 +25779,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -25746,6 +25809,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -25780,6 +25844,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -25809,6 +25874,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -25881,6 +25947,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsDefender?: BattleCreateNestedManyWithoutDefenderInput
@@ -25910,6 +25977,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
@@ -25938,6 +26006,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -25967,6 +26036,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsAttackerAlly?: BattleUncheckedCreateNestedManyWithoutAttackerAllyInput
@@ -25995,6 +26065,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -26024,6 +26095,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -26052,6 +26124,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -26081,6 +26154,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -26109,6 +26183,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -26138,6 +26213,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -26232,6 +26308,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
@@ -26261,6 +26338,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
@@ -26295,6 +26373,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -26324,6 +26403,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsAttackerAlly?: BattleUncheckedUpdateManyWithoutAttackerAllyNestedInput
@@ -26358,6 +26438,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -26387,6 +26468,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -26421,6 +26503,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -26450,6 +26533,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -26484,6 +26568,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -26513,6 +26598,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -26588,6 +26674,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -26617,6 +26704,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -26705,6 +26793,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -26734,6 +26823,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -26812,6 +26902,7 @@ export namespace Prisma {
     pda: string
     isAlive?: boolean
     deathTimestamp?: Date | string | null
+    vault: string
     tweets?: TweetCreateNestedManyWithoutAgentInput
     game: GameCreateNestedOneWithoutAgentsInput
     battlesAsAttacker?: BattleCreateNestedManyWithoutAttackerInput
@@ -26841,6 +26932,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
     tweets?: TweetUncheckedCreateNestedManyWithoutAgentInput
     battlesAsAttacker?: BattleUncheckedCreateNestedManyWithoutAttackerInput
     battlesAsDefender?: BattleUncheckedCreateNestedManyWithoutDefenderInput
@@ -26929,6 +27021,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -26958,6 +27051,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -27038,6 +27132,7 @@ export namespace Prisma {
     profileId: string
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
   }
 
   export type AllianceCreateManyGameInput = {
@@ -27108,6 +27203,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUpdateManyWithoutDefenderNestedInput
@@ -27136,6 +27232,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -27162,6 +27259,7 @@ export namespace Prisma {
     profileId?: StringFieldUpdateOperationsInput | string
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
   }
 
   export type AllianceUpdateWithoutGameInput = {
@@ -27354,6 +27452,7 @@ export namespace Prisma {
     isAlive?: boolean
     deathTimestamp?: Date | string | null
     mapTileId: string
+    vault: string
   }
 
   export type AgentUpdateWithoutProfileInput = {
@@ -27364,6 +27463,7 @@ export namespace Prisma {
     pda?: StringFieldUpdateOperationsInput | string
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUpdateManyWithoutAgentNestedInput
     game?: GameUpdateOneRequiredWithoutAgentsNestedInput
     battlesAsAttacker?: BattleUpdateManyWithoutAttackerNestedInput
@@ -27392,6 +27492,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
     tweets?: TweetUncheckedUpdateManyWithoutAgentNestedInput
     battlesAsAttacker?: BattleUncheckedUpdateManyWithoutAttackerNestedInput
     battlesAsDefender?: BattleUncheckedUpdateManyWithoutDefenderNestedInput
@@ -27418,6 +27519,7 @@ export namespace Prisma {
     isAlive?: BoolFieldUpdateOperationsInput | boolean
     deathTimestamp?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     mapTileId?: StringFieldUpdateOperationsInput | string
+    vault?: StringFieldUpdateOperationsInput | string
   }
 
   export type TweetCreateManyAgentInput = {

@@ -102,7 +102,7 @@ const env = cleanEnv(process.env, {
   }),
   MEARTH_TOKEN_MINT: str({
     desc: "Token mint address for the Middle Earth game token",
-    example: "6xxtS3cfzTAmuEQGHEh1CUUQwfDUPx5DZuAiyv32hous",
+    // example: "6xxtS3cfzTAmuEQGHEh1CUUQwfDUPx5DZuAiyv32hous",
   }),
   AGENT_AUTHORITY_1: str({
     desc: "Private key for agent 1 (purrlockpaws)",

@@ -20,5 +20,5 @@ async function main() {
 
 main().catch((error) => {
   console.error("Failed to seed database:", error);
-  process.exit(1);
+  // process.exit(1);
 });

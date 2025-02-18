@@ -118,6 +118,9 @@ model Agent {
   initiatedEvents GameEvent[] @relation("EventInitiator")
   targetedEvents  GameEvent[] @relation("EventTarget")
 
+  // Vault
+  vault String
+
   @@unique([onchainId, gameId])
 }
 

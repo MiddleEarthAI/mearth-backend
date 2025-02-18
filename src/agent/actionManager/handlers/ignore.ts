@@ -15,6 +15,7 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
     action: IgnoreAction
   ): Promise<ActionResult> {
     try {
+      const timestamp = new Date().getTime();
       console.info(`Agent ${ctx.agentId} ignoring ${action.targetId}`);
 
       // Get the agents
@@ -41,13 +42,23 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
       // Create records in transaction
       await this.prisma.$transaction([
         // Create ignore relationship
-        this.prisma.ignore.create({
+        // this.prisma.ignore.create({
+        //   data: {
+        //     agentId: ctx.agentId,
+        //     ignoredAgentId: targetAgent.id,
+        //     timestamp: new Date(),
+        //     gameId: ctx.gameId,
+        //     duration: gameConfig.mechanics.cooldowns.ignore,
+        //   },
+        // }),
+        this.prisma.coolDown.create({
           data: {
-            agentId: ctx.agentId,
-            ignoredAgentId: targetAgent.id,
-            timestamp: new Date(),
+            endsAt: new Date(
+              timestamp + gameConfig.mechanics.cooldowns.ignore * 1000 // convert to ms
+            ),
+            type: "Ignore",
+            cooledAgentId: ctx.agentId,
             gameId: ctx.gameId,
-            duration: gameConfig.mechanics.cooldowns.ignore,
           },
         }),
         // Create event

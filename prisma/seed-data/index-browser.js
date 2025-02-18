@@ -168,7 +168,8 @@ exports.Prisma.AgentScalarFieldEnum = {
   isAlive: 'isAlive',
   profileId: 'profileId',
   deathTimestamp: 'deathTimestamp',
-  mapTileId: 'mapTileId'
+  mapTileId: 'mapTileId',
+  vault: 'vault'
 };
 
 exports.Prisma.IgnoreScalarFieldEnum = {

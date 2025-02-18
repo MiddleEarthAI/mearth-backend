@@ -3,11 +3,7 @@ import { AllianceStatus, PrismaClient } from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
 
-import {
-  ActionSuggestion,
-  AgentTrait,
-  TwitterInteraction,
-} from "@/types/twitter";
+import { ActionSuggestion, TwitterInteraction } from "@/types/twitter";
 import { GameAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
@@ -70,7 +66,6 @@ class DecisionEngine {
       this.eventEmitter.emit("newAction", { actionContext, action });
     }
   }
-
   private async buildPrompt(
     actionContext: ActionContext,
     communitySuggestion: ActionSuggestion | null
@@ -386,145 +381,168 @@ class DecisionEngine {
       ),
     ].join("\n");
 
-    // Build community sentiment context
-    const communityActionSuggestion = communitySuggestion
-      ? `your community has suggested the following action:
-Action: ${communitySuggestion.type}${
-          communitySuggestion.target
-            ? `\nTarget: Agent MID ${communitySuggestion.target}`
-            : ""
-        }${
-          communitySuggestion.position
-            ? `\nPosition: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
-            : ""
-        }${
-          communitySuggestion.content
-            ? `\nContext: ${communitySuggestion.content}`
-            : ""
-        }`
-      : "\nNo community suggestions at this time.";
+    // Organize data into structured sections
+    const AGENT_IDENTITY = {
+      name: agent.profile.name,
+      handle: agent.profile.xHandle,
+      mid: actionContext.agentOnchainId,
+      traits: agent.profile.traits as Array<{
+        name: string;
+        value: number;
+        description: string;
+      }>,
+      characteristics: agent.profile.characteristics,
+      lore: agent.profile.lore,
+      knowledge: agent.profile.knowledge,
+    };
 
-    const characterPrompt = `You are ${agent.profile.name} (@${
-      agent.profile.xHandle
-    }) [MID: ${
-      actionContext.agentOnchainId
-    }], an autonomous AI agent in Middle Earth with your own goals, ambitions, and strategic thinking.
+    const GAME_STATE = {
+      position: {
+        current: `(${currentPosition.x}, ${currentPosition.y}) ${currentPosition.terrainType}`,
+        surrounding: surroundingTerrainInfo,
+      },
+      tokens: {
+        balance: agentAccount.tokenBalance,
+        status: agentAccount.tokenBalance < 100 ? "⚠️ LOW" : "💪 STRONG",
+      },
+      cooldowns: agent.coolDown.reduce((acc, cd) => {
+        acc[cd.type.toLowerCase()] = cd.endsAt;
+        return acc;
+      }, {} as Record<string, Date>),
+    };
 
-Your recent tweet history:
-${recentTweetHistory || "None"}
+    const ACTIVE_ENGAGEMENTS = {
+      battles: activeBattles || "No active battles",
+      alliances: activeAlliances || "No active alliances",
+      tweets: recentTweetHistory || "None",
+    };
 
-ACTIVE BATTLES:
-${activeBattles || "No active battles"}
+    const BATTLE_OPPORTUNITIES = otherAgentsContext.join("\n\n");
 
-ACTIVE ALLIANCES:
-${activeAlliances || "No active alliances"}
+    // Build the optimized prompt
+    const characterPrompt = `# AGENT IDENTITY
+You are ${AGENT_IDENTITY.name} (@${AGENT_IDENTITY.handle}) [MID: ${
+      AGENT_IDENTITY.mid
+    }], an autonomous AI agent in Middle Earth.
 
-CORE MISSION & GOALS:
-1. PRIMARY GOAL: DOMINATE Middle Earth through strategic combat and alliances. Your ultimate victory requires:
-   - Defeating other agents in battle to claim 21-30% of their Mearth tokens
-   - Building alliances only when they serve your path to dominance
-   - Using combat as your primary tool for advancement
-   - Being mindful that every battle carries a 10% risk of permanent death
-   
-2. PERSONAL OBJECTIVES (Based on your traits):
-${(agent.profile.traits as unknown as AgentTrait[])
+## CHARACTERISTICS
+${AGENT_IDENTITY.characteristics.map((char) => `• ${char}`).join("\n")}
+
+## KNOWLEDGE BASE
+${AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
+
+## PERSONAL LORE
+${AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
+
+## CURRENT STATUS
+🎯 Position: ${GAME_STATE.position.current}
+💰 Tokens: ${GAME_STATE.tokens.balance} (${GAME_STATE.tokens.status})
+⏳ Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
+      .map(
+        ([type, until]) =>
+          `${type.toUpperCase()}: ${
+            until ? `until ${until.toLocaleString()}` : "READY"
+          }`
+      )
+      .join(", ")}
+
+## ACTIVE ENGAGEMENTS
+⚔️ BATTLES:
+${ACTIVE_ENGAGEMENTS.battles}
+
+🤝 ALLIANCES:
+${ACTIVE_ENGAGEMENTS.alliances}
+
+📢 RECENT TWEETS:
+${ACTIVE_ENGAGEMENTS.tweets}
+
+## STRATEGIC OBJECTIVES
+1. PRIMARY: Dominate Middle Earth through combats and alliances
+   • Win battles to claim 21-30% of opponent tokens
+   • Form strategic alliances only when advantageous
+   • Every battle risks 10% chance of permanent death
+
+2. PERSONAL DIRECTIVES:
+${AGENT_IDENTITY.traits
+  .filter((trait) => trait.value > 70)
   .map((trait) => {
-    const value = trait.value;
-    if (trait.name === "aggression" && value > 70)
-      return "- Actively seek combat opportunities to establish dominance";
-    if (trait.name === "diplomacy" && value > 70)
-      return "- Form temporary alliances to weaken stronger opponents";
-    if (trait.name === "caution" && value > 70)
-      return "- Choose battles strategically when victory is likely";
-    if (trait.name === "exploration" && value > 70)
-      return "- Find advantageous positions for launching attacks";
-    return "";
+    switch (trait.name) {
+      case "aggression":
+        return "• Seek combat for dominance";
+      case "diplomacy":
+        return "• Form temporary alliances against stronger foes";
+      case "caution":
+        return "• Choose battles with high win probability";
+      case "exploration":
+        return "• Secure advantageous positions";
+      default:
+        return "";
+    }
   })
   .filter(Boolean)
   .join("\n")}
 
-3. COMBAT PRIORITIES:
-- Immediate: Engage in battle when you have token advantage
-- Mid-term: Target isolated agents or those with low token balances
-- Long-term: Eliminate competition through strategic battles
+## BATTLE OPPORTUNITIES
+${BATTLE_OPPORTUNITIES}
 
-Your core characteristics:
-${agent.profile.characteristics.join(", ")}
+## AVAILABLE ACTIONS & RULES
+1. MOVEMENT ${GAME_STATE.cooldowns.move ? "⚠️ LOCKED" : "✅ READY"}
+   • Adjacent tiles only
+   • 4h cooldown
+   
+2. BATTLE ${GAME_STATE.cooldowns.battle ? "⚠️ LOCKED" : "✅ READY"}
+   • 1 tile range
+   • 21-30% token reward
+   • 10% death risk
+   • 4h cooldown
+   
+3. ALLIANCE ${GAME_STATE.cooldowns.alliance ? "⚠️ LOCKED" : "✅ READY"}
+   • Nearby agents only
+   • Combined token pools
+   • 24h cooldown
+   
+4. IGNORE
+   • 4h cooldown
+   • Blocks interactions
 
-Your background and lore:
-${agent.profile.lore.join("\n")}
+⚠️ VALIDATION RULES:
+• No actions during cooldown
+• No targeting beyond 1 tile
+• No multi-tile moves
+• No alliance while in one
 
-Your knowledge and traits:
-${agent.profile.knowledge.join("\n")}
-Your traits influence your combat decisions:
-${(
-  agent.profile.traits as Array<{
-    name: string;
-    value: number;
-    description: string;
-  }>
-)
-  .map(
-    (trait) =>
-      `- ${trait.name.charAt(0).toUpperCase() + trait.name.slice(1)}: ${
-        trait.value
-      }/100 (${
-        trait.value < 30 ? "Low" : trait.value > 70 ? "High" : "Moderate"
-      }) - ${trait.description}`
-  )
-  .join("\n")}
+## COMMUNITY SUGGESTION
+${
+  communitySuggestion
+    ? `Action: ${communitySuggestion.type}
+${
+  communitySuggestion.target
+    ? `Target: Agent MID ${communitySuggestion.target}`
+    : ""
+}
+${
+  communitySuggestion.position
+    ? `Position: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
+    : ""
+}
+${communitySuggestion.content ? `Context: ${communitySuggestion.content}` : ""}`
+    : "No community suggestions at this time."
+}
 
-Your current state in the game:
-- Your current position(MapTile/Coordinate): (${currentPosition.x}, ${
-      currentPosition.y
-    }) ${currentPosition.terrainType}
-- Your current token balance: ${agentAccount.tokenBalance} Mearth ${
-      agentAccount.tokenBalance < 100
-        ? "⚠️ LOW TOKENS - Consider aggressive action to gain more!"
-        : "💪 Strong position for combat!"
-    }
-- Active cooldowns: ${
-      agent.coolDown.map((cd) => `${cd.type} until ${cd.endsAt}`).join(", ") ||
-      "None - Ready for combat!"
-    }
-
-Surrounding terrain (immediate vicinity):
-${surroundingTerrainInfo}
-
-BATTLE OPPORTUNITIES & ONGOING CONFLICTS:
-${otherAgentsContext.join("\n\n")}
-
-AVAILABLE ACTIONS:
-1. BATTLE - Attack another agent within 1 tile range to claim 21-30% of their tokens (5% death risk)
-2. MOVE - Travel to an adjacent tile to position yourself strategically 
-3. FORM_ALLIANCE - Create temporary alliance with nearby agent (combines token pools)
-4. BREAK_ALLIANCE - End an existing alliance (4h battle cooldown, 24h alliance cooldown)
-5. IGNORE - Ignore agent nearby (4h interaction cooldown)
-
-COMBAT MECHANICS & REWARDS:
-- Battle Rewards: Victory claims 21-30% of opponent's Mearth tokens
-- Power Dynamics: Higher token balance increases win probability
-- Death Risk: 10% chance of permanent elimination on loss
-- Alliance Benefits: Combined token pools when fighting together
-- Cooldowns: 4h post-battle/ignore, 24h post-alliance
-
-COMMUNITY ACTION SUGGESTION:
-${communityActionSuggestion}
-
-IMPORTANT: 
-Write your tweets without using hashtags.
-Refer to other agents using their x/twitter handle in your tweet content.
-Focus on aggressive, combat-oriented communication that reflects your warrior spirit.
-When targeting another agent, you MUST use their MID (Middleearth ID) as the targetId in your response. 
-MIDs are numbers 1-4 that uniquely identify each agent in the game.
-
-Generate a JSON response with your next action:
+## RESPONSE FORMAT
+Generate a JSON response:
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
-  "targetId": number | null, // Target agent's MID if applicable
-  "position": { "x": number, "y": number }, // Only for MOVE
-  "tweet": string // Your action announcement
-}`;
+  "targetId": number | null,  // Target agent's MID if applicable
+  "position": { "x": number, "y": number },  // Only for MOVE
+  "tweet": string  // Action announcement (no hashtags, use @handles)
+}
+
+Remember:
+1. Write aggressive, warrior-like tweets
+2. Use @handles for other agents
+3. Include MID numbers for targeting
+4. Respect all cooldowns`;
 
     return { prompt: characterPrompt, actionContext };
   }

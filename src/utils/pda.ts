@@ -32,21 +32,3 @@ export const getAgentPDA = (
     programId
   );
 };
-
-/**
- * Get the PDA for an alliance
- * @param programId The program ID
- * @param initiatorPDA The initiator agent PDA
- * @param targetPDA The target agent PDA
- * @returns [PDA, bump]
- */
-export const getAlliancePDA = (
-  programId: PublicKey,
-  initiatorPDA: PublicKey,
-  targetPDA: PublicKey
-) => {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from("alliance"), initiatorPDA.toBuffer(), targetPDA.toBuffer()],
-    programId
-  );
-};

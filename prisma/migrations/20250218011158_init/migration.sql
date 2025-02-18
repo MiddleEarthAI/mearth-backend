@@ -84,6 +84,7 @@ CREATE TABLE "Agent" (
     "profileId" TEXT NOT NULL,
     "deathTimestamp" TIMESTAMP(3),
     "mapTileId" TEXT NOT NULL,
+    "vault" TEXT NOT NULL,
 
     CONSTRAINT "Agent_pkey" PRIMARY KEY ("id")
 );

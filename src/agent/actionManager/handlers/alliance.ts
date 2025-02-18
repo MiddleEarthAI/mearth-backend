@@ -20,6 +20,17 @@ export class AllianceHandler
     private readonly prisma: PrismaClient
   ) {}
 
+  async handle(
+    ctx: ActionContext,
+    action: FormAllianceAction | BreakAllianceAction
+  ): Promise<ActionResult> {
+    if (action.type === "FORM_ALLIANCE") {
+      return this.handleFormAlliance(ctx, action);
+    } else {
+      return this.handleBreakAlliance(ctx, action);
+    }
+  }
+
   private async handleFormAlliance(
     ctx: ActionContext,
     action: FormAllianceAction
@@ -335,17 +346,6 @@ export class AllianceHandler
           },
         },
       };
-    }
-  }
-
-  async handle(
-    ctx: ActionContext,
-    action: FormAllianceAction | BreakAllianceAction
-  ): Promise<ActionResult> {
-    if (action.type === "FORM_ALLIANCE") {
-      return this.handleFormAlliance(ctx, action);
-    } else {
-      return this.handleBreakAlliance(ctx, action);
     }
   }
 }

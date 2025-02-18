@@ -10,7 +10,9 @@ import * as anchor from "@coral-xyz/anchor";
 import {
   getAgentAuthorityAta,
   getAgentAuthorityKeypair,
+  getAgentVault,
   getMiddleEarthAiAuthorityWallet,
+  getRewardsVault,
 } from "@/utils/program";
 
 const { BN } = anchor;
@@ -210,13 +212,16 @@ export class GameManager implements IGameManager {
 
           console.info("💾 Creating game record in database...");
 
+          const rewardsVault = await getRewardsVault();
+          console.log(gameAccount);
+
           const dbGame = await this.prisma.game.create({
             data: {
               pda: gamePda.toString(),
               onchainId: nextGameId,
               authority: gameAuthWallet.keypair.publicKey.toString(),
               tokenMint: solanaConfig.tokenMint,
-              rewardsVault: gameAccount.rewardsVault.toString(),
+              rewardsVault: rewardsVault.address.toBase58(),
               mapDiameter: gameConfig.mapDiameter,
               bump: bump,
               dailyRewardTokens: gameConfig.dailyRewardTokens,
@@ -257,6 +262,12 @@ export class GameManager implements IGameManager {
 
   private async initializeAgents(gamePda: PublicKey, dbGame: Game) {
     console.info("🎭 Starting agent initialization process...");
+    // clear all map off occupants
+    await this.prisma.mapTile.updateMany({
+      data: {
+        agentId: null,
+      },
+    });
     const profiles = await this.prisma.agentProfile.findMany();
     return Promise.all(
       profiles.map(async (profile, index) => {
@@ -316,8 +327,12 @@ export class GameManager implements IGameManager {
 
         console.info(`💾 Creating agent database record...`);
 
+        console.info(`💰 Creating agent vault...`);
+        const agentVault = await getAgentVault(profile.onchainId);
+
         const agentDb = await this.prisma.agent.create({
           data: {
+            vault: agentVault.address.toString(),
             onchainId: profile.onchainId,
             pda: agentPda.toString(),
             gameId: dbGame.id,

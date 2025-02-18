@@ -117,3 +117,36 @@ export async function getAgentAuthorityKeypair(agentOnchainId: number) {
   const keypair = Keypair.fromSecretKey(privateKey);
   return keypair;
 }
+
+export async function getAgentVault(agentOnchainId: number) {
+  const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
+  const agentVault = await getOrCreateAssociatedTokenAccount(
+    connection(),
+    agentAuthorityKeypair,
+    new PublicKey(solanaConfig.tokenMint),
+    agentAuthorityKeypair.publicKey,
+    false
+  );
+  return agentVault;
+}
+
+export async function getRewardsVault() {
+  const mearthTokenMint = solanaConfig.tokenMint;
+
+  if (!mearthTokenMint) {
+    throw new Error("MEARTH_TOKEN_MINT is not set");
+  }
+
+  const gameAuthorityKeypair = await getMiddleEarthAiAuthorityWallet();
+  const mintPubKey = new PublicKey(mearthTokenMint);
+  const conn = connection();
+  const ata = await getOrCreateAssociatedTokenAccount(
+    conn,
+    gameAuthorityKeypair.keypair,
+    mintPubKey,
+    gameAuthorityKeypair.keypair.publicKey,
+    false
+  );
+
+  return ata;
+}

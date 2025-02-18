@@ -2,12 +2,25 @@ import { ActionContext, BattleAction, ActionResult } from "@/types";
 import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
-import { calculateBattleOutcome } from "@/utils/battle";
+
 import {
-  getAgentAuthorityAta,
   getAgentAuthorityKeypair,
   getMiddleEarthAiAuthorityWallet,
 } from "@/utils/program";
+import { AgentAccount } from "@/types/program";
+import { gameConfig } from "@/config/env";
+
+interface BattleSide {
+  agent: AgentAccount;
+  ally: AgentAccount | null;
+}
+
+interface BattleOutcome {
+  winner: "sideA" | "sideB";
+  percentageLost: number;
+  totalTokensAtStake: number;
+  agentsToDie: number[];
+}
 
 export class BattleHandler {
   constructor(
@@ -109,7 +122,8 @@ export class BattleHandler {
       };
 
       // Calculate battle outcome
-      const outcome = calculateBattleOutcome(sideA, sideB);
+      const outcome = await this.calculateBattleOutcome(sideA, sideB);
+      console.info("Battle outcome", { outcome });
 
       const battleType =
         attackerAllyAccount && defenderAllyAccount
@@ -171,9 +185,57 @@ export class BattleHandler {
               percentageLost: outcome.percentageLost,
               winner: outcome.winner,
               timestamp: new Date().toISOString(),
+              agentsToDie: outcome.agentsToDie,
             },
           },
         });
+
+        console.log("Killing agents onchain....................", { outcome });
+        if (outcome.agentsToDie.length > 0) {
+          const deathTime = new Date();
+
+          // Update agent records to mark them as dead
+          await Promise.all(
+            outcome.agentsToDie.map(async (agentId) => {
+              // Update database record
+              await prisma.agent.update({
+                where: {
+                  onchainId_gameId: {
+                    onchainId: agentId,
+                    gameId: ctx.gameId,
+                  },
+                },
+                data: {
+                  isAlive: false,
+                  deathTimestamp: deathTime,
+                },
+              });
+
+              // Create death event
+              await prisma.gameEvent.create({
+                data: {
+                  gameId: ctx.gameId,
+                  eventType: "AGENT_DEATH",
+                  initiatorId: ctx.agentId,
+                  targetId:
+                    agentId === attackerRecord.profile.onchainId
+                      ? attackerRecord.id
+                      : defenderRecord.id,
+                  message: `💀 @${
+                    agentId === attackerRecord.profile.onchainId
+                      ? attackerRecord.profile.xHandle
+                      : defenderRecord.profile.xHandle
+                  } has fallen in battle!`,
+                  metadata: {
+                    cause: "BATTLE",
+                    battleId: battle.id,
+                    timestamp: deathTime.toISOString(),
+                  },
+                },
+              });
+            })
+          );
+        }
 
         // Execute onchain battle resolution
         let tx: string;
@@ -324,7 +386,29 @@ export class BattleHandler {
             .rpc();
         }
 
-        return { battle, battleEvent, tx };
+        // Kill the agents that died
+        await Promise.all(
+          outcome.agentsToDie.map(async (agentId) => {
+            // Execute on-chain kill instruction
+            const [deadAgentPda] = getAgentPDA(
+              this.program.programId,
+              gamePda,
+              agentId
+            );
+            const deadAgentAuthority = await getAgentAuthorityKeypair(agentId);
+
+            await this.program.methods
+              .killAgent()
+              .accountsStrict({
+                agent: deadAgentPda,
+                authority: deadAgentAuthority.publicKey,
+              })
+              .signers([deadAgentAuthority])
+              .rpc();
+
+            return { battle, battleEvent, tx };
+          })
+        );
       });
 
       return {
@@ -349,6 +433,68 @@ export class BattleHandler {
     }
   }
 
+  /**
+   * Calculate the outcome of a battle between two participants
+   * If total tokens is zero, uses agent and ally count as a fallback mechanism
+   */
+
+  private async calculateBattleOutcome(
+    sideA: BattleSide,
+    sideB: BattleSide
+  ): Promise<BattleOutcome> {
+    // Calculate total tokens for each side
+    const sideATokens =
+      sideA.agent.tokenBalance + (sideA.ally?.tokenBalance ?? 0);
+    const sideBTokens =
+      sideB.agent.tokenBalance + (sideB.ally?.tokenBalance ?? 0);
+    const totalTokens = sideATokens + sideBTokens;
+
+    let sideAWins: boolean;
+
+    if (totalTokens === 0) {
+      // Use number of agents as fallback when no tokens
+      const sideACount = sideA.ally ? 2 : 1;
+      const sideBCount = sideB.ally ? 2 : 1;
+      const totalCount = sideACount + sideBCount;
+
+      // Calculate probability based on agent count
+      const sideAProbability = sideACount / totalCount;
+      const rand = Math.random();
+      sideAWins = rand < sideAProbability;
+    } else {
+      // Calculate winning probabilities based on tokens
+      const sideAProbability = sideATokens / totalTokens;
+      const rand = Math.random();
+      sideAWins = rand < sideAProbability;
+    }
+
+    // Generate loss percentage (20-30%)
+    const percentageLost = Math.floor(Math.random() * 11) + 20;
+
+    // Check for agentsToDie (10% chance for losing side)
+    const agentsToDie: number[] = [];
+    const losingSide = sideAWins ? sideB : sideA;
+
+    const deathChance = gameConfig.mechanics.deathChance / 100;
+
+    // Check death for main agent (10% chance)
+    if (Math.random() < deathChance) {
+      agentsToDie.push(Number(losingSide.agent.id));
+    }
+
+    // Check death for ally if exists (10% chance)
+    if (losingSide.ally && Math.random() < deathChance) {
+      agentsToDie.push(Number(losingSide.ally.id));
+    }
+
+    return {
+      winner: sideAWins ? "sideA" : "sideB",
+      percentageLost,
+      totalTokensAtStake: Number(totalTokens),
+      agentsToDie,
+    };
+  }
+
   private createBattleMessage(
     attackerHandle: string,
     defenderHandle: string,
@@ -356,11 +502,20 @@ export class BattleHandler {
       winner: "sideA" | "sideB";
       percentageLost: number;
       totalTokensAtStake: number;
+      agentsToDie: number[];
     }
   ): string {
     const winner = outcome.winner === "sideA" ? attackerHandle : defenderHandle;
     const loser = outcome.winner === "sideA" ? defenderHandle : attackerHandle;
 
-    return `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of ${outcome.totalTokensAtStake} tokens lost in the clash!`;
+    let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of ${outcome.totalTokensAtStake} tokens lost in the clash!`;
+
+    if (outcome.agentsToDie.length > 0) {
+      message += ` 💀 ${
+        outcome.agentsToDie.length === 1 ? "A warrior has" : "Warriors have"
+      } fallen in battle!`;
+    }
+
+    return message;
   }
 }
