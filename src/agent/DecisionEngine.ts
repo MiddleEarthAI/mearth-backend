@@ -510,9 +510,9 @@ ${AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
 ${AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
 
 ## CURRENT STATUS
-🎯 Position: ${GAME_STATE.position.current}
-💰 Tokens: ${GAME_STATE.tokens.balance} (${GAME_STATE.tokens.status})
-⏳ Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
+Position: ${GAME_STATE.position.current}
+Tokens: ${GAME_STATE.tokens.balance} (${GAME_STATE.tokens.status})
+Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
       .map(
         ([type, until]) =>
           `${type.toUpperCase()}: ${
@@ -522,13 +522,13 @@ ${AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
       .join(", ")}
 
 ## ACTIVE ENGAGEMENTS
-⚔️ BATTLES:
+You have participated in the following battles:
 ${ACTIVE_ENGAGEMENTS.battles}
 
-🤝 ALLIANCES:
+You are a member of the following alliances:
 ${ACTIVE_ENGAGEMENTS.alliances}
 
-📢 RECENT TWEETS:
+You have the following recent tweets:
 ${ACTIVE_ENGAGEMENTS.tweets}
 
 ## STRATEGIC OBJECTIVES
@@ -539,7 +539,7 @@ ${ACTIVE_ENGAGEMENTS.tweets}
 
 2. PERSONAL DIRECTIVES:
 ${AGENT_IDENTITY.traits
-  .filter((trait) => trait.value > 70)
+  .filter((trait) => trait.value > 20)
   .map((trait) => {
     switch (trait.name) {
       case "aggression":
@@ -557,7 +557,7 @@ ${AGENT_IDENTITY.traits
   .filter(Boolean)
   .join("\n")}
 
-## BATTLE OPPORTUNITIES
+## FELLOW AGENTS ACTIVITIES
 ${BATTLE_OPPORTUNITIES}
 
 ## AVAILABLE ACTIONS & RULES
@@ -610,7 +610,7 @@ Generate a JSON response:
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null,  // Target agent's MID if applicable
   "position": { "x": number, "y": number },  // Only for MOVE
-  "tweet": string  // Action announcement (no hashtags, ONLY use @handles to refer to other agents)
+  "tweet": string  // Action announcement (no hashtags, use @handles, NO MID in tweet)
 }
 
 Remember:

@@ -237,6 +237,87 @@ export class BattleHandler {
           );
         }
 
+        // Create battle cooldowns for all participating agents
+        const cooldownEndTime = new Date(
+          startTime.getTime() + gameConfig.mechanics.battle.duration
+        );
+
+        // Create cooldown for attacker
+        await prisma.coolDown.create({
+          data: {
+            type: "Battle",
+            endsAt: cooldownEndTime,
+            cooledAgent: {
+              connect: {
+                id: attackerRecord.id,
+              },
+            },
+            game: {
+              connect: {
+                id: ctx.gameId,
+              },
+            },
+          },
+        });
+
+        // Create cooldown for defender
+        await prisma.coolDown.create({
+          data: {
+            type: "Battle",
+            endsAt: cooldownEndTime,
+            cooledAgent: {
+              connect: {
+                id: defenderRecord.id,
+              },
+            },
+            game: {
+              connect: {
+                id: ctx.gameId,
+              },
+            },
+          },
+        });
+
+        // Create cooldown for attacker's ally if exists
+        if (attackerAllyRecord) {
+          await prisma.coolDown.create({
+            data: {
+              type: "Battle",
+              endsAt: cooldownEndTime,
+              cooledAgent: {
+                connect: {
+                  id: attackerAllyRecord.id,
+                },
+              },
+              game: {
+                connect: {
+                  id: ctx.gameId,
+                },
+              },
+            },
+          });
+        }
+
+        // Create cooldown for defender's ally if exists
+        if (defenderAllyRecord) {
+          await prisma.coolDown.create({
+            data: {
+              type: "Battle",
+              endsAt: cooldownEndTime,
+              cooledAgent: {
+                connect: {
+                  id: defenderAllyRecord.id,
+                },
+              },
+              game: {
+                connect: {
+                  id: ctx.gameId,
+                },
+              },
+            },
+          });
+        }
+
         // Execute onchain battle resolution
         let tx: string;
 
