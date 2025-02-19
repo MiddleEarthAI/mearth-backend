@@ -523,16 +523,20 @@ ${AGENT_IDENTITY.postExamples
 
 ## CURRENT STATUS
 Position: ${GAME_STATE.position.current}
-surrounding: ${GAME_STATE.position.surrounding}
 Tokens: ${GAME_STATE.tokens.balance} (${GAME_STATE.tokens.status})
-Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
-      .map(
-        ([type, until]) =>
-          `${type.toUpperCase()}: ${
-            until ? `until ${until.toLocaleString()}` : "READY"
-          }`
-      )
-      .join(", ")}
+
+## COOLDOWNS
+${Object.entries(GAME_STATE.cooldowns)
+  .map(
+    ([type, until]) =>
+      `• ${type.toUpperCase()}: ${
+        until ? `until ${until.toLocaleString()}` : "READY"
+      }`
+  )
+  .join("\n")}
+
+## SURROUNDING TERRAIN (Available Move Positions)
+${GAME_STATE.position.surrounding}
 
 ## RECENT ENGAGEMENTS
 battles you warred in:
@@ -570,6 +574,7 @@ ${FellowAgentsContext}
 ⚠️ VALIDATION RULES:
 • No actions during cooldown
 • No targeting beyond 1 tile away
+• MOVE action can ONLY use coordinates from SURROUNDING TERRAIN section above
 • No multi-tile moves
 • No alliance while in one
 • No new alliance while in battle
@@ -599,8 +604,8 @@ Generate a JSON response:
 {
   "type": "${availableActions.join(" | ")}", // Action to take
   "targetId": number | null,  // Target agent's MID if applicable.
-  "position": { "x": number, "y": number },  // Only for MOVE. 
-  "tweet": string  // Action announcement (no hashtags, use @handles for other agents but not yourself, NO MID in tweet), make it engaging and interesting, you can be creative, sarcastic, funny, etc.
+  "position": { "x": number, "y": number },  // For MOVE: MUST be one of the coordinates listed in SURROUNDING TERRAIN
+  "tweet": string  // Action announcement (no hashtags, use @handles for other agents but not yourself, NO MID in tweet)
 }
 `;
 
