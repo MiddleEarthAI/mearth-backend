@@ -523,6 +523,7 @@ ${AGENT_IDENTITY.postExamples
 
 ## CURRENT STATUS
 Position: ${GAME_STATE.position.current}
+surrounding: ${GAME_STATE.position.surrounding}
 Tokens: ${GAME_STATE.tokens.balance} (${GAME_STATE.tokens.status})
 Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
       .map(
@@ -532,9 +533,6 @@ Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
           }`
       )
       .join(", ")}
-
-## SURROUNDING TERRAIN
-${GAME_STATE.position.surrounding}
 
 ## RECENT ENGAGEMENTS
 battles you warred in:
