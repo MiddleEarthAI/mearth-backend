@@ -5,11 +5,11 @@ async function main() {
   console.log("🌱 Starting database seeding...");
 
   try {
-    // Seed agent profiles
-    await seedAgentProfiles();
-
     // Seed map tiles
     await seedMapTiles();
+
+    // Seed agent profiles
+    await seedAgentProfiles();
 
     console.log("✅ Database seeding completed successfully");
   } catch (error) {

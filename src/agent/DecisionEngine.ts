@@ -514,12 +514,6 @@ ${AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
 ## PERSONAL LORE
 ${AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
 
-## POST EXAMPLES
-${AGENT_IDENTITY.postExamples
-  .sort(() => Math.random() - 0.5) // Randomly shuffle array
-  .slice(0, 3) // Take first 3 after shuffle
-  .map((p) => `${p}`)
-  .join("\n\n")}
 
 ## CURRENT STATUS
 Position: ${GAME_STATE.position.current}
@@ -906,3 +900,10 @@ Generate a single ActionSuggestion in JSON format:
 }
 
 export { DecisionEngine };
+
+// ## POST EXAMPLES
+// ${AGENT_IDENTITY.postExamples
+//   .sort(() => Math.random() - 0.5) // Randomly shuffle array
+//   .slice(0, 3) // Take first 3 after shuffle
+//   .map((p) => `${p}`)
+//   .join("\n\n")}
