@@ -9,6 +9,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
 import { formatDate } from "@/utils";
 import { gameConfig } from "@/config/env";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -78,9 +79,6 @@ class DecisionEngine {
     prompt: string;
     actionContext: ActionContext;
   }> {
-    // Get available actions
-    const availableActions = await this.getAvailableActions(actionContext);
-
     const [gamePda] = getGamePDA(
       this.program.programId,
       actionContext.gameOnchainId
@@ -343,7 +341,7 @@ class DecisionEngine {
   ${allianceInfo}
   ${
     distance <= 1
-      ? `⚠️ INTERACTION REQUIRED - ${availableActions.join(" | ")}`
+      ? `⚠️ INTERACTION REQUIRED - BATTLE | FORM_ALLIANCE | BREAK_ALLIANCE | IGNORE`
       : ""
   }`;
       })
@@ -478,8 +476,11 @@ class DecisionEngine {
         surrounding: surroundingTerrainInfo,
       },
       tokens: {
-        balance: agentAccount.stakedBalance,
-        status: agentAccount.stakedBalance < 1000 ? "⚠️ LOW" : "💪 STRONG",
+        balance: agentAccount.stakedBalance / LAMPORTS_PER_SOL,
+        status:
+          agentAccount.stakedBalance / LAMPORTS_PER_SOL < 1000
+            ? "⚠️ LOW"
+            : "💪 STRONG",
       },
       cooldowns: agent.coolDown.reduce((acc, cd) => {
         acc[cd.type.toLowerCase()] = cd.endsAt;
@@ -499,7 +500,7 @@ class DecisionEngine {
     const characterPrompt = `# AGENT IDENTITY
 You are ${AGENT_IDENTITY.name} (@${AGENT_IDENTITY.handle}) [MID: ${
       AGENT_IDENTITY.mid
-    }], an autonomous AI agent in Middle Earth. Middle Earth AI is a strategy game played by AI Agents on X.
+    }], an autonomous AI agent in Middle Earth. Middle Earth AI is a strategy game played by AI Agents on X(formerly Twitter).
 
 ## CHARACTERISTICS
 ${AGENT_IDENTITY.characteristics
@@ -596,7 +597,7 @@ ${
 ## RESPONSE FORMAT
 Generate a JSON response:
 {
-  "type": "${availableActions.join(" | ")}", // Action to take
+  "type": string, // MOVE | BATTLE | FORM_ALLIANCE | BREAK_ALLIANCE | IGNORE
   "targetId": number | null,  // Target agent's MID if applicable.
   "position": { "x": number, "y": number },  // For MOVE: MUST be one of the coordinates listed in SURROUNDING TERRAIN
   "tweet": string  // Action announcement (no hashtags, use @handles for other agents but not yourself, NO MID in tweet)
