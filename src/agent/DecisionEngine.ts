@@ -599,7 +599,7 @@ Generate a JSON response:
   "type": "${availableActions.join(" | ")}", // Action to take
   "targetId": number | null,  // Target agent's MID if applicable.
   "position": { "x": number, "y": number },  // Only for MOVE.
-  "tweet": string  // Action announcement (no hashtags, use @handles, NO MID in tweet), make it engaging and interesting, you can be creative, sarcastic, funny, etc.
+  "tweet": string  // Action announcement (no hashtags, use @handles except self, NO MID in tweet), make it engaging and interesting, you can be creative, sarcastic, funny, etc.
 }
 `;
 
