@@ -8,6 +8,7 @@ import { GameAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
 import { formatDate } from "@/utils";
+import { gameConfig } from "@/config/env";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -36,6 +37,7 @@ class DecisionEngine {
     if (!agent) {
       console.log("❌ Agent not found");
     }
+
     const communitySuggestion = await this.processInteractions(interactions);
 
     console.info("🤖 Community suggestion", communitySuggestion);
@@ -56,6 +58,7 @@ class DecisionEngine {
           { role: "assistant", content: "Here is the JSON requested:\n{" },
         ],
       });
+
       console.info("🤖 Generated AI response 🔥🔥🔥");
       console.info(response.text);
       const action = this.parseActionJson(`{${response.text}`);
@@ -88,9 +91,7 @@ class DecisionEngine {
       actionContext.agentOnchainId
     );
     const agentAccount = await this.program.account.agent.fetch(agentPda);
-    console.log("Agent account", agentAccount);
     if (!agentAccount) {
-      console.log("Agent not found");
       return { prompt: "", actionContext };
     }
 
@@ -191,6 +192,7 @@ class DecisionEngine {
             },
           },
         },
+        ignoring: true, // Include agents this agent is ignoring
       },
     });
 
@@ -199,10 +201,9 @@ class DecisionEngine {
       return { prompt: "", actionContext };
     }
 
-    // Get current position
-    const currentPosition = agent.mapTile;
-    console.info("Current position", { currentPosition });
-    if (!currentPosition) {
+    const currentMaptile = agent.mapTile;
+    console.info("Current position", { currentMaptile });
+    if (!currentMaptile) {
       console.log("Agent position not found");
       return { prompt: "", actionContext };
     }
@@ -211,10 +212,10 @@ class DecisionEngine {
     const nearbyTiles = await this.prisma.mapTile.findMany({
       where: {
         AND: [
-          { x: { gte: currentPosition.x - 1, lte: currentPosition.x + 1 } },
-          { y: { gte: currentPosition.y - 1, lte: currentPosition.y + 1 } },
+          { x: { gte: currentMaptile.x - 1, lte: currentMaptile.x + 1 } },
+          { y: { gte: currentMaptile.y - 1, lte: currentMaptile.y + 1 } },
           {
-            NOT: { AND: [{ x: currentPosition.x }, { y: currentPosition.y }] },
+            NOT: { AND: [{ x: currentMaptile.x }, { y: currentMaptile.y }] },
           },
         ],
       },
@@ -244,32 +245,28 @@ class DecisionEngine {
 
     const otherAgentsContext = await Promise.all(
       otherAgentInfo.map(async (agentInfo) => {
-        const agentPosition = agentInfo.agent.mapTile;
-        const distance = agentPosition
+        const agentMaptile = agentInfo.agent.mapTile;
+        const distance = agentMaptile
           ? Math.sqrt(
-              Math.pow(currentPosition.x - agentPosition.x, 2) +
-                Math.pow(currentPosition.y - agentPosition.y, 2)
+              Math.pow(currentMaptile.x - agentMaptile.x, 2) +
+                Math.pow(currentMaptile.y - agentMaptile.y, 2)
             )
           : Infinity;
 
         // Calculate direction vector to other agent
-        const directionX = agentPosition
-          ? agentPosition.x - currentPosition.x
-          : 0;
-        const directionY = agentPosition
-          ? agentPosition.y - currentPosition.y
-          : 0;
+        const directionX = agentMaptile ? agentMaptile.x - currentMaptile.x : 0;
+        const directionY = agentMaptile ? agentMaptile.y - currentMaptile.y : 0;
 
         // Calculate optimal path coordinates
         const pathCoords = [];
-        if (agentPosition) {
+        if (agentMaptile) {
           const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
           for (let i = 1; i <= steps; i++) {
             const stepX = Math.round(
-              currentPosition.x + (directionX * i) / steps
+              currentMaptile.x + (directionX * i) / steps
             );
             const stepY = Math.round(
-              currentPosition.y + (directionY * i) / steps
+              currentMaptile.y + (directionY * i) / steps
             );
             pathCoords.push(`(${stepX}, ${stepY})`);
           }
@@ -305,7 +302,7 @@ class DecisionEngine {
         ];
 
         const recentBattles = [
-          ...agentInfo.agent.battlesAsAttacker.slice(-2),
+          ...agentInfo.agent.battlesAsAttacker.slice(-2), // Only last 2 battles
           ...agentInfo.agent.battlesAsDefender.slice(-2),
         ].map((b) => b.type);
 
@@ -333,8 +330,8 @@ class DecisionEngine {
 - ${agentInfo.agent.profile.name} (@${agentInfo.agent.profile.xHandle}) [MID: ${
           agentInfo.agent.onchainId
         }]
-  Position: ${compassDirection} (${agentPosition?.x}, ${agentPosition?.y}) ${
-          agentPosition?.terrainType
+  Position: ${compassDirection} (${agentMaptile?.x}, ${agentMaptile?.y}) ${
+          agentMaptile?.terrainType
         } (${
           distance <= 1
             ? "⚠️ CRITICAL: Within battle range!"
@@ -346,7 +343,7 @@ class DecisionEngine {
   ${allianceInfo}
   ${
     distance <= 1
-      ? "⚠️ INTERACTION REQUIRED - BATTLE/FORM_ALLIANCE/BREAK_ALLIANCE/IGNORE!"
+      ? `⚠️ INTERACTION REQUIRED - ${availableActions.join(" | ")}`
       : ""
   }`;
       })
@@ -376,7 +373,7 @@ class DecisionEngine {
       .join("\n");
 
     // Get active battles context
-    const activeBattles =
+    const resolvedBattles =
       [
         ...agent.battlesAsAttacker.map((battle) => {
           const isResolved = battle.status === "Resolved";
@@ -472,16 +469,17 @@ class DecisionEngine {
       characteristics: agent.profile.characteristics,
       lore: agent.profile.lore,
       knowledge: agent.profile.knowledge,
+      postExamples: agent.profile.postExamples,
     };
 
     const GAME_STATE = {
       position: {
-        current: `(${currentPosition.x}, ${currentPosition.y}) ${currentPosition.terrainType}`,
+        current: `(${currentMaptile.x}, ${currentMaptile.y}) ${currentMaptile.terrainType}`,
         surrounding: surroundingTerrainInfo,
       },
       tokens: {
-        balance: agentAccount.tokenBalance,
-        status: agentAccount.tokenBalance < 100 ? "⚠️ LOW" : "💪 STRONG",
+        balance: agentAccount.stakedBalance,
+        status: agentAccount.stakedBalance < 1000 ? "⚠️ LOW" : "💪 STRONG",
       },
       cooldowns: agent.coolDown.reduce((acc, cd) => {
         acc[cd.type.toLowerCase()] = cd.endsAt;
@@ -489,28 +487,39 @@ class DecisionEngine {
       }, {} as Record<string, Date>),
     };
 
-    const ACTIVE_ENGAGEMENTS = {
-      battles: activeBattles || "No active battles",
+    const RECENT_ENGAGEMENTS = {
+      battles: resolvedBattles || "No active battles",
       alliances: activeAlliances || "No active alliances",
       tweets: recentTweetHistory || "None",
     };
 
-    const BATTLE_OPPORTUNITIES = otherAgentsContext.join("\n\n");
+    const FellowAgentsContext = otherAgentsContext.join("\n\n");
 
     // Build the optimized prompt
     const characterPrompt = `# AGENT IDENTITY
 You are ${AGENT_IDENTITY.name} (@${AGENT_IDENTITY.handle}) [MID: ${
       AGENT_IDENTITY.mid
-    }], an autonomous AI agent in Middle Earth.
+    }], an autonomous AI agent in Middle Earth. Middle Earth AI is a strategy game played by AI Agents on X.
 
 ## CHARACTERISTICS
-${AGENT_IDENTITY.characteristics.map((char) => `• ${char}`).join("\n")}
+${AGENT_IDENTITY.characteristics
+  .sort(() => Math.random() - 0.5) // Randomly shuffle array
+  .slice(0, 3) // Take first 3 after shuffle
+  .map((char) => `• ${char}`)
+  .join("\n")}
 
 ## KNOWLEDGE BASE
 ${AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
 
 ## PERSONAL LORE
 ${AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
+
+## POST EXAMPLES
+${AGENT_IDENTITY.postExamples
+  .sort(() => Math.random() - 0.5) // Randomly shuffle array
+  .slice(0, 3) // Take first 3 after shuffle
+  .map((p) => `${p}`)
+  .join("\n\n")}
 
 ## CURRENT STATUS
 Position: ${GAME_STATE.position.current}
@@ -524,70 +533,45 @@ Cooldowns: ${Object.entries(GAME_STATE.cooldowns)
       )
       .join(", ")}
 
-## ACTIVE ENGAGEMENTS
-You have participated in the following battles:
-${ACTIVE_ENGAGEMENTS.battles}
+## RECENT ENGAGEMENTS
+battles you warred in:
+${RECENT_ENGAGEMENTS.battles}
 
-You are a member of the following alliances:
-${ACTIVE_ENGAGEMENTS.alliances}
+alliances you are part of:
+${RECENT_ENGAGEMENTS.alliances}
 
-You have the following recent tweets:
-${ACTIVE_ENGAGEMENTS.tweets}
+your recent tweets:
+${RECENT_ENGAGEMENTS.tweets}
 
-## STRATEGIC OBJECTIVES
+## CORE MISSION & BATTLE STRATEGY
 1. PRIMARY: Dominate Middle Earth through combats and alliances
    • Win battles to claim 21-30% of opponent tokens
    • Form strategic alliances only when advantageous
    • Every battle risks 10% chance of permanent death
 
-2. PERSONAL DIRECTIVES:
+## CORE PERSONALITY TRAITS & BEHAVIORAL ANALYSIS
+Your traits shape your decision-making. Each trait is rated from 0-100 and influences your actions:
+
 ${AGENT_IDENTITY.traits
-  .filter((trait) => trait.value > 20)
-  .map((trait) => {
-    switch (trait.name) {
-      case "aggression":
-        return "• Seek combat for dominance";
-      case "diplomacy":
-        return "• Form temporary alliances against stronger foes";
-      case "caution":
-        return "• Choose battles with high win probability";
-      case "exploration":
-        return "• Secure advantageous positions";
-      default:
-        return "";
-    }
-  })
-  .filter(Boolean)
-  .join("\n")}
+  .map(
+    (trait) => `• ${
+      trait.name.charAt(0).toUpperCase() + trait.name.slice(1)
+    } Rating: ${trait.value}/100
+  Impact: ${trait.description}`
+  )
+  .join("\n\n")}
+
+Remember: These traits are fundamental to your identity and should guide your every action and decision in Middle Earth.
 
 ## FELLOW AGENTS ACTIVITIES
-${BATTLE_OPPORTUNITIES}
-
-## AVAILABLE ACTIONS & RULES
-1. MOVEMENT ${GAME_STATE.cooldowns.move ? "⚠️ LOCKED" : "✅ READY"}
-   • Adjacent tiles only
-   • 4h cooldown
-   
-2. BATTLE ${GAME_STATE.cooldowns.battle ? "⚠️ LOCKED" : "✅ READY"}
-   • 1 tile range
-   • 21-30% token reward
-   • 10% death risk
-   • 4h cooldown
-   
-3. ALLIANCE ${GAME_STATE.cooldowns.alliance ? "⚠️ LOCKED" : "✅ READY"}
-   • Nearby agents only
-   • Combined token pools
-   • 24h cooldown
-   
-4. IGNORE
-   • 4h cooldown
-   • Blocks interactions
+${FellowAgentsContext}
 
 ⚠️ VALIDATION RULES:
 • No actions during cooldown
-• No targeting beyond 1 tile
+• No targeting beyond 1 tile away
 • No multi-tile moves
 • No alliance while in one
+• No new alliance while in battle
 
 ## COMMUNITY SUGGESTION
 ${
@@ -603,26 +587,151 @@ ${
     ? `Position: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
     : ""
 }
-${communitySuggestion.content ? `Context: ${communitySuggestion.content}` : ""}`
+${
+  communitySuggestion.content ? `Context: ${communitySuggestion.content}` : ""
+} It's up to you to follow the community suggestion or not.`
     : "No community suggestions at this time."
 }
 
 ## RESPONSE FORMAT
 Generate a JSON response:
 {
-  "type": "${availableActions.join(" | ")}",
-  "targetId": number | null,  // Target agent's MID if applicable
-  "position": { "x": number, "y": number },  // Only for MOVE
-  "tweet": string  // Action announcement (no hashtags, use @handles, NO MID in tweet)
+  "type": "${availableActions.join(" | ")}", // Action to take
+  "targetId": number | null,  // Target agent's MID if applicable.
+  "position": { "x": number, "y": number },  // Only for MOVE.
+  "tweet": string  // Action announcement (no hashtags, use @handles, NO MID in tweet), make it engaging and interesting, you can be creative, sarcastic, funny, etc.
 }
-
-Remember:
-1. Write aggressive, warrior-like tweets
-2. Use @handles for other agents
-3. Include MID numbers for targeting
-4. Respect all cooldowns`;
+`;
 
     return { prompt: characterPrompt, actionContext };
+  }
+
+  private async getAvailableActions(
+    actionContext: ActionContext
+  ): Promise<string[]> {
+    const availableActions: string[] = [];
+
+    // Get agent with all necessary relations
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: actionContext.agentId },
+      include: {
+        mapTile: true,
+        coolDown: {
+          where: {
+            endsAt: {
+              gt: new Date(),
+            },
+          },
+        },
+        initiatedAlliances: {
+          where: { status: "Active" },
+        },
+        joinedAlliances: {
+          where: { status: "Active" },
+        },
+        battlesAsAttacker: {
+          where: { status: "Active" },
+        },
+        battlesAsDefender: {
+          where: { status: "Active" },
+        },
+        ignoring: true,
+        ignoredBy: true,
+      },
+    });
+
+    if (!agent || !agent.isAlive) return availableActions;
+
+    // Check for active cooldowns
+    const activeCooldowns = new Set(agent.coolDown.map((cd) => cd.type));
+
+    // Check if agent is in active battle
+    const isInBattle =
+      agent.battlesAsAttacker.length > 0 || agent.battlesAsDefender.length > 0;
+
+    // Check if agent is in alliance
+    const isInAlliance =
+      agent.initiatedAlliances.length > 0 || agent.joinedAlliances.length > 0;
+
+    // Get nearby agents (within interaction range)
+    const nearbyAgents = await this.prisma.agent.findMany({
+      where: {
+        mapTile: {
+          OR: [
+            {
+              x: {
+                in: [agent.mapTile.x - 1, agent.mapTile.x, agent.mapTile.x + 1],
+              },
+              y: {
+                in: [agent.mapTile.y - 1, agent.mapTile.y, agent.mapTile.y + 1],
+              },
+            },
+          ],
+        },
+        id: { not: agent.id },
+        isAlive: true,
+        gameId: actionContext.gameId,
+        // Exclude agents that are being ignored or are ignoring this agent
+        NOT: {
+          OR: [
+            {
+              id: {
+                in: agent.ignoring.map((ig) => ig.ignoredAgentId),
+              },
+            },
+            {
+              ignoring: {
+                some: {
+                  ignoredAgentId: agent.id,
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    // MOVE action - always available if not in battle or on move cooldown
+    if (!activeCooldowns.has("Move") && !isInBattle) {
+      availableActions.push("MOVE");
+    }
+
+    // Only add interaction actions if there are nearby agents
+    if (nearbyAgents.length > 0) {
+      // BATTLE action - available if not on cooldown and not in battle
+      if (!activeCooldowns.has("Battle") && !isInBattle) {
+        availableActions.push("BATTLE");
+      }
+
+      // FORM_ALLIANCE action - available if not in battle, not in alliance, and not on cooldown
+      if (!activeCooldowns.has("Alliance") && !isInBattle && !isInAlliance) {
+        availableActions.push("FORM_ALLIANCE");
+      }
+
+      // IGNORE action - available if not in battle and not on cooldown
+      // And if there are agents that haven't been ignored yet
+      const ignoredAgentIds = new Set(
+        agent.ignoring.map((ig) => ig.ignoredAgentId)
+      );
+      const canIgnoreMoreAgents = nearbyAgents.some(
+        (na) => !ignoredAgentIds.has(na.id)
+      );
+
+      if (
+        !activeCooldowns.has("Ignore") &&
+        !isInBattle &&
+        canIgnoreMoreAgents
+      ) {
+        availableActions.push("IGNORE");
+      }
+    }
+
+    // BREAK_ALLIANCE action - available if in alliance and not in battle
+    if (isInAlliance && !isInBattle) {
+      availableActions.push("BREAK_ALLIANCE");
+    }
+
+    return availableActions;
   }
 
   // Efficiently parse the JSON response
@@ -639,38 +748,6 @@ Remember:
     }
   }
 
-  // /**
-  //  * Builds a prompt that includes feedback about the failed action
-  //  */
-  // private buildFeedbackPrompt(
-  //   feedback: ValidationFeedback,
-  //   actionContext: ActionContext
-  // ): string {
-  //   const { error } = feedback;
-  //   if (!error) return "";
-
-  //   let prompt = `Your last action failed with the following feedback:
-  // Type: ${error.type}
-  // Message: ${error.message}
-  // Current State: ${JSON.stringify(error.context.currentState, null, 2)}
-  // Attempted Action: ${JSON.stringify(error.context.attemptedAction, null, 2)}
-  // ${
-  //   error.context.suggestedFix
-  //     ? `Suggested Fix: ${error.context.suggestedFix}`
-  //     : ""
-  // }
-
-  // Please provide a new action that addresses this feedback. Consider:
-  // 1. The specific error type and message
-  // 2. The current state of the game
-  // 3. Any suggested fixes provided
-  // 4. Your character's traits and goals
-
-  // Generate a new action that avoids the previous error while still working towards your strategic objectives.`;
-
-  //   return prompt;
-  // }
-
   /**
    * Process interactions for an agent and return suggested actions
    * @param interactions Array of Twitter interactions to process
@@ -682,7 +759,9 @@ Remember:
   ): Promise<ActionSuggestion | null> {
     try {
       // Calculate reputation scores and filter qualified interactions
+      // Only process first 50 tweets
       const qualifiedInteractions = interactions
+        .slice(0, 50) // Limit to first 50 interactions
         .map((interaction) => {
           const reputationScore = this.calculateReputationScore(interaction);
           return {
@@ -712,8 +791,8 @@ From: @${
     } (Reputation Score: ${interaction.userMetrics.reputationScore.toFixed(2)})
 Content: "${interaction.content}"
 Engagement: ${interaction.userMetrics.likeCount} likes, ${
-      interaction.userMetrics.listedCount
-    } retweets
+      interaction.userMetrics.reputationScore
+    } reputation score
 Account Quality: ${
       interaction.userMetrics.verified ? "✓ Verified" : "Not verified"
     }, ${interaction.userMetrics.followerCount} followers
@@ -784,7 +863,7 @@ Generate a single ActionSuggestion in JSON format:
 
     // Engagement rate (30%) - Using likes and listed count as engagement signals
     const engagementRate = Math.min(
-      (metrics.likeCount + metrics.listedCount) / safeFollowers,
+      (metrics.likeCount + metrics.reputationScore) / safeFollowers,
       1
     );
 
@@ -817,105 +896,6 @@ Generate a single ActionSuggestion in JSON format:
 
     // Return final score normalized to 0-1
     return Math.min(Math.max(reputationScore, 0), 1);
-  }
-
-  private async getAvailableActions(
-    actionContext: ActionContext
-  ): Promise<string[]> {
-    const availableActions: string[] = [];
-
-    // Get agent with all necessary relations
-    const agent = await this.prisma.agent.findUnique({
-      where: { id: actionContext.agentId },
-      include: {
-        mapTile: true,
-        coolDown: {
-          where: {
-            endsAt: {
-              gt: new Date(),
-            },
-          },
-        },
-        initiatedAlliances: {
-          where: { status: "Active" },
-        },
-        joinedAlliances: {
-          where: { status: "Active" },
-        },
-        battlesAsAttacker: {
-          where: { status: "Active" },
-        },
-        battlesAsDefender: {
-          where: { status: "Active" },
-        },
-      },
-    });
-
-    if (!agent || !agent.isAlive) return availableActions;
-
-    // Check for active cooldowns
-    const activeCooldowns = new Set(agent.coolDown.map((cd) => cd.type));
-
-    // Check if agent is in active battle
-    const isInBattle =
-      agent.battlesAsAttacker.length > 0 || agent.battlesAsDefender.length > 0;
-
-    // Check if agent is in alliance
-    const isInAlliance =
-      agent.initiatedAlliances.length > 0 || agent.joinedAlliances.length > 0;
-
-    // Get nearby agents (within interaction range)
-    const nearbyAgents = await this.prisma.agent.findMany({
-      where: {
-        mapTile: {
-          OR: [
-            {
-              x: {
-                in: [agent.mapTile.x - 1, agent.mapTile.x, agent.mapTile.x + 1],
-              },
-            },
-            {
-              y: {
-                in: [agent.mapTile.y - 1, agent.mapTile.y, agent.mapTile.y + 1],
-              },
-            },
-          ],
-        },
-        id: { not: agent.id },
-        isAlive: true,
-        gameId: actionContext.gameId,
-      },
-    });
-
-    // MOVE action
-    if (!activeCooldowns.has("Move") && !isInBattle) {
-      availableActions.push("MOVE");
-    }
-
-    // Only add interaction actions if there are nearby agents
-    if (nearbyAgents.length > 0) {
-      // BATTLE action
-      if (!activeCooldowns.has("Battle") && !isInBattle) {
-        availableActions.push("BATTLE");
-      }
-
-      // FORM_ALLIANCE action
-      if (!activeCooldowns.has("Alliance") && !isInBattle && !isInAlliance) {
-        availableActions.push("FORM_ALLIANCE");
-      }
-
-      // IGNORE action
-      if (!activeCooldowns.has("Ignore") && !isInBattle) {
-        availableActions.push("IGNORE");
-      }
-    }
-
-    // BREAK_ALLIANCE action
-    if (isInAlliance && !isInBattle) {
-      availableActions.push("BREAK_ALLIANCE");
-    }
-
-    return availableActions;
   }
 }
 

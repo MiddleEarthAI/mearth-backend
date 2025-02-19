@@ -18,11 +18,30 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
       const timestamp = new Date().getTime();
       console.info(`Agent ${ctx.agentId} ignoring ${action.targetId}`);
 
-      // Get the agents
+      // Get the agents with their current ignore relationships
       const [agent, targetAgent] = await Promise.all([
         this.prisma.agent.findUnique({
           where: { id: ctx.agentId },
-          include: { profile: true },
+          include: {
+            profile: true,
+            ignoring: {
+              where: {
+                timestamp: {
+                  gte: new Date(
+                    timestamp - gameConfig.mechanics.cooldowns.ignore * 1000
+                  ),
+                },
+              },
+            },
+            coolDown: {
+              where: {
+                type: "Ignore",
+                endsAt: {
+                  gt: new Date(),
+                },
+              },
+            },
+          },
         }),
         this.prisma.agent.findUnique({
           where: {
@@ -31,7 +50,18 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
               gameId: ctx.gameId,
             },
           },
-          include: { profile: true },
+          include: {
+            profile: true,
+            ignoredBy: {
+              where: {
+                timestamp: {
+                  gte: new Date(
+                    timestamp - gameConfig.mechanics.cooldowns.ignore * 1000
+                  ),
+                },
+              },
+            },
+          },
         }),
       ]);
 
@@ -39,18 +69,38 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
         throw new Error("One or more agents not found");
       }
 
+      // Check if agent is on cooldown
+      if (agent.coolDown.length > 0) {
+        throw new Error("Agent is on ignore cooldown");
+      }
+
+      // Check if target is already being ignored by this agent
+      const existingIgnore = agent.ignoring.find(
+        (ignore) => ignore.ignoredAgentId === targetAgent.id
+      );
+      if (existingIgnore) {
+        // throw new Error("Agent is already ignoring target");
+        return {
+          success: true,
+          feedback: {
+            isValid: true,
+          },
+        };
+      }
+
       // Create records in transaction
       await this.prisma.$transaction([
         // Create ignore relationship
-        // this.prisma.ignore.create({
-        //   data: {
-        //     agentId: ctx.agentId,
-        //     ignoredAgentId: targetAgent.id,
-        //     timestamp: new Date(),
-        //     gameId: ctx.gameId,
-        //     duration: gameConfig.mechanics.cooldowns.ignore,
-        //   },
-        // }),
+        this.prisma.ignore.create({
+          data: {
+            agentId: ctx.agentId,
+            ignoredAgentId: targetAgent.id,
+            timestamp: new Date(timestamp),
+            gameId: ctx.gameId,
+            duration: gameConfig.mechanics.cooldowns.ignore,
+          },
+        }),
+        // Create cooldown
         this.prisma.coolDown.create({
           data: {
             endsAt: new Date(
