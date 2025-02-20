@@ -26,7 +26,6 @@ export class GameOrchestrator {
   private readonly actionInterval = gameConfig.actionInterval * 1000; // milliseconds
 
   private readonly agentInitGapDelay = 900000; // Default 15 minutes delay between agents entrance into the game
-
   private readonly cleanupInterval = gameConfig.cleanupInterval * 1000; // milliseconds
   private isRunning: boolean = false;
   private readonly maxRetries: number = gameConfig.maxRetries;

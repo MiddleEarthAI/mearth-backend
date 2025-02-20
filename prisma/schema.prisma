@@ -69,9 +69,12 @@ model AgentProfile {
   onchainId       Int      @unique
   name            String
   xHandle         String   @unique
+  description     String
+  telegramLink    String
   followers       Int      @default(100)
   bio             String[]
   lore            String[]
+  loreFulltext    String
   characteristics String[]
   knowledge       String[]
   traits          Json

@@ -4885,7 +4885,10 @@ export namespace Prisma {
     onchainId: number | null
     name: string | null
     xHandle: string | null
+    description: string | null
+    telegramLink: string | null
     followers: number | null
+    loreFulltext: string | null
   }
 
   export type AgentProfileMaxAggregateOutputType = {
@@ -4893,7 +4896,10 @@ export namespace Prisma {
     onchainId: number | null
     name: string | null
     xHandle: string | null
+    description: string | null
+    telegramLink: string | null
     followers: number | null
+    loreFulltext: string | null
   }
 
   export type AgentProfileCountAggregateOutputType = {
@@ -4901,9 +4907,12 @@ export namespace Prisma {
     onchainId: number
     name: number
     xHandle: number
+    description: number
+    telegramLink: number
     followers: number
     bio: number
     lore: number
+    loreFulltext: number
     characteristics: number
     knowledge: number
     traits: number
@@ -4927,7 +4936,10 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
+    description?: true
+    telegramLink?: true
     followers?: true
+    loreFulltext?: true
   }
 
   export type AgentProfileMaxAggregateInputType = {
@@ -4935,7 +4947,10 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
+    description?: true
+    telegramLink?: true
     followers?: true
+    loreFulltext?: true
   }
 
   export type AgentProfileCountAggregateInputType = {
@@ -4943,9 +4958,12 @@ export namespace Prisma {
     onchainId?: true
     name?: true
     xHandle?: true
+    description?: true
+    telegramLink?: true
     followers?: true
     bio?: true
     lore?: true
+    loreFulltext?: true
     characteristics?: true
     knowledge?: true
     traits?: true
@@ -5044,9 +5062,12 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    description: string
+    telegramLink: string
     followers: number
     bio: string[]
     lore: string[]
+    loreFulltext: string
     characteristics: string[]
     knowledge: string[]
     traits: JsonValue
@@ -5077,9 +5098,12 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    description?: boolean
+    telegramLink?: boolean
     followers?: boolean
     bio?: boolean
     lore?: boolean
+    loreFulltext?: boolean
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
@@ -5093,9 +5117,12 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    description?: boolean
+    telegramLink?: boolean
     followers?: boolean
     bio?: boolean
     lore?: boolean
+    loreFulltext?: boolean
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
@@ -5107,9 +5134,12 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    description?: boolean
+    telegramLink?: boolean
     followers?: boolean
     bio?: boolean
     lore?: boolean
+    loreFulltext?: boolean
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
@@ -5121,16 +5151,19 @@ export namespace Prisma {
     onchainId?: boolean
     name?: boolean
     xHandle?: boolean
+    description?: boolean
+    telegramLink?: boolean
     followers?: boolean
     bio?: boolean
     lore?: boolean
+    loreFulltext?: boolean
     characteristics?: boolean
     knowledge?: boolean
     traits?: boolean
     postExamples?: boolean
   }
 
-  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "followers" | "bio" | "lore" | "characteristics" | "knowledge" | "traits" | "postExamples", ExtArgs["result"]["agentProfile"]>
+  export type AgentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "onchainId" | "name" | "xHandle" | "description" | "telegramLink" | "followers" | "bio" | "lore" | "loreFulltext" | "characteristics" | "knowledge" | "traits" | "postExamples", ExtArgs["result"]["agentProfile"]>
   export type AgentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     agents?: boolean | AgentProfile$agentsArgs<ExtArgs>
     _count?: boolean | AgentProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -5148,9 +5181,12 @@ export namespace Prisma {
       onchainId: number
       name: string
       xHandle: string
+      description: string
+      telegramLink: string
       followers: number
       bio: string[]
       lore: string[]
+      loreFulltext: string
       characteristics: string[]
       knowledge: string[]
       traits: Prisma.JsonValue
@@ -5583,9 +5619,12 @@ export namespace Prisma {
     readonly onchainId: FieldRef<"AgentProfile", 'Int'>
     readonly name: FieldRef<"AgentProfile", 'String'>
     readonly xHandle: FieldRef<"AgentProfile", 'String'>
+    readonly description: FieldRef<"AgentProfile", 'String'>
+    readonly telegramLink: FieldRef<"AgentProfile", 'String'>
     readonly followers: FieldRef<"AgentProfile", 'Int'>
     readonly bio: FieldRef<"AgentProfile", 'String[]'>
     readonly lore: FieldRef<"AgentProfile", 'String[]'>
+    readonly loreFulltext: FieldRef<"AgentProfile", 'String'>
     readonly characteristics: FieldRef<"AgentProfile", 'String[]'>
     readonly knowledge: FieldRef<"AgentProfile", 'String[]'>
     readonly traits: FieldRef<"AgentProfile", 'Json'>
@@ -17589,9 +17628,12 @@ export namespace Prisma {
     onchainId: 'onchainId',
     name: 'name',
     xHandle: 'xHandle',
+    description: 'description',
+    telegramLink: 'telegramLink',
     followers: 'followers',
     bio: 'bio',
     lore: 'lore',
+    loreFulltext: 'loreFulltext',
     characteristics: 'characteristics',
     knowledge: 'knowledge',
     traits: 'traits',
@@ -18174,9 +18216,12 @@ export namespace Prisma {
     onchainId?: IntFilter<"AgentProfile"> | number
     name?: StringFilter<"AgentProfile"> | string
     xHandle?: StringFilter<"AgentProfile"> | string
+    description?: StringFilter<"AgentProfile"> | string
+    telegramLink?: StringFilter<"AgentProfile"> | string
     followers?: IntFilter<"AgentProfile"> | number
     bio?: StringNullableListFilter<"AgentProfile">
     lore?: StringNullableListFilter<"AgentProfile">
+    loreFulltext?: StringFilter<"AgentProfile"> | string
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonFilter<"AgentProfile">
@@ -18189,9 +18234,12 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    description?: SortOrder
+    telegramLink?: SortOrder
     followers?: SortOrder
     bio?: SortOrder
     lore?: SortOrder
+    loreFulltext?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
@@ -18207,9 +18255,12 @@ export namespace Prisma {
     OR?: AgentProfileWhereInput[]
     NOT?: AgentProfileWhereInput | AgentProfileWhereInput[]
     name?: StringFilter<"AgentProfile"> | string
+    description?: StringFilter<"AgentProfile"> | string
+    telegramLink?: StringFilter<"AgentProfile"> | string
     followers?: IntFilter<"AgentProfile"> | number
     bio?: StringNullableListFilter<"AgentProfile">
     lore?: StringNullableListFilter<"AgentProfile">
+    loreFulltext?: StringFilter<"AgentProfile"> | string
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonFilter<"AgentProfile">
@@ -18222,9 +18273,12 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    description?: SortOrder
+    telegramLink?: SortOrder
     followers?: SortOrder
     bio?: SortOrder
     lore?: SortOrder
+    loreFulltext?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
@@ -18244,9 +18298,12 @@ export namespace Prisma {
     onchainId?: IntWithAggregatesFilter<"AgentProfile"> | number
     name?: StringWithAggregatesFilter<"AgentProfile"> | string
     xHandle?: StringWithAggregatesFilter<"AgentProfile"> | string
+    description?: StringWithAggregatesFilter<"AgentProfile"> | string
+    telegramLink?: StringWithAggregatesFilter<"AgentProfile"> | string
     followers?: IntWithAggregatesFilter<"AgentProfile"> | number
     bio?: StringNullableListFilter<"AgentProfile">
     lore?: StringNullableListFilter<"AgentProfile">
+    loreFulltext?: StringWithAggregatesFilter<"AgentProfile"> | string
     characteristics?: StringNullableListFilter<"AgentProfile">
     knowledge?: StringNullableListFilter<"AgentProfile">
     traits?: JsonWithAggregatesFilter<"AgentProfile">
@@ -19248,9 +19305,12 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    description: string
+    telegramLink: string
     followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
+    loreFulltext: string
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
@@ -19263,9 +19323,12 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    description: string
+    telegramLink: string
     followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
+    loreFulltext: string
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
@@ -19278,9 +19341,12 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    telegramLink?: StringFieldUpdateOperationsInput | string
     followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
+    loreFulltext?: StringFieldUpdateOperationsInput | string
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
@@ -19293,9 +19359,12 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    telegramLink?: StringFieldUpdateOperationsInput | string
     followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
+    loreFulltext?: StringFieldUpdateOperationsInput | string
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
@@ -19308,9 +19377,12 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    description: string
+    telegramLink: string
     followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
+    loreFulltext: string
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
@@ -19322,9 +19394,12 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    telegramLink?: StringFieldUpdateOperationsInput | string
     followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
+    loreFulltext?: StringFieldUpdateOperationsInput | string
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
@@ -19336,9 +19411,12 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    telegramLink?: StringFieldUpdateOperationsInput | string
     followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
+    loreFulltext?: StringFieldUpdateOperationsInput | string
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
@@ -20570,9 +20648,12 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    description?: SortOrder
+    telegramLink?: SortOrder
     followers?: SortOrder
     bio?: SortOrder
     lore?: SortOrder
+    loreFulltext?: SortOrder
     characteristics?: SortOrder
     knowledge?: SortOrder
     traits?: SortOrder
@@ -20589,7 +20670,10 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    description?: SortOrder
+    telegramLink?: SortOrder
     followers?: SortOrder
+    loreFulltext?: SortOrder
   }
 
   export type AgentProfileMinOrderByAggregateInput = {
@@ -20597,7 +20681,10 @@ export namespace Prisma {
     onchainId?: SortOrder
     name?: SortOrder
     xHandle?: SortOrder
+    description?: SortOrder
+    telegramLink?: SortOrder
     followers?: SortOrder
+    loreFulltext?: SortOrder
   }
 
   export type AgentProfileSumOrderByAggregateInput = {
@@ -24333,9 +24420,12 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    description: string
+    telegramLink: string
     followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
+    loreFulltext: string
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
@@ -24347,9 +24437,12 @@ export namespace Prisma {
     onchainId: number
     name: string
     xHandle: string
+    description: string
+    telegramLink: string
     followers?: number
     bio?: AgentProfileCreatebioInput | string[]
     lore?: AgentProfileCreateloreInput | string[]
+    loreFulltext: string
     characteristics?: AgentProfileCreatecharacteristicsInput | string[]
     knowledge?: AgentProfileCreateknowledgeInput | string[]
     traits: JsonNullValueInput | InputJsonValue
@@ -24751,9 +24844,12 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    telegramLink?: StringFieldUpdateOperationsInput | string
     followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
+    loreFulltext?: StringFieldUpdateOperationsInput | string
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
@@ -24765,9 +24861,12 @@ export namespace Prisma {
     onchainId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     xHandle?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    telegramLink?: StringFieldUpdateOperationsInput | string
     followers?: IntFieldUpdateOperationsInput | number
     bio?: AgentProfileUpdatebioInput | string[]
     lore?: AgentProfileUpdateloreInput | string[]
+    loreFulltext?: StringFieldUpdateOperationsInput | string
     characteristics?: AgentProfileUpdatecharacteristicsInput | string[]
     knowledge?: AgentProfileUpdateknowledgeInput | string[]
     traits?: JsonNullValueInput | InputJsonValue
