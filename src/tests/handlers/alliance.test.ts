@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { AllianceHandler } from "@/agent/actionManager/handlers/alliance";
-import { PrismaClient } from "@prisma/client";
-import { MearthProgram } from "@/types";
+import { Agent, Game, PrismaClient } from "@prisma/client";
+import { AgentWithProfile, GameInfo, MearthProgram } from "@/types";
 import {
   ActionContext,
   FormAllianceAction,
@@ -9,53 +9,68 @@ import {
 } from "@/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { getAgentAuthorityKeypair, getProgram } from "@/utils/program";
-import { test, describe } from "node:test";
 import { GameManager } from "@/agent/GameManager";
+import { describe, it, before, after } from "mocha";
+import { AgentAccount } from "@/types/program";
 
-describe("AllianceHandler", async () => {
+describe("AllianceHandler", function () {
   let allianceHandler: AllianceHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
   let gameManager: GameManager;
   let gameAuthority: Keypair;
+  let activeGame: GameInfo;
+  let agent: AgentWithProfile;
+  let agentAccount: AgentAccount;
+  let agentKeypair: Keypair;
+  let targetAgent: AgentWithProfile;
+  let targetAgentAccount: AgentAccount;
+  let targetAgentKeypair: Keypair;
 
-  test("setup", async () => {
+  before(async function () {
     prisma = new PrismaClient();
     program = await getProgram();
     allianceHandler = new AllianceHandler(program, prisma);
     gameManager = new GameManager(program, prisma);
   });
 
-  // test("cleanup", async () => {
-  //   await prisma.$disconnect();
-  // });
+  after(async function () {
+    await prisma.$disconnect();
+  });
 
-  test("should successfully form an alliance between two agents", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
+  beforeEach("setup", async function () {
+    activeGame = await gameManager.createNewGame();
+    agent = activeGame.agents[0].agent;
+    agentAccount = activeGame.agents[0].account;
+    agentKeypair = await getAgentAuthorityKeypair(agent.profile.onchainId);
+    targetAgent = activeGame.agents[1].agent;
+    targetAgentAccount = activeGame.agents[1].account;
+    targetAgentKeypair = await getAgentAuthorityKeypair(
+      targetAgent.profile.onchainId
     );
-    const targetAgent = activeGame.agents[1];
-    const targetAgentKeypair = await getAgentAuthorityKeypair(
-      targetAgent.agent.profile.onchainId
-    );
-    // Setup test data
+  });
+
+  it.only("should successfully form an alliance between two agents", async function () {
+    // Log the authorities and PDAs for debugging
+    console.log("Agent Authority:", agentKeypair.publicKey.toString());
+    console.log("Agent PDA:", agent.pda);
+    console.log("Target Agent PDA:", targetAgent.pda);
+    console.log("Game PDA:", activeGame.dbGame.pda);
+
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
-
-    const action: FormAllianceAction = {
+    const formAllianceAction: FormAllianceAction = {
       type: "FORM_ALLIANCE",
-      targetId: targetAgent.agent.profile.onchainId,
+      targetId: targetAgent.profile.onchainId,
       tweet: "Forming alliance",
     };
 
     // Execute alliance formation
-    const result = await allianceHandler.handle(ctx, action);
+    const result = await allianceHandler.handle(ctx, formAllianceAction);
 
     // Assertions
     expect(result.success).to.be.true;
@@ -64,8 +79,8 @@ describe("AllianceHandler", async () => {
     // Verify alliance record created
     const alliance = await prisma.alliance.findFirst({
       where: {
-        initiatorId: agent.agent.id,
-        joinerId: targetAgent.agent.id,
+        initiatorId: ctx.agentId,
+        joinerId: targetAgent.id,
         status: "Active",
       },
     });
@@ -74,7 +89,7 @@ describe("AllianceHandler", async () => {
     // Verify cooldown created
     const cooldown = await prisma.coolDown.findFirst({
       where: {
-        cooledAgentId: agent.agent.id,
+        cooledAgentId: ctx.agentId,
         type: "Alliance",
       },
     });
@@ -85,41 +100,30 @@ describe("AllianceHandler", async () => {
       where: {
         gameId: activeGame.dbGame.id,
         eventType: "ALLIANCE_FORM",
-        initiatorId: agent.agent.id,
-        targetId: targetAgent.agent.id,
+        initiatorId: ctx.agentId,
+        targetId: targetAgent.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(agent.agent.profile.xHandle);
-    expect(event?.message).to.include(targetAgent.agent.profile.xHandle);
+    expect(event?.message).to.include(agent.profile.xHandle);
+    expect(event?.message).to.include(targetAgent.profile.xHandle);
   });
 
-  test("should successfully break an existing alliance", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
-    const targetAgent = activeGame.agents[1];
-    const targetAgentKeypair = await getAgentAuthorityKeypair(
-      targetAgent.agent.profile.onchainId
-    );
-    // Setup test data
+  it("should successfully break an existing alliance", async function () {
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
-
-    const action: BreakAllianceAction = {
+    const breakAllianceAction: BreakAllianceAction = {
       type: "BREAK_ALLIANCE",
-      targetId: targetAgent.agent.profile.onchainId,
+      targetId: targetAgent.profile.onchainId,
       tweet: "Breaking alliance",
     };
 
     // Execute alliance break
-    const result = await allianceHandler.handle(ctx, action);
+    const result = await allianceHandler.handle(ctx, breakAllianceAction);
 
     // Assertions
     expect(result.success).to.be.true;
@@ -128,8 +132,8 @@ describe("AllianceHandler", async () => {
     // Verify alliance status updated
     const alliance = await prisma.alliance.findFirst({
       where: {
-        initiatorId: agent.agent.id,
-        joinerId: targetAgent.agent.id,
+        initiatorId: ctx.agentId,
+        joinerId: targetAgent.id,
       },
     });
     expect(alliance).to.not.be.null;
@@ -138,7 +142,7 @@ describe("AllianceHandler", async () => {
     // Verify cooldown created
     const cooldown = await prisma.coolDown.findFirst({
       where: {
-        cooledAgentId: agent.agent.id,
+        cooledAgentId: ctx.agentId,
         type: "Alliance",
       },
     });
@@ -149,36 +153,26 @@ describe("AllianceHandler", async () => {
       where: {
         gameId: activeGame.dbGame.id,
         eventType: "ALLIANCE_BREAK",
-        initiatorId: agent.agent.id,
-        targetId: targetAgent.agent.id,
+        initiatorId: ctx.agentId,
+        targetId: targetAgent.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(agent.agent.profile.xHandle);
-    expect(event?.message).to.include(targetAgent.agent.profile.xHandle);
+    expect(event?.message).to.include(agent.profile.xHandle);
+    expect(event?.message).to.include(targetAgent.profile.xHandle);
   });
 
-  test("should handle alliance formation during cooldown period", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
-    const targetAgent = activeGame.agents[1];
-    const targetAgentKeypair = await getAgentAuthorityKeypair(
-      targetAgent.agent.profile.onchainId
-    );
-    // Setup test data
+  it("should handle alliance formation during cooldown period", async function () {
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: FormAllianceAction = {
       type: "FORM_ALLIANCE",
-      targetId: targetAgent.agent.profile.onchainId,
+      targetId: targetAgent.profile.onchainId,
       tweet: "Forming alliance during cooldown",
     };
 
@@ -187,7 +181,7 @@ describe("AllianceHandler", async () => {
       data: {
         type: "Alliance",
         endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-        cooledAgentId: agent.agent.id,
+        cooledAgentId: ctx.agentId,
         gameId: activeGame.dbGame.id,
       },
     });
@@ -202,22 +196,17 @@ describe("AllianceHandler", async () => {
     expect(result.feedback?.error?.message).to.include("cooldown");
   });
 
-  test("should handle breaking non-existent alliance", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
-    const targetAgent = activeGame.agents[1];
-    const targetAgentKeypair = await getAgentAuthorityKeypair(
-      targetAgent.agent.profile.onchainId
-    );
-    // Setup test data
+  it("should handle breaking non-existent alliance", async function () {
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
+    };
+    const breakAllianceAction: BreakAllianceAction = {
+      type: "BREAK_ALLIANCE",
+      targetId: targetAgent.profile.onchainId,
+      tweet: "Breaking non-existent alliance",
     };
 
     const action: BreakAllianceAction = {
@@ -253,28 +242,24 @@ describe("AllianceHandler", async () => {
     );
   });
 
-  test("should handle attempting to form alliance with self", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
-
+  it("should handle attempting to form alliance with self", async function () {
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: FormAllianceAction = {
       type: "FORM_ALLIANCE",
-      targetId: agent.agent.profile.onchainId, // Same as initiator
+      targetId: agent.profile.onchainId, // Same as initiator
       tweet: "Attempting to ally with self",
     };
 
+    // Attempt to form alliance with self
     const result = await allianceHandler.handle(ctx, action);
 
+    // Assertions
     expect(result.success).to.be.false;
     expect(result.feedback?.isValid).to.be.false;
     expect(result.feedback?.error?.type).to.equal("FORM_ALLIANCE");
@@ -283,7 +268,8 @@ describe("AllianceHandler", async () => {
     );
   });
 
-  test("should handle attempting to form alliance with already allied agent", async () => {
+  it("should handle attempting to form alliance with already allied agent", async function () {
+    // Setup test data
     const activeGame = await gameManager.createNewGame();
     const initiator = activeGame.agents[0];
     const initiatorKeypair = await getAgentAuthorityKeypair(
@@ -320,7 +306,6 @@ describe("AllianceHandler", async () => {
       },
     });
 
-    // Now try to form alliance with third agent
     const ctx: ActionContext = {
       agentId: target.agent.id,
       agentOnchainId: target.agent.profile.onchainId,
@@ -334,8 +319,10 @@ describe("AllianceHandler", async () => {
       tweet: "Attempting to form second alliance",
     };
 
+    // Attempt to form second alliance
     const result = await allianceHandler.handle(ctx, action);
 
+    // Assertions
     expect(result.success).to.be.false;
     expect(result.feedback?.isValid).to.be.false;
     expect(result.feedback?.error?.type).to.equal("FORM_ALLIANCE");
@@ -344,7 +331,8 @@ describe("AllianceHandler", async () => {
     );
   });
 
-  test("should handle breaking alliance with wrong authority", async () => {
+  it("should handle breaking alliance with wrong authority", async function () {
+    // Setup test data
     const activeGame = await gameManager.createNewGame();
     const initiator = activeGame.agents[0];
     const initiatorKeypair = await getAgentAuthorityKeypair(
@@ -381,7 +369,6 @@ describe("AllianceHandler", async () => {
       },
     });
 
-    // Try to break alliance using wrong agent
     const ctx: ActionContext = {
       agentId: wrongAgent.agent.id,
       agentOnchainId: wrongAgent.agent.profile.onchainId,
@@ -395,8 +382,10 @@ describe("AllianceHandler", async () => {
       tweet: "Attempting to break others' alliance",
     };
 
+    // Attempt to break alliance with wrong authority
     const result = await allianceHandler.handle(ctx, action);
 
+    // Assertions
     expect(result.success).to.be.false;
     expect(result.feedback?.isValid).to.be.false;
     expect(result.feedback?.error?.type).to.equal("BREAK_ALLIANCE");
@@ -405,7 +394,8 @@ describe("AllianceHandler", async () => {
     );
   });
 
-  test("should handle alliance formation with non-existent agent", async () => {
+  it("should handle alliance formation with non-existent agent", async function () {
+    // Setup test data
     const activeGame = await gameManager.createNewGame();
     const agent = activeGame.agents[0];
     const agentKeypair = await getAgentAuthorityKeypair(
@@ -425,15 +415,18 @@ describe("AllianceHandler", async () => {
       tweet: "Attempting to ally with non-existent agent",
     };
 
+    // Attempt to form alliance with non-existent agent
     const result = await allianceHandler.handle(ctx, action);
 
+    // Assertions
     expect(result.success).to.be.false;
     expect(result.feedback?.isValid).to.be.false;
     expect(result.feedback?.error?.type).to.equal("FORM_ALLIANCE");
     expect(result.feedback?.error?.message).to.include("Agent not found");
   });
 
-  test("should handle alliance formation with dead agent", async () => {
+  it("should handle alliance formation with dead agent", async function () {
+    // Setup test data
     const activeGame = await gameManager.createNewGame();
     const initiator = activeGame.agents[0];
     const initiatorKeypair = await getAgentAuthorityKeypair(
@@ -463,8 +456,10 @@ describe("AllianceHandler", async () => {
       tweet: "Attempting to ally with dead agent",
     };
 
+    // Attempt to form alliance with dead agent
     const result = await allianceHandler.handle(ctx, action);
 
+    // Assertions
     expect(result.success).to.be.false;
     expect(result.feedback?.isValid).to.be.false;
     expect(result.feedback?.error?.type).to.equal("FORM_ALLIANCE");

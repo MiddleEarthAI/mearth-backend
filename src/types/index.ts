@@ -1,6 +1,9 @@
 import type { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 
 import type * as anchor from "@coral-xyz/anchor";
+import { AgentAccount } from "./program";
+import { GameAccount } from "./program";
+import { Game, Prisma } from "@prisma/client";
 
 export interface Position {
   x: number;
@@ -85,3 +88,17 @@ export interface ActionContext {
   agentId: string;
   agentOnchainId: number;
 }
+
+export interface GameInfo {
+  dbGame: Game;
+  gameAccount: GameAccount;
+  agents: Array<{
+    account: AgentAccount;
+    agent: AgentWithProfile;
+  }>;
+  tx: string;
+}
+
+export type AgentWithProfile = Prisma.AgentGetPayload<{
+  include: { profile: true };
+}>;

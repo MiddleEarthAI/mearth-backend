@@ -9,17 +9,17 @@ import {
   getMiddleEarthAiAuthorityWallet,
   getProgram,
 } from "@/utils/program";
-import { test, describe } from "node:test";
+import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
 
-describe("MovementHandler", async () => {
+describe("MovementHandler", function () {
   let movementHandler: MovementHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
   let gameAuthorityWallet: Keypair;
   let gameManager: GameManager;
 
-  test("setup", async () => {
+  before(async function () {
     prisma = new PrismaClient();
     program = await getProgram();
     movementHandler = new MovementHandler(program, prisma);
@@ -27,11 +27,11 @@ describe("MovementHandler", async () => {
     gameManager = new GameManager(program, prisma);
   });
 
-  // test("cleanup", async () => {
-  //   await prisma.$disconnect();
-  // });
+  after(async function () {
+    await prisma.$disconnect();
+  });
 
-  test("should successfully move agent to adjacent tile", async () => {
+  it("should successfully move agent to adjacent tile", async function () {
     const activeGame = await gameManager.createNewGame();
     const agent = activeGame.agents[0];
     const agentKeypair = await getAgentAuthorityKeypair(
@@ -103,13 +103,13 @@ describe("MovementHandler", async () => {
     );
   });
 
-  test("should handle movement during cooldown period", async () => {
-    // Setup test data
+  it("should handle movement during cooldown period", async function () {
     const activeGame = await gameManager.createNewGame();
     const agent = activeGame.agents[0];
     const agentKeypair = await getAgentAuthorityKeypair(
       agent.agent.profile.onchainId
     );
+    // Setup test data
     const ctx: ActionContext = {
       agentId: agent.agent.id,
       agentOnchainId: agent.agent.profile.onchainId,
@@ -158,7 +158,7 @@ describe("MovementHandler", async () => {
     expect(result.feedback?.error?.message).to.include("cooldown");
   });
 
-  test("should handle movement to non-adjacent tile", async () => {
+  it("should handle movement to non-adjacent tile", async function () {
     const activeGame = await gameManager.createNewGame();
     const agent = activeGame.agents[0];
     const agentKeypair = await getAgentAuthorityKeypair(
@@ -203,7 +203,7 @@ describe("MovementHandler", async () => {
     expect(result.feedback?.error?.message).to.include("adjacent");
   });
 
-  test("should handle movement to non-existent tile", async () => {
+  it("should handle movement to non-existent tile", async function () {
     const activeGame = await gameManager.createNewGame();
     const agent = activeGame.agents[0];
     const agentKeypair = await getAgentAuthorityKeypair(

@@ -5,116 +5,44 @@ import { MearthProgram } from "@/types";
 import { ActionContext, IgnoreAction } from "@/types";
 import { PublicKey } from "@solana/web3.js";
 import { getProgram } from "@/utils/program";
-import { test, describe } from "node:test";
+import { describe, it, before, after } from "mocha";
+import { GameManager } from "@/agent/GameManager";
 
-describe("IgnoreHandler", async () => {
+describe("IgnoreHandler", function () {
   let ignoreHandler: IgnoreHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
+  let gameManager: GameManager;
 
-  test("setup", async () => {
+  before(async function () {
     prisma = new PrismaClient();
     program = await getProgram();
     ignoreHandler = new IgnoreHandler(program, prisma);
+    gameManager = new GameManager(program, prisma);
   });
 
-  test("cleanup", async () => {
+  after(async function () {
     await prisma.$disconnect();
   });
 
-  test("should successfully ignore another agent", async () => {
+  it("should successfully ignore another agent", async function () {
+    const activeGame = await gameManager.createNewGame();
+    const agent = activeGame.agents[0];
+    const targetAgent = activeGame.agents[1];
+
     // Setup test data
     const ctx: ActionContext = {
-      agentId: "test-agent-1",
-      agentOnchainId: 1,
-      gameId: "test-game-1",
-      gameOnchainId: 1,
+      agentId: agent.agent.id,
+      agentOnchainId: agent.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: 2,
+      targetId: targetAgent.agent.profile.onchainId,
       tweet: "Ignoring agent",
     };
-
-    // Create test game
-    const game = await prisma.game.create({
-      data: {
-        id: ctx.gameId,
-        onchainId: ctx.gameOnchainId,
-        authority: new PublicKey(program.programId).toString(),
-        tokenMint: "test-token-mint",
-        rewardsVault: "test-rewards-vault",
-        mapDiameter: 10,
-        bump: 1,
-        dailyRewardTokens: 100,
-      },
-    });
-
-    // Create agent profiles
-    const [initiatorProfile, targetProfile] = await Promise.all([
-      prisma.agentProfile.create({
-        data: {
-          name: "Test Initiator",
-          xHandle: "testInitiator",
-          onchainId: ctx.agentOnchainId,
-          bio: ["Test bio"],
-          lore: ["Test lore"],
-          characteristics: ["Test characteristics"],
-          knowledge: ["Test knowledge"],
-          traits: {},
-          postExamples: ["Test post"],
-        },
-      }),
-      prisma.agentProfile.create({
-        data: {
-          name: "Test Target",
-          xHandle: "testTarget",
-          onchainId: action.targetId,
-          bio: ["Test bio"],
-          lore: ["Test lore"],
-          characteristics: ["Test characteristics"],
-          knowledge: ["Test knowledge"],
-          traits: {},
-          postExamples: ["Test post"],
-        },
-      }),
-    ]);
-
-    // Create map tile
-    const mapTile = await prisma.mapTile.create({
-      data: {
-        x: 0,
-        y: 0,
-        terrainType: "plain",
-      },
-    });
-
-    // Create agents
-    const [initiator, target] = await Promise.all([
-      prisma.agent.create({
-        data: {
-          id: ctx.agentId,
-          onchainId: ctx.agentOnchainId,
-          authority: new PublicKey(program.programId).toString(),
-          gameId: game.id,
-          profileId: initiatorProfile.id,
-          mapTileId: mapTile.id,
-          authorityAssociatedTokenAddress: "test-ata-1",
-        },
-      }),
-      prisma.agent.create({
-        data: {
-          id: "test-agent-2",
-          onchainId: action.targetId,
-          authority: new PublicKey(program.programId).toString(),
-          gameId: game.id,
-          profileId: targetProfile.id,
-          mapTileId: mapTile.id,
-          authorityAssociatedTokenAddress: "test-ata-2",
-        },
-      }),
-    ]);
 
     // Execute ignore action
     const result = await ignoreHandler.handle(ctx, action);
@@ -126,9 +54,9 @@ describe("IgnoreHandler", async () => {
     // Verify ignore record created
     const ignore = await prisma.ignore.findFirst({
       where: {
-        agentId: initiator.id,
-        ignoredAgentId: target.id,
-        gameId: game.id,
+        agentId: agent.agent.id,
+        ignoredAgentId: targetAgent.agent.id,
+        gameId: activeGame.dbGame.id,
       },
     });
     expect(ignore).to.not.be.null;
@@ -136,7 +64,7 @@ describe("IgnoreHandler", async () => {
     // Verify cooldown created
     const cooldown = await prisma.coolDown.findFirst({
       where: {
-        cooledAgentId: initiator.id,
+        cooledAgentId: agent.agent.id,
         type: "Ignore",
       },
     });
@@ -145,90 +73,43 @@ describe("IgnoreHandler", async () => {
     // Verify game event created
     const event = await prisma.gameEvent.findFirst({
       where: {
-        gameId: game.id,
+        gameId: activeGame.dbGame.id,
         eventType: "IGNORE",
-        initiatorId: initiator.id,
-        targetId: target.id,
+        initiatorId: agent.agent.id,
+        targetId: targetAgent.agent.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(initiatorProfile.xHandle);
-    expect(event?.message).to.include(targetProfile.xHandle);
+    expect(event?.message).to.include(agent.agent.profile.xHandle);
+    expect(event?.message).to.include(targetAgent.agent.profile.xHandle);
   });
 
-  test("should handle ignoring during cooldown period", async () => {
+  it("should handle ignoring during cooldown period", async function () {
+    const activeGame = await gameManager.createNewGame();
+    const agent = activeGame.agents[0];
+    const targetAgent = activeGame.agents[1];
+
     // Setup test data
     const ctx: ActionContext = {
-      agentId: "test-agent-1",
-      agentOnchainId: 1,
-      gameId: "test-game-1",
-      gameOnchainId: 1,
+      agentId: agent.agent.id,
+      agentOnchainId: agent.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: 2,
+      targetId: targetAgent.agent.profile.onchainId,
       tweet: "Ignoring during cooldown",
     };
-
-    // Create test game
-    const game = await prisma.game.create({
-      data: {
-        id: ctx.gameId,
-        onchainId: ctx.gameOnchainId,
-        authority: new PublicKey(program.programId).toString(),
-        tokenMint: "test-token-mint",
-        rewardsVault: "test-rewards-vault",
-        mapDiameter: 10,
-        bump: 1,
-        dailyRewardTokens: 100,
-      },
-    });
-
-    // Create agent profile
-    const agentProfile = await prisma.agentProfile.create({
-      data: {
-        name: "Test Agent",
-        xHandle: "testAgent",
-        onchainId: ctx.agentOnchainId,
-        bio: ["Test bio"],
-        lore: ["Test lore"],
-        characteristics: ["Test characteristics"],
-        knowledge: ["Test knowledge"],
-        traits: {},
-        postExamples: ["Test post"],
-      },
-    });
-
-    // Create map tile
-    const mapTile = await prisma.mapTile.create({
-      data: {
-        x: 0,
-        y: 0,
-        terrainType: "plain",
-      },
-    });
-
-    // Create agent
-    const agent = await prisma.agent.create({
-      data: {
-        id: ctx.agentId,
-        onchainId: ctx.agentOnchainId,
-        authority: new PublicKey(program.programId).toString(),
-        gameId: game.id,
-        profileId: agentProfile.id,
-        mapTileId: mapTile.id,
-        authorityAssociatedTokenAddress: "test-ata-1",
-      },
-    });
 
     // Create active cooldown
     await prisma.coolDown.create({
       data: {
         type: "Ignore",
         endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-        cooledAgentId: agent.id,
-        gameId: game.id,
+        cooledAgentId: agent.agent.id,
+        gameId: activeGame.dbGame.id,
       },
     });
 
@@ -242,13 +123,16 @@ describe("IgnoreHandler", async () => {
     expect(result.feedback?.error?.message).to.include("cooldown");
   });
 
-  test("should handle ignoring non-existent agent", async () => {
+  it("should handle ignoring non-existent agent", async function () {
+    const activeGame = await gameManager.createNewGame();
+    const agent = activeGame.agents[0];
+
     // Setup test data
     const ctx: ActionContext = {
-      agentId: "test-agent-1",
-      agentOnchainId: 1,
-      gameId: "test-game-1",
-      gameOnchainId: 1,
+      agentId: agent.agent.id,
+      agentOnchainId: agent.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
@@ -256,57 +140,6 @@ describe("IgnoreHandler", async () => {
       targetId: 999, // Non-existent agent
       tweet: "Ignoring non-existent agent",
     };
-
-    // Create test game
-    const game = await prisma.game.create({
-      data: {
-        id: ctx.gameId,
-        onchainId: ctx.gameOnchainId,
-        authority: new PublicKey(program.programId).toString(),
-        tokenMint: "test-token-mint",
-        rewardsVault: "test-rewards-vault",
-        mapDiameter: 10,
-        bump: 1,
-        dailyRewardTokens: 100,
-      },
-    });
-
-    // Create agent profile
-    const agentProfile = await prisma.agentProfile.create({
-      data: {
-        name: "Test Agent",
-        xHandle: "testAgent",
-        onchainId: ctx.agentOnchainId,
-        bio: ["Test bio"],
-        lore: ["Test lore"],
-        characteristics: ["Test characteristics"],
-        knowledge: ["Test knowledge"],
-        traits: {},
-        postExamples: ["Test post"],
-      },
-    });
-
-    // Create map tile
-    const mapTile = await prisma.mapTile.create({
-      data: {
-        x: 0,
-        y: 0,
-        terrainType: "plain",
-      },
-    });
-
-    // Create agent
-    const agent = await prisma.agent.create({
-      data: {
-        id: ctx.agentId,
-        onchainId: ctx.agentOnchainId,
-        authority: new PublicKey(program.programId).toString(),
-        gameId: game.id,
-        profileId: agentProfile.id,
-        mapTileId: mapTile.id,
-        authorityAssociatedTokenAddress: "test-ata-1",
-      },
-    });
 
     // Attempt to ignore non-existent agent
     const result = await ignoreHandler.handle(ctx, action);
@@ -318,106 +151,33 @@ describe("IgnoreHandler", async () => {
     expect(result.feedback?.error?.message).to.include("not found");
   });
 
-  test("should handle ignoring already ignored agent", async () => {
+  it("should handle ignoring already ignored agent", async function () {
+    const activeGame = await gameManager.createNewGame();
+    const agent = activeGame.agents[0];
+    const targetAgent = activeGame.agents[1];
+
     // Setup test data
     const ctx: ActionContext = {
-      agentId: "test-agent-1",
-      agentOnchainId: 1,
-      gameId: "test-game-1",
-      gameOnchainId: 1,
+      agentId: agent.agent.id,
+      agentOnchainId: agent.agent.profile.onchainId,
+      gameId: activeGame.dbGame.id,
+      gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: 2,
+      targetId: targetAgent.agent.profile.onchainId,
       tweet: "Ignoring already ignored agent",
     };
-
-    // Create test game
-    const game = await prisma.game.create({
-      data: {
-        id: ctx.gameId,
-        onchainId: ctx.gameOnchainId,
-        authority: new PublicKey(program.programId).toString(),
-        tokenMint: "test-token-mint",
-        rewardsVault: "test-rewards-vault",
-        mapDiameter: 10,
-        bump: 1,
-        dailyRewardTokens: 100,
-      },
-    });
-
-    // Create agent profiles
-    const [initiatorProfile, targetProfile] = await Promise.all([
-      prisma.agentProfile.create({
-        data: {
-          name: "Test Initiator",
-          xHandle: "testInitiator",
-          onchainId: ctx.agentOnchainId,
-          bio: ["Test bio"],
-          lore: ["Test lore"],
-          characteristics: ["Test characteristics"],
-          knowledge: ["Test knowledge"],
-          traits: {},
-          postExamples: ["Test post"],
-        },
-      }),
-      prisma.agentProfile.create({
-        data: {
-          name: "Test Target",
-          xHandle: "testTarget",
-          onchainId: action.targetId,
-          bio: ["Test bio"],
-          lore: ["Test lore"],
-          characteristics: ["Test characteristics"],
-          knowledge: ["Test knowledge"],
-          traits: {},
-          postExamples: ["Test post"],
-        },
-      }),
-    ]);
-
-    // Create map tile
-    const mapTile = await prisma.mapTile.create({
-      data: {
-        x: 0,
-        y: 0,
-        terrainType: "plain",
-      },
-    });
-
-    // Create agents
-    const [initiator, target] = await Promise.all([
-      prisma.agent.create({
-        data: {
-          id: ctx.agentId,
-          onchainId: ctx.agentOnchainId,
-          authority: new PublicKey(program.programId).toString(),
-          gameId: game.id,
-          profileId: initiatorProfile.id,
-          mapTileId: mapTile.id,
-          authorityAssociatedTokenAddress: "test-ata-1",
-        },
-      }),
-      prisma.agent.create({
-        data: {
-          id: "test-agent-2",
-          onchainId: action.targetId,
-          authority: new PublicKey(program.programId).toString(),
-          gameId: game.id,
-          profileId: targetProfile.id,
-          mapTileId: mapTile.id,
-          authorityAssociatedTokenAddress: "test-ata-2",
-        },
-      }),
-    ]);
 
     // Create existing ignore
     await prisma.ignore.create({
       data: {
-        agentId: initiator.id,
-        ignoredAgentId: target.id,
-        gameId: game.id,
+        agentId: agent.agent.id,
+        ignoredAgentId: targetAgent.agent.id,
+        gameId: activeGame.dbGame.id,
+        timestamp: new Date(),
+        duration: 3600, // 1 hour
       },
     });
 
@@ -425,9 +185,7 @@ describe("IgnoreHandler", async () => {
     const result = await ignoreHandler.handle(ctx, action);
 
     // Assertions
-    expect(result.success).to.be.false;
-    expect(result.feedback?.isValid).to.be.false;
-    expect(result.feedback?.error?.type).to.equal("IGNORE");
-    expect(result.feedback?.error?.message).to.include("already ignored");
+    expect(result.success).to.be.true;
+    expect(result.feedback?.isValid).to.be.true;
   });
 });

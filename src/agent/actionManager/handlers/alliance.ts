@@ -10,7 +10,10 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import { gameConfig } from "@/config/env";
 import { ActionHandler } from "../types";
-import { getMiddleEarthAiAuthorityWallet } from "@/utils/program";
+import {
+  getAgentAuthorityKeypair,
+  getMiddleEarthAiAuthorityWallet,
+} from "@/utils/program";
 
 export class AllianceHandler
   implements ActionHandler<FormAllianceAction | BreakAllianceAction>
@@ -43,16 +46,16 @@ export class AllianceHandler
 
       // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
-      const [agentPda] = getAgentPDA(
-        this.program.programId,
-        gamePda,
-        ctx.agentOnchainId
-      );
-      const [targetAgentPda] = getAgentPDA(
-        this.program.programId,
-        gamePda,
-        action.targetId
-      );
+      // const [agentPda] = getAgentPDA(
+      //   this.program.programId,
+      //   gamePda,
+      //   ctx.agentOnchainId
+      // );
+      // const [targetAgentPda] = getAgentPDA(
+      //   this.program.programId,
+      //   gamePda,
+      //   action.targetId
+      // );
 
       // Get agents with profiles
       const [initiator, target] = await Promise.all([
@@ -75,7 +78,9 @@ export class AllianceHandler
         throw new Error("Agent not found");
       }
 
-      const gameAuthWallet = await getMiddleEarthAiAuthorityWallet();
+      const agentAuthKeypair = await getAgentAuthorityKeypair(
+        ctx.agentOnchainId
+      );
 
       // Perform all operations in a single transaction
       const result = await this.prisma.$transaction(
@@ -124,15 +129,20 @@ export class AllianceHandler
           // Step 3: Execute onchain alliance formation
           let tx: string;
           try {
+            console.log(
+              "Using authority:",
+              agentAuthKeypair.publicKey.toString()
+            );
+            console.log("For agent:", initiator.pda.toString());
             tx = await this.program.methods
               .formAlliance()
               .accountsStrict({
-                initiator: agentPda,
-                targetAgent: targetAgentPda,
+                initiator: initiator.pda,
+                targetAgent: target.pda,
                 game: gamePda,
-                authority: gameAuthWallet.keypair.publicKey,
+                authority: agentAuthKeypair.publicKey,
               })
-              .signers([gameAuthWallet.keypair])
+              .signers([agentAuthKeypair])
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback
@@ -140,6 +150,10 @@ export class AllianceHandler
               error,
               initiatorId: ctx.agentId,
               targetId: action.targetId,
+              agentPda: initiator.pda.toString(),
+              targetAgentPda: target.pda.toString(),
+              gamePda: gamePda.toString(),
+              authority: agentAuthKeypair.publicKey.toString(),
             });
             throw error;
           }
@@ -246,7 +260,7 @@ export class AllianceHandler
         throw new Error("No active alliance found between agents");
       }
 
-      const gameAuthWallet = await getMiddleEarthAiAuthorityWallet();
+      const agentAuthKeypair = await getMiddleEarthAiAuthorityWallet();
 
       // Perform all operations in a single transaction
       const result = await this.prisma.$transaction(
@@ -297,9 +311,9 @@ export class AllianceHandler
                 initiator: agentPda,
                 targetAgent: targetAgentPda,
                 game: gamePda,
-                authority: gameAuthWallet.keypair.publicKey,
+                authority: agentAuthKeypair.keypair.publicKey,
               })
-              .signers([gameAuthWallet.keypair])
+              .signers([agentAuthKeypair.keypair])
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback

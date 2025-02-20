@@ -14,18 +14,9 @@ import {
   getMiddleEarthAiAuthorityWallet,
   getRewardsVault,
 } from "@/utils/program";
+import { GameInfo } from "@/types";
 
 const { BN } = anchor;
-
-interface GameInfo {
-  dbGame: Game;
-  gameAccount: GameAccount;
-  agents: Array<{
-    account: AgentAccount;
-    agent: Prisma.AgentGetPayload<{ include: { profile: true } }>;
-  }>;
-  tx: string;
-}
 
 interface IGameManager {
   createNewGame(): Promise<GameInfo>;

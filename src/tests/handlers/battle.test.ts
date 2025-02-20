@@ -8,7 +8,7 @@ import {
   getMiddleEarthAiAuthorityWallet,
   getProgram,
 } from "@/utils/program";
-import { test, describe } from "node:test";
+import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
@@ -17,7 +17,8 @@ import {
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
-describe("BattleHandler", async () => {
+
+describe("BattleHandler", function () {
   let program: MearthProgram;
   let mint = new PublicKey("7SW467MLwRuYSpMbvjLJcy8igeK7Qk6hwSPzTFQotw2N");
   const connection = new Connection(process.env.SOLANA_RPC_URL!);
@@ -48,7 +49,7 @@ describe("BattleHandler", async () => {
   //   "confirmed"
   // );
 
-  test("setup", async () => {
+  before(async function () {
     prisma = new PrismaClient();
     program = await getProgram();
     battleHandler = new BattleHandler(program, prisma);
@@ -71,11 +72,11 @@ describe("BattleHandler", async () => {
     );
   });
 
-  //   test("cleanup", async () => {
-  //     await prisma.$disconnect();
-  //   });
+  after(async function () {
+    await prisma.$disconnect();
+  });
 
-  test("should successfully resolve a simple battle between two agents", async () => {
+  it("should successfully resolve a simple battle between two agents", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -138,7 +139,7 @@ describe("BattleHandler", async () => {
     expect(event?.message).to.include(defender.agent.profile.xHandle);
   });
 
-  test("should handle battle with dead agent", async () => {
+  it("should handle battle with dead agent", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -176,7 +177,7 @@ describe("BattleHandler", async () => {
     expect(result.feedback?.error?.message).to.include("dead agent");
   });
 
-  test("should handle battle with non-existent agent", async () => {
+  it("should handle battle with non-existent agent", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -204,7 +205,7 @@ describe("BattleHandler", async () => {
     expect(result.feedback?.error?.message).to.include("not found");
   });
 
-  test("should handle battle with self", async () => {
+  it("should handle battle with self", async () => {
     const activeGame = await gameManager.createNewGame();
     const agent = activeGame.agents[0];
     const agentKeypair = await getAgentAuthorityKeypair(
@@ -232,7 +233,7 @@ describe("BattleHandler", async () => {
     expect(result.feedback?.error?.message).to.include("Cannot battle self");
   });
 
-  test("should handle battle during cooldown period", async () => {
+  it("should handle battle during cooldown period", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -274,7 +275,7 @@ describe("BattleHandler", async () => {
     expect(result.feedback?.error?.message).to.include("cooldown");
   });
 
-  test("should handle alliance vs alliance battle correctly", async () => {
+  it("should handle alliance vs alliance battle correctly", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -367,7 +368,7 @@ describe("BattleHandler", async () => {
     expect(battle?.defenderAllyId).to.equal(defenderAlly.agent.id);
   });
 
-  test("should handle agent vs alliance battle correctly", async () => {
+  it("should handle agent vs alliance battle correctly", async () => {
     const activeGame = await gameManager.createNewGame();
     const singleAgent = activeGame.agents[0];
     const singleAgentKeypair = await getAgentAuthorityKeypair(
@@ -432,7 +433,7 @@ describe("BattleHandler", async () => {
     expect(battle?.type).to.equal("AgentVsAlliance");
   });
 
-  test("should handle battle outcome calculations correctly", async () => {
+  it("should handle battle outcome calculations correctly", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
@@ -487,7 +488,7 @@ describe("BattleHandler", async () => {
     expect(metadata.tokensAtStake).to.equal(battle?.tokensStaked);
   });
 
-  test("should handle database transaction failure gracefully", async () => {
+  it("should handle database transaction failure gracefully", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const defender = activeGame.agents[1];
@@ -522,7 +523,7 @@ describe("BattleHandler", async () => {
     expect(battle).to.be.null;
   });
 
-  test("should handle onchain transaction failure gracefully", async () => {
+  it("should handle onchain transaction failure gracefully", async () => {
     const activeGame = await gameManager.createNewGame();
     const attacker = activeGame.agents[0];
     const attackerKeypair = await getAgentAuthorityKeypair(
