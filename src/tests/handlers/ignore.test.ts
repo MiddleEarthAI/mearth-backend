@@ -1,18 +1,23 @@
 import { expect } from "chai";
 import { IgnoreHandler } from "@/agent/actionManager/handlers/ignore";
 import { PrismaClient } from "@prisma/client";
-import { MearthProgram } from "@/types";
+import { AgentWithProfile, GameInfo, MearthProgram } from "@/types";
 import { ActionContext, IgnoreAction } from "@/types";
-import { PublicKey } from "@solana/web3.js";
 import { getProgram } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
+import { AgentAccount } from "@/types/program";
 
 describe("IgnoreHandler", function () {
   let ignoreHandler: IgnoreHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
   let gameManager: GameManager;
+  let activeGame: GameInfo;
+  let agent: AgentWithProfile;
+  let agentAccount: AgentAccount;
+  let targetAgent: AgentWithProfile;
+  let targetAgentAccount: AgentAccount;
 
   before(async function () {
     prisma = new PrismaClient();
@@ -21,26 +26,30 @@ describe("IgnoreHandler", function () {
     gameManager = new GameManager(program, prisma);
   });
 
+  beforeEach(async function () {
+    activeGame = await gameManager.createNewGame();
+    agent = activeGame.agents[0].agent;
+    agentAccount = activeGame.agents[0].account;
+    targetAgent = activeGame.agents[1].agent;
+    targetAgentAccount = activeGame.agents[1].account;
+  });
+
   after(async function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully ignore another agent", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const targetAgent = activeGame.agents[1];
-
+  it.only("should successfully ignore another agent", async function () {
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: targetAgent.agent.profile.onchainId,
+      targetId: targetAgent.profile.onchainId,
       tweet: "Ignoring agent",
     };
 
@@ -54,8 +63,8 @@ describe("IgnoreHandler", function () {
     // Verify ignore record created
     const ignore = await prisma.ignore.findFirst({
       where: {
-        agentId: agent.agent.id,
-        ignoredAgentId: targetAgent.agent.id,
+        agentId: agent.id,
+        ignoredAgentId: targetAgent.id,
         gameId: activeGame.dbGame.id,
       },
     });
@@ -64,7 +73,7 @@ describe("IgnoreHandler", function () {
     // Verify cooldown created
     const cooldown = await prisma.coolDown.findFirst({
       where: {
-        cooledAgentId: agent.agent.id,
+        cooledAgentId: agent.id,
         type: "Ignore",
       },
     });
@@ -75,13 +84,13 @@ describe("IgnoreHandler", function () {
       where: {
         gameId: activeGame.dbGame.id,
         eventType: "IGNORE",
-        initiatorId: agent.agent.id,
-        targetId: targetAgent.agent.id,
+        initiatorId: agent.id,
+        targetId: targetAgent.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(agent.agent.profile.xHandle);
-    expect(event?.message).to.include(targetAgent.agent.profile.xHandle);
+    expect(event?.message).to.include(agent.profile.xHandle);
+    expect(event?.message).to.include(targetAgent.profile.xHandle);
   });
 
   it("should handle ignoring during cooldown period", async function () {

@@ -46,16 +46,6 @@ export class AllianceHandler
 
       // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
-      // const [agentPda] = getAgentPDA(
-      //   this.program.programId,
-      //   gamePda,
-      //   ctx.agentOnchainId
-      // );
-      // const [targetAgentPda] = getAgentPDA(
-      //   this.program.programId,
-      //   gamePda,
-      //   action.targetId
-      // );
 
       // Get agents with profiles
       const [initiator, target] = await Promise.all([
@@ -208,16 +198,6 @@ export class AllianceHandler
 
       // Get PDAs
       const [gamePda] = getGamePDA(this.program.programId, ctx.gameOnchainId);
-      const [agentPda] = getAgentPDA(
-        this.program.programId,
-        gamePda,
-        ctx.agentOnchainId
-      );
-      const [targetAgentPda] = getAgentPDA(
-        this.program.programId,
-        gamePda,
-        action.targetId
-      );
 
       // Get agents with profiles and existing alliance
       const [initiator, target] = await Promise.all([
@@ -260,7 +240,9 @@ export class AllianceHandler
         throw new Error("No active alliance found between agents");
       }
 
-      const agentAuthKeypair = await getMiddleEarthAiAuthorityWallet();
+      const agentAuthKeypair = await getAgentAuthorityKeypair(
+        ctx.agentOnchainId
+      );
 
       // Perform all operations in a single transaction
       const result = await this.prisma.$transaction(
@@ -308,12 +290,12 @@ export class AllianceHandler
             tx = await this.program.methods
               .breakAlliance()
               .accountsStrict({
-                initiator: agentPda,
-                targetAgent: targetAgentPda,
+                initiator: initiator.pda,
+                targetAgent: target.pda,
                 game: gamePda,
-                authority: agentAuthKeypair.keypair.publicKey,
+                authority: agentAuthKeypair.publicKey,
               })
-              .signers([agentAuthKeypair.keypair])
+              .signers([agentAuthKeypair])
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback

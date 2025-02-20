@@ -50,13 +50,7 @@ describe("AllianceHandler", function () {
     );
   });
 
-  it.only("should successfully form an alliance between two agents", async function () {
-    // Log the authorities and PDAs for debugging
-    console.log("Agent Authority:", agentKeypair.publicKey.toString());
-    console.log("Agent PDA:", agent.pda);
-    console.log("Target Agent PDA:", targetAgent.pda);
-    console.log("Game PDA:", activeGame.dbGame.pda);
-
+  it("should successfully form an alliance between two agents", async function () {
     const ctx: ActionContext = {
       agentId: agent.id,
       agentOnchainId: agent.profile.onchainId,
@@ -116,11 +110,19 @@ describe("AllianceHandler", function () {
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
+    const formAllianceAction: FormAllianceAction = {
+      type: "FORM_ALLIANCE",
+      targetId: targetAgent.profile.onchainId,
+      tweet: "Forming alliance",
+    };
     const breakAllianceAction: BreakAllianceAction = {
       type: "BREAK_ALLIANCE",
       targetId: targetAgent.profile.onchainId,
       tweet: "Breaking alliance",
     };
+
+    // Execute alliance formation
+    await allianceHandler.handle(ctx, formAllianceAction);
 
     // Execute alliance break
     const result = await allianceHandler.handle(ctx, breakAllianceAction);
@@ -202,11 +204,6 @@ describe("AllianceHandler", function () {
       agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
-    };
-    const breakAllianceAction: BreakAllianceAction = {
-      type: "BREAK_ALLIANCE",
-      targetId: targetAgent.profile.onchainId,
-      tweet: "Breaking non-existent alliance",
     };
 
     const action: BreakAllianceAction = {

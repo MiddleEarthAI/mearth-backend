@@ -569,7 +569,7 @@ ${FellowAgentsContext}
 ⚠️ VALIDATION RULES:
 • No actions during cooldown
 • No targeting beyond 1 tile away
-• MOVE action can ONLY use coordinates from SURROUNDING TERRAIN section above
+• MOVE action can ONLY use NON-OCCUPIED coordinates from SURROUNDING TERRAIN section above
 • No multi-tile moves
 • No alliance while in one
 • No new alliance while in battle
