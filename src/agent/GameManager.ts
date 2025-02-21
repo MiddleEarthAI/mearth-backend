@@ -204,7 +204,6 @@ export class GameManager implements IGameManager {
           console.info("💾 Creating game record in database...");
 
           const rewardsVault = await getRewardsVault();
-          console.log(gameAccount);
 
           const dbGame = await this.prisma.game.create({
             data: {
@@ -318,7 +317,6 @@ export class GameManager implements IGameManager {
 
         console.info(`💾 Creating agent database record...`);
 
-        console.info(`💰 Creating agent vault...`);
         const agentVault = await getAgentVault(profile.onchainId);
 
         const agentDb = await this.prisma.agent.create({

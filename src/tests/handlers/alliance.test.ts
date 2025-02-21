@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { AllianceHandler } from "@/agent/actionManager/handlers/alliance";
-import { Agent, Game, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { AgentWithProfile, GameInfo, MearthProgram } from "@/types";
 import {
   ActionContext,

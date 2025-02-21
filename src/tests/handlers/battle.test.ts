@@ -24,9 +24,10 @@ import {
 } from "@solana/spl-token";
 import { AgentAccount } from "@/types/program";
 import { BN } from "@coral-xyz/anchor";
+import { solanaConfig } from "@/config/env";
 
 async function requestAirdrop(publicKey: PublicKey, amount: number = 1) {
-  const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
+  const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
   try {
     const signature = await connection.requestAirdrop(
       publicKey,
@@ -44,9 +45,9 @@ async function mintMearthTokens(
   authority: Keypair,
   recipient: PublicKey,
   amount: number,
-  mintPubkey = new PublicKey("6w1GfoXH9HpGCRTcqLMqGeaLGRiuPfeCMhwXFx92gjEu")
+  mintPubkey: PublicKey = new PublicKey(solanaConfig.tokenMint)
 ) {
-  const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
+  const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
   try {
     // Create mint if not provided
     const mint =
@@ -121,20 +122,20 @@ describe.only("BattleHandler", function () {
     gameAuthority = gameAuthorityWallet.keypair;
 
     // Request airdrops for test wallets
-    await Promise.all([
-      requestAirdrop(user1.publicKey),
-      requestAirdrop(user2.publicKey),
-      requestAirdrop(gameAuthority.publicKey, 2), // Extra SOL for token operations
-    ]);
+    // await Promise.all([
+    //   requestAirdrop(user1.publicKey),
+    //   requestAirdrop(user2.publicKey),
+    //   requestAirdrop(gameAuthority.publicKey, 2), // Extra SOL for token operations
+    // ]);
 
     // Create MEARTH token mint
-    const { mint } = await mintMearthTokens(
-      gameAuthority,
-      gameAuthority.publicKey,
-      1000000000 // Initial supply
-    );
-    console.log("Mint address: ", mint.toString());
-    mearthMint = mint;
+    // const { mint } = await mintMearthTokens(
+    //   gameAuthority,
+    //   gameAuthority.publicKey,
+    //   1000000000 // Initial supply
+    // );
+    // console.log("Mint address: ", mint.toString());
+    mearthMint = new PublicKey(solanaConfig.tokenMint);
   });
 
   beforeEach(async function () {
@@ -158,12 +159,12 @@ describe.only("BattleHandler", function () {
     agent4AuthorityKeypair = await getAgentAuthorityKeypair(4);
 
     // Request airdrops for agent authorities
-    await Promise.all([
-      requestAirdrop(agent1AuthorityKeypair.publicKey),
-      requestAirdrop(agent2AuthorityKeypair.publicKey),
-      requestAirdrop(agent3AuthorityKeypair.publicKey),
-      requestAirdrop(agent4AuthorityKeypair.publicKey),
-    ]);
+    // await Promise.all([
+    //   requestAirdrop(agent1AuthorityKeypair.publicKey),
+    //   requestAirdrop(agent2AuthorityKeypair.publicKey),
+    //   requestAirdrop(agent3AuthorityKeypair.publicKey),
+    //   requestAirdrop(agent4AuthorityKeypair.publicKey),
+    // ]);
 
     // Mint initial tokens to agent vaults
     // for (const authority of [
@@ -185,35 +186,35 @@ describe.only("BattleHandler", function () {
     await prisma.$disconnect();
   });
 
-  it.only("should successfully resolve a simple battle between two agents", async () => {
+  it("should successfully resolve a simple battle between two agents", async () => {
     const stakerAta = await getOrCreateAssociatedTokenAccount(
-      new Connection(process.env.SOLANA_RPC_URL!, "confirmed"),
-      gameAuthority,
+      new Connection(solanaConfig.rpcUrl, "confirmed"),
+      agent1AuthorityKeypair,
       mearthMint,
-      gameAuthority.publicKey
+      agent1AuthorityKeypair.publicKey
     );
     // // stake tokens on agents
     await program.methods
       .initializeStake(new BN(1000000))
       .accounts({
         agent: agent1.pda,
-        authority: gameAuthority.publicKey,
+        authority: agent1AuthorityKeypair.publicKey,
         stakerSource: stakerAta.address,
         agentVault: new PublicKey(agent1.vault),
       })
-      .signers([gameAuthority])
+      .signers([agent1AuthorityKeypair])
       .rpc();
     console.log("Staking tokens...");
-    await program.methods
-      .stakeTokens(new BN(1000000))
-      .accounts({
-        agent: agent1.pda,
-        authority: gameAuthority.publicKey,
-        stakerSource: stakerAta.address,
-        agentVault: new PublicKey(agent1.vault),
-      })
-      .signers([gameAuthority])
-      .rpc();
+    // await program.methods
+    //   .stakeTokens(new BN(1000000))
+    //   .accounts({
+    //     agent: agent1.pda,
+    //     authority: gameAuthority.publicKey,
+    //     stakerSource: stakerAta.address,
+    //     agentVault: new PublicKey(agent1.vault),
+    //   })
+    //   .signers([gameAuthority])
+    //   .rpc();
 
     const ctx: ActionContext = {
       agentId: agent1.id,
@@ -256,32 +257,30 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle battle with dead agent", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
-    );
-    const defender = activeGame.agents[1];
-    const defenderKeypair = await getAgentAuthorityKeypair(
-      defender.agent.profile.onchainId
-    );
+    program.methods
+      .killAgent()
+      .accounts({
+        agent: agent2.pda,
+      })
+      .signers([gameAuthority])
+      .rpc();
 
     // Mark defender as dead
     await prisma.agent.update({
-      where: { id: defender.agent.id },
+      where: { id: agent2.id },
       data: { isAlive: false },
     });
 
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Battling dead agent",
     };
 

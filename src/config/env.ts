@@ -91,11 +91,11 @@ const env = cleanEnv(process.env, {
   }),
   SOLANA_RPC_URL: url({
     desc: "Solana RPC endpoint URL",
-    example: "https://api.devnet.solana.com",
+    // example: "https://api.devnet.solana.com",
   }),
   PROGRAM_ID: str({
     desc: "Solana program ID for the game contract",
-    example: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
+    // example: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
   }),
   MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY: str({
     desc: "Private key for the game wallet",
