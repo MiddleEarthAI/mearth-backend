@@ -10919,12 +10919,12 @@ export namespace Prisma {
   }
 
   export type AllianceSumAggregateOutputType = {
-    combinedTokens: number | null
+    combinedTokens: bigint | null
   }
 
   export type AllianceMinAggregateOutputType = {
     id: string | null
-    combinedTokens: number | null
+    combinedTokens: bigint | null
     status: $Enums.AllianceStatus | null
     timestamp: Date | null
     gameId: string | null
@@ -10935,7 +10935,7 @@ export namespace Prisma {
 
   export type AllianceMaxAggregateOutputType = {
     id: string | null
-    combinedTokens: number | null
+    combinedTokens: bigint | null
     status: $Enums.AllianceStatus | null
     timestamp: Date | null
     gameId: string | null
@@ -11087,7 +11087,7 @@ export namespace Prisma {
 
   export type AllianceGroupByOutputType = {
     id: string
-    combinedTokens: number | null
+    combinedTokens: bigint | null
     status: $Enums.AllianceStatus
     timestamp: Date
     gameId: string
@@ -11194,7 +11194,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      combinedTokens: number | null
+      combinedTokens: bigint | null
       status: $Enums.AllianceStatus
       timestamp: Date
       gameId: string
@@ -11628,7 +11628,7 @@ export namespace Prisma {
    */ 
   interface AllianceFieldRefs {
     readonly id: FieldRef<"Alliance", 'String'>
-    readonly combinedTokens: FieldRef<"Alliance", 'Float'>
+    readonly combinedTokens: FieldRef<"Alliance", 'BigInt'>
     readonly status: FieldRef<"Alliance", 'AllianceStatus'>
     readonly timestamp: FieldRef<"Alliance", 'DateTime'>
     readonly gameId: FieldRef<"Alliance", 'String'>
@@ -12054,14 +12054,14 @@ export namespace Prisma {
   }
 
   export type BattleSumAggregateOutputType = {
-    tokensStaked: number | null
+    tokensStaked: bigint | null
   }
 
   export type BattleMinAggregateOutputType = {
     id: string | null
     type: $Enums.BattleType | null
     status: $Enums.BattleStatus | null
-    tokensStaked: number | null
+    tokensStaked: bigint | null
     startTime: Date | null
     endTime: Date | null
     gameId: string | null
@@ -12076,7 +12076,7 @@ export namespace Prisma {
     id: string | null
     type: $Enums.BattleType | null
     status: $Enums.BattleStatus | null
-    tokensStaked: number | null
+    tokensStaked: bigint | null
     startTime: Date | null
     endTime: Date | null
     gameId: string | null
@@ -12248,7 +12248,7 @@ export namespace Prisma {
     id: string
     type: $Enums.BattleType
     status: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint
     startTime: Date
     endTime: Date | null
     gameId: string
@@ -12396,7 +12396,7 @@ export namespace Prisma {
       id: string
       type: $Enums.BattleType
       status: $Enums.BattleStatus
-      tokensStaked: number
+      tokensStaked: bigint
       startTime: Date
       endTime: Date | null
       gameId: string
@@ -12837,7 +12837,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Battle", 'String'>
     readonly type: FieldRef<"Battle", 'BattleType'>
     readonly status: FieldRef<"Battle", 'BattleStatus'>
-    readonly tokensStaked: FieldRef<"Battle", 'Int'>
+    readonly tokensStaked: FieldRef<"Battle", 'BigInt'>
     readonly startTime: FieldRef<"Battle", 'DateTime'>
     readonly endTime: FieldRef<"Battle", 'DateTime'>
     readonly gameId: FieldRef<"Battle", 'String'>
@@ -17931,6 +17931,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'BigInt'
+   */
+  export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+  /**
+   * Reference to a field of type 'BigInt[]'
+   */
+  export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+  /**
    * Reference to a field of type 'AllianceStatus'
    */
   export type EnumAllianceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AllianceStatus'>
@@ -18641,7 +18655,7 @@ export namespace Prisma {
     OR?: AllianceWhereInput[]
     NOT?: AllianceWhereInput | AllianceWhereInput[]
     id?: StringFilter<"Alliance"> | string
-    combinedTokens?: FloatNullableFilter<"Alliance"> | number | null
+    combinedTokens?: BigIntNullableFilter<"Alliance"> | bigint | number | null
     status?: EnumAllianceStatusFilter<"Alliance"> | $Enums.AllianceStatus
     timestamp?: DateTimeFilter<"Alliance"> | Date | string
     gameId?: StringFilter<"Alliance"> | string
@@ -18673,7 +18687,7 @@ export namespace Prisma {
     AND?: AllianceWhereInput | AllianceWhereInput[]
     OR?: AllianceWhereInput[]
     NOT?: AllianceWhereInput | AllianceWhereInput[]
-    combinedTokens?: FloatNullableFilter<"Alliance"> | number | null
+    combinedTokens?: BigIntNullableFilter<"Alliance"> | bigint | number | null
     status?: EnumAllianceStatusFilter<"Alliance"> | $Enums.AllianceStatus
     timestamp?: DateTimeFilter<"Alliance"> | Date | string
     gameId?: StringFilter<"Alliance"> | string
@@ -18706,7 +18720,7 @@ export namespace Prisma {
     OR?: AllianceScalarWhereWithAggregatesInput[]
     NOT?: AllianceScalarWhereWithAggregatesInput | AllianceScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Alliance"> | string
-    combinedTokens?: FloatNullableWithAggregatesFilter<"Alliance"> | number | null
+    combinedTokens?: BigIntNullableWithAggregatesFilter<"Alliance"> | bigint | number | null
     status?: EnumAllianceStatusWithAggregatesFilter<"Alliance"> | $Enums.AllianceStatus
     timestamp?: DateTimeWithAggregatesFilter<"Alliance"> | Date | string
     gameId?: StringWithAggregatesFilter<"Alliance"> | string
@@ -18722,7 +18736,7 @@ export namespace Prisma {
     id?: StringFilter<"Battle"> | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
-    tokensStaked?: IntFilter<"Battle"> | number
+    tokensStaked?: BigIntFilter<"Battle"> | bigint | number
     startTime?: DateTimeFilter<"Battle"> | Date | string
     endTime?: DateTimeNullableFilter<"Battle"> | Date | string | null
     gameId?: StringFilter<"Battle"> | string
@@ -18768,7 +18782,7 @@ export namespace Prisma {
     NOT?: BattleWhereInput | BattleWhereInput[]
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
-    tokensStaked?: IntFilter<"Battle"> | number
+    tokensStaked?: BigIntFilter<"Battle"> | bigint | number
     startTime?: DateTimeFilter<"Battle"> | Date | string
     endTime?: DateTimeNullableFilter<"Battle"> | Date | string | null
     gameId?: StringFilter<"Battle"> | string
@@ -18812,7 +18826,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Battle"> | string
     type?: EnumBattleTypeWithAggregatesFilter<"Battle"> | $Enums.BattleType
     status?: EnumBattleStatusWithAggregatesFilter<"Battle"> | $Enums.BattleStatus
-    tokensStaked?: IntWithAggregatesFilter<"Battle"> | number
+    tokensStaked?: BigIntWithAggregatesFilter<"Battle"> | bigint | number
     startTime?: DateTimeWithAggregatesFilter<"Battle"> | Date | string
     endTime?: DateTimeNullableWithAggregatesFilter<"Battle"> | Date | string | null
     gameId?: StringWithAggregatesFilter<"Battle"> | string
@@ -19762,7 +19776,7 @@ export namespace Prisma {
 
   export type AllianceCreateInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     endedAt?: Date | string | null
@@ -19773,7 +19787,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedCreateInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     gameId: string
@@ -19784,7 +19798,7 @@ export namespace Prisma {
 
   export type AllianceUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19795,7 +19809,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
@@ -19806,7 +19820,7 @@ export namespace Prisma {
 
   export type AllianceCreateManyInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     gameId: string
@@ -19817,7 +19831,7 @@ export namespace Prisma {
 
   export type AllianceUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19825,7 +19839,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
@@ -19838,7 +19852,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
@@ -19853,7 +19867,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -19868,7 +19882,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
@@ -19883,7 +19897,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -19898,7 +19912,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -19913,7 +19927,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -19922,7 +19936,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -20950,15 +20964,15 @@ export namespace Prisma {
     conversationId?: SortOrder
   }
 
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  export type BigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
   }
 
   export type EnumAllianceStatusFilter<$PrismaModel = never> = {
@@ -21014,20 +21028,20 @@ export namespace Prisma {
     combinedTokens?: SortOrder
   }
 
-  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+  export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
   export type EnumAllianceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -21052,6 +21066,17 @@ export namespace Prisma {
     in?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.BattleStatus[] | ListEnumBattleStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumBattleStatusFilter<$PrismaModel> | $Enums.BattleStatus
+  }
+
+  export type BigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
   }
 
   export type BattleStartTimeTypeCompoundUniqueInput = {
@@ -21130,6 +21155,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBattleStatusFilter<$PrismaModel>
     _max?: NestedEnumBattleStatusFilter<$PrismaModel>
+  }
+
+  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type EnumInteractionTypeFilter<$PrismaModel = never> = {
@@ -22556,12 +22597,12 @@ export namespace Prisma {
     connect?: AgentWhereUniqueInput
   }
 
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type NullableBigIntFieldUpdateOperationsInput = {
+    set?: bigint | number | null
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
   }
 
   export type EnumAllianceStatusFieldUpdateOperationsInput = {
@@ -22634,6 +22675,14 @@ export namespace Prisma {
 
   export type EnumBattleStatusFieldUpdateOperationsInput = {
     set?: $Enums.BattleStatus
+  }
+
+  export type BigIntFieldUpdateOperationsInput = {
+    set?: bigint | number
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
   }
 
   export type GameUpdateOneRequiredWithoutBattlesNestedInput = {
@@ -23044,15 +23093,15 @@ export namespace Prisma {
     _max?: NestedEnumTerrainTypeFilter<$PrismaModel>
   }
 
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  export type NestedBigIntNullableFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableFilter<$PrismaModel> | bigint | number | null
   }
 
   export type NestedEnumAllianceStatusFilter<$PrismaModel = never> = {
@@ -23062,7 +23111,23 @@ export namespace Prisma {
     not?: NestedEnumAllianceStatusFilter<$PrismaModel> | $Enums.AllianceStatus
   }
 
-  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedBigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel> | null
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel> | null
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntNullableWithAggregatesFilter<$PrismaModel> | bigint | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedBigIntNullableFilter<$PrismaModel>
+    _min?: NestedBigIntNullableFilter<$PrismaModel>
+    _max?: NestedBigIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -23070,12 +23135,7 @@ export namespace Prisma {
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumAllianceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -23102,6 +23162,17 @@ export namespace Prisma {
     not?: NestedEnumBattleStatusFilter<$PrismaModel> | $Enums.BattleStatus
   }
 
+  export type NestedBigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
   export type NestedEnumBattleTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.BattleType | EnumBattleTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BattleType[] | ListEnumBattleTypeFieldRefInput<$PrismaModel>
@@ -23120,6 +23191,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBattleStatusFilter<$PrismaModel>
     _max?: NestedEnumBattleStatusFilter<$PrismaModel>
+  }
+
+  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type NestedEnumInteractionTypeFilter<$PrismaModel = never> = {
@@ -23239,7 +23326,7 @@ export namespace Prisma {
 
   export type AllianceCreateWithoutGameInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     endedAt?: Date | string | null
@@ -23249,7 +23336,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedCreateWithoutGameInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     initiatorId: string
@@ -23271,7 +23358,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     attacker: AgentCreateNestedOneWithoutBattlesAsAttackerInput
@@ -23285,7 +23372,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     attackerId: string
@@ -23471,7 +23558,7 @@ export namespace Prisma {
     OR?: AllianceScalarWhereInput[]
     NOT?: AllianceScalarWhereInput | AllianceScalarWhereInput[]
     id?: StringFilter<"Alliance"> | string
-    combinedTokens?: FloatNullableFilter<"Alliance"> | number | null
+    combinedTokens?: BigIntNullableFilter<"Alliance"> | bigint | number | null
     status?: EnumAllianceStatusFilter<"Alliance"> | $Enums.AllianceStatus
     timestamp?: DateTimeFilter<"Alliance"> | Date | string
     gameId?: StringFilter<"Alliance"> | string
@@ -23503,7 +23590,7 @@ export namespace Prisma {
     id?: StringFilter<"Battle"> | string
     type?: EnumBattleTypeFilter<"Battle"> | $Enums.BattleType
     status?: EnumBattleStatusFilter<"Battle"> | $Enums.BattleStatus
-    tokensStaked?: IntFilter<"Battle"> | number
+    tokensStaked?: BigIntFilter<"Battle"> | bigint | number
     startTime?: DateTimeFilter<"Battle"> | Date | string
     endTime?: DateTimeNullableFilter<"Battle"> | Date | string | null
     gameId?: StringFilter<"Battle"> | string
@@ -24143,7 +24230,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
@@ -24157,7 +24244,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -24181,7 +24268,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
@@ -24195,7 +24282,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -24219,7 +24306,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
@@ -24233,7 +24320,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -24257,7 +24344,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
@@ -24271,7 +24358,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -24295,7 +24382,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     game: GameCreateNestedOneWithoutBattlesInput
@@ -24309,7 +24396,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -24357,7 +24444,7 @@ export namespace Prisma {
 
   export type AllianceCreateWithoutInitiatorInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     endedAt?: Date | string | null
@@ -24367,7 +24454,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedCreateWithoutInitiatorInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     gameId: string
@@ -24387,7 +24474,7 @@ export namespace Prisma {
 
   export type AllianceCreateWithoutJoinerInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     endedAt?: Date | string | null
@@ -24397,7 +24484,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedCreateWithoutJoinerInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     gameId: string
@@ -27236,7 +27323,7 @@ export namespace Prisma {
 
   export type AllianceCreateManyGameInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     initiatorId: string
@@ -27248,7 +27335,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     attackerId: string
@@ -27363,7 +27450,7 @@ export namespace Prisma {
 
   export type AllianceUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27373,7 +27460,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     initiatorId?: StringFieldUpdateOperationsInput | string
@@ -27383,7 +27470,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateManyWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     initiatorId?: StringFieldUpdateOperationsInput | string
@@ -27395,7 +27482,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     attacker?: AgentUpdateOneRequiredWithoutBattlesAsAttackerNestedInput
@@ -27409,7 +27496,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     attackerId?: StringFieldUpdateOperationsInput | string
@@ -27423,7 +27510,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     attackerId?: StringFieldUpdateOperationsInput | string
@@ -27633,7 +27720,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -27647,7 +27734,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -27661,7 +27748,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -27675,7 +27762,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -27689,7 +27776,7 @@ export namespace Prisma {
     id?: string
     type: $Enums.BattleType
     status?: $Enums.BattleStatus
-    tokensStaked: number
+    tokensStaked: bigint | number
     startTime?: Date | string
     endTime?: Date | string | null
     gameId: string
@@ -27709,7 +27796,7 @@ export namespace Prisma {
 
   export type AllianceCreateManyInitiatorInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     gameId: string
@@ -27719,7 +27806,7 @@ export namespace Prisma {
 
   export type AllianceCreateManyJoinerInput = {
     id?: string
-    combinedTokens?: number | null
+    combinedTokens?: bigint | number | null
     status?: $Enums.AllianceStatus
     timestamp?: Date | string
     gameId: string
@@ -27803,7 +27890,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
@@ -27817,7 +27904,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27831,7 +27918,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27845,7 +27932,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
@@ -27859,7 +27946,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27873,7 +27960,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27887,7 +27974,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
@@ -27901,7 +27988,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27915,7 +28002,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27929,7 +28016,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
@@ -27943,7 +28030,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27957,7 +28044,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27971,7 +28058,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutBattlesNestedInput
@@ -27985,7 +28072,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -27999,7 +28086,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBattleTypeFieldUpdateOperationsInput | $Enums.BattleType
     status?: EnumBattleStatusFieldUpdateOperationsInput | $Enums.BattleStatus
-    tokensStaked?: IntFieldUpdateOperationsInput | number
+    tokensStaked?: BigIntFieldUpdateOperationsInput | bigint | number
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     gameId?: StringFieldUpdateOperationsInput | string
@@ -28035,7 +28122,7 @@ export namespace Prisma {
 
   export type AllianceUpdateWithoutInitiatorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28045,7 +28132,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateWithoutInitiatorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
@@ -28055,7 +28142,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateManyWithoutInitiatorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
@@ -28065,7 +28152,7 @@ export namespace Prisma {
 
   export type AllianceUpdateWithoutJoinerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28075,7 +28162,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateWithoutJoinerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string
@@ -28085,7 +28172,7 @@ export namespace Prisma {
 
   export type AllianceUncheckedUpdateManyWithoutJoinerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    combinedTokens?: NullableFloatFieldUpdateOperationsInput | number | null
+    combinedTokens?: NullableBigIntFieldUpdateOperationsInput | bigint | number | null
     status?: EnumAllianceStatusFieldUpdateOperationsInput | $Enums.AllianceStatus
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     gameId?: StringFieldUpdateOperationsInput | string

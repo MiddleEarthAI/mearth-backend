@@ -634,7 +634,7 @@ Generate a JSON response:
 
     // Get agent with all necessary relations
     const agent = await this.prisma.agent.findUnique({
-      where: { id: actionContext.agentId },
+      where: { id: actionContext.agentId, isAlive: true },
       include: {
         mapTile: true,
         coolDown: {

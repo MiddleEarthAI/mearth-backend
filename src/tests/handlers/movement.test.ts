@@ -14,7 +14,7 @@ import { GameManager } from "@/agent/GameManager";
 import { AgentAccount, GameAccount } from "@/types/program";
 import { requestAirdrop } from "../utiils";
 
-describe.only("MovementHandler", function () {
+describe("MovementHandler", function () {
   let movementHandler: MovementHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
@@ -62,7 +62,7 @@ describe.only("MovementHandler", function () {
     //      agent2Keypair = await getAgentAuthorityKeypair(agent2.profile.onchainId);
   });
 
-  it.only("should successfully move agent to adjacent tile", async function () {
+  it("should successfully move agent to adjacent tile", async function () {
     // Setup test data
     const ctx: ActionContext = {
       agentId: agent1.id,

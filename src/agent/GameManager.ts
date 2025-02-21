@@ -265,7 +265,7 @@ export class GameManager implements IGameManager {
 
     const profiles = await this.prisma.agentProfile.findMany();
     const adjacentTiles = await this.getAdjacentEmptyTiles(6, 22);
-    console.log("adjacentTiles", adjacentTiles);
+    // console.log("adjacentTiles", adjacentTiles);
     return Promise.all(
       profiles.map(async (profile, index) => {
         console.info(`👤 Initializing agent for profile: ${profile.name}`);

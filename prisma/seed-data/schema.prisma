@@ -170,7 +170,7 @@ model Tweet {
 
 model Alliance {
   id             String         @id @default(uuid())
-  combinedTokens Float?
+  combinedTokens BigInt?
   status         AllianceStatus @default(Active)
   timestamp      DateTime       @default(now())
 
@@ -198,7 +198,7 @@ model Battle {
   id           String       @id @default(uuid())
   type         BattleType
   status       BattleStatus @default(Active)
-  tokensStaked Int
+  tokensStaked BigInt
   startTime    DateTime     @default(now())
   endTime      DateTime?
 

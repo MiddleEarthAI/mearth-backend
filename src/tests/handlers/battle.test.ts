@@ -11,24 +11,14 @@ import {
 } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
-import {
-  getOrCreateAssociatedTokenAccount,
-  createMint,
-  mintTo,
-  Account,
-} from "@solana/spl-token";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { getOrCreateAssociatedTokenAccount, Account } from "@solana/spl-token";
 import { AgentAccount } from "@/types/program";
 import { BN } from "@coral-xyz/anchor";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { mintMearthTokens, requestAirdrop } from "../utiils";
 
-describe("BattleHandler", function () {
+describe.only("BattleHandler", function () {
   let program: MearthProgram;
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
@@ -64,50 +54,54 @@ describe("BattleHandler", function () {
     const gameAuthorityWallet = await getMiddleEarthAiAuthorityWallet();
     gameAuthority = gameAuthorityWallet.keypair;
 
-    user1Ata = await getOrCreateAssociatedTokenAccount(
-      new Connection(solanaConfig.rpcUrl, "confirmed"),
-      user1,
-      mearthMint,
-      user1.publicKey
-    );
-    user2Ata = await getOrCreateAssociatedTokenAccount(
-      new Connection(solanaConfig.rpcUrl, "confirmed"),
-      user2,
-      mearthMint,
-      user2.publicKey
-    );
-
-    // Request airdrops for test wallets
-    await Promise.all([
-      requestAirdrop(user1.publicKey),
-      requestAirdrop(user2.publicKey),
-    ]);
-
-    for (const id of [1, 2, 3, 4]) {
-      const agentAuthorityKeypair = await getAgentAuthorityKeypair(id);
-      await requestAirdrop(agentAuthorityKeypair.publicKey);
-    }
     // Create MEARTH token mint
     const { mint } = await mintMearthTokens(
       gameAuthority,
       gameAuthority.publicKey,
-      1000000000 // Initial supply
+      10_000_000_000 // Initial supply
     );
-    console.log("Mint address: ", mint.toString());
-    mearthMint = new PublicKey(solanaConfig.tokenMint);
 
-    // Mint initial tokens to agent vaults
-    for (const authority of [
-      agent1AuthorityKeypair,
-      agent2AuthorityKeypair,
-      agent3AuthorityKeypair,
-      agent4AuthorityKeypair,
-    ]) {
+    const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
+
+    // Request airdrops for test wallets
+    await Promise.all([
+      requestAirdrop(gameAuthority.publicKey),
+      requestAirdrop(user1.publicKey),
+      requestAirdrop(user2.publicKey),
+    ]);
+
+    user1Ata = await getOrCreateAssociatedTokenAccount(
+      connection,
+      user1,
+      mint,
+      user1.publicKey
+    );
+    user2Ata = await getOrCreateAssociatedTokenAccount(
+      connection,
+      user2,
+      mint,
+      user2.publicKey
+    );
+
+    // Mint MEARTH tokens to users
+    await mintMearthTokens(gameAuthority, user1.publicKey, 1_000_000_000_000);
+    await mintMearthTokens(gameAuthority, user2.publicKey, 1_000_000_000_000);
+
+    // Airdrop SOL to agent authorities
+    for (const id of [1, 2, 3, 4]) {
+      const authority = await getAgentAuthorityKeypair(id);
+      await requestAirdrop(authority.publicKey);
+    }
+
+    mearthMint = mint;
+
+    // Mint initial MEARTH tokens to agent vaults
+    for (const id of [1, 2, 3, 4]) {
+      const authority = await getAgentAuthorityKeypair(id);
       await mintMearthTokens(
-        authority,
-        gameAuthority.publicKey,
-        1000000000,
-        mearthMint
+        gameAuthority,
+        authority.publicKey,
+        10_000_000_000
       );
     }
   });
@@ -137,10 +131,10 @@ describe("BattleHandler", function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully resolve a simple battle between two agents", async () => {
+  it.only("should successfully resolve a simple battle between two agents", async () => {
     // // stake tokens on agents
     await program.methods
-      .initializeStake(new BN(1000000))
+      .initializeStake(new BN(50_000_000_000))
       .accounts({
         agent: agent1.pda,
         authority: user1.publicKey,
@@ -149,17 +143,17 @@ describe("BattleHandler", function () {
       })
       .signers([user1])
       .rpc();
-    // console.log("Staking tokens...");
-    // await program.methods
-    //   .stakeTokens(new BN(1000000))
-    //   .accounts({
-    //     agent: agent1.pda,
-    //     authority: gameAuthority.publicKey,
-    //     stakerSource: stakerAta.address,
-    //     agentVault: new PublicKey(agent1.vault),
-    //   })
-    //   .signers([gameAuthority])
-    //   .rpc();
+    console.log("Staking tokens...");
+    await program.methods
+      .stakeTokens(new BN(50_000_000_000))
+      .accounts({
+        agent: agent1.pda,
+        authority: user1.publicKey,
+        stakerSource: user1Ata.address,
+        agentVault: new PublicKey(agent1.vault),
+      })
+      .signers([user1])
+      .rpc();
 
     const ctx: ActionContext = {
       agentId: agent1.id,

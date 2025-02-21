@@ -32,22 +32,11 @@ export async function requestAirdrop(publicKey: PublicKey, amount: number = 1) {
 export async function mintMearthTokens(
   authority: Keypair,
   recipient: PublicKey,
-  amount: number,
-  mintPubkey: PublicKey = new PublicKey(solanaConfig.tokenMint)
+  amount: number
 ) {
+  const mint = new PublicKey(solanaConfig.tokenMint);
   const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
   try {
-    // Create mint if not provided
-    const mint =
-      mintPubkey ||
-      (await createMint(
-        connection,
-        authority,
-        authority.publicKey,
-        authority.publicKey,
-        9 // 9 decimals
-      ));
-
     // Get or create recipient's token account
     const recipientAta = await getOrCreateAssociatedTokenAccount(
       connection,
@@ -55,7 +44,6 @@ export async function mintMearthTokens(
       mint,
       recipient
     );
-
     // Mint tokens
     await mintTo(
       connection,
