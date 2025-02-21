@@ -525,9 +525,9 @@ export class BattleHandler {
   ): Promise<BattleOutcome> {
     // Calculate total tokens for each side
     const sideATokens =
-      sideA.agent.tokenBalance + (sideA.ally?.tokenBalance ?? 0);
+      sideA.agent.stakedBalance + (sideA.ally?.stakedBalance ?? 0);
     const sideBTokens =
-      sideB.agent.tokenBalance + (sideB.ally?.tokenBalance ?? 0);
+      sideB.agent.stakedBalance + (sideB.ally?.stakedBalance ?? 0);
     const totalTokens = sideATokens + sideBTokens;
 
     let sideAWins: boolean;

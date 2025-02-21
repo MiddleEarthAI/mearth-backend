@@ -1,114 +1,230 @@
 import { expect } from "chai";
 import { BattleHandler } from "@/agent/actionManager/handlers/battle";
-import { PrismaClient } from "@prisma/client";
-import { MearthProgram } from "@/types";
+import { Game, PrismaClient } from "@prisma/client";
+import { AgentWithProfile, GameInfo, MearthProgram } from "@/types";
 import { ActionContext, BattleAction } from "@/types";
 import {
   getAgentAuthorityKeypair,
   getMiddleEarthAiAuthorityWallet,
   getProgram,
+  getAgentVault,
 } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { BN } from "@coral-xyz/anchor";
 import {
-  Account,
-  getAssociatedTokenAddressSync,
+  Connection,
+  Keypair,
+  PublicKey,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+import {
   getOrCreateAssociatedTokenAccount,
+  createMint,
+  mintTo,
 } from "@solana/spl-token";
+import { AgentAccount } from "@/types/program";
+import { BN } from "@coral-xyz/anchor";
 
-describe("BattleHandler", function () {
+async function requestAirdrop(publicKey: PublicKey, amount: number = 1) {
+  const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
+  try {
+    const signature = await connection.requestAirdrop(
+      publicKey,
+      amount * LAMPORTS_PER_SOL
+    );
+    await connection.confirmTransaction(signature);
+    console.log(`Airdropped ${amount} SOL to ${publicKey.toString()}`);
+  } catch (error) {
+    console.error("Airdrop failed:", error);
+    throw error;
+  }
+}
+
+async function mintMearthTokens(
+  authority: Keypair,
+  recipient: PublicKey,
+  amount: number,
+  mintPubkey = new PublicKey("6w1GfoXH9HpGCRTcqLMqGeaLGRiuPfeCMhwXFx92gjEu")
+) {
+  const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
+  try {
+    // Create mint if not provided
+    const mint =
+      mintPubkey ||
+      (await createMint(
+        connection,
+        authority,
+        authority.publicKey,
+        authority.publicKey,
+        9 // 9 decimals
+      ));
+
+    // Get or create recipient's token account
+    const recipientAta = await getOrCreateAssociatedTokenAccount(
+      connection,
+      authority,
+      mint,
+      recipient
+    );
+
+    // Mint tokens
+    await mintTo(
+      connection,
+      authority,
+      mint,
+      recipientAta.address,
+      authority,
+      amount
+    );
+
+    console.log(`Minted ${amount} MEARTH tokens to ${recipient.toString()}`);
+    return { mint, recipientAta };
+  } catch (error) {
+    console.error("Token minting failed:", error);
+    throw error;
+  }
+}
+
+describe.only("BattleHandler", function () {
   let program: MearthProgram;
-  let mint = new PublicKey("7SW467MLwRuYSpMbvjLJcy8igeK7Qk6hwSPzTFQotw2N");
-  const connection = new Connection(process.env.SOLANA_RPC_URL!);
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
-  let gameManager: GameManager;
+  let gameInfo: GameInfo;
+  let activeGame: Game;
   let gameAuthority: Keypair;
-  let agent1Authority: Keypair;
-  let agent2Authority: Keypair;
-  let agent3Authority: Keypair;
-  let agent4Authority: Keypair;
+  let gameManager: GameManager;
+  let agent1: AgentWithProfile;
+  let agent2: AgentWithProfile;
+  let agent3: AgentWithProfile;
+  let agent4: AgentWithProfile;
+  let agent1Account: AgentAccount;
+  let agent2Account: AgentAccount;
+  let agent3Account: AgentAccount;
+  let agent4Account: AgentAccount;
+  let agent1AuthorityKeypair: Keypair;
+  let agent2AuthorityKeypair: Keypair;
+  let agent3AuthorityKeypair: Keypair;
+  let agent4AuthorityKeypair: Keypair;
   let user1 = Keypair.generate();
   let user2 = Keypair.generate();
-  // let user1Ata = await getOrCreateAssociatedTokenAccount(
-  //   connection,
-  //   user1,
-  //   mint,
-  //   user1.publicKey,
-  //   false,
-  //   "confirmed"
-  // );
-  // let user2Ata = await getOrCreateAssociatedTokenAccount(
-  //   connection,
-  //   user2,
-  //   mint,
-  //   user2.publicKey,
-  //   false,
-  //   "confirmed"
-  // );
+  let mearthMint: PublicKey;
 
   before(async function () {
+    // Initialize test dependencies
     prisma = new PrismaClient();
     program = await getProgram();
     battleHandler = new BattleHandler(program, prisma);
     gameManager = new GameManager(program, prisma);
-    gameAuthority = (await getMiddleEarthAiAuthorityWallet()).keypair;
 
-    agent1Authority = await getAgentAuthorityKeypair(1);
-    agent2Authority = await getAgentAuthorityKeypair(2);
-    agent3Authority = await getAgentAuthorityKeypair(3);
-    agent4Authority = await getAgentAuthorityKeypair(4);
+    // Get game authority
+    const gameAuthorityWallet = await getMiddleEarthAiAuthorityWallet();
+    gameAuthority = gameAuthorityWallet.keypair;
 
-    // airdrop tokens to users
-    await program.provider.connection.requestAirdrop(
-      user1.publicKey,
-      new BN(1000000000000)
+    // Request airdrops for test wallets
+    await Promise.all([
+      requestAirdrop(user1.publicKey),
+      requestAirdrop(user2.publicKey),
+      requestAirdrop(gameAuthority.publicKey, 2), // Extra SOL for token operations
+    ]);
+
+    // Create MEARTH token mint
+    const { mint } = await mintMearthTokens(
+      gameAuthority,
+      gameAuthority.publicKey,
+      1000000000 // Initial supply
     );
-    await program.provider.connection.requestAirdrop(
-      user2.publicKey,
-      new BN(100000000000)
-    );
+    console.log("Mint address: ", mint.toString());
+    mearthMint = mint;
+  });
+
+  beforeEach(async function () {
+    // Create new game and get agents for each test
+    gameInfo = await gameManager.createNewGame();
+    activeGame = gameInfo.dbGame;
+
+    agent1 = gameInfo.agents[0].agent;
+    agent2 = gameInfo.agents[1].agent;
+    agent3 = gameInfo.agents[2].agent;
+    agent4 = gameInfo.agents[3].agent;
+
+    agent1Account = gameInfo.agents[0].account;
+    agent2Account = gameInfo.agents[1].account;
+    agent3Account = gameInfo.agents[2].account;
+    agent4Account = gameInfo.agents[3].account;
+
+    agent1AuthorityKeypair = await getAgentAuthorityKeypair(1);
+    agent2AuthorityKeypair = await getAgentAuthorityKeypair(2);
+    agent3AuthorityKeypair = await getAgentAuthorityKeypair(3);
+    agent4AuthorityKeypair = await getAgentAuthorityKeypair(4);
+
+    // Request airdrops for agent authorities
+    await Promise.all([
+      requestAirdrop(agent1AuthorityKeypair.publicKey),
+      requestAirdrop(agent2AuthorityKeypair.publicKey),
+      requestAirdrop(agent3AuthorityKeypair.publicKey),
+      requestAirdrop(agent4AuthorityKeypair.publicKey),
+    ]);
+
+    // Mint initial tokens to agent vaults
+    // for (const authority of [
+    //   agent1AuthorityKeypair,
+    //   agent2AuthorityKeypair,
+    //   agent3AuthorityKeypair,
+    //   agent4AuthorityKeypair,
+    // ]) {
+    //   await mintMearthTokens(
+    //     authority,
+    //     gameAuthority.publicKey,
+    //     1000000000,
+    //     mearthMint
+    //   );
+    // }
   });
 
   after(async function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully resolve a simple battle between two agents", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
+  it.only("should successfully resolve a simple battle between two agents", async () => {
+    const stakerAta = await getOrCreateAssociatedTokenAccount(
+      new Connection(process.env.SOLANA_RPC_URL!, "confirmed"),
+      gameAuthority,
+      mearthMint,
+      gameAuthority.publicKey
     );
-    const defender = activeGame.agents[1];
-    const defenderKeypair = await getAgentAuthorityKeypair(
-      defender.agent.profile.onchainId
-    );
-
     // // stake tokens on agents
-    // await program.methods
-    //   .stakeTokens(new BN(1000000))
-    //   .accounts({
-    //     agent: attacker.agent.pda,
-    //     authority: user1.publicKey,
-    //     stakerSource: user1Ata.address,
-    //     agentVault: new PublicKey(attacker.agent.vault),
-    //   })
-    //   .signers([user1])
-    //   .rpc();
+    await program.methods
+      .initializeStake(new BN(1000000))
+      .accounts({
+        agent: agent1.pda,
+        authority: gameAuthority.publicKey,
+        stakerSource: stakerAta.address,
+        agentVault: new PublicKey(agent1.vault),
+      })
+      .signers([gameAuthority])
+      .rpc();
+    console.log("Staking tokens...");
+    await program.methods
+      .stakeTokens(new BN(1000000))
+      .accounts({
+        agent: agent1.pda,
+        authority: gameAuthority.publicKey,
+        stakerSource: stakerAta.address,
+        agentVault: new PublicKey(agent1.vault),
+      })
+      .signers([gameAuthority])
+      .rpc();
 
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Initiating battle test",
     };
 
@@ -119,8 +235,8 @@ describe("BattleHandler", function () {
 
     const battle = await prisma.battle.findFirst({
       where: {
-        attackerId: attacker.agent.id,
-        defenderId: defender.agent.id,
+        attackerId: agent1.id,
+        defenderId: agent2.id,
       },
     });
     expect(battle).to.not.be.null;
@@ -128,15 +244,15 @@ describe("BattleHandler", function () {
 
     const event = await prisma.gameEvent.findFirst({
       where: {
-        gameId: activeGame.dbGame.id,
+        gameId: activeGame.id,
         eventType: "BATTLE",
-        initiatorId: attacker.agent.id,
-        targetId: defender.agent.id,
+        initiatorId: agent1.id,
+        targetId: agent2.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(attacker.agent.profile.xHandle);
-    expect(event?.message).to.include(defender.agent.profile.xHandle);
+    expect(event?.message).to.include(agent1.profile.xHandle);
+    expect(event?.message).to.include(agent2.profile.xHandle);
   });
 
   it("should handle battle with dead agent", async () => {

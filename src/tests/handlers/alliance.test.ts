@@ -7,11 +7,89 @@ import {
   FormAllianceAction,
   BreakAllianceAction,
 } from "@/types";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { getAgentAuthorityKeypair, getProgram } from "@/utils/program";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+import {
+  getAgentAuthorityKeypair,
+  getProgram,
+  getAgentVault,
+  getMiddleEarthAiAuthorityWallet,
+} from "@/utils/program";
 import { GameManager } from "@/agent/GameManager";
 import { describe, it, before, after } from "mocha";
 import { AgentAccount } from "@/types/program";
+import {
+  getOrCreateAssociatedTokenAccount,
+  createMint,
+  mintTo,
+} from "@solana/spl-token";
+
+async function requestAirdrop(
+  connection: Connection,
+  publicKey: PublicKey,
+  amount: number = 1
+) {
+  try {
+    const signature = await connection.requestAirdrop(
+      publicKey,
+      amount * LAMPORTS_PER_SOL
+    );
+    await connection.confirmTransaction(signature);
+    console.log(`Airdropped ${amount} SOL to ${publicKey.toString()}`);
+  } catch (error) {
+    console.error("Airdrop failed:", error);
+    throw error;
+  }
+}
+
+async function mintMearthTokens(
+  connection: Connection,
+  authority: Keypair,
+  recipient: PublicKey,
+  amount: number,
+  mintPubkey?: PublicKey
+) {
+  try {
+    // Create mint if not provided
+    const mint =
+      mintPubkey ||
+      (await createMint(
+        connection,
+        authority,
+        authority.publicKey,
+        authority.publicKey,
+        9 // 9 decimals
+      ));
+
+    // Get or create recipient's token account
+    const recipientAta = await getOrCreateAssociatedTokenAccount(
+      connection,
+      authority,
+      mint,
+      recipient
+    );
+
+    // Mint tokens
+    await mintTo(
+      connection,
+      authority,
+      mint,
+      recipientAta.address,
+      authority,
+      amount
+    );
+
+    console.log(`Minted ${amount} MEARTH tokens to ${recipient.toString()}`);
+    return { mint, recipientAta };
+  } catch (error) {
+    console.error("Token minting failed:", error);
+    throw error;
+  }
+}
 
 describe("AllianceHandler", function () {
   let allianceHandler: AllianceHandler;
@@ -26,12 +104,30 @@ describe("AllianceHandler", function () {
   let targetAgent: AgentWithProfile;
   let targetAgentAccount: AgentAccount;
   let targetAgentKeypair: Keypair;
+  let mearthMint: PublicKey;
+  const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
 
   before(async function () {
     prisma = new PrismaClient();
     program = await getProgram();
     allianceHandler = new AllianceHandler(program, prisma);
     gameManager = new GameManager(program, prisma);
+
+    // Get game authority
+    const gameAuthorityWallet = await getMiddleEarthAiAuthorityWallet();
+    gameAuthority = gameAuthorityWallet.keypair;
+
+    // Request airdrop for game authority
+    await requestAirdrop(connection, gameAuthority.publicKey, 2);
+
+    // Create MEARTH token mint
+    const { mint } = await mintMearthTokens(
+      connection,
+      gameAuthority,
+      gameAuthority.publicKey,
+      1000000000 // Initial supply
+    );
+    mearthMint = mint;
   });
 
   after(async function () {
@@ -48,6 +144,26 @@ describe("AllianceHandler", function () {
     targetAgentKeypair = await getAgentAuthorityKeypair(
       targetAgent.profile.onchainId
     );
+
+    // Request airdrops for test keypairs
+    await Promise.all([
+      requestAirdrop(connection, agentKeypair.publicKey),
+      requestAirdrop(connection, targetAgentKeypair.publicKey),
+    ]);
+
+    // Mint tokens to agent vaults
+    for (const authority of [agentKeypair, targetAgentKeypair]) {
+      const agentVault = await getAgentVault(
+        Number(authority.publicKey.toBuffer()[0])
+      );
+      await mintMearthTokens(
+        connection,
+        gameAuthority,
+        agentVault.address,
+        1000000000,
+        mearthMint
+      );
+    }
   });
 
   it("should successfully form an alliance between two agents", async function () {
