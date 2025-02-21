@@ -204,6 +204,10 @@ export class GameManager implements IGameManager {
           console.info("💾 Creating game record in database...");
 
           const rewardsVault = await getRewardsVault();
+          console.info(
+            "💰 Rewards vault created",
+            rewardsVault.address.toBase58()
+          );
 
           const dbGame = await this.prisma.game.create({
             data: {
@@ -268,7 +272,9 @@ export class GameManager implements IGameManager {
           new BN(profile.onchainId)
         );
 
+        console.log("creating ata...........................................");
         const ata = await getAgentAuthorityAta(profile.onchainId);
+        console.info("💰 Agent authority ATA created", ata.address.toBase58());
 
         console.info("🎯 Finding spawn location...");
         const spawnTile = await this.prisma.mapTile

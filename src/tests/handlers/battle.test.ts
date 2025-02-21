@@ -21,76 +21,17 @@ import {
   getOrCreateAssociatedTokenAccount,
   createMint,
   mintTo,
+  Account,
 } from "@solana/spl-token";
 import { AgentAccount } from "@/types/program";
 import { BN } from "@coral-xyz/anchor";
-import { solanaConfig } from "@/config/env";
+import { gameConfig, solanaConfig } from "@/config/env";
+import { mintMearthTokens, requestAirdrop } from "../utiils";
 
-async function requestAirdrop(publicKey: PublicKey, amount: number = 1) {
-  const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
-  try {
-    const signature = await connection.requestAirdrop(
-      publicKey,
-      amount * LAMPORTS_PER_SOL
-    );
-    await connection.confirmTransaction(signature);
-    console.log(`Airdropped ${amount} SOL to ${publicKey.toString()}`);
-  } catch (error) {
-    console.error("Airdrop failed:", error);
-    throw error;
-  }
-}
-
-async function mintMearthTokens(
-  authority: Keypair,
-  recipient: PublicKey,
-  amount: number,
-  mintPubkey: PublicKey = new PublicKey(solanaConfig.tokenMint)
-) {
-  const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
-  try {
-    // Create mint if not provided
-    const mint =
-      mintPubkey ||
-      (await createMint(
-        connection,
-        authority,
-        authority.publicKey,
-        authority.publicKey,
-        9 // 9 decimals
-      ));
-
-    // Get or create recipient's token account
-    const recipientAta = await getOrCreateAssociatedTokenAccount(
-      connection,
-      authority,
-      mint,
-      recipient
-    );
-
-    // Mint tokens
-    await mintTo(
-      connection,
-      authority,
-      mint,
-      recipientAta.address,
-      authority,
-      amount
-    );
-
-    console.log(`Minted ${amount} MEARTH tokens to ${recipient.toString()}`);
-    return { mint, recipientAta };
-  } catch (error) {
-    console.error("Token minting failed:", error);
-    throw error;
-  }
-}
-
-describe.only("BattleHandler", function () {
+describe("BattleHandler", function () {
   let program: MearthProgram;
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
-  let gameInfo: GameInfo;
   let activeGame: Game;
   let gameAuthority: Keypair;
   let gameManager: GameManager;
@@ -107,7 +48,9 @@ describe.only("BattleHandler", function () {
   let agent3AuthorityKeypair: Keypair;
   let agent4AuthorityKeypair: Keypair;
   let user1 = Keypair.generate();
+  let user1Ata: Account;
   let user2 = Keypair.generate();
+  let user2Ata: Account;
   let mearthMint: PublicKey;
 
   before(async function () {
@@ -121,26 +64,57 @@ describe.only("BattleHandler", function () {
     const gameAuthorityWallet = await getMiddleEarthAiAuthorityWallet();
     gameAuthority = gameAuthorityWallet.keypair;
 
-    // Request airdrops for test wallets
-    // await Promise.all([
-    //   requestAirdrop(user1.publicKey),
-    //   requestAirdrop(user2.publicKey),
-    //   requestAirdrop(gameAuthority.publicKey, 2), // Extra SOL for token operations
-    // ]);
+    user1Ata = await getOrCreateAssociatedTokenAccount(
+      new Connection(solanaConfig.rpcUrl, "confirmed"),
+      user1,
+      mearthMint,
+      user1.publicKey
+    );
+    user2Ata = await getOrCreateAssociatedTokenAccount(
+      new Connection(solanaConfig.rpcUrl, "confirmed"),
+      user2,
+      mearthMint,
+      user2.publicKey
+    );
 
+    // Request airdrops for test wallets
+    await Promise.all([
+      requestAirdrop(user1.publicKey),
+      requestAirdrop(user2.publicKey),
+    ]);
+
+    for (const id of [1, 2, 3, 4]) {
+      const agentAuthorityKeypair = await getAgentAuthorityKeypair(id);
+      await requestAirdrop(agentAuthorityKeypair.publicKey);
+    }
     // Create MEARTH token mint
-    // const { mint } = await mintMearthTokens(
-    //   gameAuthority,
-    //   gameAuthority.publicKey,
-    //   1000000000 // Initial supply
-    // );
-    // console.log("Mint address: ", mint.toString());
+    const { mint } = await mintMearthTokens(
+      gameAuthority,
+      gameAuthority.publicKey,
+      1000000000 // Initial supply
+    );
+    console.log("Mint address: ", mint.toString());
     mearthMint = new PublicKey(solanaConfig.tokenMint);
+
+    // Mint initial tokens to agent vaults
+    for (const authority of [
+      agent1AuthorityKeypair,
+      agent2AuthorityKeypair,
+      agent3AuthorityKeypair,
+      agent4AuthorityKeypair,
+    ]) {
+      await mintMearthTokens(
+        authority,
+        gameAuthority.publicKey,
+        1000000000,
+        mearthMint
+      );
+    }
   });
 
   beforeEach(async function () {
     // Create new game and get agents for each test
-    gameInfo = await gameManager.createNewGame();
+    const gameInfo = await gameManager.createNewGame();
     activeGame = gameInfo.dbGame;
 
     agent1 = gameInfo.agents[0].agent;
@@ -157,29 +131,6 @@ describe.only("BattleHandler", function () {
     agent2AuthorityKeypair = await getAgentAuthorityKeypair(2);
     agent3AuthorityKeypair = await getAgentAuthorityKeypair(3);
     agent4AuthorityKeypair = await getAgentAuthorityKeypair(4);
-
-    // Request airdrops for agent authorities
-    // await Promise.all([
-    //   requestAirdrop(agent1AuthorityKeypair.publicKey),
-    //   requestAirdrop(agent2AuthorityKeypair.publicKey),
-    //   requestAirdrop(agent3AuthorityKeypair.publicKey),
-    //   requestAirdrop(agent4AuthorityKeypair.publicKey),
-    // ]);
-
-    // Mint initial tokens to agent vaults
-    // for (const authority of [
-    //   agent1AuthorityKeypair,
-    //   agent2AuthorityKeypair,
-    //   agent3AuthorityKeypair,
-    //   agent4AuthorityKeypair,
-    // ]) {
-    //   await mintMearthTokens(
-    //     authority,
-    //     gameAuthority.publicKey,
-    //     1000000000,
-    //     mearthMint
-    //   );
-    // }
   });
 
   after(async function () {
@@ -187,24 +138,18 @@ describe.only("BattleHandler", function () {
   });
 
   it("should successfully resolve a simple battle between two agents", async () => {
-    const stakerAta = await getOrCreateAssociatedTokenAccount(
-      new Connection(solanaConfig.rpcUrl, "confirmed"),
-      agent1AuthorityKeypair,
-      mearthMint,
-      agent1AuthorityKeypair.publicKey
-    );
     // // stake tokens on agents
     await program.methods
       .initializeStake(new BN(1000000))
       .accounts({
         agent: agent1.pda,
-        authority: agent1AuthorityKeypair.publicKey,
-        stakerSource: stakerAta.address,
+        authority: user1.publicKey,
+        stakerSource: user1Ata.address,
         agentVault: new PublicKey(agent1.vault),
       })
-      .signers([agent1AuthorityKeypair])
+      .signers([user1])
       .rpc();
-    console.log("Staking tokens...");
+    // console.log("Staking tokens...");
     // await program.methods
     //   .stakeTokens(new BN(1000000))
     //   .accounts({
@@ -262,7 +207,7 @@ describe.only("BattleHandler", function () {
       .accounts({
         agent: agent2.pda,
       })
-      .signers([gameAuthority])
+      .signers([gameAuthority]) // only game authority can kill agent
       .rpc();
 
     // Mark defender as dead
@@ -293,17 +238,11 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle battle with non-existent agent", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
-    );
-
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
@@ -321,22 +260,16 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle battle with self", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
-
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: agent.agent.profile.onchainId, // Same as attacker
+      targetId: agent1.profile.onchainId, // Same as attacker
       tweet: "Battling self",
     };
 
@@ -349,36 +282,26 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle battle during cooldown period", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
-    );
-    const defender = activeGame.agents[1];
-    const defenderKeypair = await getAgentAuthorityKeypair(
-      defender.agent.profile.onchainId
-    );
-
     // Create active cooldown
     await prisma.coolDown.create({
       data: {
         type: "Battle",
-        endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-        cooledAgentId: attacker.agent.id,
-        gameId: activeGame.dbGame.id,
+        endsAt: new Date(Date.now() + gameConfig.mechanics.cooldowns.battle), // 1 hour from now
+        cooledAgentId: agent1.id,
+        gameId: activeGame.id,
       },
     });
 
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Battling during cooldown",
     };
 
@@ -391,45 +314,27 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle alliance vs alliance battle correctly", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
-    );
-    const defender = activeGame.agents[1];
-    const defenderKeypair = await getAgentAuthorityKeypair(
-      defender.agent.profile.onchainId
-    );
-    const attackerAlly = activeGame.agents[2];
-    const attackerAllyKeypair = await getAgentAuthorityKeypair(
-      attackerAlly.agent.profile.onchainId
-    );
-    const defenderAlly = activeGame.agents[3];
-    const defenderAllyKeypair = await getAgentAuthorityKeypair(
-      defenderAlly.agent.profile.onchainId
-    );
-
     // Create alliances
     await Promise.all([
       program.methods
         .formAlliance()
         .accountsStrict({
-          initiator: attacker.agent.pda,
-          targetAgent: attackerAlly.agent.pda,
-          game: activeGame.dbGame.pda,
-          authority: attackerKeypair.publicKey,
+          initiator: agent1.pda,
+          targetAgent: agent2.pda,
+          game: activeGame.pda,
+          authority: agent1AuthorityKeypair.publicKey,
         })
-        .signers([attackerKeypair])
+        .signers([agent1AuthorityKeypair])
         .rpc(),
       program.methods
         .formAlliance()
         .accountsStrict({
-          initiator: defender.agent.pda,
-          targetAgent: defenderAlly.agent.pda,
-          game: activeGame.dbGame.pda,
-          authority: defenderKeypair.publicKey,
+          initiator: agent2.pda,
+          targetAgent: agent3.pda,
+          game: activeGame.pda,
+          authority: agent2AuthorityKeypair.publicKey,
         })
-        .signers([defenderKeypair])
+        .signers([agent2AuthorityKeypair])
         .rpc(),
     ]);
 
@@ -437,32 +342,32 @@ describe.only("BattleHandler", function () {
     await Promise.all([
       prisma.alliance.create({
         data: {
-          initiatorId: attacker.agent.id,
-          joinerId: attackerAlly.agent.id,
+          initiatorId: agent1.id,
+          joinerId: agent2.id,
           status: "Active",
-          gameId: activeGame.dbGame.id,
+          gameId: activeGame.id,
         },
       }),
       prisma.alliance.create({
         data: {
-          initiatorId: defender.agent.id,
-          joinerId: defenderAlly.agent.id,
+          initiatorId: agent2.id,
+          joinerId: agent3.id,
           status: "Active",
-          gameId: activeGame.dbGame.id,
+          gameId: activeGame.id,
         },
       }),
     ]);
 
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent3.profile.onchainId,
       tweet: "Alliance vs Alliance battle",
     };
 
@@ -473,63 +378,49 @@ describe.only("BattleHandler", function () {
 
     const battle = await prisma.battle.findFirst({
       where: {
-        attackerId: attacker.agent.id,
-        defenderId: defender.agent.id,
+        attackerId: agent1.id,
+        defenderId: agent3.id,
       },
     });
     expect(battle).to.not.be.null;
     expect(battle?.type).to.equal("AllianceVsAlliance");
-    expect(battle?.attackerAllyId).to.equal(attackerAlly.agent.id);
-    expect(battle?.defenderAllyId).to.equal(defenderAlly.agent.id);
+    expect(battle?.attackerAllyId).to.equal(agent2.id);
+    expect(battle?.defenderAllyId).to.equal(agent3.id);
   });
 
   it("should handle agent vs alliance battle correctly", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const singleAgent = activeGame.agents[0];
-    const singleAgentKeypair = await getAgentAuthorityKeypair(
-      singleAgent.agent.profile.onchainId
-    );
-    const allianceLeader = activeGame.agents[1];
-    const allianceLeaderKeypair = await getAgentAuthorityKeypair(
-      allianceLeader.agent.profile.onchainId
-    );
-    const alliancePartner = activeGame.agents[2];
-    const alliancePartnerKeypair = await getAgentAuthorityKeypair(
-      alliancePartner.agent.profile.onchainId
-    );
-
     // Create alliance
     await program.methods
       .formAlliance()
       .accountsStrict({
-        initiator: allianceLeader.agent.pda,
-        targetAgent: alliancePartner.agent.pda,
-        game: activeGame.dbGame.pda,
-        authority: allianceLeaderKeypair.publicKey,
+        initiator: agent1.pda,
+        targetAgent: agent2.pda,
+        game: activeGame.pda,
+        authority: agent1AuthorityKeypair.publicKey,
       })
-      .signers([allianceLeaderKeypair])
+      .signers([agent1AuthorityKeypair])
       .rpc();
 
     // Create alliance record
     await prisma.alliance.create({
       data: {
-        initiatorId: allianceLeader.agent.id,
-        joinerId: alliancePartner.agent.id,
+        initiatorId: agent1.id,
+        joinerId: agent2.id,
         status: "Active",
-        gameId: activeGame.dbGame.id,
+        gameId: activeGame.id,
       },
     });
 
     const ctx: ActionContext = {
-      agentId: singleAgent.agent.id,
-      agentOnchainId: singleAgent.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: allianceLeader.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Agent vs Alliance battle",
     };
 
@@ -540,8 +431,8 @@ describe.only("BattleHandler", function () {
 
     const battle = await prisma.battle.findFirst({
       where: {
-        attackerId: singleAgent.agent.id,
-        defenderId: allianceLeader.agent.id,
+        attackerId: agent1.id,
+        defenderId: agent2.id,
       },
     });
     expect(battle).to.not.be.null;
@@ -549,26 +440,16 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle battle outcome calculations correctly", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
-    );
-    const defender = activeGame.agents[1];
-    const defenderKeypair = await getAgentAuthorityKeypair(
-      defender.agent.profile.onchainId
-    );
-
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Testing battle outcome",
     };
 
@@ -578,8 +459,8 @@ describe.only("BattleHandler", function () {
 
     const battle = await prisma.battle.findFirst({
       where: {
-        attackerId: attacker.agent.id,
-        defenderId: defender.agent.id,
+        attackerId: agent1.id,
+        defenderId: agent2.id,
       },
     });
     expect(battle).to.not.be.null;
@@ -589,10 +470,10 @@ describe.only("BattleHandler", function () {
     // Verify game event metadata
     const event = await prisma.gameEvent.findFirst({
       where: {
-        gameId: activeGame.dbGame.id,
+        gameId: activeGame.id,
         eventType: "BATTLE",
-        initiatorId: attacker.agent.id,
-        targetId: defender.agent.id,
+        initiatorId: agent1.id,
+        targetId: agent2.id,
       },
     });
     expect(event).to.not.be.null;
@@ -604,21 +485,17 @@ describe.only("BattleHandler", function () {
   });
 
   it("should handle database transaction failure gracefully", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const defender = activeGame.agents[1];
-
     // Simulate database error by providing invalid data
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: "invalid-game-id", // This will cause the transaction to fail
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Testing transaction failure",
     };
 
@@ -631,56 +508,46 @@ describe.only("BattleHandler", function () {
     // Verify no battle record was created
     const battle = await prisma.battle.findFirst({
       where: {
-        attackerId: attacker.agent.id,
-        defenderId: defender.agent.id,
+        attackerId: agent1.id,
+        defenderId: agent2.id,
       },
     });
     expect(battle).to.be.null;
   });
 
   it("should handle onchain transaction failure gracefully", async () => {
-    const activeGame = await gameManager.createNewGame();
-    const attacker = activeGame.agents[0];
-    const attackerKeypair = await getAgentAuthorityKeypair(
-      attacker.agent.profile.onchainId
-    );
-    const defender = activeGame.agents[1];
-    const defenderKeypair = await getAgentAuthorityKeypair(
-      defender.agent.profile.onchainId
-    );
-
     // Create an alliance to test more complex battle resolution
     await program.methods
       .formAlliance()
       .accountsStrict({
-        initiator: attacker.agent.pda,
-        targetAgent: defender.agent.pda,
-        game: activeGame.dbGame.pda,
-        authority: attackerKeypair.publicKey,
+        initiator: agent1.pda,
+        targetAgent: agent2.pda,
+        game: activeGame.pda,
+        authority: agent1AuthorityKeypair.publicKey,
       })
-      .signers([attackerKeypair])
+      .signers([agent1AuthorityKeypair])
       .rpc();
 
     // Create alliance record
     await prisma.alliance.create({
       data: {
-        initiatorId: attacker.agent.id,
-        joinerId: defender.agent.id,
+        initiatorId: agent1.id,
+        joinerId: agent2.id,
         status: "Active",
-        gameId: activeGame.dbGame.id,
+        gameId: activeGame.id,
       },
     });
 
     const ctx: ActionContext = {
-      agentId: attacker.agent.id,
-      agentOnchainId: attacker.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: BattleAction = {
       type: "BATTLE",
-      targetId: defender.agent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Testing onchain failure",
     };
 
@@ -701,8 +568,8 @@ describe.only("BattleHandler", function () {
       // Verify no battle record was created due to rollback
       const battle = await prisma.battle.findFirst({
         where: {
-          attackerId: attacker.agent.id,
-          defenderId: defender.agent.id,
+          attackerId: agent1.id,
+          defenderId: agent2.id,
         },
       });
       expect(battle).to.be.null;

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { MovementHandler } from "@/agent/actionManager/handlers/movement";
-import { PrismaClient } from "@prisma/client";
-import { MearthProgram } from "@/types";
+import { Game, PrismaClient } from "@prisma/client";
+import { AgentWithProfile, MearthProgram } from "@/types";
 import { ActionContext, MoveAction } from "@/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import {
@@ -11,13 +11,20 @@ import {
 } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
+import { AgentAccount, GameAccount } from "@/types/program";
+import { requestAirdrop } from "../utiils";
 
-describe("MovementHandler", function () {
+describe.only("MovementHandler", function () {
   let movementHandler: MovementHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
   let gameAuthorityWallet: Keypair;
   let gameManager: GameManager;
+  let activeGame: Game;
+  let activeGameAccount: GameAccount;
+  let agent1: AgentWithProfile;
+  let agent1Account: AgentAccount;
+  let agent1Keypair: Keypair;
 
   before(async function () {
     prisma = new PrismaClient();
@@ -25,24 +32,43 @@ describe("MovementHandler", function () {
     movementHandler = new MovementHandler(program, prisma);
     gameAuthorityWallet = (await getMiddleEarthAiAuthorityWallet()).keypair;
     gameManager = new GameManager(program, prisma);
+
+    //  airdrop authority wallets
+    await requestAirdrop(gameAuthorityWallet.publicKey, 5);
+    for (const agent of [1, 2, 3, 4]) {
+      const agentKp = await getAgentAuthorityKeypair(agent);
+      await requestAirdrop(agentKp.publicKey, 5);
+    }
   });
 
   after(async function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully move agent to adjacent tile", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
+  beforeEach("setup", async function () {
+    await prisma.mapTile.updateMany({
+      data: {
+        agentId: null,
+      },
+    });
+    const gameInfo = await gameManager.createNewGame();
+    activeGame = gameInfo.dbGame;
+    activeGameAccount = gameInfo.gameAccount;
+    agent1 = gameInfo.agents[0].agent;
+    agent1Account = gameInfo.agents[0].account;
+    //      agent1Keypair = await getAgentAuthorityKeypair(agent1.profile.onchainId);
+    //      agent2 = gameInfo.agents[1].agent;
+    //      agent2Account = gameInfo.agents[1].account;
+    //      agent2Keypair = await getAgentAuthorityKeypair(agent2.profile.onchainId);
+  });
+
+  it.only("should successfully move agent to adjacent tile", async function () {
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const mapTile = await prisma.mapTile.findFirst({
@@ -75,14 +101,14 @@ describe("MovementHandler", function () {
 
     // Verify agent position updated
     const updatedAgent = await prisma.agent.findUnique({
-      where: { id: agent.agent.id },
+      where: { id: agent1.id },
     });
     expect(updatedAgent?.mapTileId).to.equal(mapTile.id);
 
     // Verify cooldown created
     const cooldown = await prisma.coolDown.findFirst({
       where: {
-        cooledAgentId: agent.agent.id,
+        cooledAgentId: agent1.id,
         type: "Move",
       },
     });
@@ -91,30 +117,25 @@ describe("MovementHandler", function () {
     // Verify game event created
     const event = await prisma.gameEvent.findFirst({
       where: {
-        gameId: activeGame.dbGame.id,
+        gameId: activeGame.id,
         eventType: "MOVE",
-        initiatorId: agent.agent.id,
+        initiatorId: agent1.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(agent.agent.profile.xHandle);
+    expect(event?.message).to.include(agent1.profile.xHandle);
     expect(event?.message).to.include(
       `(${action.position.x}, ${action.position.y})`
     );
   });
 
   it("should handle movement during cooldown period", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: MoveAction = {
@@ -143,8 +164,8 @@ describe("MovementHandler", function () {
       data: {
         type: "Move",
         endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-        cooledAgentId: agent.agent.id,
-        gameId: activeGame.dbGame.id,
+        cooledAgentId: agent1.id,
+        gameId: activeGame.id,
       },
     });
 
@@ -159,17 +180,12 @@ describe("MovementHandler", function () {
   });
 
   it("should handle movement to non-adjacent tile", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const mapTile = await prisma.mapTile.findFirst({
@@ -204,17 +220,12 @@ describe("MovementHandler", function () {
   });
 
   it("should handle movement to non-existent tile", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.agent.profile.onchainId
-    );
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
-      gameId: activeGame.dbGame.id,
-      gameOnchainId: activeGame.dbGame.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
     };
 
     const action: MoveAction = {

@@ -18,74 +18,9 @@ import {
   PublicKey,
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
-import {
-  getOrCreateAssociatedTokenAccount,
-  createMint,
-  mintTo,
-} from "@solana/spl-token";
-
-async function requestAirdrop(
-  connection: Connection,
-  publicKey: PublicKey,
-  amount: number = 1
-) {
-  try {
-    const signature = await connection.requestAirdrop(
-      publicKey,
-      amount * LAMPORTS_PER_SOL
-    );
-    await connection.confirmTransaction(signature);
-    console.log(`Airdropped ${amount} SOL to ${publicKey.toString()}`);
-  } catch (error) {
-    console.error("Airdrop failed:", error);
-    throw error;
-  }
-}
-
-async function mintMearthTokens(
-  connection: Connection,
-  authority: Keypair,
-  recipient: PublicKey,
-  amount: number,
-  mintPubkey?: PublicKey
-) {
-  try {
-    // Create mint if not provided
-    const mint =
-      mintPubkey ||
-      (await createMint(
-        connection,
-        authority,
-        authority.publicKey,
-        authority.publicKey,
-        9 // 9 decimals
-      ));
-
-    // Get or create recipient's token account
-    const recipientAta = await getOrCreateAssociatedTokenAccount(
-      connection,
-      authority,
-      mint,
-      recipient
-    );
-
-    // Mint tokens
-    await mintTo(
-      connection,
-      authority,
-      mint,
-      recipientAta.address,
-      authority,
-      amount
-    );
-
-    console.log(`Minted ${amount} MEARTH tokens to ${recipient.toString()}`);
-    return { mint, recipientAta };
-  } catch (error) {
-    console.error("Token minting failed:", error);
-    throw error;
-  }
-}
+import { mintMearthTokens } from "../utiils";
+import { requestAirdrop } from "../utiils";
+import { solanaConfig } from "@/config/env";
 
 describe("IgnoreHandler", function () {
   let ignoreHandler: IgnoreHandler;
@@ -99,7 +34,7 @@ describe("IgnoreHandler", function () {
   let targetAgent: AgentWithProfile;
   let targetAgentAccount: AgentAccount;
   let mearthMint: PublicKey;
-  const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
+  const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
 
   before(async function () {
     prisma = new PrismaClient();
@@ -112,11 +47,10 @@ describe("IgnoreHandler", function () {
     gameAuthority = gameAuthorityWallet.keypair;
 
     // Request airdrop for game authority
-    await requestAirdrop(connection, gameAuthority.publicKey, 2);
+    await requestAirdrop(gameAuthority.publicKey, 2);
 
     // Create MEARTH token mint
     const { mint } = await mintMearthTokens(
-      connection,
       gameAuthority,
       gameAuthority.publicKey,
       1000000000 // Initial supply
@@ -141,8 +75,8 @@ describe("IgnoreHandler", function () {
 
     // Request airdrops for test agents
     await Promise.all([
-      requestAirdrop(connection, agentKeypair.publicKey),
-      requestAirdrop(connection, targetAgentKeypair.publicKey),
+      requestAirdrop(agentKeypair.publicKey),
+      requestAirdrop(targetAgentKeypair.publicKey),
     ]);
 
     // Mint tokens to agent vaults
@@ -151,9 +85,8 @@ describe("IgnoreHandler", function () {
         Number(authority.publicKey.toBuffer()[0])
       );
       await mintMearthTokens(
-        connection,
-        gameAuthority,
-        agentVault.address,
+        authority,
+        gameAuthority.publicKey,
         1000000000,
         mearthMint
       );
@@ -220,21 +153,17 @@ describe("IgnoreHandler", function () {
   });
 
   it("should handle ignoring during cooldown period", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const targetAgent = activeGame.agents[1];
-
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: targetAgent.agent.profile.onchainId,
+      targetId: targetAgent.profile.onchainId,
       tweet: "Ignoring during cooldown",
     };
 
@@ -243,7 +172,7 @@ describe("IgnoreHandler", function () {
       data: {
         type: "Ignore",
         endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-        cooledAgentId: agent.agent.id,
+        cooledAgentId: agent.id,
         gameId: activeGame.dbGame.id,
       },
     });
@@ -259,13 +188,10 @@ describe("IgnoreHandler", function () {
   });
 
   it("should handle ignoring non-existent agent", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
@@ -287,29 +213,25 @@ describe("IgnoreHandler", function () {
   });
 
   it("should handle ignoring already ignored agent", async function () {
-    const activeGame = await gameManager.createNewGame();
-    const agent = activeGame.agents[0];
-    const targetAgent = activeGame.agents[1];
-
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.agent.id,
-      agentOnchainId: agent.agent.profile.onchainId,
+      agentId: agent.id,
+      agentOnchainId: agent.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: targetAgent.agent.profile.onchainId,
+      targetId: targetAgent.profile.onchainId,
       tweet: "Ignoring already ignored agent",
     };
 
     // Create existing ignore
     await prisma.ignore.create({
       data: {
-        agentId: agent.agent.id,
-        ignoredAgentId: targetAgent.agent.id,
+        agentId: agent.id,
+        ignoredAgentId: targetAgent.id,
         gameId: activeGame.dbGame.id,
         timestamp: new Date(),
         duration: 3600, // 1 hour
