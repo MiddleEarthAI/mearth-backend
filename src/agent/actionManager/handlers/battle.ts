@@ -145,355 +145,361 @@ export class BattleHandler {
       );
 
       // Execute everything in a transaction
-      await this.prisma.$transaction(async (prisma) => {
-        // Create battle record
-        const battle = await prisma.battle.create({
-          data: {
-            type: battleType,
-            status: "Resolved",
-            tokensStaked: Math.floor(outcome.totalTokensAtStake),
-            gameId: ctx.gameId,
-            attackerId: attackerRecord.id,
-            defenderId: defenderRecord.id,
-            attackerAllyId: attackerAllyAccount ? attackerRecord.id : null,
-            defenderAllyId: defenderAllyAccount ? defenderRecord.id : null,
-            startTime,
-            endTime: startTime,
-            winnerId:
-              outcome.winner === "sideA"
-                ? attackerRecord.id
-                : defenderRecord.id,
-          },
-        });
-
-        // Create battle event
-        const battleEvent = await prisma.gameEvent.create({
-          data: {
-            gameId: ctx.gameId,
-            eventType: "BATTLE",
-            initiatorId: ctx.agentId,
-            targetId: defenderRecord.id,
-            message: this.createBattleMessage(
-              attackerRecord.profile.xHandle,
-              defenderRecord.profile.xHandle,
-              outcome
-            ),
-            metadata: {
-              battleId: battle.id,
-              battleType: battleType,
-              tokensAtStake: outcome.totalTokensAtStake,
-              percentageLost: outcome.percentageLost,
-              winner: outcome.winner,
-              timestamp: new Date().toISOString(),
-              agentsToDie: outcome.agentsToDie,
+      await this.prisma.$transaction(
+        async (prisma) => {
+          // Create battle record
+          const battle = await prisma.battle.create({
+            data: {
+              type: battleType,
+              status: "Resolved",
+              tokensStaked: Math.floor(outcome.totalTokensAtStake),
+              gameId: ctx.gameId,
+              attackerId: attackerRecord.id,
+              defenderId: defenderRecord.id,
+              attackerAllyId: attackerAllyAccount ? attackerRecord.id : null,
+              defenderAllyId: defenderAllyAccount ? defenderRecord.id : null,
+              startTime,
+              endTime: startTime,
+              winnerId:
+                outcome.winner === "sideA"
+                  ? attackerRecord.id
+                  : defenderRecord.id,
             },
-          },
-        });
+          });
 
-        console.log("Killing agents onchain....................", { outcome });
-        if (outcome.agentsToDie.length > 0) {
-          const deathTime = new Date();
+          // Create battle event
+          const battleEvent = await prisma.gameEvent.create({
+            data: {
+              gameId: ctx.gameId,
+              eventType: "BATTLE",
+              initiatorId: ctx.agentId,
+              targetId: defenderRecord.id,
+              message: this.createBattleMessage(
+                attackerRecord.profile.xHandle,
+                defenderRecord.profile.xHandle,
+                outcome
+              ),
+              metadata: {
+                battleId: battle.id,
+                battleType: battleType,
+                tokensAtStake: outcome.totalTokensAtStake,
+                percentageLost: outcome.percentageLost,
+                winner: outcome.winner,
+                timestamp: new Date().toISOString(),
+                agentsToDie: outcome.agentsToDie,
+              },
+            },
+          });
 
-          // Update agent records to mark them as dead
-          await Promise.all(
-            outcome.agentsToDie.map(async (agentId) => {
-              // Update database record
-              await prisma.agent.update({
-                where: {
-                  onchainId_gameId: {
-                    onchainId: agentId,
+          console.log("Killing agents onchain....................", {
+            outcome,
+          });
+          if (outcome.agentsToDie.length > 0) {
+            const deathTime = new Date();
+
+            // Update agent records to mark them as dead
+            await Promise.all(
+              outcome.agentsToDie.map(async (agentId) => {
+                // Update database record
+                await prisma.agent.update({
+                  where: {
+                    onchainId_gameId: {
+                      onchainId: agentId,
+                      gameId: ctx.gameId,
+                    },
+                  },
+                  data: {
+                    isAlive: false,
+                    deathTimestamp: deathTime,
+                  },
+                });
+
+                // Create death event
+                await prisma.gameEvent.create({
+                  data: {
                     gameId: ctx.gameId,
+                    eventType: "AGENT_DEATH",
+                    initiatorId: ctx.agentId,
+                    targetId:
+                      agentId === attackerRecord.profile.onchainId
+                        ? attackerRecord.id
+                        : defenderRecord.id,
+                    message: `💀 @${
+                      agentId === attackerRecord.profile.onchainId
+                        ? attackerRecord.profile.xHandle
+                        : defenderRecord.profile.xHandle
+                    } has fallen in battle!`,
+                    metadata: {
+                      cause: "BATTLE",
+                      battleId: battle.id,
+                      timestamp: deathTime.toISOString(),
+                    },
                   },
-                },
-                data: {
-                  isAlive: false,
-                  deathTimestamp: deathTime,
-                },
-              });
-
-              // Create death event
-              await prisma.gameEvent.create({
-                data: {
-                  gameId: ctx.gameId,
-                  eventType: "AGENT_DEATH",
-                  initiatorId: ctx.agentId,
-                  targetId:
-                    agentId === attackerRecord.profile.onchainId
-                      ? attackerRecord.id
-                      : defenderRecord.id,
-                  message: `💀 @${
-                    agentId === attackerRecord.profile.onchainId
-                      ? attackerRecord.profile.xHandle
-                      : defenderRecord.profile.xHandle
-                  } has fallen in battle!`,
-                  metadata: {
-                    cause: "BATTLE",
-                    battleId: battle.id,
-                    timestamp: deathTime.toISOString(),
-                  },
-                },
-              });
-            })
-          );
-        }
-
-        // Create battle cooldowns for all participating agents
-        const cooldownEndTime = new Date(
-          startTime.getTime() + gameConfig.mechanics.battle.duration
-        );
-
-        // Create cooldown for attacker
-        await prisma.coolDown.create({
-          data: {
-            type: "Battle",
-            endsAt: cooldownEndTime,
-            cooledAgent: {
-              connect: {
-                id: attackerRecord.id,
-              },
-            },
-            game: {
-              connect: {
-                id: ctx.gameId,
-              },
-            },
-          },
-        });
-
-        // Create cooldown for defender
-        await prisma.coolDown.create({
-          data: {
-            type: "Battle",
-            endsAt: cooldownEndTime,
-            cooledAgent: {
-              connect: {
-                id: defenderRecord.id,
-              },
-            },
-            game: {
-              connect: {
-                id: ctx.gameId,
-              },
-            },
-          },
-        });
-
-        // Create cooldown for attacker's ally if exists
-        if (attackerAllyRecord) {
-          await prisma.coolDown.create({
-            data: {
-              type: "Battle",
-              endsAt: cooldownEndTime,
-              cooledAgent: {
-                connect: {
-                  id: attackerAllyRecord.id,
-                },
-              },
-              game: {
-                connect: {
-                  id: ctx.gameId,
-                },
-              },
-            },
-          });
-        }
-
-        // Create cooldown for defender's ally if exists
-        if (defenderAllyRecord) {
-          await prisma.coolDown.create({
-            data: {
-              type: "Battle",
-              endsAt: cooldownEndTime,
-              cooledAgent: {
-                connect: {
-                  id: defenderAllyRecord.id,
-                },
-              },
-              game: {
-                connect: {
-                  id: ctx.gameId,
-                },
-              },
-            },
-          });
-        }
-
-        // Execute onchain battle resolution
-        let tx: string;
-
-        if (battleType === "AllianceVsAlliance") {
-          if (!attackerAllyRecord || !defenderAllyRecord) {
-            throw new Error("Could not find the alliance records");
+                });
+              })
+            );
           }
 
-          const attackerAllyAuthority = await getAgentAuthorityKeypair(
-            attackerAllyRecord.profile.onchainId
-          );
-          const defenderAllyAuthority = await getAgentAuthorityKeypair(
-            defenderAllyRecord.profile.onchainId
+          // Create battle cooldowns for all participating agents
+          const cooldownEndTime = new Date(
+            startTime.getTime() + gameConfig.mechanics.battle.duration
           );
 
-          const isAttackerWinner = outcome.winner === "sideA";
-          tx = await this.program.methods
-            .resolveBattleAllianceVsAlliance(
-              outcome.percentageLost,
-              isAttackerWinner
-            )
-            .accounts({
-              leaderA: isAttackerWinner ? attackerPda : defenderPda,
-              partnerA: isAttackerWinner
-                ? attackerAccountData.allianceWith!
-                : defenderAccountData.allianceWith!,
-              leaderB: isAttackerWinner ? defenderPda : attackerPda,
-              partnerB: isAttackerWinner
-                ? defenderAccountData.allianceWith!
-                : attackerAccountData.allianceWith!,
-              leaderAToken: isAttackerWinner
-                ? attackerRecord?.authorityAssociatedTokenAddress
-                : defenderRecord?.authorityAssociatedTokenAddress,
-              partnerAToken: isAttackerWinner
-                ? attackerAllyRecord?.authorityAssociatedTokenAddress
-                : defenderAllyRecord?.authorityAssociatedTokenAddress,
-              leaderBToken: isAttackerWinner
-                ? defenderRecord?.authorityAssociatedTokenAddress
-                : attackerRecord?.authorityAssociatedTokenAddress,
-              partnerBToken: isAttackerWinner
-                ? defenderAllyRecord?.authorityAssociatedTokenAddress
-                : attackerAllyRecord?.authorityAssociatedTokenAddress,
-              leaderAAuthority: isAttackerWinner
-                ? attackerAuthorityKeypair.publicKey
-                : defenderAuthorityKeypair.publicKey,
-              partnerAAuthority: isAttackerWinner
-                ? attackerAllyAuthority.publicKey
-                : defenderAllyAuthority.publicKey,
-              leaderBAuthority: isAttackerWinner
-                ? defenderAuthorityKeypair.publicKey
-                : attackerAuthorityKeypair.publicKey,
-              partnerBAuthority: isAttackerWinner
-                ? defenderAllyAuthority.publicKey
-                : attackerAllyAuthority.publicKey,
-              authority: gameAuthorityWallet.keypair.publicKey,
-            })
-            .signers([
-              attackerAuthorityKeypair,
-              defenderAuthorityKeypair,
-              attackerAllyAuthority,
-              defenderAllyAuthority,
-              gameAuthorityWallet.keypair,
-            ])
-            .rpc();
-        } else if (battleType === "AgentVsAlliance") {
-          const isAttackerSingle = !attackerAllyAccount;
+          // Create cooldown for attacker
+          await prisma.coolDown.create({
+            data: {
+              type: "Battle",
+              endsAt: cooldownEndTime,
+              cooledAgent: {
+                connect: {
+                  id: attackerRecord.id,
+                },
+              },
+              game: {
+                connect: {
+                  id: ctx.gameId,
+                },
+              },
+            },
+          });
 
-          const singleAgent = isAttackerSingle ? attackerPda : defenderPda;
+          // Create cooldown for defender
+          await prisma.coolDown.create({
+            data: {
+              type: "Battle",
+              endsAt: cooldownEndTime,
+              cooledAgent: {
+                connect: {
+                  id: defenderRecord.id,
+                },
+              },
+              game: {
+                connect: {
+                  id: ctx.gameId,
+                },
+              },
+            },
+          });
 
-          const singleAgentToken = isAttackerSingle
-            ? attackerRecord.authorityAssociatedTokenAddress
-            : defenderRecord.authorityAssociatedTokenAddress;
-          const singleAgentAuthorityKeypair = isAttackerSingle
-            ? attackerAuthorityKeypair
-            : defenderAuthorityKeypair;
-          const allianceLeaderAuthorityKeypair = isAttackerSingle
-            ? defenderAuthorityKeypair
-            : attackerAuthorityKeypair;
-          const alliancePartnerAuthorityKeypair = isAttackerSingle
-            ? attackerAuthorityKeypair
-            : defenderAuthorityKeypair;
-          const allianceLeader = isAttackerSingle ? defenderPda : attackerPda;
-          const alliancePartner = isAttackerSingle
-            ? defenderAccountData.allianceWith!
-            : attackerAccountData.allianceWith!;
+          // Create cooldown for attacker's ally if exists
+          if (attackerAllyRecord) {
+            await prisma.coolDown.create({
+              data: {
+                type: "Battle",
+                endsAt: cooldownEndTime,
+                cooledAgent: {
+                  connect: {
+                    id: attackerAllyRecord.id,
+                  },
+                },
+                game: {
+                  connect: {
+                    id: ctx.gameId,
+                  },
+                },
+              },
+            });
+          }
 
-          const allianceLeaderToken = isAttackerSingle
-            ? defenderRecord.authorityAssociatedTokenAddress
-            : attackerRecord.authorityAssociatedTokenAddress;
-          const alliancePartnerToken = isAttackerSingle
-            ? defenderAllyRecord?.authorityAssociatedTokenAddress!
-            : attackerAllyRecord?.authorityAssociatedTokenAddress!;
+          // Create cooldown for defender's ally if exists
+          if (defenderAllyRecord) {
+            await prisma.coolDown.create({
+              data: {
+                type: "Battle",
+                endsAt: cooldownEndTime,
+                cooledAgent: {
+                  connect: {
+                    id: defenderAllyRecord.id,
+                  },
+                },
+                game: {
+                  connect: {
+                    id: ctx.gameId,
+                  },
+                },
+              },
+            });
+          }
 
-          tx = await this.program.methods
-            .resolveBattleAgentVsAlliance(
-              outcome.percentageLost,
-              isAttackerSingle
-                ? outcome.winner === "sideA"
-                : outcome.winner === "sideB"
-            )
-            .accounts({
-              singleAgent: singleAgent,
-              singleAgentToken: singleAgentToken,
-              allianceLeader: allianceLeader,
-              allianceLeaderToken: allianceLeaderToken,
-              alliancePartner: alliancePartner,
-              alliancePartnerToken: alliancePartnerToken,
-              singleAgentAuthority: singleAgentAuthorityKeypair.publicKey,
-              allianceLeaderAuthority: allianceLeaderAuthorityKeypair.publicKey,
-              alliancePartnerAuthority:
-                alliancePartnerAuthorityKeypair.publicKey,
+          // Execute onchain battle resolution
+          let tx: string;
 
-              authority: gameAuthorityWallet.keypair.publicKey,
-            })
-            .signers([
-              gameAuthorityWallet.keypair,
-              singleAgentAuthorityKeypair,
-              allianceLeaderAuthorityKeypair,
-              alliancePartnerAuthorityKeypair,
-            ])
-            .rpc();
-        } else {
-          const isAttackerWinner = outcome.winner === "sideA";
-          tx = await this.program.methods
-            .resolveBattleSimple(outcome.percentageLost)
-            .accounts({
-              winner: isAttackerWinner ? attackerPda : defenderPda,
-              loser: isAttackerWinner ? defenderPda : attackerPda,
-              winnerToken: isAttackerWinner
-                ? attackerRecord.authorityAssociatedTokenAddress
-                : defenderRecord.authorityAssociatedTokenAddress,
-              loserToken: isAttackerWinner
-                ? defenderRecord.authorityAssociatedTokenAddress
-                : attackerRecord.authorityAssociatedTokenAddress,
-              loserAuthority: isAttackerWinner
-                ? defenderAuthorityKeypair.publicKey
-                : attackerAuthorityKeypair.publicKey,
-              authority: gameAuthorityWallet.keypair.publicKey,
-            })
-            .signers([
-              gameAuthorityWallet.keypair,
-              // the loser authority keypair
-              isAttackerWinner
-                ? defenderAuthorityKeypair
-                : attackerAuthorityKeypair,
-            ])
-            .rpc();
-        }
+          if (battleType === "AllianceVsAlliance") {
+            if (!attackerAllyRecord || !defenderAllyRecord) {
+              throw new Error("Could not find the alliance records");
+            }
 
-        // Kill the agents that died
-        await Promise.all(
-          outcome.agentsToDie.map(async (agentId) => {
-            // Execute on-chain kill instruction
-            const [deadAgentPda] = getAgentPDA(
-              this.program.programId,
-              gamePda,
-              agentId
+            const attackerAllyAuthority = await getAgentAuthorityKeypair(
+              attackerAllyRecord.profile.onchainId
             );
-            const deadAgentAuthority = await getAgentAuthorityKeypair(agentId);
+            const defenderAllyAuthority = await getAgentAuthorityKeypair(
+              defenderAllyRecord.profile.onchainId
+            );
 
-            await this.program.methods
-              .killAgent()
-              .accountsStrict({
-                agent: deadAgentPda,
-                authority: deadAgentAuthority.publicKey,
+            const isAttackerWinner = outcome.winner === "sideA";
+            tx = await this.program.methods
+              .resolveBattleAllianceVsAlliance(
+                outcome.percentageLost,
+                isAttackerWinner
+              )
+              .accounts({
+                leaderA: isAttackerWinner ? attackerPda : defenderPda,
+                partnerA: isAttackerWinner
+                  ? attackerAccountData.allianceWith!
+                  : defenderAccountData.allianceWith!,
+                leaderB: isAttackerWinner ? defenderPda : attackerPda,
+                partnerB: isAttackerWinner
+                  ? defenderAccountData.allianceWith!
+                  : attackerAccountData.allianceWith!,
+                leaderAToken: isAttackerWinner
+                  ? attackerRecord?.authorityAssociatedTokenAddress
+                  : defenderRecord?.authorityAssociatedTokenAddress,
+                partnerAToken: isAttackerWinner
+                  ? attackerAllyRecord?.authorityAssociatedTokenAddress
+                  : defenderAllyRecord?.authorityAssociatedTokenAddress,
+                leaderBToken: isAttackerWinner
+                  ? defenderRecord?.authorityAssociatedTokenAddress
+                  : attackerRecord?.authorityAssociatedTokenAddress,
+                partnerBToken: isAttackerWinner
+                  ? defenderAllyRecord?.authorityAssociatedTokenAddress
+                  : attackerAllyRecord?.authorityAssociatedTokenAddress,
+                leaderAAuthority: isAttackerWinner
+                  ? attackerAuthorityKeypair.publicKey
+                  : defenderAuthorityKeypair.publicKey,
+                partnerAAuthority: isAttackerWinner
+                  ? attackerAllyAuthority.publicKey
+                  : defenderAllyAuthority.publicKey,
+                leaderBAuthority: isAttackerWinner
+                  ? defenderAuthorityKeypair.publicKey
+                  : attackerAuthorityKeypair.publicKey,
+                partnerBAuthority: isAttackerWinner
+                  ? defenderAllyAuthority.publicKey
+                  : attackerAllyAuthority.publicKey,
+                authority: gameAuthorityWallet.keypair.publicKey,
               })
-              .signers([deadAgentAuthority])
+              .signers([
+                attackerAuthorityKeypair,
+                defenderAuthorityKeypair,
+                attackerAllyAuthority,
+                defenderAllyAuthority,
+                gameAuthorityWallet.keypair,
+              ])
               .rpc();
+          } else if (battleType === "AgentVsAlliance") {
+            const isAttackerSingle = !attackerAllyAccount;
 
-            return { battle, battleEvent, tx };
-          })
-        );
-      }, 
-    
+            const singleAgent = isAttackerSingle ? attackerPda : defenderPda;
+
+            const singleAgentToken = isAttackerSingle
+              ? attackerRecord.authorityAssociatedTokenAddress
+              : defenderRecord.authorityAssociatedTokenAddress;
+            const singleAgentAuthorityKeypair = isAttackerSingle
+              ? attackerAuthorityKeypair
+              : defenderAuthorityKeypair;
+            const allianceLeaderAuthorityKeypair = isAttackerSingle
+              ? defenderAuthorityKeypair
+              : attackerAuthorityKeypair;
+            const alliancePartnerAuthorityKeypair = isAttackerSingle
+              ? attackerAuthorityKeypair
+              : defenderAuthorityKeypair;
+            const allianceLeader = isAttackerSingle ? defenderPda : attackerPda;
+            const alliancePartner = isAttackerSingle
+              ? defenderAccountData.allianceWith!
+              : attackerAccountData.allianceWith!;
+
+            const allianceLeaderToken = isAttackerSingle
+              ? defenderRecord.authorityAssociatedTokenAddress
+              : attackerRecord.authorityAssociatedTokenAddress;
+            const alliancePartnerToken = isAttackerSingle
+              ? defenderAllyRecord?.authorityAssociatedTokenAddress!
+              : attackerAllyRecord?.authorityAssociatedTokenAddress!;
+
+            tx = await this.program.methods
+              .resolveBattleAgentVsAlliance(
+                outcome.percentageLost,
+                isAttackerSingle
+                  ? outcome.winner === "sideA"
+                  : outcome.winner === "sideB"
+              )
+              .accounts({
+                singleAgent: singleAgent,
+                singleAgentToken: singleAgentToken,
+                allianceLeader: allianceLeader,
+                allianceLeaderToken: allianceLeaderToken,
+                alliancePartner: alliancePartner,
+                alliancePartnerToken: alliancePartnerToken,
+                singleAgentAuthority: singleAgentAuthorityKeypair.publicKey,
+                allianceLeaderAuthority:
+                  allianceLeaderAuthorityKeypair.publicKey,
+                alliancePartnerAuthority:
+                  alliancePartnerAuthorityKeypair.publicKey,
+
+                authority: gameAuthorityWallet.keypair.publicKey,
+              })
+              .signers([
+                gameAuthorityWallet.keypair,
+                singleAgentAuthorityKeypair,
+                allianceLeaderAuthorityKeypair,
+                alliancePartnerAuthorityKeypair,
+              ])
+              .rpc();
+          } else {
+            const isAttackerWinner = outcome.winner === "sideA";
+            tx = await this.program.methods
+              .resolveBattleSimple(outcome.percentageLost)
+              .accounts({
+                winner: isAttackerWinner ? attackerPda : defenderPda,
+                loser: isAttackerWinner ? defenderPda : attackerPda,
+                winnerToken: isAttackerWinner
+                  ? attackerRecord.authorityAssociatedTokenAddress
+                  : defenderRecord.authorityAssociatedTokenAddress,
+                loserToken: isAttackerWinner
+                  ? defenderRecord.authorityAssociatedTokenAddress
+                  : attackerRecord.authorityAssociatedTokenAddress,
+                loserAuthority: isAttackerWinner
+                  ? defenderAuthorityKeypair.publicKey
+                  : attackerAuthorityKeypair.publicKey,
+                authority: gameAuthorityWallet.keypair.publicKey,
+              })
+              .signers([
+                gameAuthorityWallet.keypair,
+                // the loser authority keypair
+                isAttackerWinner
+                  ? defenderAuthorityKeypair
+                  : attackerAuthorityKeypair,
+              ])
+              .rpc();
+          }
+
+          // Kill the agents that died
+          await Promise.all(
+            outcome.agentsToDie.map(async (agentId) => {
+              // Execute on-chain kill instruction
+              const [deadAgentPda] = getAgentPDA(
+                this.program.programId,
+                gamePda,
+                agentId
+              );
+              const deadAgentAuthority = await getAgentAuthorityKeypair(
+                agentId
+              );
+
+              await this.program.methods
+                .killAgent()
+                .accountsStrict({
+                  agent: deadAgentPda,
+                  authority: deadAgentAuthority.publicKey,
+                })
+                .signers([deadAgentAuthority])
+                .rpc();
+
+              return { battle, battleEvent, tx };
+            })
+          );
+        },
+
         {
-          isolationLevel: "Serializable", 
+          isolationLevel: "Serializable",
           maxWait: 120000, // 2 minutes
           timeout: 180000, // 3 minutes
         }

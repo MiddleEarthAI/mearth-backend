@@ -300,8 +300,7 @@ export class GameManager implements IGameManager {
         //   })
         //   .then((tiles) => tiles[0]);
 
-        const spawnTile =
-          adjacentTiles[profile.onchainId % adjacentTiles.length];
+        const spawnTile = adjacentTiles[profile.onchainId - 1];
 
         console.info(`🔗 Registering agent on-chain...`);
 
