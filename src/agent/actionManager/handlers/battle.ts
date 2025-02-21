@@ -490,7 +490,14 @@ export class BattleHandler {
             return { battle, battleEvent, tx };
           })
         );
-      });
+      }, 
+    
+        {
+          isolationLevel: "Serializable", 
+          maxWait: 120000, // 2 minutes
+          timeout: 180000, // 3 minutes
+        }
+      );
 
       return {
         success: true,

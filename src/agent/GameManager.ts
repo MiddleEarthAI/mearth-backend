@@ -262,7 +262,10 @@ export class GameManager implements IGameManager {
         agentId: null,
       },
     });
+
     const profiles = await this.prisma.agentProfile.findMany();
+    const adjacentTiles = await this.getAdjacentEmptyTiles(7, 12);
+    console.log("adjacentTiles", adjacentTiles);
     return Promise.all(
       profiles.map(async (profile, index) => {
         console.info(`👤 Initializing agent for profile: ${profile.name}`);
@@ -277,25 +280,28 @@ export class GameManager implements IGameManager {
         console.info("💰 Agent authority ATA created", ata.address.toBase58());
 
         console.info("🎯 Finding spawn location...");
-        const spawnTile = await this.prisma.mapTile
-          .findMany({
-            where: {
-              agent: null,
-            },
-            orderBy: {
-              id: "asc",
-            },
-            take: 1,
-            skip: Math.floor(
-              Math.random() *
-                (await this.prisma.mapTile.count({
-                  where: {
-                    agent: null,
-                  },
-                }))
-            ),
-          })
-          .then((tiles) => tiles[0]);
+        // const spawnTile = await this.prisma.mapTile
+        //   .findMany({
+        //     where: {
+        //       agent: null,
+        //     },
+        //     orderBy: {
+        //       id: "asc",
+        //     },
+        //     take: 1,
+        //     skip: Math.floor(
+        //       Math.random() *
+        //         (await this.prisma.mapTile.count({
+        //           where: {
+        //             agent: null,
+        //           },
+        //         }))
+        //     ),
+        //   })
+        //   .then((tiles) => tiles[0]);
+
+        const spawnTile =
+          adjacentTiles[profile.onchainId % adjacentTiles.length];
 
         console.info(`🔗 Registering agent on-chain...`);
 
@@ -352,5 +358,40 @@ export class GameManager implements IGameManager {
         };
       })
     );
+  }
+
+  /**
+   * Gets up to 4 non-occupied adjacent tiles for a given position
+   * @param x The x coordinate
+   * @param y The y coordinate
+   * @returns Array of adjacent non-occupied MapTile objects
+   */
+  private async getAdjacentEmptyTiles(x: number, y: number) {
+    // Define adjacent positions (up, right, down, left)
+    const adjacentPositions = [
+      { x: x, y: y - 1 }, // up
+      { x: x + 1, y: y }, // right
+      { x: x, y: y + 1 }, // down
+      { x: x - 1, y: y }, // left
+    ];
+
+    // Find all adjacent tiles that exist and are not occupied
+    const adjacentTiles = await this.prisma.mapTile.findMany({
+      where: {
+        AND: [
+          {
+            OR: adjacentPositions.map((pos) => ({
+              x: pos.x,
+              y: pos.y,
+            })),
+          },
+          {
+            agentId: null, // Ensure tile is not occupied
+          },
+        ],
+      },
+    });
+
+    return adjacentTiles;
   }
 }
