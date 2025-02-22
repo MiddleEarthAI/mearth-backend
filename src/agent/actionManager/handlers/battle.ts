@@ -158,8 +158,12 @@ export class BattleHandler {
               gameId: ctx.gameId,
               attackerId: attackerRecord.id,
               defenderId: defenderRecord.id,
-              attackerAllyId: attackerAllyAccount ? attackerRecord.id : null,
-              defenderAllyId: defenderAllyAccount ? defenderRecord.id : null,
+              attackerAllyId: attackerAllyAccount
+                ? attackerAllyRecord?.id
+                : null,
+              defenderAllyId: defenderAllyAccount
+                ? defenderAllyRecord?.id
+                : null,
               startTime,
               endTime: startTime,
               winnerId:

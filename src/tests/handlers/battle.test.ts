@@ -84,8 +84,16 @@ describe.only("BattleHandler", function () {
     );
 
     // Mint MEARTH tokens to users
-    await mintMearthTokens(gameAuthority, user1.publicKey, 1_000_000_000_000);
-    await mintMearthTokens(gameAuthority, user2.publicKey, 1_000_000_000_000);
+    await mintMearthTokens(
+      gameAuthority,
+      user1.publicKey,
+      1_000_000_000_000_000
+    );
+    await mintMearthTokens(
+      gameAuthority,
+      user2.publicKey,
+      1_000_000_000_000_000
+    );
 
     // Airdrop SOL to agent authorities
     for (const id of [1, 2, 3, 4]) {
@@ -111,6 +119,11 @@ describe.only("BattleHandler", function () {
     const gameInfo = await gameManager.createNewGame();
     activeGame = gameInfo.dbGame;
 
+    // Sort agents by onchainId so we can assign agent variables in a deterministic way
+    gameInfo.agents.sort(
+      (a, b) => a.agent.profile.onchainId - b.agent.profile.onchainId
+    );
+
     agent1 = gameInfo.agents[0].agent;
     agent2 = gameInfo.agents[1].agent;
     agent3 = gameInfo.agents[2].agent;
@@ -125,55 +138,26 @@ describe.only("BattleHandler", function () {
     agent2AuthorityKeypair = await getAgentAuthorityKeypair(2);
     agent3AuthorityKeypair = await getAgentAuthorityKeypair(3);
     agent4AuthorityKeypair = await getAgentAuthorityKeypair(4);
+
+    for (const agent of [agent1, agent2, agent3, agent4]) {
+      await program.methods
+        .initializeStake(new BN(Math.random() * 1_000_000_000_000))
+        .accounts({
+          agent: agent.pda,
+          authority: user1.publicKey,
+          stakerSource: user1Ata.address,
+          agentVault: new PublicKey(agent.vault),
+        })
+        .signers([user1])
+        .rpc();
+    }
   });
 
   after(async function () {
     await prisma.$disconnect();
   });
 
-  it.only("should successfully resolve a simple battle between two agents", async () => {
-    // // stake tokens on agents
-    await program.methods
-      .initializeStake(new BN(1_000_000_000))
-      .accounts({
-        agent: agent1.pda,
-        authority: user1.publicKey,
-        stakerSource: user1Ata.address,
-        agentVault: new PublicKey(agent1.vault),
-      })
-      .signers([user1])
-      .rpc();
-    await program.methods
-      .initializeStake(new BN(1_000_000_000))
-      .accounts({
-        agent: agent2.pda,
-        authority: user2.publicKey,
-        stakerSource: user2Ata.address,
-        agentVault: new PublicKey(agent2.vault),
-      })
-      .signers([user2])
-      .rpc();
-    console.log("Staking tokens...");
-    await program.methods
-      .stakeTokens(new BN(1_000_000_000))
-      .accounts({
-        agent: agent1.pda,
-        authority: user1.publicKey,
-        stakerSource: user1Ata.address,
-        agentVault: new PublicKey(agent1.vault),
-      })
-      .signers([user1])
-      .rpc();
-    await program.methods
-      .stakeTokens(new BN(1_000_000_000))
-      .accounts({
-        agent: agent2.pda,
-        authority: user2.publicKey,
-        stakerSource: user2Ata.address,
-        agentVault: new PublicKey(agent2.vault),
-      })
-      .signers([user2])
-      .rpc();
+  it("should successfully resolve a simple battle between two agents", async () => {
     const ctx: ActionContext = {
       agentId: agent1.id,
       agentOnchainId: agent1.profile.onchainId,
@@ -212,6 +196,142 @@ describe.only("BattleHandler", function () {
     expect(event).to.not.be.null;
     expect(event?.message).to.include(agent1.profile.xHandle);
     expect(event?.message).to.include(agent2.profile.xHandle);
+  });
+
+  it("should handle agent vs alliance battle correctly", async () => {
+    console.log("Creating alliance...", {
+      initiator: agent2.pda,
+      targetAgent: agent3.pda,
+      game: activeGame.pda,
+      authority: agent2AuthorityKeypair.publicKey.toBase58(),
+    });
+    // Create alliance
+    await program.methods
+      .formAlliance()
+      .accountsStrict({
+        initiator: agent2.pda,
+        targetAgent: agent3.pda,
+        game: activeGame.pda,
+        authority: agent2AuthorityKeypair.publicKey,
+      })
+      .signers([agent2AuthorityKeypair])
+      .rpc();
+
+    // Create alliance record
+    await prisma.alliance.create({
+      data: {
+        initiatorId: agent1.id,
+        joinerId: agent2.id,
+        status: "Active",
+        gameId: activeGame.id,
+      },
+    });
+    console.log("Alliance created...");
+
+    const ctx: ActionContext = {
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: agent2.profile.onchainId,
+      tweet: "Agent vs Alliance battle",
+    };
+
+    const result = await battleHandler.handle(ctx, action);
+
+    expect(result.success).to.be.true;
+    expect(result.feedback?.isValid).to.be.true;
+
+    const battle = await prisma.battle.findFirst({
+      where: {
+        attackerId: agent1.id,
+        defenderId: agent2.id,
+      },
+    });
+    expect(battle).to.not.be.null;
+    expect(battle?.type).to.equal("AgentVsAlliance");
+  });
+
+  it.only("should handle alliance vs alliance battle correctly", async () => {
+    console.log("Forming alliances...");
+
+    await program.methods
+      .formAlliance()
+      .accountsStrict({
+        initiator: agent1.pda,
+        targetAgent: agent2.pda,
+        game: activeGame.pda,
+        authority: agent1AuthorityKeypair.publicKey,
+      })
+      .signers([agent1AuthorityKeypair])
+      .rpc();
+
+    await program.methods
+      .formAlliance()
+      .accountsStrict({
+        initiator: agent3.pda,
+        targetAgent: agent4.pda,
+        game: activeGame.pda,
+        authority: agent3AuthorityKeypair.publicKey,
+      })
+      .signers([agent3AuthorityKeypair])
+      .rpc();
+
+    // create alliance records
+    await prisma.alliance.create({
+      data: {
+        initiatorId: agent1.id,
+        joinerId: agent2.id,
+        status: "Active",
+        gameId: activeGame.id,
+      },
+    });
+    await prisma.alliance.create({
+      data: {
+        initiatorId: agent3.id,
+        joinerId: agent4.id,
+        status: "Active",
+        gameId: activeGame.id,
+      },
+    });
+    const ctx: ActionContext = {
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
+      gameId: activeGame.id,
+      gameOnchainId: activeGame.onchainId,
+    };
+
+    const action: BattleAction = {
+      type: "BATTLE",
+      targetId: agent3.profile.onchainId,
+      tweet: "Alliance vs Alliance battle",
+    };
+
+    const result = await battleHandler.handle(ctx, action);
+
+    expect(result.success).to.be.true;
+    expect(result.feedback?.isValid).to.be.true;
+
+    const battle = await prisma.battle.findFirst({
+      where: {
+        attackerId: agent1.id,
+        attackerAllyId: agent2.id,
+        defenderId: agent3.id,
+        defenderAllyId: agent4.id,
+      },
+    });
+
+    expect(battle).to.not.be.null;
+    expect(battle?.type).to.equal("AllianceVsAlliance");
+    expect(battle?.attackerId).to.equal(agent1.id);
+    expect(battle?.attackerAllyId).to.equal(agent2.id);
+    expect(battle?.defenderId).to.equal(agent3.id);
+    expect(battle?.defenderAllyId).to.equal(agent4.id);
+    expect(battle?.tokensStaked).to.be.greaterThan(0);
   });
 
   it("should handle battle with dead agent", async () => {
@@ -324,132 +444,6 @@ describe.only("BattleHandler", function () {
     expect(result.feedback?.isValid).to.be.false;
     expect(result.feedback?.error?.type).to.equal("BATTLE");
     expect(result.feedback?.error?.message).to.include("cooldown");
-  });
-
-  it("should handle alliance vs alliance battle correctly", async () => {
-    // Create alliances
-    await Promise.all([
-      program.methods
-        .formAlliance()
-        .accountsStrict({
-          initiator: agent1.pda,
-          targetAgent: agent2.pda,
-          game: activeGame.pda,
-          authority: agent1AuthorityKeypair.publicKey,
-        })
-        .signers([agent1AuthorityKeypair])
-        .rpc(),
-      program.methods
-        .formAlliance()
-        .accountsStrict({
-          initiator: agent2.pda,
-          targetAgent: agent3.pda,
-          game: activeGame.pda,
-          authority: agent2AuthorityKeypair.publicKey,
-        })
-        .signers([agent2AuthorityKeypair])
-        .rpc(),
-    ]);
-
-    // Create alliance records
-    await Promise.all([
-      prisma.alliance.create({
-        data: {
-          initiatorId: agent1.id,
-          joinerId: agent2.id,
-          status: "Active",
-          gameId: activeGame.id,
-        },
-      }),
-      prisma.alliance.create({
-        data: {
-          initiatorId: agent2.id,
-          joinerId: agent3.id,
-          status: "Active",
-          gameId: activeGame.id,
-        },
-      }),
-    ]);
-
-    const ctx: ActionContext = {
-      agentId: agent1.id,
-      agentOnchainId: agent1.profile.onchainId,
-      gameId: activeGame.id,
-      gameOnchainId: activeGame.onchainId,
-    };
-
-    const action: BattleAction = {
-      type: "BATTLE",
-      targetId: agent3.profile.onchainId,
-      tweet: "Alliance vs Alliance battle",
-    };
-
-    const result = await battleHandler.handle(ctx, action);
-
-    expect(result.success).to.be.true;
-    expect(result.feedback?.isValid).to.be.true;
-
-    const battle = await prisma.battle.findFirst({
-      where: {
-        attackerId: agent1.id,
-        defenderId: agent3.id,
-      },
-    });
-    expect(battle).to.not.be.null;
-    expect(battle?.type).to.equal("AllianceVsAlliance");
-    expect(battle?.attackerAllyId).to.equal(agent2.id);
-    expect(battle?.defenderAllyId).to.equal(agent3.id);
-  });
-
-  it("should handle agent vs alliance battle correctly", async () => {
-    // Create alliance
-    await program.methods
-      .formAlliance()
-      .accountsStrict({
-        initiator: agent1.pda,
-        targetAgent: agent2.pda,
-        game: activeGame.pda,
-        authority: agent1AuthorityKeypair.publicKey,
-      })
-      .signers([agent1AuthorityKeypair])
-      .rpc();
-
-    // Create alliance record
-    await prisma.alliance.create({
-      data: {
-        initiatorId: agent1.id,
-        joinerId: agent2.id,
-        status: "Active",
-        gameId: activeGame.id,
-      },
-    });
-
-    const ctx: ActionContext = {
-      agentId: agent1.id,
-      agentOnchainId: agent1.profile.onchainId,
-      gameId: activeGame.id,
-      gameOnchainId: activeGame.onchainId,
-    };
-
-    const action: BattleAction = {
-      type: "BATTLE",
-      targetId: agent2.profile.onchainId,
-      tweet: "Agent vs Alliance battle",
-    };
-
-    const result = await battleHandler.handle(ctx, action);
-
-    expect(result.success).to.be.true;
-    expect(result.feedback?.isValid).to.be.true;
-
-    const battle = await prisma.battle.findFirst({
-      where: {
-        attackerId: agent1.id,
-        defenderId: agent2.id,
-      },
-    });
-    expect(battle).to.not.be.null;
-    expect(battle?.type).to.equal("AgentVsAlliance");
   });
 
   it("should handle battle outcome calculations correctly", async () => {
