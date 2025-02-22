@@ -1086,7 +1086,9 @@ ${
 }
 
 # ACTION GENERATION REQUIRED
-As ${CURRENT_AGENT_IDENTITY.name}, generate ONE strategic action in this format:
+As ${
+      CURRENT_AGENT_IDENTITY.name
+    }, generate ONE strategic action in this format. You must return only the JSON with nothing extra:
 
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
