@@ -22,7 +22,7 @@ import { mintMearthTokens } from "../utiils";
 import { requestAirdrop } from "../utiils";
 import { solanaConfig } from "@/config/env";
 
-describe.only("IgnoreHandler", function () {
+describe("IgnoreHandler", function () {
   let ignoreHandler: IgnoreHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;

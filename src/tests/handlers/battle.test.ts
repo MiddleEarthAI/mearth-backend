@@ -18,7 +18,7 @@ import { BN } from "@coral-xyz/anchor";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { mintMearthTokens, requestAirdrop } from "../utiils";
 
-describe("BattleHandler", function () {
+describe.only("BattleHandler", function () {
   let program: MearthProgram;
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
@@ -131,10 +131,10 @@ describe("BattleHandler", function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully resolve a simple battle between two agents", async () => {
+  it.only("should successfully resolve a simple battle between two agents", async () => {
     // // stake tokens on agents
     await program.methods
-      .initializeStake(new BN(50_000_000_000))
+      .initializeStake(new BN(1_000_000_000))
       .accounts({
         agent: agent1.pda,
         authority: user1.publicKey,
@@ -142,10 +142,20 @@ describe("BattleHandler", function () {
         agentVault: new PublicKey(agent1.vault),
       })
       .signers([user1])
+      .rpc();
+    await program.methods
+      .initializeStake(new BN(1_000_000_000))
+      .accounts({
+        agent: agent2.pda,
+        authority: user2.publicKey,
+        stakerSource: user2Ata.address,
+        agentVault: new PublicKey(agent2.vault),
+      })
+      .signers([user2])
       .rpc();
     console.log("Staking tokens...");
     await program.methods
-      .stakeTokens(new BN(50_000_000_000))
+      .stakeTokens(new BN(1_000_000_000))
       .accounts({
         agent: agent1.pda,
         authority: user1.publicKey,
@@ -154,7 +164,16 @@ describe("BattleHandler", function () {
       })
       .signers([user1])
       .rpc();
-
+    await program.methods
+      .stakeTokens(new BN(1_000_000_000))
+      .accounts({
+        agent: agent2.pda,
+        authority: user2.publicKey,
+        stakerSource: user2Ata.address,
+        agentVault: new PublicKey(agent2.vault),
+      })
+      .signers([user2])
+      .rpc();
     const ctx: ActionContext = {
       agentId: agent1.id,
       agentOnchainId: agent1.profile.onchainId,

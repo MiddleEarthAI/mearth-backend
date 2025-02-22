@@ -9,6 +9,8 @@ import {
 } from "@/utils/program";
 import { AgentAccount } from "@/types/program";
 import { gameConfig } from "@/config/env";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { BN } from "@coral-xyz/anchor";
 
 interface BattleSide {
   agent: AgentAccount;
@@ -152,7 +154,7 @@ export class BattleHandler {
             data: {
               type: battleType,
               status: "Resolved",
-              tokensStaked: Math.floor(outcome.totalTokensAtStake),
+              tokensStaked: outcome.totalTokensAtStake,
               gameId: ctx.gameId,
               attackerId: attackerRecord.id,
               defenderId: defenderRecord.id,
@@ -182,7 +184,7 @@ export class BattleHandler {
               metadata: {
                 battleId: battle.id,
                 battleType: battleType,
-                tokensAtStake: outcome.totalTokensAtStake,
+                tokensAtStake: outcome.totalTokensAtStake.toString(),
                 percentageLost: outcome.percentageLost,
                 winner: outcome.winner,
                 timestamp: new Date().toISOString(),
@@ -536,16 +538,20 @@ export class BattleHandler {
     sideA: BattleSide,
     sideB: BattleSide
   ): Promise<BattleOutcome> {
-    // Calculate total tokens for each side
-    const sideATokens =
-      sideA.agent.stakedBalance + (sideA.ally?.stakedBalance ?? 0);
-    const sideBTokens =
-      sideB.agent.stakedBalance + (sideB.ally?.stakedBalance ?? 0);
-    const totalTokens = sideATokens + sideBTokens;
+    // Convert to BN and handle calculations
+    const sideATokens = sideA.agent.stakedBalance.add(
+      sideA.ally ? sideA.ally.stakedBalance : new BN(0)
+    );
+
+    const sideBTokens = sideB.agent.stakedBalance.add(
+      sideB.ally ? sideB.ally.stakedBalance : new BN(0)
+    );
+
+    const totalTokens = sideATokens.add(sideBTokens);
 
     let sideAWins: boolean;
 
-    if (totalTokens === 0) {
+    if (totalTokens.isZero()) {
       // Use number of agents as fallback when no tokens
       const sideACount = sideA.ally ? 2 : 1;
       const sideBCount = sideB.ally ? 2 : 1;
@@ -556,35 +562,37 @@ export class BattleHandler {
       const rand = Math.random();
       sideAWins = rand < sideAProbability;
     } else {
-      // Calculate winning probabilities based on tokens
-      const sideAProbability = sideATokens / totalTokens;
+      const sideAProbability = sideATokens.div(totalTokens);
       const rand = Math.random();
       sideAWins = rand < sideAProbability;
     }
 
-    // Generate loss percentage (20-30%)
+    // Calculate battle losses and deaths
     const percentageLost = Math.floor(Math.random() * 11) + 20;
-
-    // Check for agentsToDie (10% chance for losing side)
     const agentsToDie: number[] = [];
     const losingSide = sideAWins ? sideB : sideA;
 
     const deathChance = gameConfig.mechanics.deathChance / 100;
 
-    // Check death for main agent (10% chance)
     if (Math.random() < deathChance) {
       agentsToDie.push(Number(losingSide.agent.id));
     }
 
-    // Check death for ally if exists (10% chance)
     if (losingSide.ally && Math.random() < deathChance) {
       agentsToDie.push(Number(losingSide.ally.id));
     }
 
+    console.log("Battle outcome:::::::::::::::", {
+      sideAWins,
+      percentageLost,
+      totalTokens: totalTokens.toString(),
+      agentsToDie,
+    });
+
     return {
       winner: sideAWins ? "sideA" : "sideB",
       percentageLost,
-      totalTokensAtStake: Number(totalTokens),
+      totalTokensAtStake: totalTokens.toNumber(),
       agentsToDie,
     };
   }
@@ -592,12 +600,7 @@ export class BattleHandler {
   private createBattleMessage(
     attackerHandle: string,
     defenderHandle: string,
-    outcome: {
-      winner: "sideA" | "sideB";
-      percentageLost: number;
-      totalTokensAtStake: number;
-      agentsToDie: number[];
-    }
+    outcome: BattleOutcome
   ): string {
     const winner = outcome.winner === "sideA" ? attackerHandle : defenderHandle;
     const loser = outcome.winner === "sideA" ? defenderHandle : attackerHandle;
