@@ -90,9 +90,19 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
 
       // Create records in transaction
       await this.prisma.$transaction([
-        // Create ignore relationship
-        this.prisma.ignore.create({
-          data: {
+        // Upsert ignore relationship
+        this.prisma.ignore.upsert({
+          where: {
+            agentId_ignoredAgentId: {
+              agentId: ctx.agentId,
+              ignoredAgentId: targetAgent.id,
+            },
+          },
+          update: {
+            timestamp: new Date(timestamp),
+            duration: gameConfig.mechanics.cooldowns.ignore,
+          },
+          create: {
             agentId: ctx.agentId,
             ignoredAgentId: targetAgent.id,
             timestamp: new Date(timestamp),
@@ -118,7 +128,7 @@ export class IgnoreHandler implements ActionHandler<IgnoreAction> {
             eventType: "IGNORE",
             initiatorId: ctx.agentId,
             targetId: targetAgent.id,
-            message: `🚫 @${agent.profile.xHandle} turns their back on @${targetAgent.profile.xHandle}!`,
+            message: `🚫 @${agent.profile.name} has chosen to ignore @${targetAgent.profile.name} from now on.`,
             metadata: {
               toJSON: () => ({
                 duration: gameConfig.mechanics.cooldowns.ignore,

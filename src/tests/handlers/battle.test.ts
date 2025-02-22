@@ -18,7 +18,7 @@ import { BN } from "@coral-xyz/anchor";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { mintMearthTokens, requestAirdrop } from "../utiils";
 
-describe.only("BattleHandler", function () {
+describe("BattleHandler", function () {
   let program: MearthProgram;
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
@@ -131,7 +131,7 @@ describe.only("BattleHandler", function () {
     await prisma.$disconnect();
   });
 
-  it.only("should successfully resolve a simple battle between two agents", async () => {
+  it("should successfully resolve a simple battle between two agents", async () => {
     // // stake tokens on agents
     await program.methods
       .initializeStake(new BN(50_000_000_000))

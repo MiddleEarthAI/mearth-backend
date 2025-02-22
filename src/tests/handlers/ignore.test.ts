@@ -22,19 +22,18 @@ import { mintMearthTokens } from "../utiils";
 import { requestAirdrop } from "../utiils";
 import { solanaConfig } from "@/config/env";
 
-describe("IgnoreHandler", function () {
+describe.only("IgnoreHandler", function () {
   let ignoreHandler: IgnoreHandler;
   let prisma: PrismaClient;
   let program: MearthProgram;
   let gameManager: GameManager;
   let gameAuthority: Keypair;
   let activeGame: GameInfo;
-  let agent: AgentWithProfile;
-  let agentAccount: AgentAccount;
-  let targetAgent: AgentWithProfile;
-  let targetAgentAccount: AgentAccount;
+  let agent1: AgentWithProfile;
+  let agent1Account: AgentAccount;
+  let agent2: AgentWithProfile;
+  let agent2Account: AgentAccount;
   let mearthMint: PublicKey;
-  const connection = new Connection(solanaConfig.rpcUrl, "confirmed");
 
   before(async function () {
     prisma = new PrismaClient();
@@ -49,6 +48,12 @@ describe("IgnoreHandler", function () {
     // Request airdrop for game authority
     await requestAirdrop(gameAuthority.publicKey, 2);
 
+    for (const id of [1, 2, 3, 4]) {
+      const authority = await getAgentAuthorityKeypair(id);
+      await requestAirdrop(authority.publicKey, 2);
+      await mintMearthTokens(gameAuthority, authority.publicKey, 1000000000);
+    }
+
     // Create MEARTH token mint
     const { mint } = await mintMearthTokens(
       gameAuthority,
@@ -60,57 +65,40 @@ describe("IgnoreHandler", function () {
 
   beforeEach(async function () {
     activeGame = await gameManager.createNewGame();
-    agent = activeGame.agents[0].agent;
-    agentAccount = activeGame.agents[0].account;
-    targetAgent = activeGame.agents[1].agent;
-    targetAgentAccount = activeGame.agents[1].account;
+    agent1 = activeGame.agents[0].agent;
+    agent1Account = activeGame.agents[0].account;
+    agent2 = activeGame.agents[1].agent;
+    agent2Account = activeGame.agents[1].account;
 
-    // Get agent keypairs
-    const agentKeypair = await getAgentAuthorityKeypair(
-      agent.profile.onchainId
-    );
-    const targetAgentKeypair = await getAgentAuthorityKeypair(
-      targetAgent.profile.onchainId
-    );
-
-    // Request airdrops for test agents
-    await Promise.all([
-      requestAirdrop(agentKeypair.publicKey),
-      requestAirdrop(targetAgentKeypair.publicKey),
-    ]);
-
-    // Mint tokens to agent vaults
-    for (const authority of [agentKeypair, targetAgentKeypair]) {
-      const agentVault = await getAgentVault(
-        Number(authority.publicKey.toBuffer()[0])
-      );
-      await mintMearthTokens(
-        authority,
-        gameAuthority.publicKey,
-        1000000000,
-        mearthMint
-      );
-    }
+    // // Get agent1 keypairs
+    //  agentKeypair = await getAgentAuthorityKeypair(
+    //   agent1.profile.onchainId
+    // );
+    // const targetAgentKeypair = await getAgentAuthorityKeypair(
+    //   agent2.profile.onchainId
+    // );
   });
 
   after(async function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully ignore another agent", async function () {
-    // Setup test data
+  it("should successfully ignore another agent1", async function () {
     const ctx: ActionContext = {
-      agentId: agent.id,
-      agentOnchainId: agent.profile.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: targetAgent.profile.onchainId,
-      tweet: "Ignoring agent",
+      targetId: agent2.profile.onchainId,
+      tweet: "Ignoring agent1",
     };
+
+    console.log("ctx", ctx);
+    console.log("action", action);
 
     // Execute ignore action
     const result = await ignoreHandler.handle(ctx, action);
@@ -122,8 +110,8 @@ describe("IgnoreHandler", function () {
     // Verify ignore record created
     const ignore = await prisma.ignore.findFirst({
       where: {
-        agentId: agent.id,
-        ignoredAgentId: targetAgent.id,
+        agentId: agent1.id,
+        ignoredAgentId: agent2.id,
         gameId: activeGame.dbGame.id,
       },
     });
@@ -132,7 +120,7 @@ describe("IgnoreHandler", function () {
     // Verify cooldown created
     const cooldown = await prisma.coolDown.findFirst({
       where: {
-        cooledAgentId: agent.id,
+        cooledAgentId: agent1.id,
         type: "Ignore",
       },
     });
@@ -143,27 +131,27 @@ describe("IgnoreHandler", function () {
       where: {
         gameId: activeGame.dbGame.id,
         eventType: "IGNORE",
-        initiatorId: agent.id,
-        targetId: targetAgent.id,
+        initiatorId: agent1.id,
+        targetId: agent2.id,
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(agent.profile.xHandle);
-    expect(event?.message).to.include(targetAgent.profile.xHandle);
+    expect(event?.message).to.include(agent1.profile.xHandle);
+    expect(event?.message).to.include(agent2.profile.xHandle);
   });
 
   it("should handle ignoring during cooldown period", async function () {
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.id,
-      agentOnchainId: agent.profile.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: targetAgent.profile.onchainId,
+      targetId: agent2.profile.onchainId,
       tweet: "Ignoring during cooldown",
     };
 
@@ -172,7 +160,7 @@ describe("IgnoreHandler", function () {
       data: {
         type: "Ignore",
         endsAt: new Date(Date.now() + 3600000), // 1 hour from now
-        cooledAgentId: agent.id,
+        cooledAgentId: agent1.id,
         gameId: activeGame.dbGame.id,
       },
     });
@@ -187,22 +175,22 @@ describe("IgnoreHandler", function () {
     expect(result.feedback?.error?.message).to.include("cooldown");
   });
 
-  it("should handle ignoring non-existent agent", async function () {
+  it("should handle ignoring non-existent agent1", async function () {
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.id,
-      agentOnchainId: agent.profile.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: 999, // Non-existent agent
-      tweet: "Ignoring non-existent agent",
+      targetId: 999, // Non-existent agent1
+      tweet: "Ignoring non-existent agent1",
     };
 
-    // Attempt to ignore non-existent agent
+    // Attempt to ignore non-existent agent1
     const result = await ignoreHandler.handle(ctx, action);
 
     // Assertions
@@ -212,33 +200,33 @@ describe("IgnoreHandler", function () {
     expect(result.feedback?.error?.message).to.include("not found");
   });
 
-  it("should handle ignoring already ignored agent", async function () {
+  it("should handle ignoring already ignored agent1", async function () {
     // Setup test data
     const ctx: ActionContext = {
-      agentId: agent.id,
-      agentOnchainId: agent.profile.onchainId,
+      agentId: agent1.id,
+      agentOnchainId: agent1.profile.onchainId,
       gameId: activeGame.dbGame.id,
       gameOnchainId: activeGame.dbGame.onchainId,
     };
 
     const action: IgnoreAction = {
       type: "IGNORE",
-      targetId: targetAgent.profile.onchainId,
-      tweet: "Ignoring already ignored agent",
+      targetId: agent2.profile.onchainId,
+      tweet: "Ignoring already ignored agent1",
     };
 
     // Create existing ignore
     await prisma.ignore.create({
       data: {
-        agentId: agent.id,
-        ignoredAgentId: targetAgent.id,
+        agentId: agent1.id,
+        ignoredAgentId: agent2.id,
         gameId: activeGame.dbGame.id,
         timestamp: new Date(),
         duration: 3600, // 1 hour
       },
     });
 
-    // Attempt to ignore already ignored agent
+    // Attempt to ignore already ignored agent1
     const result = await ignoreHandler.handle(ctx, action);
 
     // Assertions
