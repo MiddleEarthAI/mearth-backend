@@ -694,8 +694,8 @@ ${
 ## RESPONSE FORMAT
 Generate a JSON response:
 {
-  "type": string, // MOVE | BATTLE | FORM_ALLIANCE | BREAK_ALLIANCE | IGNORE
-  "targetId": number | null,  // target agent's MID. Strictly REQUIRED for BATTLE | FORM_ALLIANCE | BREAK_ALLIANCE | IGNORE action types.
+  "type": string, // MOVE | BATTLE | FORM_ALLIANCE | BREAK_ALLIANCE
+  "targetId": number | null,  // target agent's MID. Strictly REQUIRED for BATTLE | FORM_ALLIANCE | BREAK_ALLIANCE  action types.
   "position": { "x": number, "y": number },  // For MOVE: MUST be one of the coordinates listed in SURROUNDING TERRAIN
   "tweet": string  // Action announcement (no hashtags, use @handles for other agents but not yourself, NO MID in tweet)
 }
