@@ -1038,9 +1038,14 @@ ${CURRENT_AGENT_STATE.position.surrounding}
 ${recentEventsString}
 
 # RECENT ACTIVITY 
-Battles: ${CURRENT_AGENT_RECENT_ENGAGEMENTS.battles}
-Active Alliances: ${CURRENT_AGENT_RECENT_ENGAGEMENTS.alliances}
-Recent Tweets: ${CURRENT_AGENT_RECENT_ENGAGEMENTS.tweets}
+## BATTLES
+${CURRENT_AGENT_RECENT_ENGAGEMENTS.battles}
+
+## ALLIANCES
+${CURRENT_AGENT_RECENT_ENGAGEMENTS.alliances}
+
+## RECENT TWEETS
+${CURRENT_AGENT_RECENT_ENGAGEMENTS.tweets}
 
 # OTHER AGENTS IN MIDDLE EARTH
 ${otherAliveAgentsContextString.join("\n\n")}
@@ -1063,11 +1068,11 @@ ${
   communitySuggestion
     ? `Action: ${communitySuggestion.type}
    ${communitySuggestion.target ? `Target: @${communitySuggestion.target}` : ""}
-   ${
-     communitySuggestion.position
-       ? `Move to: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
-       : ""
-   }
+${
+  communitySuggestion.position
+    ? `Move to: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
+    : ""
+}
    Context: ${communitySuggestion.content || "None"}`
     : "No community suggestions"
 }
