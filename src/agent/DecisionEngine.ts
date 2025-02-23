@@ -486,9 +486,9 @@ class DecisionEngine {
   ${
     distanceFromCurrentAgent <= 1
       ? "⚠️ CRITICAL: Enemy within battle range!"
-      : `${distanceFromCurrentAgent.toFixed(1)} fields away from you ${
+      : `${distanceFromCurrentAgent.toFixed(1)} fields away from you (${
           currentAgentRecord.profile.xHandle
-        }`
+        })`
   }
   
   @${otherAgentInfo.agent.profile.xHandle} Recent Tweets:
@@ -697,7 +697,7 @@ class DecisionEngine {
     # DISTANCE ALERT: TARGET OUT OF RANGE
     Target @${
       otherAgentInfo.agent.profile.xHandle
-    } is ${distanceFromCurrentAgent} fields away.
+    } is ${distanceFromCurrentAgent.toFixed(1)} fields away.
     Direct interaction unavailable. Available options:
     
     ## AVAILABLE ACTIONS [SELECT ONE]
@@ -749,7 +749,7 @@ class DecisionEngine {
                 ? "Wanderleaf the Aging Explorer"
                 : "Unknown Agent"
             })`
-          : `Empty - You(${currentAgentRecord.profile.xHandle}) can move here`;
+          : `No one - You(${currentAgentRecord.profile.xHandle}) can move here`;
 
         // Format terrain description with coordinates and occupancy
         return `Location (${tile.x}, ${tile.y}): ${
@@ -1052,7 +1052,7 @@ As ${
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null,  // Agent's MID for interactions
   "position": { "x": number, "y": number } | null,  // Required for MOVE (choose from #SURROUNDING TERRAIN)
-  "tweet": string  // In-character announcement (use @handles for others, no self-mentions)
+  "tweet": string  // In-character announcement (use @handles for others, no self-mentions). try not to repeat the same tweet(see recent tweets for reference)
 }
 
 Consider:
