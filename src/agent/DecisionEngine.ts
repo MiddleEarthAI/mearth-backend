@@ -421,6 +421,7 @@ class DecisionEngine {
                 })
                 .join(", ")}`
             : "No active alliances";
+
         return `
 
 - ${otherAgentInfo.agent.profile.name} (@${
@@ -491,9 +492,13 @@ class DecisionEngine {
     distanceFromCurrentAgent <= 1
       ? `
   # INTERACTION DECISION MATRIX [MANDATORY SELECTION REQUIRED]
-  Target Agent: @${otherAgentInfo.agent.profile.xHandle}
+  Target Agent: @${otherAgentInfo.agent.profile.xHandle} [MID: ${
+          otherAgentInfo.agent.profile.onchainId
+        }]
   Distance: ${distanceFromCurrentAgent} field(s)
-  Action Required: You MUST select ONE of the available actions below
+  Action Required: You MUST select ONE of the available actions below if you want to interact with @${
+    otherAgentInfo.agent.profile.xHandle
+  }
   
   ## AVAILABLE ACTIONS [SELECT ONE]
   ${(() => {
@@ -532,13 +537,15 @@ class DecisionEngine {
     ${
       canBattle
         ? `[AVAILABLE] BATTLE
-         • Command: "BATTLE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "BATTLE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Risk: 5% mortality chance
          • Reward: 21-30% token transfer
          • Cooldown: 4 hours post-battle`
         : `[LOCKED] BATTLE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Battle ${
+           otherAgentInfo.agent.profile.xHandle
+         } at this time
          • Reason: ${
            currentAgentActiveCooldowns.has("Battle")
              ? "Your battle cooldown active"
@@ -552,12 +559,14 @@ class DecisionEngine {
     ${
       !existingAlliance && !allianceCooldown
         ? `[AVAILABLE] FORM_ALLIANCE
-         • Command: "FORM_ALLIANCE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "FORM_ALLIANCE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Effect: Shared token power
          • Duration: 4 hour commitment`
         : `[LOCKED] FORM_ALLIANCE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Form Alliance with ${
+           otherAgentInfo.agent.profile.xHandle
+         } at this time
          • Reason: ${
            existingAlliance
              ? "Alliance already exists"
@@ -570,12 +579,12 @@ class DecisionEngine {
     ${
       existingAlliance
         ? `[AVAILABLE] BREAK_ALLIANCE
-         • Command: "BREAK_ALLIANCE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "BREAK_ALLIANCE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Warning: 4hr battle cooldown
          • Effect: Ends resource sharing`
         : `[LOCKED] BREAK_ALLIANCE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Break Alliance with ${otherAgentInfo.agent.profile.xHandle} at this time
          • Reason: No active alliance`
     }
 
@@ -583,31 +592,32 @@ class DecisionEngine {
     ${
       !isIgnored && !isBeingIgnored && !ignoreCooldown
         ? `[AVAILABLE] IGNORE
-         • Command: "IGNORE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "IGNORE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Effect: 4hr interaction block
          • Note: Mutual restriction`
         : `[LOCKED] IGNORE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Ignore ${
+           otherAgentInfo.agent.profile.xHandle
+         } at this time
          • Reason: ${
            isIgnored
-             ? "Already ignoring target"
+             ? "You are already ignoring target"
              : isBeingIgnored
-             ? "Being ignored by target"
+             ? "You are being ignored by target"
              : ignoreCooldown
-             ? "Ignore cooldown active"
+             ? "Your ignore cooldown is active"
              : "Social restrictions"
          }`
     }
 
     ### OPTION 4: TACTICAL RETREAT
     [ALWAYS AVAILABLE] MOVE
-    • Command: "MOVE"
+    • ActionType: "MOVE"
     • Effect: Relocate to adjacent tile
     • Terrain Modifiers:
       - Mountain: +2 turns
       - River: +1 turn
-      - Plain: No delay
 
     ## CURRENT RELATIONSHIP STATUS
     • Alliance: ${existingAlliance ? "Active" : "None"}
@@ -615,7 +625,7 @@ class DecisionEngine {
       isIgnored
         ? "Ignoring"
         : isBeingIgnored
-        ? "Being Ignored"
+        ? "You are being ignored by target"
         : "No Restrictions"
     }
     • Combat: ${
@@ -630,73 +640,27 @@ class DecisionEngine {
         ? "Previous Combat"
         : "No History"
     }
-
-    ## ACTION REQUIRED
-    You MUST respond with ONE of the following action formats:
-
-    1. Battle Response:
-    {
-      "type": "BATTLE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your battle announcement"
-    }
-
-    2. Alliance Response:
-    {
-      "type": "FORM_ALLIANCE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your alliance proposal"
-    }
-
-    3. Break Alliance Response:
-    {
-      "type": "BREAK_ALLIANCE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your alliance termination"
-    }
-
-    4. Ignore Response:
-    {
-      "type": "IGNORE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your ignore announcement"
-    }
-
-    5. Move Response:
-    {
-      "type": "MOVE",
-      "targetId": null,
-      "position": {"x": number, "y": number},
-      "tweet": "Your movement announcement"
-    }`;
+`;
   })()}`
       : `
     # DISTANCE ALERT: TARGET OUT OF RANGE
-    Target @${otherAgentInfo.agent.profile.xHandle} is ${distanceFromCurrentAgent} fields away.
+    Target @${
+      otherAgentInfo.agent.profile.xHandle
+    } is ${distanceFromCurrentAgent} fields away.
     Direct interaction unavailable. Available options:
     
     ## AVAILABLE ACTIONS [SELECT ONE]
     
     ### OPTION 1: STRATEGIC MOVEMENT
-    [AVAILABLE] MOVE
-    • Command: "MOVE"
-    • Purpose: Close distance or maintain position
-    • Terrain Effects:
-      - Mountain: +2 turn delay
-      - River: +1 turn delay
-      - Plain: No delay
-
-    ## ACTION REQUIRED
-    You MUST respond with the following format:
-    {
-      "type": "MOVE",
-      "targetId": null,
-      "position": {"x": number, "y": number},
-      "tweet": "Your strategic announcement"
+    ${
+      !currentAgentActiveCooldowns.has("Move")
+        ? `[AVAILABLE] MOVE 
+    • ActionType: "MOVE"
+    • Purpose: Close distance or maintain position`
+        : `[LOCKED] MOVE
+    • Status: Movement currently unavailable
+    • Reason: Movement cooldown active
+    • Try Again: When cooldown expires`
     }
     `
   }
@@ -1036,6 +1000,9 @@ $MEARTH Balance: ${CURRENT_AGENT_STATE.tokens.balance} tokens
 Health: ${currentAgentRecord.isAlive ? "Alive" : "Dead"}
 In Alliance: ${isInAlliance ? "Yes" : "No"}
 
+# SURROUNDING TERRAIN
+${CURRENT_AGENT_STATE.position.surrounding}
+
 # RECENT EVENTS
 ${recentEventsString}
 
@@ -1082,7 +1049,7 @@ As ${
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null,  // Agent's MID for interactions
-  "position": { "x": number, "y": number } | null,  // Required for MOVE
+  "position": { "x": number, "y": number } | null,  // Required for MOVE (choose from #SURROUNDING TERRAIN)
   "tweet": string  // In-character announcement (use @handles for others, no self-mentions)
 }
 
