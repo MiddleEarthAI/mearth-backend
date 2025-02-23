@@ -1,0 +1,148 @@
+{
+  "interactions": [
+    {
+      "type": "reply",
+      "userId": "crypto_whale_1",
+      "username": "CryptoWhale",
+      "tweetId": "tweet_battle_1",
+      "content": "@PurrlockPaws Don't trust Sir Gullihop! He's gathering allies at (12,15) to ambush you. Move south to the mountain terrain for better defensive position! 🗡️ #MEARTH",
+      "timestamp": "2024-03-20T10:15:00Z",
+      "userMetrics": {
+        "followerCount": 125000,
+        "followingCount": 1200,
+        "tweetCount": 15800,
+        "likeCount": 89000,
+        "listedCount": 450,
+        "verified": true,
+        "accountAge": 189216000,
+        "reputationScore": 0.92
+      }
+    },
+    {
+      "type": "quote",
+      "userId": "mearth_analyst",
+      "username": "MEarthAnalyst",
+      "tweetId": "tweet_strategy_1",
+      "content": "Smart move by @Scootles forming an alliance with @Wanderleaf! Their combined $MEARTH holdings (2.5M + 1.8M) make them formidable. @PurrlockPaws needs to act fast or risk getting cornered. 📊 Analysis thread 🧵👇 #MiddleEarthAI",
+      "timestamp": "2024-03-20T10:20:00Z",
+      "userMetrics": {
+        "followerCount": 45000,
+        "followingCount": 890,
+        "tweetCount": 6500,
+        "likeCount": 28000,
+        "listedCount": 180,
+        "verified": true,
+        "accountAge": 94608000,
+        "reputationScore": 0.85
+      }
+    },
+    {
+      "type": "mention",
+      "userId": "game_strategist",
+      "username": "MEarthStrategist",
+      "tweetId": "tweet_warning_1",
+      "content": "@SirGullihop URGENT: @Scootles and @Wanderleaf's alliance is a trap! They're splitting up to surround you from both sides. Break the alliance with @PurrlockPaws and retreat to (8,12)! I've staked 50K $MEARTH to support you 🎯",
+      "timestamp": "2024-03-20T10:25:00Z",
+      "userMetrics": {
+        "followerCount": 28000,
+        "followingCount": 450,
+        "tweetCount": 3200,
+        "likeCount": 15000,
+        "listedCount": 120,
+        "verified": false,
+        "accountAge": 47304000,
+        "reputationScore": 0.78
+      }
+    },
+    {
+      "type": "reply",
+      "userId": "token_staker",
+      "username": "MEarthStaker",
+      "tweetId": "tweet_stake_1",
+      "content": "@Wanderleaf Just staked 100K $MEARTH to your pool! The mountain terrain at (15,18) gives you height advantage for battle. @Scootles is weakened after the last fight, strike now! 💰⚔️",
+      "timestamp": "2024-03-20T10:30:00Z",
+      "userMetrics": {
+        "followerCount": 15000,
+        "followingCount": 800,
+        "tweetCount": 2800,
+        "likeCount": 9000,
+        "listedCount": 85,
+        "verified": false,
+        "accountAge": 31536000,
+        "reputationScore": 0.72
+      }
+    },
+    {
+      "type": "quote",
+      "userId": "community_leader",
+      "username": "MEarthCommander",
+      "tweetId": "tweet_alliance_1",
+      "content": "🚨 COMMUNITY CALL TO ACTION 🚨\n@PurrlockPaws needs our support! Everyone stake your $MEARTH now - we're facing a 2v1 situation and need to boost battle odds. Current pool: 1.2M\nTarget: 2M before the battle at (10,14)\nRTs appreciated! 🎯💪 #MiddleEarthAI",
+      "timestamp": "2024-03-20T10:35:00Z",
+      "userMetrics": {
+        "followerCount": 82000,
+        "followingCount": 1500,
+        "tweetCount": 9800,
+        "likeCount": 45000,
+        "listedCount": 320,
+        "verified": true,
+        "accountAge": 126144000,
+        "reputationScore": 0.88
+      }
+    },
+    {
+      "type": "mention",
+      "userId": "defi_expert",
+      "username": "DeFiExpertME",
+      "tweetId": "tweet_market_1",
+      "content": "Market Analysis: @SirGullihop's pool TVL dropped 30% after the failed alliance. @Scootles now has 65% win probability in direct combat. Stakers should consider reallocation before the next battle phase. 📊🔄 #MEARTH #MEarthAI",
+      "timestamp": "2024-03-20T10:40:00Z",
+      "userMetrics": {
+        "followerCount": 35000,
+        "followingCount": 920,
+        "tweetCount": 4500,
+        "likeCount": 19000,
+        "listedCount": 150,
+        "verified": true,
+        "accountAge": 63072000,
+        "reputationScore": 0.82
+      }
+    },
+    {
+      "type": "reply",
+      "userId": "game_historian",
+      "username": "MEarthHistorian",
+      "tweetId": "tweet_lore_1",
+      "content": "@Wanderleaf Remember your encounter in the northern forests? Those glowing eyes belonged to @PurrlockPaws! She's been tracking you. Don't trust any alliance offers - she's out for revenge! 👀🌲 #MEarthLore",
+      "timestamp": "2024-03-20T10:45:00Z",
+      "userMetrics": {
+        "followerCount": 18000,
+        "followingCount": 600,
+        "tweetCount": 2200,
+        "likeCount": 12000,
+        "listedCount": 95,
+        "verified": false,
+        "accountAge": 47304000,
+        "reputationScore": 0.75
+      }
+    },
+    {
+      "type": "quote",
+      "userId": "onchain_analyst",
+      "username": "ChainWatcher",
+      "tweetId": "tweet_onchain_1",
+      "content": "🔍 On-chain data shows massive $MEARTH movements:\n- 500K unstaked from @SirGullihop\n- 800K new stakes in @Scootles pool\n- 300K moved to @PurrlockPaws\n\nBig battle incoming at coordinates (11,15)! Choose your side wisely 📈 #MEarthMetrics",
+      "timestamp": "2024-03-20T10:50:00Z",
+      "userMetrics": {
+        "followerCount": 55000,
+        "followingCount": 1100,
+        "tweetCount": 7800,
+        "likeCount": 32000,
+        "listedCount": 220,
+        "verified": true,
+        "accountAge": 78840000,
+        "reputationScore": 0.86
+      }
+    }
+  ]
+}

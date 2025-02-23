@@ -18,7 +18,7 @@ import { BN } from "@coral-xyz/anchor";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { mintMearthTokens, requestAirdrop } from "../utiils";
 
-describe.only("BattleHandler", function () {
+describe("BattleHandler", function () {
   let program: MearthProgram;
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
@@ -256,7 +256,7 @@ describe.only("BattleHandler", function () {
     expect(battle?.type).to.equal("AgentVsAlliance");
   });
 
-  it.only("should handle alliance vs alliance battle correctly", async () => {
+  it("should handle alliance vs alliance battle correctly", async () => {
     console.log("Forming alliances...");
 
     await program.methods

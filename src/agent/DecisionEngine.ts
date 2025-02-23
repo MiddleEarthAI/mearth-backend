@@ -24,7 +24,7 @@ type BattleWithRelations = Prisma.BattleGetPayload<{
  * It processes influence scores and generates appropriate actions based on character traits and game rules
  */
 class DecisionEngine {
-  private readonly MIN_REPUTATION_SCORE = 0.5;
+  private readonly MIN_REPUTATION_SCORE = 0.3;
 
   constructor(
     private prisma: PrismaClient,
@@ -690,18 +690,8 @@ class DecisionEngine {
       - River: +1 turn delay
       - Plain: No delay
 
-    ### OPTION 2: STRATEGIC COMMUNICATION
-    [AVAILABLE] TWEET
-    • Command: Include in any action
-    • Purpose: Signal intentions or strategy
-    • Impact Weights:
-      - Comments: High influence
-      - Quote RTs: Medium influence
-      - Likes: Low influence
-
     ## ACTION REQUIRED
     You MUST respond with the following format:
-
     {
       "type": "MOVE",
       "targetId": null,
@@ -962,7 +952,6 @@ class DecisionEngine {
             },
           ],
         },
-
         id: { not: currentAgentRecord.id },
         isAlive: true,
         gameId: actionContext.gameId,
@@ -1143,12 +1132,22 @@ Requirements:
     interactions: TwitterInteraction[]
   ): Promise<ActionSuggestion | null> {
     try {
+      console.log("[PROCESS_INTERACTIONS] Starting to process interactions...");
+      console.log(
+        `[PROCESS_INTERACTIONS] Total interactions received: ${interactions.length}`
+      );
+
       // Calculate reputation scores and filter qualified interactions
       // Only process first 50 tweets
       const qualifiedInteractions = interactions
         .slice(0, 50) // Limit to first 50 interactions
         .map((interaction) => {
           const reputationScore = this.calculateReputationScore(interaction);
+          console.log(
+            `[REPUTATION_CALC] @${
+              interaction.username
+            }: ${reputationScore.toFixed(2)}`
+          );
           return {
             ...interaction,
             userMetrics: { ...interaction.userMetrics, reputationScore },
@@ -1159,7 +1158,14 @@ Requirements:
             interaction.userMetrics.reputationScore >= this.MIN_REPUTATION_SCORE
         );
 
+      console.log(
+        `[PROCESS_INTERACTIONS] Qualified interactions after filtering: ${qualifiedInteractions.length}`
+      );
+
       if (qualifiedInteractions.length === 0) {
+        console.log(
+          "[PROCESS_INTERACTIONS] No qualified interactions found, returning null"
+        );
         return null;
       }
 
@@ -1207,6 +1213,8 @@ Generate a single ActionSuggestion in JSON format:
   "content": string  // Context/reasoning from community interactions
 }`;
 
+      console.log("[LLM_REQUEST] Sending prompt to Claude for processing...");
+
       const response = await generateText({
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: [
@@ -1218,10 +1226,19 @@ Generate a single ActionSuggestion in JSON format:
         ],
       });
 
-      const suggestion = JSON.parse(response.text || "{}");
+      console.log(
+        "[LLM_RESPONSE] Received response from Claude",
+        response.text
+      );
+
+      const suggestion = JSON.parse(`{${response.text}`);
+      console.log("[ACTION_SUGGESTION] Generated suggestion:", suggestion);
       return suggestion;
     } catch (error) {
-      console.error("Failed to process interactions:", error);
+      console.error(
+        "[PROCESS_INTERACTIONS_ERROR] Failed to process interactions:",
+        error
+      );
       return null;
     }
   }
@@ -1246,29 +1263,31 @@ Generate a single ActionSuggestion in JSON format:
     const safeFollowers = Math.max(metrics.followerCount, 1);
     const safeFollowing = Math.max(metrics.followingCount, 1);
 
-    // Engagement rate (30%) - Using likes and listed count as engagement signals
+    // Engagement rate (30%) - Using likes and reputation as engagement signals
+    // Adjusted to be more lenient with the ratio
     const engagementRate = Math.min(
-      (metrics.likeCount + metrics.reputationScore) / safeFollowers,
+      ((metrics.likeCount + metrics.reputationScore * 100) / safeFollowers) *
+        10,
       1
     );
 
-    // Follower quality (25%) - Log scale to handle varying magnitudes
+    // Follower quality (25%) - Adjusted log scale for better distribution
     const followerQuality = Math.min(
-      Math.log10(metrics.followerCount / safeFollowing + 1) / 4,
+      Math.log10(safeFollowers / safeFollowing + 1) / 2,
       1
     );
 
-    // Account activity (15%) - Tweet frequency normalized
-    const tweetFrequency = Math.min(metrics.tweetCount / 10000, 1);
+    // Account activity (15%) - Normalized with lower threshold
+    const tweetFrequency = Math.min(metrics.tweetCount / 1000, 1);
 
-    // Account longevity (20%) - Logarithmic scale for diminishing returns
+    // Account longevity (20%) - Adjusted scale for more reasonable distribution
     const accountAgeInDays = metrics.accountAge / (24 * 60 * 60);
     const accountLongevity = Math.min(
-      Math.log10(accountAgeInDays + 1) / Math.log10(3650), // Max 10 years
+      Math.log10(accountAgeInDays + 1) / Math.log10(365), // Max 1 year
       1
     );
 
-    // Verification bonus (10%) - Moderate boost for verified accounts
+    // Verification bonus (10%) - Kept as is
     const verificationBonus = metrics.verified ? 1 : 0;
 
     // Weighted sum of all components
@@ -1278,6 +1297,16 @@ Generate a single ActionSuggestion in JSON format:
       tweetFrequency * 0.15 +
       accountLongevity * 0.2 +
       verificationBonus * 0.1;
+
+    // Add debug logging
+    console.log(`[REPUTATION_DETAILS] @${interaction.username}:`, {
+      engagementRate: engagementRate.toFixed(2),
+      followerQuality: followerQuality.toFixed(2),
+      tweetFrequency: tweetFrequency.toFixed(2),
+      accountLongevity: accountLongevity.toFixed(2),
+      verificationBonus,
+      finalScore: reputationScore.toFixed(2),
+    });
 
     // Return final score normalized to 0-1
     return Math.min(Math.max(reputationScore, 0), 1);

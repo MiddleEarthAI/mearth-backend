@@ -61,18 +61,12 @@ export async function getProgram() {
 
 export async function getAgentAuthorityAta(agentOnchainId: number) {
   const mearthTokenMint = solanaConfig.tokenMint;
-  console.log("mearthTokenMint >>>>>>>>>>>.", mearthTokenMint);
 
   if (!mearthTokenMint) {
     throw new Error("MEARTH_TOKEN_MINT is not set");
   }
   const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
   const mintPubKey = new PublicKey(mearthTokenMint);
-  console.log("mintPubKey >>>>>>>>>>>.", mintPubKey.toBase58());
-  console.log(
-    "agentAuthorityKeypair >>>>>>>>>>>.",
-    agentAuthorityKeypair.publicKey.toBase58()
-  );
   const conn = connection();
   const ata = await getOrCreateAssociatedTokenAccount(
     conn,
