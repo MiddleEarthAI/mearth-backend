@@ -326,6 +326,34 @@ class DecisionEngine {
       })
     );
 
+    const deadAgentsContextString =
+      currentAgentRecord.game.agents
+        .filter((agent) => !agent.isAlive)
+        .map((deadAgent) => {
+          // Get their last battle (the one that killed them)
+          const lastBattle = [
+            ...deadAgent.battlesAsAttacker,
+            ...deadAgent.battlesAsDefender,
+          ].sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
+
+          // Format death context
+          return `⚰️ @${deadAgent.profile.xHandle} (${deadAgent.profile.name})
+        Last Position: (${deadAgent.mapTile?.x || "?"}, ${
+            deadAgent.mapTile?.y || "?"
+          })
+        Time of Death: ${formatDate(deadAgent.deathTimestamp || new Date())}
+        ${
+          lastBattle
+            ? `Final Battle: vs @${
+                lastBattle.attackerId === deadAgent.id
+                  ? lastBattle.defender.profile.xHandle
+                  : lastBattle.attacker.profile.xHandle
+              }`
+            : "Death circumstances unknown"
+        }`;
+        })
+        .join("\n\n") || "No fallen agents in Middle Earth yet";
+
     const otherAliveAgentsContextString = otherAgentsInfo.map(
       (otherAgentInfo) => {
         const agentMaptile = otherAgentInfo.agent.mapTile;
@@ -698,7 +726,7 @@ class DecisionEngine {
     Target @${
       otherAgentInfo.agent.profile.xHandle
     } is ${distanceFromCurrentAgent.toFixed(1)} fields away.
-    Direct interaction unavailable. Available options:
+    Direct interaction unavailable.
     
     ## AVAILABLE ACTIONS [SELECT ONE]
     
@@ -992,6 +1020,7 @@ Time: ${currentTime.toLocaleString("en-US", {
       second: "2-digit",
       timeZoneName: "short",
     })}
+Dead Agents: ${deadAgentsContextString}
 
 # AGENT STATUS
 You are ${CURRENT_AGENT_IDENTITY.name} (@${
