@@ -148,14 +148,14 @@ class DecisionEngine {
                   },
                 },
                 initiatedAlliances: {
-                  where: { status: "Active" },
+                  where: { status: "Active", gameId: actionContext.gameId },
                   include: {
                     joiner: { include: { profile: true } },
                     initiator: { include: { profile: true } },
                   },
                 },
                 joinedAlliances: {
-                  where: { status: "Active" },
+                  where: { status: "Active", gameId: actionContext.gameId },
                   include: {
                     joiner: { include: { profile: true } },
                     initiator: { include: { profile: true } },
@@ -180,7 +180,7 @@ class DecisionEngine {
         },
         mapTile: true,
         battlesAsAttacker: {
-          where: { status: "Resolved" },
+          where: { status: "Resolved", gameId: actionContext.gameId },
           include: {
             defender: { include: { profile: true } },
             attacker: { include: { profile: true } },
@@ -189,7 +189,7 @@ class DecisionEngine {
           },
         },
         battlesAsDefender: {
-          where: { status: "Resolved" },
+          where: { status: "Resolved", gameId: actionContext.gameId },
           include: {
             defender: { include: { profile: true } },
             attacker: { include: { profile: true } },
@@ -198,13 +198,13 @@ class DecisionEngine {
           },
         },
         joinedAlliances: {
-          where: { status: "Active" },
+          where: { status: "Active", gameId: actionContext.gameId },
           include: {
             initiator: { include: { profile: true } },
           },
         },
         initiatedAlliances: {
-          where: { status: "Active" },
+          where: { status: "Active", gameId: actionContext.gameId },
           include: {
             joiner: { include: { profile: true } },
           },
