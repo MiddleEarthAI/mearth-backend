@@ -1225,6 +1225,8 @@ Generate a single ActionSuggestion in JSON format:
    * Each component is normalized to 0-1 range and weighted based on importance
    */
   private calculateReputationScore(interaction: TwitterInteraction): number {
+    // pass every interaction just for testing
+    return 1;
     const metrics = interaction.userMetrics;
     if (!metrics) return 0;
 
