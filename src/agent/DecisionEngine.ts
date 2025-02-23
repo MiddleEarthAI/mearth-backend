@@ -233,6 +233,57 @@ class DecisionEngine {
       return { prompt: "", actionContext };
     }
 
+    // Move these declarations up before they're used
+    // Add action availability checks
+    const currentAgentActiveCooldowns = new Set(
+      currentAgentRecord.coolDown.map((cd) => cd.type) || []
+    );
+
+    const isInAlliance =
+      currentAgentRecord.initiatedAlliances.length > 0 ||
+      currentAgentRecord.joinedAlliances.length > 0;
+
+    // Get all agents this currentAgentRecord is ignoring or being ignored by
+    const ignoredAgentIds = new Set([
+      ...currentAgentRecord.ignoring.map((ig) => ig.ignoredAgentId),
+      ...currentAgentRecord.ignoredBy.map((ig) => ig.agentId),
+    ]);
+
+    // Get nearby agents for interaction checks
+    const nearbyAgents = await this.prisma.agent.findMany({
+      where: {
+        mapTile: {
+          OR: [
+            {
+              x: {
+                in: [
+                  currentAgentMaptile.x - 1,
+                  currentAgentMaptile.x,
+                  currentAgentMaptile.x + 1,
+                ],
+              },
+              y: {
+                in: [
+                  currentAgentMaptile.y - 1,
+                  currentAgentMaptile.y,
+                  currentAgentMaptile.y + 1,
+                ],
+              },
+            },
+          ],
+        },
+        id: { not: currentAgentRecord.id },
+        isAlive: true,
+        gameId: actionContext.gameId,
+        NOT: {
+          id: { in: Array.from(ignoredAgentIds) },
+        },
+      },
+      include: {
+        profile: true,
+      },
+    });
+
     // Get nearby map tiles (8 surrounding tiles)
     const nearbyTiles = await this.prisma.mapTile.findMany({
       where: {
@@ -878,55 +929,6 @@ class DecisionEngine {
       tweets: currentAgentRecentTweetHistoryString,
     };
 
-    // Add action availability checks
-    const currentAgentActiveCooldowns = new Set(
-      currentAgentRecord.coolDown.map((cd) => cd.type) || []
-    );
-
-    const isInAlliance =
-      currentAgentRecord.initiatedAlliances.length > 0 ||
-      currentAgentRecord.joinedAlliances.length > 0;
-
-    // Get all agents this currentAgentRecord is ignoring or being ignored by
-    const ignoredAgentIds = new Set([
-      ...currentAgentRecord.ignoring.map((ig) => ig.ignoredAgentId),
-      ...currentAgentRecord.ignoredBy.map((ig) => ig.agentId),
-    ]);
-
-    // Get nearby agents for interaction checks
-    const nearbyAgents = await this.prisma.agent.findMany({
-      where: {
-        mapTile: {
-          OR: [
-            {
-              x: {
-                in: [
-                  currentAgentMaptile.x - 1,
-                  currentAgentMaptile.x,
-                  currentAgentMaptile.x + 1,
-                ],
-              },
-              y: {
-                in: [
-                  currentAgentMaptile.y - 1,
-                  currentAgentMaptile.y,
-                  currentAgentMaptile.y + 1,
-                ],
-              },
-            },
-          ],
-        },
-        id: { not: currentAgentRecord.id },
-        isAlive: true,
-        gameId: actionContext.gameId,
-        NOT: {
-          id: { in: Array.from(ignoredAgentIds) },
-        },
-      },
-      include: {
-        profile: true,
-      },
-    });
     // Get recent events for context
     const recentEvents = await this.prisma.gameEvent.findMany({
       where: { gameId: actionContext.gameId },
