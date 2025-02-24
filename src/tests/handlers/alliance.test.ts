@@ -7,12 +7,7 @@ import {
   FormAllianceAction,
   BreakAllianceAction,
 } from "@/types";
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import {
   getAgentAuthorityKeypair,
   getProgram,
@@ -291,9 +286,9 @@ describe("AllianceHandler", function () {
         initiator: agent1.pda,
         targetAgent: agent2.pda,
         game: activeGame.pda,
-        authority: agent1Keypair.publicKey,
+        authority: gameAuthority.publicKey,
       })
-      .signers([agent1Keypair])
+      .signers([gameAuthority])
       .rpc();
 
     // Create alliance record
@@ -361,6 +356,7 @@ describe("AllianceHandler", function () {
       .killAgent()
       .accounts({
         agent: agent2.pda,
+        game: activeGame.pda,
       })
       .signers([gameAuthority]) // only game authority can kill an agent
       .rpc();

@@ -6,18 +6,12 @@ import { ActionContext, IgnoreAction } from "@/types";
 import {
   getProgram,
   getAgentAuthorityKeypair,
-  getAgentVault,
   getMiddleEarthAiAuthorityWallet,
 } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
 import { AgentAccount } from "@/types/program";
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import { mintMearthTokens } from "../utiils";
 import { requestAirdrop } from "../utiils";
 
@@ -135,8 +129,8 @@ describe("IgnoreHandler", function () {
       },
     });
     expect(event).to.not.be.null;
-    expect(event?.message).to.include(agent1.profile.xHandle);
-    expect(event?.message).to.include(agent2.profile.xHandle);
+    expect(event?.message).to.include(agent1.profile.name);
+    expect(event?.message).to.include(agent2.profile.name);
   });
 
   it("should handle ignoring during cooldown period", async function () {

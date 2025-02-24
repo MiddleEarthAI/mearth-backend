@@ -68,9 +68,7 @@ export class AllianceHandler
         throw new Error("Agent not found");
       }
 
-      const agentAuthKeypair = await getAgentAuthorityKeypair(
-        ctx.agentOnchainId
-      );
+      const agentAuthKeypair = await getMiddleEarthAiAuthorityWallet();
 
       // Perform all operations in a single transaction
       const result = await this.prisma.$transaction(
@@ -121,7 +119,7 @@ export class AllianceHandler
           try {
             console.log(
               "Using authority:",
-              agentAuthKeypair.publicKey.toString()
+              agentAuthKeypair.wallet.publicKey.toString()
             );
             console.log("For agent:", initiator.pda.toString());
             tx = await this.program.methods
@@ -130,9 +128,9 @@ export class AllianceHandler
                 initiator: initiator.pda,
                 targetAgent: target.pda,
                 game: gamePda,
-                authority: agentAuthKeypair.publicKey,
+                authority: agentAuthKeypair.keypair.publicKey,
               })
-              .signers([agentAuthKeypair])
+              .signers([agentAuthKeypair.keypair])
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback
@@ -143,7 +141,7 @@ export class AllianceHandler
               agentPda: initiator.pda.toString(),
               targetAgentPda: target.pda.toString(),
               gamePda: gamePda.toString(),
-              authority: agentAuthKeypair.publicKey.toString(),
+              authority: agentAuthKeypair.keypair.publicKey.toString(),
             });
             throw error;
           }
@@ -240,9 +238,7 @@ export class AllianceHandler
         throw new Error("No active alliance found between agents");
       }
 
-      const agentAuthKeypair = await getAgentAuthorityKeypair(
-        ctx.agentOnchainId
-      );
+      const agentAuthKeypair = await getMiddleEarthAiAuthorityWallet();
 
       // Perform all operations in a single transaction
       const result = await this.prisma.$transaction(
@@ -293,9 +289,9 @@ export class AllianceHandler
                 initiator: initiator.pda,
                 targetAgent: target.pda,
                 game: gamePda,
-                authority: agentAuthKeypair.publicKey,
+                authority: agentAuthKeypair.keypair.publicKey,
               })
-              .signers([agentAuthKeypair])
+              .signers([agentAuthKeypair.keypair])
               .rpc();
           } catch (error) {
             // If onchain operation fails, log and throw to trigger rollback

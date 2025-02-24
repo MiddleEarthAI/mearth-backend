@@ -1,5 +1,5 @@
 export const mearthIdl = {
-  address: "8nSSZdZ2FEY3ShuPm5pLBLm2Ta1uvjj8HoRuyiGiUtJ9",
+  address: "6DSSNV3bHaCn8RF6VD64Y7mBX1Uh2T9gUcaEW1U9J2Yx",
   metadata: {
     name: "middle_earth_ai_program",
     version: "0.1.0",
@@ -257,52 +257,6 @@ export const mearthIdl = {
       ],
     },
     {
-      name: "initiate_cooldown",
-      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."],
-      discriminator: [156, 179, 66, 226, 152, 118, 213, 187],
-      accounts: [
-        {
-          name: "agent",
-          writable: true,
-        },
-        {
-          name: "game",
-          writable: true,
-          relations: ["agent"],
-        },
-        {
-          name: "stake_info",
-          writable: true,
-          pda: {
-            seeds: [
-              {
-                kind: "const",
-                value: [115, 116, 97, 107, 101],
-              },
-              {
-                kind: "account",
-                path: "agent",
-              },
-              {
-                kind: "account",
-                path: "authority",
-              },
-            ],
-          },
-        },
-        {
-          name: "authority",
-          writable: true,
-          signer: true,
-        },
-        {
-          name: "system_program",
-          address: "11111111111111111111111111111111",
-        },
-      ],
-      args: [],
-    },
-    {
       name: "kill_agent",
       discriminator: [152, 243, 180, 237, 215, 248, 160, 57],
       accounts: [
@@ -311,7 +265,11 @@ export const mearthIdl = {
           writable: true,
         },
         {
+          name: "game",
+        },
+        {
           name: "authority",
+          docs: ["The caller must be the game authority."],
           writable: true,
           signer: true,
           relations: ["agent"],
@@ -372,6 +330,7 @@ export const mearthIdl = {
         },
         {
           name: "authority",
+          docs: ["The caller must be the game authority."],
           writable: true,
           signer: true,
         },
@@ -588,6 +547,7 @@ export const mearthIdl = {
     },
     {
       name: "set_agent_cooldown",
+      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."],
       discriminator: [135, 110, 177, 130, 20, 228, 172, 214],
       accounts: [
         {
@@ -600,6 +560,7 @@ export const mearthIdl = {
         },
         {
           name: "authority",
+          docs: ["The caller must be the game authority."],
           writable: true,
           signer: true,
         },
@@ -994,6 +955,10 @@ export const mearthIdl = {
             type: "i64",
           },
           {
+            name: "staked_balance",
+            type: "u128",
+          },
+          {
             name: "alliance_with",
             type: {
               option: "pubkey",
@@ -1005,10 +970,6 @@ export const mearthIdl = {
           },
           {
             name: "token_balance",
-            type: "u64",
-          },
-          {
-            name: "staked_balance",
             type: "u64",
           },
           {

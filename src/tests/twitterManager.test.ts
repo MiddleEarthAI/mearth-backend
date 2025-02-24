@@ -43,7 +43,7 @@ describe("TwitterManager", function () {
     });
   });
 
-  describe.only("Tweet Interactions", function () {
+  describe("Tweet Interactions", function () {
     let testTweetId: string = "1891889506489598298";
     // const TEST_TWEET_CONTENT =
     //   "Test tweet from Mearth AI Agent Test Suite 🤖 " + Date.now();
@@ -84,7 +84,7 @@ describe("TwitterManager", function () {
       }
     });
 
-    it.only("should handle rate limiting gracefully", async function () {
+    it("should handle rate limiting gracefully", async function () {
       // Make multiple rapid requests to trigger rate limiting
       const promises = Array(5)
         .fill(null)

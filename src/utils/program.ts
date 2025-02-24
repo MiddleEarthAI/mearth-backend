@@ -6,17 +6,6 @@ import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { solanaConfig } from "@/config/env";
 
-// export async function getProgram() {
-//   const conn = connection();
-//   // const authorityWallet = await getMiddleEarthAiAuthorityWallet();
-
-//   const program = new anchor.Program(mearthIdl as MiddleEarthAiProgram, {
-//     connection: conn,
-//   });
-
-//   return program;
-// }
-
 export async function getMiddleEarthAiAuthorityWallet() {
   const privateKeyString = solanaConfig.middleEarthAiAuthorityPrivateKey;
   if (!privateKeyString) {
@@ -59,27 +48,27 @@ export async function getProgram() {
   return program;
 }
 
-export async function getAgentAuthorityAta(agentOnchainId: number) {
-  const mearthTokenMint = solanaConfig.tokenMint;
+// export async function getAgentAuthorityAta(agentOnchainId: number) {
+//   const mearthTokenMint = solanaConfig.tokenMint;
 
-  if (!mearthTokenMint) {
-    throw new Error("MEARTH_TOKEN_MINT is not set");
-  }
-  const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
-  const mintPubKey = new PublicKey(mearthTokenMint);
-  const conn = connection();
-  const ata = await getOrCreateAssociatedTokenAccount(
-    conn,
-    agentAuthorityKeypair,
-    mintPubKey,
-    agentAuthorityKeypair.publicKey,
-    false
-  );
+//   if (!mearthTokenMint) {
+//     throw new Error("MEARTH_TOKEN_MINT is not set");
+//   }
+//   const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
+//   const mintPubKey = new PublicKey(mearthTokenMint);
+//   const conn = connection();
+//   const ata = await getOrCreateAssociatedTokenAccount(
+//     conn,
+//     agentAuthorityKeypair,
+//     mintPubKey,
+//     agentAuthorityKeypair.publicKey,
+//     false
+//   );
 
-  return ata;
-}
+//   return ata;
+// }
 
-const connection = () => {
+export const connection = () => {
   const rpcUrl = solanaConfig.rpcUrl;
   if (!rpcUrl) {
     throw new Error("SOLANA_RPC_URL is not set");

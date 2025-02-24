@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/middle_earth_ai_program.json`.
  */
 export type MiddleEarthAiProgram = {
-  address: "8nSSZdZ2FEY3ShuPm5pLBLm2Ta1uvjj8HoRuyiGiUtJ9";
+  address: "6DSSNV3bHaCn8RF6VD64Y7mBX1Uh2T9gUcaEW1U9J2Yx";
   metadata: {
     name: "middleEarthAiProgram";
     version: "0.1.0";
@@ -263,52 +263,6 @@ export type MiddleEarthAiProgram = {
       ];
     },
     {
-      name: "initiateCooldown";
-      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."];
-      discriminator: [156, 179, 66, 226, 152, 118, 213, 187];
-      accounts: [
-        {
-          name: "agent";
-          writable: true;
-        },
-        {
-          name: "game";
-          writable: true;
-          relations: ["agent"];
-        },
-        {
-          name: "stakeInfo";
-          writable: true;
-          pda: {
-            seeds: [
-              {
-                kind: "const";
-                value: [115, 116, 97, 107, 101];
-              },
-              {
-                kind: "account";
-                path: "agent";
-              },
-              {
-                kind: "account";
-                path: "authority";
-              }
-            ];
-          };
-        },
-        {
-          name: "authority";
-          writable: true;
-          signer: true;
-        },
-        {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
-        }
-      ];
-      args: [];
-    },
-    {
       name: "killAgent";
       discriminator: [152, 243, 180, 237, 215, 248, 160, 57];
       accounts: [
@@ -317,7 +271,11 @@ export type MiddleEarthAiProgram = {
           writable: true;
         },
         {
+          name: "game";
+        },
+        {
           name: "authority";
+          docs: ["The caller must be the game authority."];
           writable: true;
           signer: true;
           relations: ["agent"];
@@ -378,6 +336,7 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "authority";
+          docs: ["The caller must be the game authority."];
           writable: true;
           signer: true;
         },
@@ -594,6 +553,7 @@ export type MiddleEarthAiProgram = {
     },
     {
       name: "setAgentCooldown";
+      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."];
       discriminator: [135, 110, 177, 130, 20, 228, 172, 214];
       accounts: [
         {
@@ -606,6 +566,7 @@ export type MiddleEarthAiProgram = {
         },
         {
           name: "authority";
+          docs: ["The caller must be the game authority."];
           writable: true;
           signer: true;
         }
@@ -1000,6 +961,10 @@ export type MiddleEarthAiProgram = {
             type: "i64";
           },
           {
+            name: "stakedBalance";
+            type: "u128";
+          },
+          {
             name: "allianceWith";
             type: {
               option: "pubkey";
@@ -1011,10 +976,6 @@ export type MiddleEarthAiProgram = {
           },
           {
             name: "tokenBalance";
-            type: "u64";
-          },
-          {
-            name: "stakedBalance";
             type: "u64";
           },
           {

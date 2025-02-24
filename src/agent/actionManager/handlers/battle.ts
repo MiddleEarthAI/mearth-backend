@@ -8,13 +8,14 @@ import {
   getMiddleEarthAiAuthorityWallet,
 } from "@/utils/program";
 import { AgentAccount } from "@/types/program";
-import { gameConfig } from "@/config/env";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { gameConfig, solanaConfig } from "@/config/env";
 import { BN } from "@coral-xyz/anchor";
+import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 
 interface BattleSide {
-  agent: AgentAccount;
-  ally: AgentAccount | null;
+  agent: AgentAccount & { vaultBalance: number };
+  ally: (AgentAccount & { vaultBalance: number }) | null;
 }
 
 interface BattleOutcome {
@@ -54,16 +55,85 @@ export class BattleHandler {
       );
 
       const [attackerAccountData, defenderAccountData] = await Promise.all([
-        this.program.account.agent.fetch(attackerPda),
-        this.program.account.agent.fetch(defenderPda),
+        (async () => {
+          const agent: AgentAccount = await this.program.account.agent.fetch(
+            attackerPda
+          );
+          const agentAuthority = await getAgentAuthorityKeypair(agent.id);
+          // Agent vault is agentAuthority ATA
+          const vault = await getOrCreateAssociatedTokenAccount(
+            this.program.provider.connection,
+            agentAuthority,
+            new PublicKey(solanaConfig.tokenMint),
+            agentAuthority.publicKey
+          );
+          const vaultBalance =
+            await this.program.provider.connection.getBalance(vault.address);
+          return { ...agent, vaultBalance };
+        })(),
+        (async () => {
+          const agent: AgentAccount = await this.program.account.agent.fetch(
+            defenderPda
+          );
+          const agentAuthority = await getAgentAuthorityKeypair(agent.id);
+          // Agent vault is agentAuthority ATA
+          const vault = await getOrCreateAssociatedTokenAccount(
+            this.program.provider.connection,
+            agentAuthority,
+            new PublicKey(solanaConfig.tokenMint),
+            agentAuthority.publicKey
+          );
+          const vaultBalance =
+            await this.program.provider.connection.getBalance(vault.address);
+          return { ...agent, vaultBalance };
+        })(),
       ]);
 
+      // Get ally accounts and balances if they exist
       const [attackerAllyAccount, defenderAllyAccount] = await Promise.all([
         attackerAccountData.allianceWith
-          ? this.program.account.agent.fetch(attackerAccountData.allianceWith)
+          ? (async () => {
+              if (!attackerAccountData.allianceWith) return null;
+              const allyAccount = await this.program.account.agent.fetch(
+                attackerAccountData.allianceWith
+              );
+              const allyAuthority = await getAgentAuthorityKeypair(
+                allyAccount.id
+              );
+              const allyVault = await getOrCreateAssociatedTokenAccount(
+                this.program.provider.connection,
+                allyAuthority,
+                new PublicKey(solanaConfig.tokenMint),
+                allyAuthority.publicKey
+              );
+              const allyVaultBalance =
+                await this.program.provider.connection.getBalance(
+                  allyVault.address
+                );
+              return { ...allyAccount, vaultBalance: allyVaultBalance };
+            })()
           : null,
         defenderAccountData.allianceWith
-          ? this.program.account.agent.fetch(defenderAccountData.allianceWith)
+          ? (async () => {
+              if (!defenderAccountData.allianceWith) return null;
+              const allyAccount = await this.program.account.agent.fetch(
+                defenderAccountData.allianceWith
+              );
+              const allyAuthority = await getAgentAuthorityKeypair(
+                allyAccount.id
+              );
+              const allyVault = await getOrCreateAssociatedTokenAccount(
+                this.program.provider.connection,
+                allyAuthority,
+                new PublicKey(solanaConfig.tokenMint),
+                allyAuthority.publicKey
+              );
+              const allyVaultBalance =
+                await this.program.provider.connection.getBalance(
+                  allyVault.address
+                );
+              return { ...allyAccount, vaultBalance: allyVaultBalance };
+            })()
           : null,
       ]);
 
@@ -90,7 +160,7 @@ export class BattleHandler {
           ? this.prisma.agent.findUnique({
               where: {
                 onchainId_gameId: {
-                  onchainId: Number(attackerAllyAccount.id),
+                  onchainId: attackerAllyAccount.id,
                   gameId: ctx.gameId,
                 },
               },
@@ -101,7 +171,7 @@ export class BattleHandler {
           ? this.prisma.agent.findUnique({
               where: {
                 onchainId_gameId: {
-                  onchainId: Number(defenderAllyAccount.id),
+                  onchainId: defenderAllyAccount.id,
                   gameId: ctx.gameId,
                 },
               },
@@ -111,7 +181,7 @@ export class BattleHandler {
       ]);
 
       if (!attackerRecord || !defenderRecord) {
-        throw new Error("One or more agents not found");
+        throw new Error("attacker or defender not found");
       }
 
       const sideA = {
@@ -495,6 +565,7 @@ export class BattleHandler {
                 .accountsStrict({
                   agent: deadAgentPda,
                   authority: deadAgentAuthority.publicKey,
+                  game: gamePda,
                 })
                 .signers([deadAgentAuthority])
                 .rpc();
@@ -542,13 +613,13 @@ export class BattleHandler {
     sideA: BattleSide,
     sideB: BattleSide
   ): Promise<BattleOutcome> {
-    // Convert to BN and handle calculations
-    const sideATokens = sideA.agent.stakedBalance.add(
-      sideA.ally ? sideA.ally.stakedBalance : new BN(0)
+    // getting the agents vault balances
+    const sideATokens = new BN(sideA.agent.vaultBalance).add(
+      sideA.ally ? new BN(sideA.ally.vaultBalance) : new BN(0)
     );
 
-    const sideBTokens = sideB.agent.stakedBalance.add(
-      sideB.ally ? sideB.ally.stakedBalance : new BN(0)
+    const sideBTokens = new BN(sideB.agent.vaultBalance).add(
+      sideB.ally ? new BN(sideB.ally.vaultBalance) : new BN(0)
     );
 
     const totalTokens = sideATokens.add(sideBTokens);
@@ -609,7 +680,7 @@ export class BattleHandler {
     const winner = outcome.winner === "sideA" ? attackerHandle : defenderHandle;
     const loser = outcome.winner === "sideA" ? defenderHandle : attackerHandle;
 
-    let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of ${outcome.totalTokensAtStake} tokens lost in the clash!`;
+    let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of @${loser} tokens lost in the clash!`;
 
     if (outcome.agentsToDie.length > 0) {
       message += ` 💀 ${

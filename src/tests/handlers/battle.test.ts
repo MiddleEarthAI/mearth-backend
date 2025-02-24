@@ -7,7 +7,6 @@ import {
   getAgentAuthorityKeypair,
   getMiddleEarthAiAuthorityWallet,
   getProgram,
-  getAgentVault,
 } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
@@ -212,9 +211,9 @@ describe("BattleHandler", function () {
         initiator: agent2.pda,
         targetAgent: agent3.pda,
         game: activeGame.pda,
-        authority: agent2AuthorityKeypair.publicKey,
+        authority: gameAuthority.publicKey,
       })
-      .signers([agent2AuthorityKeypair])
+      .signers([gameAuthority])
       .rpc();
 
     // Create alliance record
@@ -265,9 +264,9 @@ describe("BattleHandler", function () {
         initiator: agent1.pda,
         targetAgent: agent2.pda,
         game: activeGame.pda,
-        authority: agent1AuthorityKeypair.publicKey,
+        authority: gameAuthority.publicKey,
       })
-      .signers([agent1AuthorityKeypair])
+      .signers([gameAuthority])
       .rpc();
 
     await program.methods
@@ -276,9 +275,9 @@ describe("BattleHandler", function () {
         initiator: agent3.pda,
         targetAgent: agent4.pda,
         game: activeGame.pda,
-        authority: agent3AuthorityKeypair.publicKey,
+        authority: gameAuthority.publicKey,
       })
-      .signers([agent3AuthorityKeypair])
+      .signers([gameAuthority])
       .rpc();
 
     // create alliance records
@@ -339,6 +338,7 @@ describe("BattleHandler", function () {
       .killAgent()
       .accounts({
         agent: agent2.pda,
+        game: activeGame.pda,
       })
       .signers([gameAuthority]) // only game authority can kill agent
       .rpc();
@@ -530,9 +530,9 @@ describe("BattleHandler", function () {
         initiator: agent1.pda,
         targetAgent: agent2.pda,
         game: activeGame.pda,
-        authority: agent1AuthorityKeypair.publicKey,
+        authority: gameAuthority.publicKey,
       })
-      .signers([agent1AuthorityKeypair])
+      .signers([gameAuthority])
       .rpc();
 
     // Create alliance record

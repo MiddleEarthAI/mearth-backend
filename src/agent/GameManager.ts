@@ -8,7 +8,6 @@ import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
 import {
-  getAgentAuthorityAta,
   getAgentAuthorityKeypair,
   getAgentVault,
   getMiddleEarthAiAuthorityWallet,
@@ -275,10 +274,6 @@ export class GameManager implements IGameManager {
           new BN(profile.onchainId)
         );
 
-        console.log("creating ata...........................................");
-        const ata = await getAgentAuthorityAta(profile.onchainId);
-        console.info("💰 Agent authority ATA created", ata.address.toBase58());
-
         console.info("🎯 Finding spawn location...");
         const spawnTile = await this.prisma.mapTile
           .findMany({
@@ -304,9 +299,7 @@ export class GameManager implements IGameManager {
 
         console.info(`🔗 Registering agent on-chain...`);
 
-        const agentAuthKeypair = await getAgentAuthorityKeypair(
-          profile.onchainId
-        );
+        const gameAuthWallet = await getMiddleEarthAiAuthorityWallet();
 
         await this.program.methods
           .registerAgent(
@@ -318,10 +311,10 @@ export class GameManager implements IGameManager {
           .accountsStrict({
             game: gamePda,
             agent: agentPda,
-            authority: agentAuthKeypair.publicKey,
+            authority: gameAuthWallet.keypair.publicKey,
             systemProgram: SystemProgram.programId,
           })
-          .signers([agentAuthKeypair])
+          .signers([gameAuthWallet.keypair])
           .rpc();
 
         const agentAccount = await this.program.account.agent.fetch(agentPda);
@@ -338,8 +331,8 @@ export class GameManager implements IGameManager {
             gameId: dbGame.id,
             mapTileId: spawnTile.id,
             profileId: profile.id,
-            authority: agentAuthKeypair.publicKey.toString(),
-            authorityAssociatedTokenAddress: ata.address.toString(),
+            authority: gameAuthWallet.keypair.publicKey.toString(),
+            authorityAssociatedTokenAddress: agentVault.address.toString(),
             isAlive: true,
           },
           include: {
