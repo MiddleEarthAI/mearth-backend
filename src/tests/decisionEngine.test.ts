@@ -9,7 +9,7 @@ import { describe, it, before, after, beforeEach } from "mocha";
 import EventEmitter from "events";
 import { GameManager } from "@/agent/GameManager";
 
-describe.only("DecisionEngine", function () {
+describe("DecisionEngine", function () {
   let decisionEngine: DecisionEngine;
   let prisma: PrismaClient;
   let program: MearthProgram;
@@ -308,7 +308,7 @@ describe.only("DecisionEngine", function () {
     });
   });
 
-  describe.only("processInteractions", function () {
+  describe("processInteractions", function () {
     let actionContext: ActionContext;
 
     beforeEach("processInteractions setup", async function () {
@@ -323,7 +323,7 @@ describe.only("DecisionEngine", function () {
       };
     });
 
-    it.only("should process valid interactions and return action suggestion", async function () {
+    it("should process valid interactions and return action suggestion", async function () {
       const interactions: TwitterInteraction[] = [
         {
           type: "mention",

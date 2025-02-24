@@ -20,7 +20,6 @@ import {
 } from "@solana/web3.js";
 import { mintMearthTokens } from "../utiils";
 import { requestAirdrop } from "../utiils";
-import { solanaConfig } from "@/config/env";
 
 describe("IgnoreHandler", function () {
   let ignoreHandler: IgnoreHandler;

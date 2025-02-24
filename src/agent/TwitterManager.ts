@@ -66,10 +66,7 @@ class TwitterManager {
     console.log("✅ Twitter Manager initialized successfully");
   }
 
-  async fetchTweetInteractions(
-    tweetId: string,
-    username?: string
-  ): Promise<TwitterInteraction[]> {
+  async fetchTweetInteractions(tweetId: string): Promise<TwitterInteraction[]> {
     try {
       // Check rate limiting before making requests
       if (this.shouldThrottle()) {
@@ -80,113 +77,112 @@ class TwitterManager {
       const interactions: TwitterInteraction[] = [];
       this.requestCount++;
 
-      // Fetch replies
-      const replies = await this.fetchTweetReplies(tweetId);
+      // Fetch replies with author expansion
+      const replies = await this.client.v2.search(
+        `conversation_id:${tweetId}`,
+        {
+          "tweet.fields": [
+            "created_at",
+            "author_id",
+            "in_reply_to_user_id",
+            "referenced_tweets",
+          ],
+          "user.fields": [
+            "created_at",
+            "public_metrics",
+            "verified",
+            "protected",
+          ],
+          expansions: ["author_id", "referenced_tweets.id"], // Include author info directly
+        }
+      );
+
       console.log("🔍 Fetched replies:", replies);
-      for (const reply of replies) {
-        const user = await this.fetchUserInfo(
-          this.client,
-          reply.in_reply_to_user_id!
+
+      for (const reply of replies.data.data || []) {
+        // Get author info from the includes
+        const author = replies.includes?.users?.find(
+          (u) => u.id === reply.author_id
         );
+        console.log("raw reply", reply.referenced_tweets?.[0]);
+        console.log("users", replies.includes?.users);
+
+        if (!author) {
+          console.warn(
+            `⚠️ No author info found for reply ${reply.id}, skipping`
+          );
+          continue;
+        }
+
         interactions.push({
           type: "reply",
-          userId: user.id,
-          username: user.username,
+          userId: author.id,
+          username: author.username,
           tweetId: reply.id,
           content: reply.text,
           authorId: reply.author_id,
-          timestamp: new Date(reply.created_at!),
+          timestamp: new Date(reply.created_at || Date.now()),
           userMetrics: {
-            followerCount: user.public_metrics?.followers_count || 0,
-            likeCount: user.public_metrics?.like_count || 0,
-            followingCount: user.public_metrics?.following_count || 0,
-            tweetCount: user.public_metrics?.tweet_count || 0,
-            listedCount: user.public_metrics?.listed_count || 0,
-            accountAge: user.created_at
-              ? new Date().getTime() - new Date(user.created_at).getTime()
+            followerCount: author.public_metrics?.followers_count || 0,
+            likeCount: author.public_metrics?.like_count || 0,
+            followingCount: author.public_metrics?.following_count || 0,
+            tweetCount: author.public_metrics?.tweet_count || 0,
+            listedCount: author.public_metrics?.listed_count || 0,
+            accountAge: author.created_at
+              ? new Date().getTime() - new Date(author.created_at).getTime()
               : 0,
-            verified: user.verified || false,
+            verified: author.verified || false,
             reputationScore: 0,
           },
         });
       }
 
-      // Check rate limiting between requests
-      if (this.shouldThrottle()) {
-        const backoffTime = this.calculateBackoff();
-        await this.wait(backoffTime);
-      }
-      this.requestCount++;
+      // Similar changes for quotes...
+      const quotes = await this.client.v2.quotes(tweetId, {
+        "tweet.fields": ["created_at", "author_id", "referenced_tweets"],
+        "user.fields": [
+          "created_at",
+          "public_metrics",
+          "verified",
+          "protected",
+        ],
+        expansions: ["author_id", "referenced_tweets.id"],
+      });
 
-      // Fetch quotes
-      const quotes = await this.fetchTweetQuotes(tweetId);
+      for (const quote of quotes.data.data || []) {
+        const author = quotes.includes?.users?.find(
+          (u) => u.id === quote.author_id
+        );
 
-      for (const quote of quotes) {
-        const user = await this.fetchUserInfo(this.client, quote.author_id!);
+        if (!author) {
+          console.warn(
+            `⚠️ No author info found for quote ${quote.id}, skipping`
+          );
+          continue;
+        }
+
         interactions.push({
           type: "quote",
-          userId: user.id,
-          username: user.username,
+          userId: author.id,
+          username: author.username,
           tweetId: quote.id,
           content: quote.text,
-          timestamp: new Date(quote.created_at!),
+          timestamp: new Date(quote.created_at || Date.now()),
           authorId: quote.author_id,
-
           userMetrics: {
-            followerCount: user.public_metrics?.followers_count || 0,
-            followingCount: user.public_metrics?.following_count || 0,
-            likeCount: user.public_metrics?.like_count || 0,
-            accountAge: user.created_at
-              ? new Date().getTime() - new Date(user.created_at).getTime()
+            followerCount: author.public_metrics?.followers_count || 0,
+            followingCount: author.public_metrics?.following_count || 0,
+            likeCount: author.public_metrics?.like_count || 0,
+            tweetCount: author.public_metrics?.tweet_count || 0,
+            listedCount: author.public_metrics?.listed_count || 0,
+            accountAge: author.created_at
+              ? new Date().getTime() - new Date(author.created_at).getTime()
               : 0,
-            tweetCount: user.public_metrics?.tweet_count || 0,
-            listedCount: user.public_metrics?.listed_count || 0,
-            verified: user.verified || false,
+            verified: author.verified || false,
             reputationScore: 0,
           },
         });
       }
-
-      // // Check rate limiting between requests
-      if (this.shouldThrottle()) {
-        const backoffTime = this.calculateBackoff();
-        await this.wait(backoffTime);
-      }
-      this.requestCount++;
-
-      // if (username) {
-      //   // Fetch mentions
-      //   const mentions = await this.fetchUserMentions(username);
-      //   for (const mention of mentions) {
-      //     // Skip if the mention is already counted as a reply or quote
-      //     if (interactions.some((i) => i.tweetId === mention.id)) continue;
-
-      //     const user = await this.fetchUserInfo(
-      //       this.client,
-      //       mention.author_id!
-      //     );
-      //     interactions.push({
-      //       type: "mention",
-      //       userId: user.id,
-      //       username: user.username,
-      //       tweetId: mention.id,
-      //       content: mention.text,
-      //       timestamp: new Date(mention.created_at!),
-      //       userMetrics: {
-      //         followerCount: user.public_metrics?.followers_count || 0,
-      //         followingCount: user.public_metrics?.following_count || 0,
-      //         likeCount: user.public_metrics?.like_count || 0,
-      //         accountAge: user.created_at
-      //           ? new Date().getTime() - new Date(user.created_at).getTime()
-      //           : 0,
-      //         tweetCount: user.public_metrics?.tweet_count || 0,
-      //         listedCount: user.public_metrics?.listed_count || 0,
-      //         verified: user.verified || false,
-      //         reputationScore: 0,
-      //       },
-      //     });
-      //   }
-      // }
 
       return interactions;
     } catch (error) {
@@ -222,311 +218,329 @@ class TwitterManager {
       });
   }
 
-  /**
-   * Fetches tweets from the past hour for a specific agent
-   * @param agentId - The ID of the agent whose tweets we want to fetch
-   * @param count - Maximum number of tweets to return (default: 100)
-   * @returns A paginated timeline of tweets from the past hour
-   */
-  async fetchTweetsFromPastHour(agentId: AgentId, count: number = 100) {
-    // Check rate limiting before fetching
-    if (this.shouldThrottle()) {
-      const backoffTime = this.calculateBackoff();
-      await this.wait(backoffTime);
-    }
-    this.requestCount++;
+  // /**
+  //  * Fetches tweets from the past hour for a specific agent
+  //  * @param agentId - The ID of the agent whose tweets we want to fetch
+  //  * @param count - Maximum number of tweets to return (default: 100)
+  //  * @returns A paginated timeline of tweets from the past hour
+  //  */
+  // async fetchTweetsFromPastHour(agentId: AgentId, count: number = 100) {
+  //   // Check rate limiting before fetching
+  //   if (this.shouldThrottle()) {
+  //     const backoffTime = this.calculateBackoff();
+  //     await this.wait(backoffTime);
+  //   }
+  //   this.requestCount++;
 
-    const agentClient = this._clients.get(agentId);
-    if (!agentClient) {
-      console.error("❌ Error: Client not found for agentId", agentId);
-      throw new Error(`Client for agent Id ${agentId} not found`);
-    }
+  //   const agentClient = this._clients.get(agentId);
+  //   if (!agentClient) {
+  //     console.error("❌ Error: Client not found for agentId", agentId);
+  //     throw new Error(`Client for agent Id ${agentId} not found`);
+  //   }
 
-    try {
-      console.log("🔍 Fetching tweets from the past hour...");
-      const me = await agentClient.v2.me();
+  //   try {
+  //     console.log("🔍 Fetching tweets from the past hour...");
+  //     const me = await agentClient.v2.me();
 
-      // Calculate timestamps
-      const endTime = new Date();
-      const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000); // 1 day ago
+  //     // Calculate timestamps
+  //     const endTime = new Date();
+  //     const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000); // 1 day ago
 
-      const timeline = await agentClient.v2.userTimeline(me.data.id, {
-        max_results: Math.min(count, 100), // Twitter API v2 has a max limit of 100
-        start_time: startTime.toISOString(),
-        end_time: endTime.toISOString(),
-        "tweet.fields": [
-          "created_at",
-          "public_metrics",
-          "text",
-          "conversation_id",
-          "in_reply_to_user_id",
-          "referenced_tweets",
-        ],
-        "user.fields": [
-          "name",
-          "username",
-          "verified",
-          "profile_image_url",
-          "public_metrics", // Added this to get follower counts etc.
-        ],
-        expansions: [
-          "author_id",
-          "referenced_tweets.id",
-          "in_reply_to_user_id",
-          "attachments.media_keys",
-        ],
-      });
-      return timeline.data.data || null;
-    } catch (error) {
-      console.error("❌ Error fetching tweets from past hour:", error);
-      throw error;
-    }
-  }
+  //     const timeline = await agentClient.v2.userTimeline(me.data.id, {
+  //       max_results: Math.min(count, 100), // Twitter API v2 has a max limit of 100
+  //       start_time: startTime.toISOString(),
+  //       end_time: endTime.toISOString(),
+  //       "tweet.fields": [
+  //         "created_at",
+  //         "public_metrics",
+  //         "text",
+  //         "conversation_id",
+  //         "in_reply_to_user_id",
+  //         "referenced_tweets",
+  //       ],
+  //       "user.fields": [
+  //         "name",
+  //         "username",
+  //         "verified",
+  //         "profile_image_url",
+  //         "public_metrics", // Added this to get follower counts etc.
+  //       ],
+  //       expansions: [
+  //         "author_id",
+  //         "referenced_tweets.id",
+  //         "in_reply_to_user_id",
+  //         "attachments.media_keys",
+  //       ],
+  //     });
+  //     return timeline.data.data || null;
+  //   } catch (error) {
+  //     console.error("❌ Error fetching tweets from past hour:", error);
+  //     throw error;
+  //   }
+  // }
 
-  /**
-   * Fetches replies to a specific tweet
-   * @param tweetId - The ID of the tweet to fetch replies for
-   * @returns Promise<TweetData[]> Array of reply tweets
-   */
-  async fetchTweetReplies(tweetId: string): Promise<TweetData[]> {
-    // Check rate limiting before fetching
-    if (this.shouldThrottle()) {
-      const backoffTime = this.calculateBackoff();
-      await this.wait(backoffTime);
-    }
-    this.requestCount++;
+  // /**
+  //  * Fetches replies to a specific tweet
+  //  * @param tweetId - The ID of the tweet to fetch replies for
+  //  * @returns Promise<TweetData[]> Array of reply tweets
+  //  */
+  // async fetchTweetReplies(tweetId: string): Promise<TweetData[]> {
+  //   // Check rate limiting before fetching
+  //   if (this.shouldThrottle()) {
+  //     const backoffTime = this.calculateBackoff();
+  //     await this.wait(backoffTime);
+  //   }
+  //   this.requestCount++;
 
-    try {
-      // First get the tweet to ensure we have the conversation ID
-      const tweet = await this.client.v2.singleTweet(tweetId, {
-        "tweet.fields": ["conversation_id"],
-      });
+  //   try {
+  //     // First get the tweet to ensure we have the conversation ID
+  //     const tweet = await this.client.v2.singleTweet(tweetId, {
+  //       "tweet.fields": ["conversation_id"],
+  //     });
 
-      if (!tweet.data) {
-        throw new Error(`Tweet ${tweetId} not found`);
-      }
+  //     if (!tweet.data) {
+  //       throw new Error(`Tweet ${tweetId} not found`);
+  //     }
 
-      // Then get all replies in the conversation
-      const replies = await this.client.v2.search(
-        `conversation_id:${tweet.data.conversation_id} 
-             in_reply_to_tweet_id:${tweetId}`, // This ensures we only get direct replies
-        {
-          "tweet.fields": [
-            "created_at",
-            "public_metrics",
-            "text",
-            "conversation_id",
-            "in_reply_to_user_id",
-            "referenced_tweets",
-          ],
-          "user.fields": ["name", "username", "verified", "public_metrics"],
-          expansions: [
-            "author_id",
-            "referenced_tweets.id",
-            "in_reply_to_user_id",
-          ],
-        }
-      );
+  //     // Then get all replies in the conversation
+  //     const replies = await this.client.v2.search(
+  //       `conversation_id:${tweet.data.conversation_id}
+  //            in_reply_to_tweet_id:${tweetId}`, // This ensures we only get direct replies
+  //       {
+  //         "tweet.fields": [
+  //           "created_at",
+  //           "public_metrics",
+  //           "text",
+  //           "conversation_id",
+  //           "in_reply_to_user_id",
+  //           "referenced_tweets",
+  //         ],
+  //         "user.fields": ["name", "username", "verified", "public_metrics"],
+  //         expansions: [
+  //           "author_id",
+  //           "referenced_tweets.id",
+  //           "in_reply_to_user_id",
+  //         ],
+  //       }
+  //     );
 
-      return replies.data.data || [];
-    } catch (error) {
-      console.error("Error fetching replies:", error);
-      throw error;
-    }
-  }
+  //     return replies.data.data || [];
+  //   } catch (error) {
+  //     console.error("Error fetching replies:", error);
+  //     throw error;
+  //   }
+  // }
 
-  /**
-   * Fetches quotes (retweets with comments) of a specific tweet
-   * @param tweetId - The ID of the tweet to fetch quotes for
-   * @param usePagination - Whether to return a paginator for handling large numbers of quotes
-   * @returns Promise<TweetData[]> Array of quote tweets or a paginator
-   */
-  async fetchTweetQuotes(
-    tweetId: string,
-    usePagination: boolean = false
-  ): Promise<TweetData[] | QuotedTweetsTimelineV2Paginator> {
-    // Check rate limiting before fetching
-    if (this.shouldThrottle()) {
-      const backoffTime = this.calculateBackoff();
-      await this.wait(backoffTime);
-    }
-    this.requestCount++;
+  // /**
+  //  * Fetches quotes (retweets with comments) of a specific tweet
+  //  * @param tweetId - The ID of the tweet to fetch quotes for
+  //  * @param usePagination - Whether to return a paginator for handling large numbers of quotes
+  //  * @returns Promise<TweetData[]> Array of quote tweets or a paginator
+  //  */
+  // async fetchTweetQuotes(
+  //   tweetId: string,
+  //   usePagination: boolean = false
+  // ): Promise<TweetData[] | QuotedTweetsTimelineV2Paginator> {
+  //   // Check rate limiting before fetching
+  //   if (this.shouldThrottle()) {
+  //     const backoffTime = this.calculateBackoff();
+  //     await this.wait(backoffTime);
+  //   }
+  //   this.requestCount++;
 
-    try {
-      const quotes = await this.client.v2.quotes(tweetId, {
-        "tweet.fields": [
-          "created_at",
-          "public_metrics",
-          "text",
-          "conversation_id",
-          "in_reply_to_user_id",
-          "referenced_tweets",
-          "author_id",
-        ],
-        "user.fields": ["name", "username", "verified", "public_metrics"],
-        expansions: ["author_id", "referenced_tweets.id"],
-      });
+  //   try {
+  //     const quotes = await this.client.v2.quotes(tweetId, {
+  //       "tweet.fields": [
+  //         "created_at",
+  //         "public_metrics",
+  //         "text",
+  //         "conversation_id",
+  //         "in_reply_to_user_id",
+  //         "referenced_tweets",
+  //         "author_id",
+  //       ],
+  //       "user.fields": ["name", "username", "verified", "public_metrics"],
+  //       expansions: ["author_id", "referenced_tweets.id"],
+  //     });
 
-      // Return paginator if requested
-      if (usePagination) {
-        return quotes;
-      }
+  //     // Return paginator if requested
+  //     if (usePagination) {
+  //       return quotes;
+  //     }
 
-      // Otherwise return just the data array
-      return quotes.data.data || [];
-    } catch (error) {
-      console.error("Error fetching quotes:", error);
-      throw error;
-    }
-  }
+  //     // Otherwise return just the data array
+  //     return quotes.data.data || [];
+  //   } catch (error) {
+  //     console.error("Error fetching quotes:", error);
+  //     throw error;
+  //   }
+  // }
 
-  /**
-   * Fetches tweets that mention a specific user
-   * @param userId - The ID of the user to fetch mentions for
-   * @param count - Maximum number of mentions to return (default: 100)
-   * @param usePagination - Whether to return a paginator for handling large numbers of mentions
-   * @returns Promise<TweetData[] | TweetUserMentionTimelineV2Paginator>
-   */
-  async fetchUserMentions(
-    userId: string,
-    count: number = 100,
-    usePagination: boolean = false
-  ): Promise<TweetData[] | TweetUserMentionTimelineV2Paginator> {
-    // Check rate limiting before fetching
-    if (this.shouldThrottle()) {
-      const backoffTime = this.calculateBackoff();
-      await this.wait(backoffTime);
-    }
-    this.requestCount++;
+  // /**
+  //  * Fetches tweets that mention a specific user
+  //  * @param userId - The ID of the user to fetch mentions for
+  //  * @param count - Maximum number of mentions to return (default: 100)
+  //  * @param usePagination - Whether to return a paginator for handling large numbers of mentions
+  //  * @returns Promise<TweetData[] | TweetUserMentionTimelineV2Paginator>
+  //  */
+  // async fetchUserMentions(
+  //   userId: string,
+  //   count: number = 100,
+  //   usePagination: boolean = false
+  // ): Promise<TweetData[] | TweetUserMentionTimelineV2Paginator> {
+  //   // Check rate limiting before fetching
+  //   if (this.shouldThrottle()) {
+  //     const backoffTime = this.calculateBackoff();
+  //     await this.wait(backoffTime);
+  //   }
+  //   this.requestCount++;
 
-    try {
-      const mentions = await this.client.v2.userMentionTimeline(userId, {
-        max_results: Math.min(count, 100), // Ensure we don't exceed Twitter's limit
-        "tweet.fields": [
-          "created_at",
-          "public_metrics",
-          "text",
-          "conversation_id",
-          "in_reply_to_user_id",
-          "referenced_tweets",
-          "author_id",
-        ],
-        "user.fields": [
-          "name",
-          "username",
-          "verified",
-          "public_metrics",
-          "profile_image_url", // Added this for user avatars
-        ],
-        expansions: [
-          "author_id",
-          "referenced_tweets.id",
-          "in_reply_to_user_id", // Added this to track reply chains
-        ],
-      });
+  //   try {
+  //     const mentions = await this.client.v2.userMentionTimeline(userId, {
+  //       max_results: Math.min(count, 100), // Ensure we don't exceed Twitter's limit
+  //       "tweet.fields": [
+  //         "created_at",
+  //         "public_metrics",
+  //         "text",
+  //         "conversation_id",
+  //         "in_reply_to_user_id",
+  //         "referenced_tweets",
+  //         "author_id",
+  //       ],
+  //       "user.fields": [
+  //         "name",
+  //         "username",
+  //         "verified",
+  //         "public_metrics",
+  //         "profile_image_url", // Added this for user avatars
+  //       ],
+  //       expansions: [
+  //         "author_id",
+  //         "referenced_tweets.id",
+  //         "in_reply_to_user_id", // Added this to track reply chains
+  //       ],
+  //     });
 
-      // Return paginator if requested
-      if (usePagination) {
-        return mentions;
-      }
+  //     // Return paginator if requested
+  //     if (usePagination) {
+  //       return mentions;
+  //     }
 
-      // Otherwise return just the data array
-      return mentions.data.data || [];
-    } catch (error) {
-      console.error("❌ Error fetching user mentions:", error);
-      throw error;
-    }
-  }
+  //     // Otherwise return just the data array
+  //     return mentions.data.data || [];
+  //   } catch (error) {
+  //     console.error("❌ Error fetching user mentions:", error);
+  //     throw error;
+  //   }
+  // }
 
-  /**
-   * Fetches a single tweet by its ID
-   * @param tweetId - The ID of the tweet to fetch
-   * @returns Promise<TweetData> The tweet data
-   */
-  async fetchTweetById(tweetId: string): Promise<TweetData> {
-    // Check rate limiting before fetching
-    if (this.shouldThrottle()) {
-      const backoffTime = this.calculateBackoff();
-      await this.wait(backoffTime);
-    }
-    this.requestCount++;
+  // /**
+  //  * Fetches a single tweet by its ID
+  //  * @param tweetId - The ID of the tweet to fetch
+  //  * @returns Promise<TweetData> The tweet data
+  //  */
+  // async fetchTweetById(tweetId: string): Promise<TweetData> {
+  //   // Check rate limiting before fetching
+  //   if (this.shouldThrottle()) {
+  //     const backoffTime = this.calculateBackoff();
+  //     await this.wait(backoffTime);
+  //   }
+  //   this.requestCount++;
 
-    try {
-      const tweet = await this.client.v2.singleTweet(tweetId, {
-        "tweet.fields": [
-          "created_at",
-          "public_metrics",
-          "text",
-          "conversation_id",
-          "in_reply_to_user_id",
-          "referenced_tweets",
-          "author_id", // Added to know who wrote the tweet
-          "attachments", // Added for media attachments
-          "context_annotations", // Added for tweet context
-        ],
-        "user.fields": [
-          // Added user fields
-          "name",
-          "username",
-          "verified",
-          "profile_image_url",
-        ],
-        expansions: [
-          // Added expansions
-          "author_id",
-          "referenced_tweets.id",
-          "attachments.media_keys",
-        ],
-      });
+  //   try {
+  //     const tweet = await this.client.v2.singleTweet(tweetId, {
+  //       "tweet.fields": [
+  //         "created_at",
+  //         "public_metrics",
+  //         "text",
+  //         "conversation_id",
+  //         "in_reply_to_user_id",
+  //         "referenced_tweets",
+  //         "author_id", // Added to know who wrote the tweet
+  //         "attachments", // Added for media attachments
+  //         "context_annotations", // Added for tweet context
+  //       ],
+  //       "user.fields": [
+  //         // Added user fields
+  //         "name",
+  //         "username",
+  //         "verified",
+  //         "profile_image_url",
+  //       ],
+  //       expansions: [
+  //         // Added expansions
+  //         "author_id",
+  //         "referenced_tweets.id",
+  //         "attachments.media_keys",
+  //       ],
+  //     });
 
-      if (!tweet.data) {
-        throw new Error(`Tweet ${tweetId} not found`);
-      }
+  //     if (!tweet.data) {
+  //       throw new Error(`Tweet ${tweetId} not found`);
+  //     }
 
-      return tweet.data;
-    } catch (error) {
-      console.error("❌ Error fetching tweet:", error);
-      throw error;
-    }
-  }
+  //     return tweet.data;
+  //   } catch (error) {
+  //     console.error("❌ Error fetching tweet:", error);
+  //     throw error;
+  //   }
+  // }
 
-  /**
-   * Fetches user information by username
-   * @param client - TwitterApi client instance
-   * @param username - The username to fetch info for
-   * @returns Promise<UserV2> The user data
-   */
-  async fetchUserInfo(client: TwitterApi, username: string): Promise<UserV2> {
-    try {
-      const user = await client.v2.userByUsername(username, {
-        "user.fields": [
-          "created_at",
-          "description",
-          "public_metrics",
-          "verified",
-          "profile_image_url",
-          "protected", // Added to know if account is private
-          "location", // Added for user location
-          "url", // Added for user's website
-          "entities", // Added for profile URL/description entities
-          "pinned_tweet_id", // Added to get pinned tweet
-        ],
-        expansions: [
-          // Added expansions
-          "pinned_tweet_id",
-        ],
-      });
+  // /**
+  //  * Fetches user information by ID or username
+  //  * @param client - TwitterApi client instance
+  //  * @param identifier - The user ID or username to fetch info for
+  //  * @param isId - Whether the identifier is a user ID (true) or username (false)
+  //  * @returns Promise<UserV2> The user data
+  //  */
+  // async fetchUserInfo(
+  //   client: TwitterApi,
+  //   identifier: string,
+  //   isId: boolean = false
+  // ): Promise<UserV2> {
+  //   try {
+  //     const user = isId
+  //       ? await client.v2.user(identifier, {
+  //           "user.fields": [
+  //             "created_at",
+  //             "description",
+  //             "public_metrics",
+  //             "verified",
+  //             "profile_image_url",
+  //             "protected",
+  //             "location",
+  //             "url",
+  //             "entities",
+  //             "pinned_tweet_id",
+  //           ],
+  //           expansions: ["pinned_tweet_id"],
+  //         })
+  //       : await client.v2.userByUsername(identifier, {
+  //           "user.fields": [
+  //             "created_at",
+  //             "description",
+  //             "public_metrics",
+  //             "verified",
+  //             "profile_image_url",
+  //             "protected",
+  //             "location",
+  //             "url",
+  //             "entities",
+  //             "pinned_tweet_id",
+  //           ],
+  //           expansions: ["pinned_tweet_id"],
+  //         });
 
-      if (!user.data) {
-        throw new Error(`User ${username} not found`);
-      }
+  //     if (!user.data) {
+  //       throw new Error(`User ${identifier} not found`);
+  //     }
 
-      return user.data;
-    } catch (error) {
-      console.error("❌ Error fetching user info:", error);
-      throw error;
-    }
-  }
+  //     return user.data;
+  //   } catch (error) {
+  //     console.error("❌ Error fetching user info:", error);
+  //     throw error;
+  //   }
+  // }
 
   /**
    * Checks if the current request count has reached the rate limit threshold
@@ -563,6 +577,29 @@ class TwitterManager {
   }
 
   /**
+   * Creates a new Twitter client for an agent
+   */
+  private async createNewClient(agentId: AgentId): Promise<TwitterApi> {
+    const agentConfig = twitterConfig.agents[agentId];
+
+    if (
+      !twitterConfig.apiKey ||
+      !twitterConfig.apiSecret ||
+      !agentConfig?.accessToken ||
+      !agentConfig?.accessSecret
+    ) {
+      throw new Error(`Missing Twitter credentials for agent ${agentId}`);
+    }
+
+    return new TwitterApi({
+      appKey: twitterConfig.apiKey,
+      appSecret: twitterConfig.apiSecret,
+      accessToken: agentConfig.accessToken,
+      accessSecret: agentConfig.accessSecret,
+    });
+  }
+
+  /**
    * Reconnects Twitter clients in case of connection issues
    * Attempts to reestablish connections for all agents
    */
@@ -575,10 +612,13 @@ class TwitterManager {
       this._clients.clear();
 
       // Reconnect each client
-      for (const [agentId, client] of oldClients) {
+      for (const agentId of ["1", "2", "3", "4"] as AgentId[]) {
         const newClient = await this.createNewClient(agentId);
         this._clients.set(agentId, newClient);
       }
+
+      // Set default client
+      this.client = this._clients.get("1")!;
 
       console.info("Successfully reconnected Twitter clients");
     } catch (error) {
@@ -600,27 +640,6 @@ class TwitterManager {
       console.error("Failed to disconnect Twitter clients", { error });
       throw error;
     }
-  }
-
-  /**
-   * Creates a new Twitter client for an agent
-   */
-  private async createNewClient(agentId: AgentId): Promise<TwitterApi> {
-    const apiKey = process.env.TWITTER_API_KEY;
-    const apiSecret = process.env.TWITTER_API_SECRET;
-    const accessToken = process.env[`TWITTER_ACCESS_TOKEN_${agentId}`];
-    const accessSecret = process.env[`TWITTER_ACCESS_TOKEN_SECRET_${agentId}`];
-
-    if (!apiKey || !apiSecret || !accessToken || !accessSecret) {
-      throw new Error(`Missing Twitter credentials for agent ${agentId}`);
-    }
-
-    return new TwitterApi({
-      appKey: apiKey,
-      appSecret: apiSecret,
-      accessToken,
-      accessSecret,
-    });
   }
 }
 
