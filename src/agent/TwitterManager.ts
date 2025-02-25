@@ -66,156 +66,129 @@ class TwitterManager {
     console.log("✅ Twitter Manager initialized successfully");
   }
 
-  private async retryWithBackoff<T>(
-    operation: () => Promise<T>,
-    maxRetries: number = 3,
-    initialDelay: number = 1000
-  ): Promise<T> {
-    let retries = 0;
-
-    while (true) {
-      try {
-        return await operation();
-      } catch (error: any) {
-        if (error?.code === 503 && retries < maxRetries) {
-          retries++;
-          const delay = initialDelay * Math.pow(2, retries);
-          console.warn(
-            `Twitter API 503 error, retrying in ${delay}ms (attempt ${retries}/${maxRetries})`
-          );
-          await this.wait(delay);
-          continue;
-        }
-        throw error;
-      }
-    }
-  }
-
   async fetchTweetInteractions(tweetId: string): Promise<TwitterInteraction[]> {
-    return this.retryWithBackoff(async () => {
-      try {
-        // Check rate limiting before making requests
-        if (this.shouldThrottle()) {
-          const backoffTime = this.calculateBackoff();
-          await this.wait(backoffTime);
-        }
+    try {
+      // Check rate limiting before making requests
+      if (this.shouldThrottle()) {
+        const backoffTime = this.calculateBackoff();
+        await this.wait(backoffTime);
+      }
 
-        const interactions: TwitterInteraction[] = [];
-        this.requestCount++;
+      const interactions: TwitterInteraction[] = [];
+      this.requestCount++;
 
-        // Fetch replies with author expansion
-        const replies = await this.client.v2.search(
-          `conversation_id:${tweetId}`,
-          {
-            "tweet.fields": [
-              "created_at",
-              "author_id",
-              "in_reply_to_user_id",
-              "referenced_tweets",
-            ],
-            "user.fields": [
-              "created_at",
-              "public_metrics",
-              "verified",
-              "protected",
-            ],
-            expansions: ["author_id", "referenced_tweets.id"], // Include author info directly
-          }
-        );
-
-        console.log("🔍 Fetched replies:", replies);
-
-        for (const reply of replies.data.data || []) {
-          // Get author info from the includes
-          const author = replies.includes?.users?.find(
-            (u) => u.id === reply.author_id
-          );
-          console.log("raw reply", reply.referenced_tweets?.[0]);
-          console.log("users", replies.includes?.users);
-
-          if (!author) {
-            console.warn(
-              `⚠️ No author info found for reply ${reply.id}, skipping`
-            );
-            continue;
-          }
-
-          interactions.push({
-            type: "reply",
-            userId: author.id,
-            username: author.username,
-            tweetId: reply.id,
-            content: reply.text,
-            authorId: reply.author_id,
-            timestamp: new Date(reply.created_at || Date.now()),
-            userMetrics: {
-              followerCount: author.public_metrics?.followers_count || 0,
-              likeCount: author.public_metrics?.like_count || 0,
-              followingCount: author.public_metrics?.following_count || 0,
-              tweetCount: author.public_metrics?.tweet_count || 0,
-              listedCount: author.public_metrics?.listed_count || 0,
-              accountAge: author.created_at
-                ? new Date().getTime() - new Date(author.created_at).getTime()
-                : 0,
-              verified: author.verified || false,
-              reputationScore: 0,
-            },
-          });
-        }
-
-        // Similar changes for quotes...
-        const quotes = await this.client.v2.quotes(tweetId, {
-          "tweet.fields": ["created_at", "author_id", "referenced_tweets"],
+      // Fetch replies with author expansion
+      const replies = await this.client.v2.search(
+        `conversation_id:${tweetId}`,
+        {
+          "tweet.fields": [
+            "created_at",
+            "author_id",
+            "in_reply_to_user_id",
+            "referenced_tweets",
+          ],
           "user.fields": [
             "created_at",
             "public_metrics",
             "verified",
             "protected",
           ],
-          expansions: ["author_id", "referenced_tweets.id"],
-        });
+          expansions: ["author_id", "referenced_tweets.id"], // Include author info directly
+        }
+      );
 
-        for (const quote of quotes.data.data || []) {
-          const author = quotes.includes?.users?.find(
-            (u) => u.id === quote.author_id
+      console.log("🔍 Fetched replies:", replies);
+
+      for (const reply of replies.data.data || []) {
+        // Get author info from the includes
+        const author = replies.includes?.users?.find(
+          (u) => u.id === reply.author_id
+        );
+        console.log("raw reply", reply.referenced_tweets?.[0]);
+        console.log("users", replies.includes?.users);
+
+        if (!author) {
+          console.warn(
+            `⚠️ No author info found for reply ${reply.id}, skipping`
           );
-
-          if (!author) {
-            console.warn(
-              `⚠️ No author info found for quote ${quote.id}, skipping`
-            );
-            continue;
-          }
-
-          interactions.push({
-            type: "quote",
-            userId: author.id,
-            username: author.username,
-            tweetId: quote.id,
-            content: quote.text,
-            timestamp: new Date(quote.created_at || Date.now()),
-            authorId: quote.author_id,
-            userMetrics: {
-              followerCount: author.public_metrics?.followers_count || 0,
-              followingCount: author.public_metrics?.following_count || 0,
-              likeCount: author.public_metrics?.like_count || 0,
-              tweetCount: author.public_metrics?.tweet_count || 0,
-              listedCount: author.public_metrics?.listed_count || 0,
-              accountAge: author.created_at
-                ? new Date().getTime() - new Date(author.created_at).getTime()
-                : 0,
-              verified: author.verified || false,
-              reputationScore: 0,
-            },
-          });
+          continue;
         }
 
-        return interactions;
-      } catch (error) {
-        console.error("Error fetching tweet interactions:", error);
-        throw error;
+        interactions.push({
+          type: "reply",
+          userId: author.id,
+          username: author.username,
+          tweetId: reply.id,
+          content: reply.text,
+          authorId: reply.author_id,
+          timestamp: new Date(reply.created_at || Date.now()),
+          userMetrics: {
+            followerCount: author.public_metrics?.followers_count || 0,
+            likeCount: author.public_metrics?.like_count || 0,
+            followingCount: author.public_metrics?.following_count || 0,
+            tweetCount: author.public_metrics?.tweet_count || 0,
+            listedCount: author.public_metrics?.listed_count || 0,
+            accountAge: author.created_at
+              ? new Date().getTime() - new Date(author.created_at).getTime()
+              : 0,
+            verified: author.verified || false,
+            reputationScore: 0,
+          },
+        });
       }
-    });
+
+      // Similar changes for quotes...
+      const quotes = await this.client.v2.quotes(tweetId, {
+        "tweet.fields": ["created_at", "author_id", "referenced_tweets"],
+        "user.fields": [
+          "created_at",
+          "public_metrics",
+          "verified",
+          "protected",
+        ],
+        expansions: ["author_id", "referenced_tweets.id"],
+      });
+
+      for (const quote of quotes.data.data || []) {
+        const author = quotes.includes?.users?.find(
+          (u) => u.id === quote.author_id
+        );
+
+        if (!author) {
+          console.warn(
+            `⚠️ No author info found for quote ${quote.id}, skipping`
+          );
+          continue;
+        }
+
+        interactions.push({
+          type: "quote",
+          userId: author.id,
+          username: author.username,
+          tweetId: quote.id,
+          content: quote.text,
+          timestamp: new Date(quote.created_at || Date.now()),
+          authorId: quote.author_id,
+          userMetrics: {
+            followerCount: author.public_metrics?.followers_count || 0,
+            followingCount: author.public_metrics?.following_count || 0,
+            likeCount: author.public_metrics?.like_count || 0,
+            tweetCount: author.public_metrics?.tweet_count || 0,
+            listedCount: author.public_metrics?.listed_count || 0,
+            accountAge: author.created_at
+              ? new Date().getTime() - new Date(author.created_at).getTime()
+              : 0,
+            verified: author.verified || false,
+            reputationScore: 0,
+          },
+        });
+      }
+
+      return interactions;
+    } catch (error) {
+      console.error("Error fetching tweet interactions:", error);
+      return [];
+    }
   }
 
   async postTweet(agentId: AgentId, content: string) {

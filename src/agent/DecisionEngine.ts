@@ -1,5 +1,11 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { AllianceStatus, Battle, Prisma, PrismaClient } from "@prisma/client";
+import {
+  AllianceStatus,
+  Battle,
+  MapTile,
+  Prisma,
+  PrismaClient,
+} from "@prisma/client";
 import { generateText } from "ai";
 import EventEmitter from "events";
 
@@ -11,7 +17,6 @@ import { formatDate } from "@/utils";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { connection, getAgentVault } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
-import { getAgentProximity } from "@/utils/map-helpers";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -41,8 +46,12 @@ class DecisionEngine {
       console.log("❌ Agent not found");
       return;
     }
-
-    const communitySuggestion = await this.processInteractions(interactions);
+    let communitySuggestion = null;
+    try {
+      communitySuggestion = await this.processInteractions(interactions);
+    } catch (error) {
+      console.error("Error processing interactions", error);
+    }
 
     console.info("🤖 Community suggestion", communitySuggestion);
 
@@ -50,7 +59,8 @@ class DecisionEngine {
       actionContext,
       communitySuggestion
     );
-    // return;
+    console.log("🤖 Testing Prompt", prompt);
+    return;
 
     console.info("🤖 Generated AI response 🔥🔥🔥");
     console.info(prompt);
@@ -236,70 +246,16 @@ class DecisionEngine {
       ...currentAgentRecord.ignoredBy.map((ig) => ig.agentId),
     ]);
 
-    // Get nearby agents for interaction checks
-    const nearbyAgents = await this.prisma.agent.findMany({
-      where: {
-        mapTile: {
-          OR: [
-            {
-              x: {
-                in: [
-                  currentAgentMaptile.x - 1,
-                  currentAgentMaptile.x,
-                  currentAgentMaptile.x + 1,
-                ],
-              },
-              y: {
-                in: [
-                  currentAgentMaptile.y - 1,
-                  currentAgentMaptile.y,
-                  currentAgentMaptile.y + 1,
-                ],
-              },
-            },
-          ],
-        },
-        id: { not: currentAgentRecord.id },
-        isAlive: true,
-        gameId: actionContext.gameId,
-        NOT: {
-          id: { in: Array.from(ignoredAgentIds) },
-        },
-      },
-      include: {
-        profile: true,
-      },
-    });
-
     // Get nearby map tiles (8 surrounding tiles)
-    const nearbyTiles = await this.prisma.mapTile.findMany({
-      where: {
-        AND: [
-          {
-            x: {
-              gte: currentAgentMaptile.x - 1,
-              lte: currentAgentMaptile.x + 1,
-            },
-          },
-          {
-            y: {
-              gte: currentAgentMaptile.y - 1,
-              lte: currentAgentMaptile.y + 1,
-            },
-          },
-          {
-            NOT: {
-              AND: [{ x: currentAgentMaptile.x }, { y: currentAgentMaptile.y }],
-            },
-          },
-        ],
-      },
-      include: {
-        agent: {
-          include: { profile: { select: { xHandle: true, onchainId: true } } },
-        },
-      },
-    });
+    const tilesInRange = await this.getTilesInRange(
+      currentAgentMaptile.x,
+      currentAgentMaptile.y
+    );
+
+    // Map of nearby tile coordinates for O(1) lookup
+    const nearbyTileMap = new Set(
+      tilesInRange.map((tile) => `${tile.x},${tile.y}`)
+    );
 
     const otherAgentsInfo = await Promise.all(
       currentAgentRecord.game.agents.map(async (otherAgent) => {
@@ -314,7 +270,7 @@ class DecisionEngine {
     );
 
     // Build detailed terrain and occupancy information for nearby tiles
-    const currentAgentSurroundingTerrainInfoString = nearbyTiles
+    const currentAgentSurroundingTerrainInfoString = tilesInRange
       .map((tile) => {
         // Get occupant info if tile is occupied
         const occupiedBy = tile.agent?.profile?.xHandle
@@ -333,7 +289,7 @@ class DecisionEngine {
           : `No one - You(${currentAgentRecord.profile.xHandle}) can move here`;
 
         // Format terrain description with coordinates and occupancy
-        return `Location (${tile.x}, ${tile.y}): ${
+        return `Map Tile (${tile.x}, ${tile.y}): ${
           tile.terrainType.charAt(0).toUpperCase() + tile.terrainType.slice(1) // Capitalize first letter
         } terrain - ${occupiedBy ? `Occupied by ${occupiedBy}` : ""}`;
       })
@@ -350,37 +306,19 @@ class DecisionEngine {
           otherAgentInfo.agent.onchainId
         );
 
-        const distanceFromCurrentAgent = getAgentProximity(
-          currentAgentMaptile,
-          agentMaptile
-        );
-        console.info("distanceFromCurrentAgent", distanceFromCurrentAgent);
-
-        // Calculate direction vector to other agent
-        const directionX = agentMaptile
-          ? agentMaptile.x - currentAgentMaptile.x
-          : 0;
-        const directionY = agentMaptile
-          ? agentMaptile.y - currentAgentMaptile.y
-          : 0;
-
-        // Calculate optimal path coordinates
-        const pathCoords = [];
-        if (agentMaptile) {
-          const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
-          for (let i = 1; i <= steps; i++) {
-            const stepX = Math.round(
-              currentAgentMaptile.x + (directionX * i) / steps
-            );
-            const stepY = Math.round(
-              currentAgentMaptile.y + (directionY * i) / steps
-            );
-            pathCoords.push(`(${stepX}, ${stepY})`);
-          }
-        }
+        // Check if other agent is in nearby tiles
+        const isClose =
+          agentMaptile &&
+          nearbyTileMap.has(`${agentMaptile.x},${agentMaptile.y}`);
 
         // Get compass direction
-        const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
+        const angle =
+          (Math.atan2(
+            agentMaptile?.y - currentAgentMaptile.y,
+            agentMaptile?.x - currentAgentMaptile.x
+          ) *
+            180) /
+          Math.PI;
         const compassDirection =
           angle >= -22.5 && angle < 22.5
             ? "East"
@@ -527,7 +465,7 @@ his/her recent tweets:
 You can navigate to @${
           otherAgentInfo.agent.profile.xHandle
         } location using the following waypoints:
-Waypoints: ${pathCoords.join(" → ")}
+Waypoints: ${this.getWaypoints(currentAgentMaptile, agentMaptile)}
 
 
 his/her battle history: 
@@ -560,14 +498,14 @@ ${
 }
   
 ${
-  distanceFromCurrentAgent.isAdjacent
+  isClose
     ? `
   Action required per the game mechanics(which you must follow), choose one of the following actions:
 ${(() => {
   // Check battle availability
   const canBattleThisAgent =
     !currentAgentActiveCooldowns.has("Battle") &&
-    nearbyAgents.some((agent) => agent.id === otherAgentInfo.agent.id) &&
+    tilesInRange.some((tile) => tile.agent?.id === otherAgentInfo.agent.id) &&
     !otherAgentInfo.agent.coolDown.some((cd) => cd.type === "Battle");
 
   // Check alliance status and cooldowns
@@ -921,13 +859,7 @@ Requirements:
 - No hashtags or self-mentions
 - Include relevant @handles
 - Factor in terrain and relationships
-- Consider recent events impact
-- Consider the community suggestion
-- Consider the current game state
-- Consider the current agent state
-- Consider the current agent identity
-- Consider the current agent lore
-- Consider the current agent traits`;
+`;
 
     return { prompt: characterPrompt, actionContext };
   }
@@ -1136,6 +1068,65 @@ Generate a single ActionSuggestion in JSON format:
 
     // Return final score normalized to 0-1
     return Math.min(Math.max(reputationScore, 0), 1);
+  }
+
+  /**
+   * Gets all map tiles within 2 tiles distance (including current position)
+   * @param x - Center X coordinate
+   * @param y - Center Y coordinate
+   * @returns Promise<MapTile[]> Array of tiles within range
+   */
+  private async getTilesInRange(x: number, y: number) {
+    return await this.prisma.mapTile.findMany({
+      where: {
+        AND: [
+          {
+            x: {
+              gte: x - 3,
+              lte: x + 3,
+            },
+          },
+          {
+            y: {
+              gte: y - 3,
+              lte: y + 3,
+            },
+          },
+        ],
+      },
+      include: {
+        agent: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+      orderBy: [{ x: "asc" }, { y: "asc" }],
+    });
+  }
+
+  private getWaypoints(
+    currentAgentMaptile: MapTile,
+    agentMaptile: MapTile | null
+  ): string {
+    if (!agentMaptile) return "";
+
+    const directionX = agentMaptile.x - currentAgentMaptile.x;
+    const directionY = agentMaptile.y - currentAgentMaptile.y;
+
+    const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
+    const pathCoords = [];
+    for (let i = 1; i <= steps; i++) {
+      const stepX = Math.round(
+        currentAgentMaptile.x + (directionX * i) / steps
+      );
+      const stepY = Math.round(
+        currentAgentMaptile.y + (directionY * i) / steps
+      );
+      pathCoords.push(`(${stepX}, ${stepY})`);
+    }
+
+    return pathCoords.join(" → ");
   }
 }
 
