@@ -267,9 +267,6 @@ export class BattleHandler {
             },
           });
 
-          console.log("Killing agents onchain....................", {
-            outcome,
-          });
           if (outcome.agentsToDie.length > 0) {
             const deathTime = new Date();
 
@@ -548,6 +545,10 @@ export class BattleHandler {
           }
 
           // Kill the agents that died
+
+          console.log("Killing agents onchain....................", {
+            outcome,
+          });
           await Promise.all(
             outcome.agentsToDie.map(async (agentId) => {
               // Execute on-chain kill instruction
@@ -556,18 +557,15 @@ export class BattleHandler {
                 gamePda,
                 agentId
               );
-              const deadAgentAuthority = await getAgentAuthorityKeypair(
-                agentId
-              );
 
               await this.program.methods
                 .killAgent()
                 .accountsStrict({
                   agent: deadAgentPda,
-                  authority: deadAgentAuthority.publicKey,
+                  authority: gameAuthorityWallet.keypair.publicKey,
                   game: gamePda,
                 })
-                .signers([deadAgentAuthority])
+                .signers([gameAuthorityWallet.keypair])
                 .rpc();
 
               return { battle, battleEvent, tx };
