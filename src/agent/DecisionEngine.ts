@@ -233,16 +233,6 @@ class DecisionEngine {
       return { prompt: "", actionContext };
     }
 
-    // Move these declarations up before they're used
-    // Add action availability checks
-    const currentAgentActiveCooldowns = new Set(
-      currentAgentRecord.coolDown.map((cd) => cd.type) || []
-    );
-
-    const isInAlliance =
-      currentAgentRecord.initiatedAlliances.length > 0 ||
-      currentAgentRecord.joinedAlliances.length > 0;
-
     // Get all agents this currentAgentRecord is ignoring or being ignored by
     const ignoredAgentIds = new Set([
       ...currentAgentRecord.ignoring.map((ig) => ig.ignoredAgentId),
@@ -395,40 +385,39 @@ Time: ${currentTime.toLocaleString("en-US", {
       timeZoneName: "short",
     })}
 
-# AGENT IDENTITY
 You are ${CURRENT_AGENT_IDENTITY.name} (@${
       CURRENT_AGENT_IDENTITY.handle
     }) a warrior in Middle Earth. Middle Earth AI is a strategy game played by AI Agents on X.
 Your goal is to defeat other agents in middle earth through strategic battles and alliances.
 
-## CHARACTERISTICS
-${CURRENT_AGENT_IDENTITY.characteristics.map((char) => `• ${char}`).join("\n")}
+Your characteristics are: ${CURRENT_AGENT_IDENTITY.characteristics
+      .map((char) => `• ${char}`)
+      .join("\n")}
 
-## KNOWLEDGE
-${CURRENT_AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
+Your knowledge is: ${CURRENT_AGENT_IDENTITY.knowledge
+      .map((k) => `• ${k}`)
+      .join("\n")}
 
-## LORE
-${CURRENT_AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
+Your lore is: ${CURRENT_AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
 
-## TRAITS
-${CURRENT_AGENT_IDENTITY.traits
-  .map(
-    (trait) =>
-      `• ${trait.name.toUpperCase()} (${trait.value}/100)
+Your traits are: ${CURRENT_AGENT_IDENTITY.traits
+      .map(
+        (trait) =>
+          `• ${trait.name.toUpperCase()} (${trait.value}/100)
      ${trait.description}`
-  )
-  .join("\n\n")}
+      )
+      .join("\n\n")}
 
-## CURRENT STATE
-Position: ${CURRENT_AGENT_STATE.position.current}
-Tokens: ${CURRENT_AGENT_STATE.tokens.balance} $MEARTH
+Your current position is: ${CURRENT_AGENT_STATE.position.current}
+You have ${CURRENT_AGENT_STATE.tokens.balance} $MEARTH
 
 
-## SURROUNDING TERRAIN
+You can move to the following surrounding tiles:
 ${CURRENT_AGENT_STATE.position.surrounding}
 
 
-## BATTLES & ALLIANCES
+
+Your previous battles are:
 ${currentAgentRecord.battlesAsAttacker
   .map(
     (battle) =>
@@ -441,6 +430,8 @@ ${currentAgentRecord.battlesAsDefender
       `• ${battle.attacker.profile.name} (@${battle.attacker.profile.xHandle})`
   )
   .join("\n")}
+
+Your alliances are(past and active):
 ${currentAgentRecord.initiatedAlliances
   .map(
     (alliance) =>
@@ -454,10 +445,10 @@ ${currentAgentRecord.joinedAlliances
   )
   .join("\n")}
 
-## RECENT TWEETS
+Your recent tweets are:
 ${currentAgentRecord.tweets.map((tweet) => `• ${tweet.content}`).join("\n")}
 
-# OTHER AGENTS IN MIDDLE EARTH
+Here are other agents in middle earth. a little about them:
 ${otherAgentsInfo
   .map(
     (agent) =>
@@ -467,14 +458,14 @@ ${otherAgentsInfo
 
 Balance aggression with strategy, but stay true to your identity.
 
-# NEARBY AGENTS (Within 1 Field Range)
+Here are nearby agents (within 1 field range):
 ${
   nearbyAgents
     .map((a) => `- ${a.profile.name} (@${a.profile.xHandle})`)
     .join("\n") || "No nearby agents"
 }
 
-# COMMUNITY SUGGESTION
+Here is a community suggestion for you:
 ${
   communitySuggestion
     ? `Action: ${communitySuggestion.type}
@@ -488,20 +479,18 @@ ${
     : "No community suggestions"
 }
 
-# ACTION GENERATION REQUIRED
 As ${
       CURRENT_AGENT_IDENTITY.name
-    }, generate ONE strategic action in this format. You must return only the JSON with nothing extra:
-
+    }, generate ONE strategic action in this format. You must return only the JSON with nothing 
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null,  // Agent's MID for interactions
-  "position": { "x": number, "y": number } | null,  // Required for MOVE (choose from #SURROUNDING TERRAIN)
+  "position": { "x": number, "y": number } | null,  // Required ONLY for MOVE
   "tweet": string  // In-character announcement (use @handles for others, no self-mentions). try not to repeat the same tweet(see recent tweets for reference)
 }
 
 Requirements:
-- MOVE: Adjacent tile only, check occupancy
+- MOVE: Adjacent coordinates only, check occupancy
 - BATTLE/ALLIANCE/IGNORE: Only for adjacent agents (≤1 distance)
 - Maintain character voice in tweet
 - No hashtags or self-mentions
