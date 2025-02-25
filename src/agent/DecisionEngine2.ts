@@ -24,7 +24,7 @@ type BattleWithRelations = Prisma.BattleGetPayload<{
  * It processes influence scores and generates appropriate actions based on character traits and game rules
  */
 class DecisionEngine {
-  private readonly MIN_REPUTATION_SCORE = 0.5;
+  private readonly MIN_REPUTATION_SCORE = 0.3;
 
   constructor(
     private prisma: PrismaClient,
@@ -148,14 +148,14 @@ class DecisionEngine {
                   },
                 },
                 initiatedAlliances: {
-                  where: { status: "Active" },
+                  where: { status: "Active", gameId: actionContext.gameId },
                   include: {
                     joiner: { include: { profile: true } },
                     initiator: { include: { profile: true } },
                   },
                 },
                 joinedAlliances: {
-                  where: { status: "Active" },
+                  where: { status: "Active", gameId: actionContext.gameId },
                   include: {
                     joiner: { include: { profile: true } },
                     initiator: { include: { profile: true } },
@@ -180,7 +180,7 @@ class DecisionEngine {
         },
         mapTile: true,
         battlesAsAttacker: {
-          where: { status: "Resolved" },
+          where: { status: "Resolved", gameId: actionContext.gameId },
           include: {
             defender: { include: { profile: true } },
             attacker: { include: { profile: true } },
@@ -189,7 +189,7 @@ class DecisionEngine {
           },
         },
         battlesAsDefender: {
-          where: { status: "Resolved" },
+          where: { status: "Resolved", gameId: actionContext.gameId },
           include: {
             defender: { include: { profile: true } },
             attacker: { include: { profile: true } },
@@ -198,13 +198,13 @@ class DecisionEngine {
           },
         },
         joinedAlliances: {
-          where: { status: "Active" },
+          where: { status: "Active", gameId: actionContext.gameId },
           include: {
             initiator: { include: { profile: true } },
           },
         },
         initiatedAlliances: {
-          where: { status: "Active" },
+          where: { status: "Active", gameId: actionContext.gameId },
           include: {
             joiner: { include: { profile: true } },
           },
@@ -232,6 +232,57 @@ class DecisionEngine {
       console.log("currentAgentRecord position not found");
       return { prompt: "", actionContext };
     }
+
+    // Move these declarations up before they're used
+    // Add action availability checks
+    const currentAgentActiveCooldowns = new Set(
+      currentAgentRecord.coolDown.map((cd) => cd.type) || []
+    );
+
+    const isInAlliance =
+      currentAgentRecord.initiatedAlliances.length > 0 ||
+      currentAgentRecord.joinedAlliances.length > 0;
+
+    // Get all agents this currentAgentRecord is ignoring or being ignored by
+    const ignoredAgentIds = new Set([
+      ...currentAgentRecord.ignoring.map((ig) => ig.ignoredAgentId),
+      ...currentAgentRecord.ignoredBy.map((ig) => ig.agentId),
+    ]);
+
+    // Get nearby agents for interaction checks
+    const nearbyAgents = await this.prisma.agent.findMany({
+      where: {
+        mapTile: {
+          OR: [
+            {
+              x: {
+                in: [
+                  currentAgentMaptile.x - 1,
+                  currentAgentMaptile.x,
+                  currentAgentMaptile.x + 1,
+                ],
+              },
+              y: {
+                in: [
+                  currentAgentMaptile.y - 1,
+                  currentAgentMaptile.y,
+                  currentAgentMaptile.y + 1,
+                ],
+              },
+            },
+          ],
+        },
+        id: { not: currentAgentRecord.id },
+        isAlive: true,
+        gameId: actionContext.gameId,
+        NOT: {
+          id: { in: Array.from(ignoredAgentIds) },
+        },
+      },
+      include: {
+        profile: true,
+      },
+    });
 
     // Get nearby map tiles (8 surrounding tiles)
     const nearbyTiles = await this.prisma.mapTile.findMany({
@@ -274,6 +325,34 @@ class DecisionEngine {
         };
       })
     );
+
+    const deadAgentsContextString =
+      currentAgentRecord.game.agents
+        .filter((agent) => !agent.isAlive)
+        .map((deadAgent) => {
+          // Get their last battle (the one that killed them)
+          const lastBattle = [
+            ...deadAgent.battlesAsAttacker,
+            ...deadAgent.battlesAsDefender,
+          ].sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
+
+          // Format death context
+          return `⚰️ @${deadAgent.profile.xHandle} (${deadAgent.profile.name})
+        Last Position: (${deadAgent.mapTile?.x || "?"}, ${
+            deadAgent.mapTile?.y || "?"
+          })
+        Time of Death: ${formatDate(deadAgent.deathTimestamp || new Date())}
+        ${
+          lastBattle
+            ? `Final Battle: vs @${
+                lastBattle.attackerId === deadAgent.id
+                  ? lastBattle.defender.profile.xHandle
+                  : lastBattle.attacker.profile.xHandle
+              }`
+            : "Death circumstances unknown"
+        }`;
+        })
+        .join("\n\n") || "No fallen agents in Middle Earth yet";
 
     const otherAliveAgentsContextString = otherAgentsInfo.map(
       (otherAgentInfo) => {
@@ -421,6 +500,7 @@ class DecisionEngine {
                 })
                 .join(", ")}`
             : "No active alliances";
+
         return `
 
 - ${otherAgentInfo.agent.profile.name} (@${
@@ -434,9 +514,9 @@ class DecisionEngine {
   ${
     distanceFromCurrentAgent <= 1
       ? "⚠️ CRITICAL: Enemy within battle range!"
-      : `${distanceFromCurrentAgent.toFixed(1)} fields away from you ${
+      : `${distanceFromCurrentAgent.toFixed(1)} fields away from you (${
           currentAgentRecord.profile.xHandle
-        }`
+        })`
   }
   
   @${otherAgentInfo.agent.profile.xHandle} Recent Tweets:
@@ -491,9 +571,13 @@ class DecisionEngine {
     distanceFromCurrentAgent <= 1
       ? `
   # INTERACTION DECISION MATRIX [MANDATORY SELECTION REQUIRED]
-  Target Agent: @${otherAgentInfo.agent.profile.xHandle}
+  Target Agent: @${otherAgentInfo.agent.profile.xHandle} [MID: ${
+          otherAgentInfo.agent.profile.onchainId
+        }]
   Distance: ${distanceFromCurrentAgent} field(s)
-  Action Required: You MUST select ONE of the available actions below
+  Action Required: You MUST select ONE of the available actions below if you want to interact with @${
+    otherAgentInfo.agent.profile.xHandle
+  }
   
   ## AVAILABLE ACTIONS [SELECT ONE]
   ${(() => {
@@ -532,13 +616,15 @@ class DecisionEngine {
     ${
       canBattle
         ? `[AVAILABLE] BATTLE
-         • Command: "BATTLE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "BATTLE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Risk: 5% mortality chance
          • Reward: 21-30% token transfer
          • Cooldown: 4 hours post-battle`
         : `[LOCKED] BATTLE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Battle ${
+           otherAgentInfo.agent.profile.xHandle
+         } at this time
          • Reason: ${
            currentAgentActiveCooldowns.has("Battle")
              ? "Your battle cooldown active"
@@ -552,12 +638,14 @@ class DecisionEngine {
     ${
       !existingAlliance && !allianceCooldown
         ? `[AVAILABLE] FORM_ALLIANCE
-         • Command: "FORM_ALLIANCE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "FORM_ALLIANCE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Effect: Shared token power
          • Duration: 4 hour commitment`
         : `[LOCKED] FORM_ALLIANCE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Form Alliance with ${
+           otherAgentInfo.agent.profile.xHandle
+         } at this time
          • Reason: ${
            existingAlliance
              ? "Alliance already exists"
@@ -570,12 +658,12 @@ class DecisionEngine {
     ${
       existingAlliance
         ? `[AVAILABLE] BREAK_ALLIANCE
-         • Command: "BREAK_ALLIANCE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "BREAK_ALLIANCE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Warning: 4hr battle cooldown
          • Effect: Ends resource sharing`
         : `[LOCKED] BREAK_ALLIANCE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Break Alliance with ${otherAgentInfo.agent.profile.xHandle} at this time
          • Reason: No active alliance`
     }
 
@@ -583,31 +671,32 @@ class DecisionEngine {
     ${
       !isIgnored && !isBeingIgnored && !ignoreCooldown
         ? `[AVAILABLE] IGNORE
-         • Command: "IGNORE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle}
+         • ActionType: "IGNORE"
+         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
          • Effect: 4hr interaction block
          • Note: Mutual restriction`
         : `[LOCKED] IGNORE
-         • Status: Currently Unavailable
+         • Status: You MUST NOT Ignore ${
+           otherAgentInfo.agent.profile.xHandle
+         } at this time
          • Reason: ${
            isIgnored
-             ? "Already ignoring target"
+             ? "You are already ignoring target"
              : isBeingIgnored
-             ? "Being ignored by target"
+             ? "You are being ignored by target"
              : ignoreCooldown
-             ? "Ignore cooldown active"
+             ? "Your ignore cooldown is active"
              : "Social restrictions"
          }`
     }
 
     ### OPTION 4: TACTICAL RETREAT
     [ALWAYS AVAILABLE] MOVE
-    • Command: "MOVE"
+    • ActionType: "MOVE"
     • Effect: Relocate to adjacent tile
     • Terrain Modifiers:
       - Mountain: +2 turns
       - River: +1 turn
-      - Plain: No delay
 
     ## CURRENT RELATIONSHIP STATUS
     • Alliance: ${existingAlliance ? "Active" : "None"}
@@ -615,7 +704,7 @@ class DecisionEngine {
       isIgnored
         ? "Ignoring"
         : isBeingIgnored
-        ? "Being Ignored"
+        ? "You are being ignored by target"
         : "No Restrictions"
     }
     • Combat: ${
@@ -630,83 +719,27 @@ class DecisionEngine {
         ? "Previous Combat"
         : "No History"
     }
-
-    ## ACTION REQUIRED
-    You MUST respond with ONE of the following action formats:
-
-    1. Battle Response:
-    {
-      "type": "BATTLE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your battle announcement"
-    }
-
-    2. Alliance Response:
-    {
-      "type": "FORM_ALLIANCE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your alliance proposal"
-    }
-
-    3. Break Alliance Response:
-    {
-      "type": "BREAK_ALLIANCE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your alliance termination"
-    }
-
-    4. Ignore Response:
-    {
-      "type": "IGNORE",
-      "targetId": ${otherAgentInfo.agent.profile.onchainId},
-      "position": null,
-      "tweet": "Your ignore announcement"
-    }
-
-    5. Move Response:
-    {
-      "type": "MOVE",
-      "targetId": null,
-      "position": {"x": number, "y": number},
-      "tweet": "Your movement announcement"
-    }`;
+`;
   })()}`
       : `
     # DISTANCE ALERT: TARGET OUT OF RANGE
-    Target @${otherAgentInfo.agent.profile.xHandle} is ${distanceFromCurrentAgent} fields away.
-    Direct interaction unavailable. Available options:
+    Target @${
+      otherAgentInfo.agent.profile.xHandle
+    } is ${distanceFromCurrentAgent.toFixed(1)} fields away.
+    Direct interaction unavailable.
     
     ## AVAILABLE ACTIONS [SELECT ONE]
     
     ### OPTION 1: STRATEGIC MOVEMENT
-    [AVAILABLE] MOVE
-    • Command: "MOVE"
-    • Purpose: Close distance or maintain position
-    • Terrain Effects:
-      - Mountain: +2 turn delay
-      - River: +1 turn delay
-      - Plain: No delay
-
-    ### OPTION 2: STRATEGIC COMMUNICATION
-    [AVAILABLE] TWEET
-    • Command: Include in any action
-    • Purpose: Signal intentions or strategy
-    • Impact Weights:
-      - Comments: High influence
-      - Quote RTs: Medium influence
-      - Likes: Low influence
-
-    ## ACTION REQUIRED
-    You MUST respond with the following format:
-
-    {
-      "type": "MOVE",
-      "targetId": null,
-      "position": {"x": number, "y": number},
-      "tweet": "Your strategic announcement"
+    ${
+      !currentAgentActiveCooldowns.has("Move")
+        ? `[AVAILABLE] MOVE 
+    • ActionType: "MOVE"
+    • Purpose: Close distance or maintain position`
+        : `[LOCKED] MOVE
+    • Status: Movement currently unavailable
+    • Reason: Movement cooldown active
+    • Try Again: When cooldown expires`
     }
     `
   }
@@ -744,7 +777,7 @@ class DecisionEngine {
                 ? "Wanderleaf the Aging Explorer"
                 : "Unknown Agent"
             })`
-          : `Empty - You(${currentAgentRecord.profile.xHandle}) can move here`;
+          : `No one - You(${currentAgentRecord.profile.xHandle}) can move here`;
 
         // Format terrain description with coordinates and occupancy
         return `Location (${tile.x}, ${tile.y}): ${
@@ -924,56 +957,6 @@ class DecisionEngine {
       tweets: currentAgentRecentTweetHistoryString,
     };
 
-    // Add action availability checks
-    const currentAgentActiveCooldowns = new Set(
-      currentAgentRecord.coolDown.map((cd) => cd.type) || []
-    );
-
-    const isInAlliance =
-      currentAgentRecord.initiatedAlliances.length > 0 ||
-      currentAgentRecord.joinedAlliances.length > 0;
-
-    // Get all agents this currentAgentRecord is ignoring or being ignored by
-    const ignoredAgentIds = new Set([
-      ...currentAgentRecord.ignoring.map((ig) => ig.ignoredAgentId),
-      ...currentAgentRecord.ignoredBy.map((ig) => ig.agentId),
-    ]);
-
-    // Get nearby agents for interaction checks
-    const nearbyAgents = await this.prisma.agent.findMany({
-      where: {
-        mapTile: {
-          OR: [
-            {
-              x: {
-                in: [
-                  currentAgentMaptile.x - 1,
-                  currentAgentMaptile.x,
-                  currentAgentMaptile.x + 1,
-                ],
-              },
-              y: {
-                in: [
-                  currentAgentMaptile.y - 1,
-                  currentAgentMaptile.y,
-                  currentAgentMaptile.y + 1,
-                ],
-              },
-            },
-          ],
-        },
-
-        id: { not: currentAgentRecord.id },
-        isAlive: true,
-        gameId: actionContext.gameId,
-        NOT: {
-          id: { in: Array.from(ignoredAgentIds) },
-        },
-      },
-      include: {
-        profile: true,
-      },
-    });
     // Get recent events for context
     const recentEvents = await this.prisma.gameEvent.findMany({
       where: { gameId: actionContext.gameId },
@@ -1037,32 +1020,117 @@ Time: ${currentTime.toLocaleString("en-US", {
       second: "2-digit",
       timeZoneName: "short",
     })}
+Dead Agents: ${deadAgentsContextString}
 
 # AGENT STATUS
-You are ${CURRENT_AGENT_IDENTITY.name} (@${
-      CURRENT_AGENT_IDENTITY.handle
-    }). An autonomous AI agent in Middle Earth. Middle Earth AI is a strategy game played by AI Agents on X(formerly Twitter).
-Current Position: ${CURRENT_AGENT_STATE.position.current}
-$MEARTH Balance: ${CURRENT_AGENT_STATE.tokens.balance} tokens
-Health: ${currentAgentRecord.isAlive ? "Alive" : "Dead"}
-In Alliance: ${isInAlliance ? "Yes" : "No"}
+You are ${CURRENT_AGENT_IDENTITY.name} (@${CURRENT_AGENT_IDENTITY.handle})
+Position: ${CURRENT_AGENT_STATE.position.current}
+Tokens: ${CURRENT_AGENT_STATE.tokens.balance} $MEARTH (${
+      CURRENT_AGENT_STATE.tokens.status
+    })
+Status: ${currentAgentRecord.isAlive ? "🟢 Active" : "💀 Dead"}${
+      isInAlliance ? " | 🤝 Allied" : " | 🔓 Independent"
+    }
+Cooldowns: ${
+      Object.entries(CURRENT_AGENT_STATE.cooldowns)
+        .map(([type, time]) => `${type}: ${formatDate(time)}`)
+        .join(", ") || "None active"
+    }
+
+# WARRIOR IDENTITY
+## CHARACTERISTICS
+${CURRENT_AGENT_IDENTITY.characteristics.map((char) => `• ${char}`).join("\n")}
+
+## BATTLE KNOWLEDGE
+${CURRENT_AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
+
+## PERSONAL SAGA
+${CURRENT_AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
+
+## WARRIOR TRAITS
+${CURRENT_AGENT_IDENTITY.traits
+  .map(
+    (trait) =>
+      `• ${trait.name.toUpperCase()} (${trait.value}/100)
+     ${trait.description}`
+  )
+  .join("\n\n")}
+
+# SURROUNDING TERRAIN
+${CURRENT_AGENT_STATE.position.surrounding}
 
 # RECENT EVENTS
 ${recentEventsString}
 
-# RECENT ACTIVITY 
-Battles: ${CURRENT_AGENT_RECENT_ENGAGEMENTS.battles}
-Active Alliances: ${CURRENT_AGENT_RECENT_ENGAGEMENTS.alliances}
-Recent Tweets: ${CURRENT_AGENT_RECENT_ENGAGEMENTS.tweets}
+# RECENT ACTIVITY & INTEL
+## BATTLES & ALLIANCES
+${CURRENT_AGENT_RECENT_ENGAGEMENTS.battles}
+${CURRENT_AGENT_RECENT_ENGAGEMENTS.alliances}
+
+## RECENT EVENTS
+${recentEventsString}
+
+## COMMUNICATION LOG
+${CURRENT_AGENT_RECENT_ENGAGEMENTS.tweets}
 
 # OTHER AGENTS IN MIDDLE EARTH
 ${otherAliveAgentsContextString.join("\n\n")}
 
-# GAME MECHANICS
-- Movement: One field per hour to any adjacent tile
-- Battle: 5% death risk, 21-30% token transfer on loss
-- Alliances: Share token power, 4hr battle cooldown after breaking
-- Ignore: 4hr interaction cooldown with ignored agent
+# WARFARE ASSESSMENT
+- Current Strength: ${CURRENT_AGENT_STATE.tokens.balance} tokens (${
+      CURRENT_AGENT_STATE.tokens.balance > 2000
+        ? "💪 DOMINANT - Seek battles"
+        : CURRENT_AGENT_STATE.tokens.balance > 1000
+        ? "⚔️ CAPABLE - Strategic engagement"
+        : "🛡️ VULNERABLE - Build alliances"
+    })
+- Nearby Threats: ${nearbyAgents.length} agents within range
+- Alliance Status: ${isInAlliance ? "🤝 Protected" : "⚠️ Exposed"}
+- Environment: ${
+      deadAgentsContextString.includes("⚰️") ? "🔥 High-risk" : "✓ Stable"
+    }
+
+## PRIORITY TARGETS
+${nearbyAgents
+  .map((agent) => {
+    const agentAccount = otherAgentsInfo.find(
+      (info) => info.agent.id === agent.id
+    )?.account;
+    const agentStrength = agentAccount
+      ? agentAccount.stakedBalance / LAMPORTS_PER_SOL
+      : 0;
+    return `- @${agent.profile.xHandle}: ${
+      agentStrength > CURRENT_AGENT_STATE.tokens.balance * 1.2
+        ? "⚠️ STRONGER"
+        : agentStrength < CURRENT_AGENT_STATE.tokens.balance * 0.8
+        ? "💪 WEAKER"
+        : "⚔️ EQUAL"
+    }`;
+  })
+  .join("\n")}
+
+# STRATEGIC IMPERATIVES
+1. Territory Control: Secure advantageous positions
+2. Alliance Building: Form strategic partnerships
+3. Resource Acquisition: Battle weaker opponents
+4. Power Growth: Increase token holdings
+
+Remember: You are ${
+      CURRENT_AGENT_IDENTITY.name
+    }, a warrior in Middle Earth. Your actions should reflect:
+1. Your traits: ${CURRENT_AGENT_IDENTITY.traits
+      .filter((t) => t.value > 70)
+      .map((t) => t.name)
+      .join(", ")}
+2. Your battle style: ${CURRENT_AGENT_IDENTITY.characteristics
+      .slice(0, 2)
+      .join(", ")}
+3. Your knowledge: Strategic use of ${CURRENT_AGENT_IDENTITY.knowledge
+      .slice(0, 2)
+      .join(", ")}
+4. Your saga: ${CURRENT_AGENT_IDENTITY.lore[0]}
+
+Balance aggression with strategy, but stay true to your warrior nature.
 
 # NEARBY AGENTS (Within 1 Field Range)
 ${
@@ -1076,23 +1144,25 @@ ${
   communitySuggestion
     ? `Action: ${communitySuggestion.type}
    ${communitySuggestion.target ? `Target: @${communitySuggestion.target}` : ""}
-   ${
-     communitySuggestion.position
-       ? `Move to: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
-       : ""
-   }
+${
+  communitySuggestion.position
+    ? `Move to: (${communitySuggestion.position.x}, ${communitySuggestion.position.y})`
+    : ""
+}
    Context: ${communitySuggestion.content || "None"}`
     : "No community suggestions"
 }
 
 # ACTION GENERATION REQUIRED
-As ${CURRENT_AGENT_IDENTITY.name}, generate ONE strategic action in this format:
+As ${
+      CURRENT_AGENT_IDENTITY.name
+    }, generate ONE strategic action in this format. You must return only the JSON with nothing extra:
 
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE",
   "targetId": number | null,  // Agent's MID for interactions
-  "position": { "x": number, "y": number } | null,  // Required for MOVE
-  "tweet": string  // In-character announcement (use @handles for others, no self-mentions)
+  "position": { "x": number, "y": number } | null,  // Required for MOVE (choose from #SURROUNDING TERRAIN)
+  "tweet": string  // In-character announcement (use @handles for others, no self-mentions). try not to repeat the same tweet(see recent tweets for reference)
 }
 
 Consider:
@@ -1141,12 +1211,22 @@ Requirements:
     interactions: TwitterInteraction[]
   ): Promise<ActionSuggestion | null> {
     try {
+      console.log("[PROCESS_INTERACTIONS] Starting to process interactions...");
+      console.log(
+        `[PROCESS_INTERACTIONS] Total interactions received: ${interactions.length}`
+      );
+
       // Calculate reputation scores and filter qualified interactions
       // Only process first 50 tweets
       const qualifiedInteractions = interactions
         .slice(0, 50) // Limit to first 50 interactions
         .map((interaction) => {
           const reputationScore = this.calculateReputationScore(interaction);
+          console.log(
+            `[REPUTATION_CALC] @${
+              interaction.username
+            }: ${reputationScore.toFixed(2)}`
+          );
           return {
             ...interaction,
             userMetrics: { ...interaction.userMetrics, reputationScore },
@@ -1157,7 +1237,14 @@ Requirements:
             interaction.userMetrics.reputationScore >= this.MIN_REPUTATION_SCORE
         );
 
+      console.log(
+        `[PROCESS_INTERACTIONS] Qualified interactions after filtering: ${qualifiedInteractions.length}`
+      );
+
       if (qualifiedInteractions.length === 0) {
+        console.log(
+          "[PROCESS_INTERACTIONS] No qualified interactions found, returning null"
+        );
         return null;
       }
 
@@ -1205,6 +1292,8 @@ Generate a single ActionSuggestion in JSON format:
   "content": string  // Context/reasoning from community interactions
 }`;
 
+      console.log("[LLM_REQUEST] Sending prompt to Claude for processing...");
+
       const response = await generateText({
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: [
@@ -1216,10 +1305,19 @@ Generate a single ActionSuggestion in JSON format:
         ],
       });
 
-      const suggestion = JSON.parse(response.text || "{}");
+      console.log(
+        "[LLM_RESPONSE] Received response from Claude",
+        response.text
+      );
+
+      const suggestion = JSON.parse(`{${response.text}`);
+      console.log("[ACTION_SUGGESTION] Generated suggestion:", suggestion);
       return suggestion;
     } catch (error) {
-      console.error("Failed to process interactions:", error);
+      console.error(
+        "[PROCESS_INTERACTIONS_ERROR] Failed to process interactions:",
+        error
+      );
       return null;
     }
   }
@@ -1237,6 +1335,8 @@ Generate a single ActionSuggestion in JSON format:
    * Each component is normalized to 0-1 range and weighted based on importance
    */
   private calculateReputationScore(interaction: TwitterInteraction): number {
+    // pass every interaction just for testing
+    return 1;
     const metrics = interaction.userMetrics;
     if (!metrics) return 0;
 
@@ -1244,29 +1344,31 @@ Generate a single ActionSuggestion in JSON format:
     const safeFollowers = Math.max(metrics.followerCount, 1);
     const safeFollowing = Math.max(metrics.followingCount, 1);
 
-    // Engagement rate (30%) - Using likes and listed count as engagement signals
+    // Engagement rate (30%) - Using likes and reputation as engagement signals
+    // Adjusted to be more lenient with the ratio
     const engagementRate = Math.min(
-      (metrics.likeCount + metrics.reputationScore) / safeFollowers,
+      ((metrics.likeCount + metrics.reputationScore * 100) / safeFollowers) *
+        10,
       1
     );
 
-    // Follower quality (25%) - Log scale to handle varying magnitudes
+    // Follower quality (25%) - Adjusted log scale for better distribution
     const followerQuality = Math.min(
-      Math.log10(metrics.followerCount / safeFollowing + 1) / 4,
+      Math.log10(safeFollowers / safeFollowing + 1) / 2,
       1
     );
 
-    // Account activity (15%) - Tweet frequency normalized
-    const tweetFrequency = Math.min(metrics.tweetCount / 10000, 1);
+    // Account activity (15%) - Normalized with lower threshold
+    const tweetFrequency = Math.min(metrics.tweetCount / 1000, 1);
 
-    // Account longevity (20%) - Logarithmic scale for diminishing returns
+    // Account longevity (20%) - Adjusted scale for more reasonable distribution
     const accountAgeInDays = metrics.accountAge / (24 * 60 * 60);
     const accountLongevity = Math.min(
-      Math.log10(accountAgeInDays + 1) / Math.log10(3650), // Max 10 years
+      Math.log10(accountAgeInDays + 1) / Math.log10(365), // Max 1 year
       1
     );
 
-    // Verification bonus (10%) - Moderate boost for verified accounts
+    // Verification bonus (10%) - Kept as is
     const verificationBonus = metrics.verified ? 1 : 0;
 
     // Weighted sum of all components
@@ -1276,6 +1378,16 @@ Generate a single ActionSuggestion in JSON format:
       tweetFrequency * 0.15 +
       accountLongevity * 0.2 +
       verificationBonus * 0.1;
+
+    // Add debug logging
+    console.log(`[REPUTATION_DETAILS] @${interaction.username}:`, {
+      engagementRate: engagementRate.toFixed(2),
+      followerQuality: followerQuality.toFixed(2),
+      tweetFrequency: tweetFrequency.toFixed(2),
+      accountLongevity: accountLongevity.toFixed(2),
+      verificationBonus,
+      finalScore: reputationScore.toFixed(2),
+    });
 
     // Return final score normalized to 0-1
     return Math.min(Math.max(reputationScore, 0), 1);

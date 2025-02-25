@@ -1113,8 +1113,7 @@ ${nearbyAgents
 1. Territory Control: Secure advantageous positions
 2. Alliance Building: Form strategic partnerships
 3. Resource Acquisition: Battle weaker opponents
-4. Survival: Avoid unfavorable engagements
-5. Power Growth: Increase token holdings
+4. Power Growth: Increase token holdings
 
 Remember: You are ${
       CURRENT_AGENT_IDENTITY.name
