@@ -326,440 +326,6 @@ class DecisionEngine {
       })
     );
 
-    const deadAgentsContextString =
-      currentAgentRecord.game.agents
-        .filter((agent) => !agent.isAlive)
-        .map((deadAgent) => {
-          // Get their last battle (the one that killed them)
-          const lastBattle = [
-            ...deadAgent.battlesAsAttacker,
-            ...deadAgent.battlesAsDefender,
-          ].sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
-
-          // Format death context
-          return `⚰️ @${deadAgent.profile.xHandle} (${deadAgent.profile.name})
-        Last Position: (${deadAgent.mapTile?.x || "?"}, ${
-            deadAgent.mapTile?.y || "?"
-          })
-        Time of Death: ${formatDate(deadAgent.deathTimestamp || new Date())}
-        ${
-          lastBattle
-            ? `Final Battle: vs @${
-                lastBattle.attackerId === deadAgent.id
-                  ? lastBattle.defender.profile.xHandle
-                  : lastBattle.attacker.profile.xHandle
-              }`
-            : "Death circumstances unknown"
-        }`;
-        })
-        .join("\n\n") || "No fallen agents in Middle Earth yet";
-
-    const otherAliveAgentsContextString = otherAgentsInfo.map(
-      (otherAgentInfo) => {
-        const agentMaptile = otherAgentInfo.agent.mapTile;
-        const distanceFromCurrentAgent = agentMaptile
-          ? Math.sqrt(
-              Math.pow(currentAgentMaptile.x - agentMaptile.x, 2) +
-                Math.pow(currentAgentMaptile.y - agentMaptile.y, 2)
-            )
-          : Infinity;
-
-        // Calculate direction vector to other agent
-        const directionX = agentMaptile
-          ? agentMaptile.x - currentAgentMaptile.x
-          : 0;
-        const directionY = agentMaptile
-          ? agentMaptile.y - currentAgentMaptile.y
-          : 0;
-
-        // Calculate optimal path coordinates
-        const pathCoords = [];
-        if (agentMaptile) {
-          const steps = Math.max(Math.abs(directionX), Math.abs(directionY));
-          for (let i = 1; i <= steps; i++) {
-            const stepX = Math.round(
-              currentAgentMaptile.x + (directionX * i) / steps
-            );
-            const stepY = Math.round(
-              currentAgentMaptile.y + (directionY * i) / steps
-            );
-            pathCoords.push(`(${stepX}, ${stepY})`);
-          }
-        }
-
-        // Get compass direction
-        const angle = (Math.atan2(directionY, directionX) * 180) / Math.PI;
-        const compassDirection =
-          angle >= -22.5 && angle < 22.5
-            ? "East"
-            : angle >= 22.5 && angle < 67.5
-            ? "Northeast"
-            : angle >= 67.5 && angle < 112.5
-            ? "North"
-            : angle >= 112.5 && angle < 157.5
-            ? "Northwest"
-            : angle >= 157.5 || angle < -157.5
-            ? "West"
-            : angle >= -157.5 && angle < -112.5
-            ? "Southwest"
-            : angle >= -112.5 && angle < -67.5
-            ? "South"
-            : "Southeast";
-
-        // Get active alliances
-        const otherAgentActiveAlliances = [
-          ...otherAgentInfo.agent.initiatedAlliances.filter(
-            (alliance) => alliance.status === AllianceStatus.Active
-          ),
-          ...otherAgentInfo.agent.joinedAlliances.filter(
-            (alliance) => alliance.status === AllianceStatus.Active
-          ),
-        ];
-
-        const otherAgentPastAlliances = [
-          ...otherAgentInfo.agent.initiatedAlliances.filter(
-            (alliance) => alliance.status !== AllianceStatus.Broken
-          ),
-          ...otherAgentInfo.agent.joinedAlliances.filter(
-            (alliance) => alliance.status !== AllianceStatus.Broken
-          ),
-        ];
-
-        // Build battle context for LLM understanding based on schema.prisma battle model
-        const otherAgentRecentBattles = [
-          ...otherAgentInfo.agent.battlesAsAttacker.slice(-2), // Recent offensive battles
-          ...otherAgentInfo.agent.battlesAsDefender.slice(-2), // Recent defensive battles
-        ]
-          .map((battle) => ({
-            // Classify battle type per schema enum BattleType
-            battleType:
-              battle.type === "Simple"
-                ? "1v1 Combat"
-                : battle.type === "AgentVsAlliance"
-                ? "Solo vs Alliance"
-                : "Alliance vs Alliance",
-
-            // Battle status per schema enum BattleStatus
-            status:
-              battle.status === "Resolved"
-                ? battle.winnerId === otherAgentInfo.agent.id
-                  ? "Emerged victorious"
-                  : "Suffered defeat"
-                : battle.status === "Cancelled"
-                ? "Battle cancelled"
-                : "Battle pending resolution",
-
-            // Alliance dynamics from schema relations
-            allianceContext:
-              battle.attackerAllyId || battle.defenderAllyId
-                ? "Fought alongside allies"
-                : "Engaged in solo combat",
-
-            // Token stakes from schema
-            resourceStakes: `Committed ${
-              Number(battle.tokensStaked) / LAMPORTS_PER_SOL
-            } tokens`,
-
-            // Temporal data from schema
-            timing: formatDate(battle.startTime),
-          }))
-          .map(
-            (context) =>
-              `COMBAT RECORD:\n` +
-              `Engagement Type: ${context.battleType}\n` +
-              `Resolution: ${context.status}\n` +
-              `Tactical Approach: ${context.allianceContext}\n` +
-              `Resources Risked: ${context.resourceStakes}\n` +
-              `Timestamp: ${context.timing}`
-          )
-          .join("\n\n");
-
-        // Get recent tweets for context
-        // Get most recent tweets with content, type and timestamp for better context
-        const otherAgentRecentTweets = otherAgentInfo.agent.tweets
-          .slice(0, 2) // Get last 2 tweets for more context
-          .map((t) => ({
-            content: t.content,
-            type: t.type,
-            timestamp: formatDate(t.timestamp),
-          }))
-          .map((t) => `"${t.content}" (${t.type} - ${t.timestamp})`)
-          .join(", ");
-
-        const activeAllianceInfo =
-          otherAgentActiveAlliances.length > 0
-            ? `Active alliances: ${otherAgentActiveAlliances
-                .map((alliance) => {
-                  const allyProfile =
-                    alliance.initiatorId === otherAgentInfo.agent.id ||
-                    alliance.joinerId === otherAgentInfo.agent.id
-                      ? alliance.initiator.profile
-                      : alliance.joiner.profile;
-
-                  return `with ${allyProfile.xHandle} (${allyProfile.name})`;
-                })
-                .join(", ")}`
-            : "No active alliances";
-
-        return `
-
-- ${otherAgentInfo.agent.profile.name} (@${
-          otherAgentInfo.agent.profile.xHandle
-        }) [MID: ${otherAgentInfo.agent.onchainId}] 
-  
-  @${otherAgentInfo.agent.profile.xHandle} Current Status:
-  --------------
-  Position: ${compassDirection} at (${agentMaptile?.x}, ${agentMaptile?.y})
-  Terrain: ${agentMaptile?.terrainType} 
-  ${
-    distanceFromCurrentAgent <= 1
-      ? "⚠️ CRITICAL: Enemy within battle range!"
-      : `${distanceFromCurrentAgent.toFixed(1)} fields away from you (${
-          currentAgentRecord.profile.xHandle
-        })`
-  }
-  
-  @${otherAgentInfo.agent.profile.xHandle} Recent Tweets:
-  --------------
-  ${
-    otherAgentRecentTweets
-      ? `\n  ${otherAgentRecentTweets}`
-      : "No recent tweets"
-  }
-  
-  Navigation Context for @${otherAgentInfo.agent.profile.xHandle}:
-  -------------------
-  Current Path: You (@${currentAgentRecord.profile.xHandle}) → @${
-          otherAgentInfo.agent.profile.xHandle
-        }
-  Waypoints: ${pathCoords.join(" → ")}
-
-
-  @${otherAgentInfo.agent.profile.xHandle} Battle History: ${
-          [...otherAgentRecentBattles].join(", ") || "No recent battles"
-        }
-  
-  @${otherAgentInfo.agent.profile.xHandle} Alliance History (past and present):
-  ------------------
-  Active Alliances:
-  ${activeAllianceInfo}
-  
-  Past Alliances:
-  ${
-    otherAgentPastAlliances.length > 0
-      ? `\n  ${otherAgentPastAlliances
-          .map((alliance) => {
-            const initiator = alliance.initiator.profile;
-            const joiner = alliance.joiner.profile;
-            const duration = Math.floor(
-              (alliance.endedAt
-                ? alliance.endedAt.getTime() - alliance.timestamp.getTime()
-                : 0) /
-                (1000 * 60)
-            );
-            return `🔗 @${initiator.xHandle} ⚔️ @${
-              joiner.xHandle
-            } (${duration}min, ${alliance.status}, ${
-              alliance.combinedTokens || 0
-            } tokens)`;
-          })
-          .join("\n  ")}`
-      : "No historical alliance"
-  }
-  
-  ${
-    distanceFromCurrentAgent <= 1
-      ? `
-  # INTERACTION DECISION MATRIX [MANDATORY SELECTION REQUIRED]
-  Target Agent: @${otherAgentInfo.agent.profile.xHandle} [MID: ${
-          otherAgentInfo.agent.profile.onchainId
-        }]
-  Distance: ${distanceFromCurrentAgent} field(s)
-  Action Required: You MUST select ONE of the available actions below if you want to interact with @${
-    otherAgentInfo.agent.profile.xHandle
-  }
-  
-  ## AVAILABLE ACTIONS [SELECT ONE]
-  ${(() => {
-    // Check battle availability
-    const canBattle =
-      !currentAgentActiveCooldowns.has("Battle") &&
-      nearbyAgents.some((agent) => agent.id === otherAgentInfo.agent.id) &&
-      !otherAgentInfo.agent.coolDown.some((cd) => cd.type === "Battle");
-
-    // Check alliance status and cooldowns
-    const existingAlliance = [
-      ...currentAgentRecord.initiatedAlliances,
-      ...currentAgentRecord.joinedAlliances,
-    ].find(
-      (a) =>
-        (a.initiatorId === otherAgentInfo.agent.id ||
-          a.joinerId === otherAgentInfo.agent.id) &&
-        a.status === "Active"
-    );
-
-    const allianceCooldown =
-      currentAgentActiveCooldowns.has("Alliance") ||
-      otherAgentInfo.agent.coolDown.some((cd) => cd.type === "Alliance");
-
-    // Check ignore status
-    const isIgnored = currentAgentRecord.ignoring.some(
-      (i) => i.ignoredAgentId === otherAgentInfo.agent.id
-    );
-    const isBeingIgnored = currentAgentRecord.ignoredBy.some(
-      (i) => i.agentId === otherAgentInfo.agent.id
-    );
-    const ignoreCooldown = currentAgentActiveCooldowns.has("Ignore");
-
-    return `
-    ### OPTION 1: COMBAT ENGAGEMENT
-    ${
-      canBattle
-        ? `[AVAILABLE] BATTLE
-         • ActionType: "BATTLE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
-         • Risk: 5% mortality chance
-         • Reward: 21-30% token transfer
-         • Cooldown: 4 hours post-battle`
-        : `[LOCKED] BATTLE
-         • Status: You MUST NOT Battle ${
-           otherAgentInfo.agent.profile.xHandle
-         } at this time
-         • Reason: ${
-           currentAgentActiveCooldowns.has("Battle")
-             ? "Your battle cooldown active"
-             : otherAgentInfo.agent.coolDown.some((cd) => cd.type === "Battle")
-             ? "Target's battle cooldown active"
-             : "Combat conditions not met"
-         }`
-    }
-
-    ### OPTION 2: DIPLOMATIC RELATIONS
-    ${
-      !existingAlliance && !allianceCooldown
-        ? `[AVAILABLE] FORM_ALLIANCE
-         • ActionType: "FORM_ALLIANCE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
-         • Effect: Shared token power
-         • Duration: 4 hour commitment`
-        : `[LOCKED] FORM_ALLIANCE
-         • Status: You MUST NOT Form Alliance with ${
-           otherAgentInfo.agent.profile.xHandle
-         } at this time
-         • Reason: ${
-           existingAlliance
-             ? "Alliance already exists"
-             : allianceCooldown
-             ? "Alliance cooldown active"
-             : "Diplomatic restrictions"
-         }`
-    }
-
-    ${
-      existingAlliance
-        ? `[AVAILABLE] BREAK_ALLIANCE
-         • ActionType: "BREAK_ALLIANCE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
-         • Warning: 4hr battle cooldown
-         • Effect: Ends resource sharing`
-        : `[LOCKED] BREAK_ALLIANCE
-         • Status: You MUST NOT Break Alliance with ${otherAgentInfo.agent.profile.xHandle} at this time
-         • Reason: No active alliance`
-    }
-
-    ### OPTION 3: SOCIAL ACTIONS
-    ${
-      !isIgnored && !isBeingIgnored && !ignoreCooldown
-        ? `[AVAILABLE] IGNORE
-         • ActionType: "IGNORE"
-         • Target: @${otherAgentInfo.agent.profile.xHandle} [MID: ${otherAgentInfo.agent.profile.onchainId}]
-         • Effect: 4hr interaction block
-         • Note: Mutual restriction`
-        : `[LOCKED] IGNORE
-         • Status: You MUST NOT Ignore ${
-           otherAgentInfo.agent.profile.xHandle
-         } at this time
-         • Reason: ${
-           isIgnored
-             ? "You are already ignoring target"
-             : isBeingIgnored
-             ? "You are being ignored by target"
-             : ignoreCooldown
-             ? "Your ignore cooldown is active"
-             : "Social restrictions"
-         }`
-    }
-
-    ### OPTION 4: TACTICAL RETREAT
-    [ALWAYS AVAILABLE] MOVE
-    • ActionType: "MOVE"
-    • Effect: Relocate to adjacent tile
-    • Terrain Modifiers:
-      - Mountain: +2 turns
-      - River: +1 turn
-
-    ## CURRENT RELATIONSHIP STATUS
-    • Alliance: ${existingAlliance ? "Active" : "None"}
-    • Social: ${
-      isIgnored
-        ? "Ignoring"
-        : isBeingIgnored
-        ? "You are being ignored by target"
-        : "No Restrictions"
-    }
-    • Combat: ${
-      [
-        ...otherAgentInfo.agent.battlesAsAttacker,
-        ...otherAgentInfo.agent.battlesAsDefender,
-      ].some(
-        (b) =>
-          b.attackerId === currentAgentRecord.id ||
-          b.defenderId === currentAgentRecord.id
-      )
-        ? "Previous Combat"
-        : "No History"
-    }
-`;
-  })()}`
-      : `
-    # DISTANCE ALERT: TARGET OUT OF RANGE
-    Target @${
-      otherAgentInfo.agent.profile.xHandle
-    } is ${distanceFromCurrentAgent.toFixed(1)} fields away.
-    Direct interaction unavailable.
-    
-    ## AVAILABLE ACTIONS [SELECT ONE]
-    
-    ### OPTION 1: STRATEGIC MOVEMENT
-    ${
-      !currentAgentActiveCooldowns.has("Move")
-        ? `[AVAILABLE] MOVE 
-    • ActionType: "MOVE"
-    • Purpose: Close distance or maintain position`
-        : `[LOCKED] MOVE
-    • Status: Movement currently unavailable
-    • Reason: Movement cooldown active
-    • Try Again: When cooldown expires`
-    }
-    `
-  }
-  
-  About @${otherAgentInfo.agent.profile.xHandle}:
-  ----------------
-  ${
-    otherAgentInfo.agent.profile.onchainId === 1
-      ? "A ruthless detective seeking justice at any cost. Known for solving every case but feared for extreme methods."
-      : otherAgentInfo.agent.profile.onchainId === 3
-      ? "The carefree prince of Middle Earth, known for reckless behavior and running from responsibilities."
-      : otherAgentInfo.agent.profile.onchainId === 2
-      ? "A determined kitchen worker pursuing truth about a mysterious incident at the palace."
-      : otherAgentInfo.agent.profile.onchainId === 4
-      ? "An aging wanderer with vast knowledge of Middle Earth, haunted by mysterious encounters."
-      : "Agent background unknown"
-  }`;
-      }
-    );
-
     // Build detailed terrain and occupancy information for nearby tiles
     const currentAgentSurroundingTerrainInfoString = nearbyTiles
       .map((tile) => {
@@ -786,137 +352,6 @@ class DecisionEngine {
       })
       .join("\n");
 
-    // Format agent's recent tweets
-    const currentAgentRecentTweetHistoryString = currentAgentRecord.tweets
-      .map((tweet) => {
-        return `- ${tweet.content} (${tweet.interactions.length} interactions, type: ${tweet.type})`;
-      })
-      .join("\n");
-
-    // Get  past battles context
-    const currentAgentPastBattles = (() => {
-      // Helper function to format battle details with rich context
-      const formatBattleDetails = (
-        battle: BattleWithRelations,
-        role: string
-      ) => {
-        const isResolved = battle.status === "Resolved";
-        const isWinner = battle.winnerId === currentAgentRecord.id;
-
-        // Build comprehensive battle outcome with visual indicators
-        const outcome = isResolved
-          ? isWinner
-            ? "🏆 VICTORIOUS - Emerged triumphant in combat"
-            : "💀 DEFEATED - Fell in battle but lived to fight again"
-          : "⚔️ ONGOING - Locked in fierce combat";
-
-        // Detailed alliance dynamics
-        const allianceContext = (() => {
-          const ownAlliance =
-            role === "Attacker" ? battle.attackerAllyId : battle.defenderAllyId;
-          const enemyAlliance =
-            role === "Attacker" ? battle.defenderAllyId : battle.attackerAllyId;
-
-          return `
-          Our Forces: ${
-            ownAlliance
-              ? `Fighting alongside @${
-                  role === "Attacker"
-                    ? battle.attackerAlly?.profile.xHandle
-                    : battle.defenderAlly?.profile.xHandle
-                }`
-              : "Fighting independently"
-          }
-          Enemy Forces: ${
-            enemyAlliance
-              ? `Enemy supported by @${
-                  role === "Attacker"
-                    ? battle.defenderAlly?.profile.xHandle
-                    : battle.attackerAlly?.profile.xHandle
-                }`
-              : "Enemy stood alone"
-          }`;
-        })();
-
-        // Rich temporal context
-        const battleTiming = isResolved
-          ? `Battle concluded ${formatDate(
-              battle.endTime!
-            )} (Duration: ${Math.floor(
-              (battle.endTime!.getTime() - battle.startTime.getTime()) /
-                (1000 * 60)
-            )}min)`
-          : `Battle rages on since ${formatDate(battle.startTime)}`;
-
-        // Stakes and strategic implications
-        const battleContext = `
-          Role: ${role}
-          Opponent: @${
-            role === "Attacker"
-              ? battle.defender.profile.xHandle
-              : battle.attacker.profile.xHandle
-          }
-          Tokens at Stake: ${battle.tokensStaked} $MEARTH
-          `;
-
-        return `
-        ### BATTLE RECORD ###
-        ${outcome}
-        ${battleContext}
-        ${allianceContext}
-        ${battleTiming}
-        `;
-      };
-
-      // Combine and sort battles chronologically
-      const allBattles = [
-        ...currentAgentRecord.battlesAsAttacker.map((b) => ({
-          ...b,
-          role: "Attacker",
-        })),
-        ...currentAgentRecord.battlesAsDefender.map((b) => ({
-          ...b,
-          role: "Defender",
-        })),
-      ].sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
-
-      // Generate comprehensive battle history
-      return allBattles.length > 0
-        ? allBattles
-            .map((battle) => formatBattleDetails(battle, battle.role))
-            .join("\n\n")
-        : "📜 No battles recorded - Yet to taste combat in Middle Earth";
-    })();
-
-    // Get comprehensive alliance context with metadata
-    const currentAgentActiveAlliancesString =
-      [
-        ...currentAgentRecord.initiatedAlliances.map((alliance) => {
-          const allyHandle = alliance.joiner.profile.xHandle;
-          const allianceAge = Math.floor(
-            (currentTime.getTime() - alliance.timestamp.getTime()) / (1000 * 60)
-          ); // Minutes
-          const combinedStrength = alliance.combinedTokens || 0;
-          return `🤝 INITIATED ALLIANCE
-           Partner: @${allyHandle}
-           Status: ${alliance.status}
-           Duration: ${allianceAge}min old
-           Combined Strength: ${combinedStrength} tokens`;
-        }),
-        ...currentAgentRecord.joinedAlliances.map((alliance) => {
-          const allyHandle = alliance.initiator.profile.xHandle;
-          const allianceAge = Math.floor(
-            (currentTime.getTime() - alliance.timestamp.getTime()) / (1000 * 60)
-          ); // Minutes
-          const combinedStrength = alliance.combinedTokens || 0;
-          return `🤝 JOINED ALLIANCE
-           Partner: @${allyHandle} 
-           Status: ${alliance.status}
-           Duration: ${allianceAge}min old
-           Combined Strength: ${combinedStrength} tokens`;
-        }),
-      ].join("\n\n") || "No active alliances - Operating independently";
-
     // Organize data into structured sections
     const CURRENT_AGENT_IDENTITY = {
       name: currentAgentRecord.profile.name,
@@ -940,10 +375,6 @@ class DecisionEngine {
       },
       tokens: {
         balance: currentAgentAccount.stakedBalance / LAMPORTS_PER_SOL,
-        status:
-          currentAgentAccount.stakedBalance / LAMPORTS_PER_SOL < 1000
-            ? "⚠️ LOW"
-            : "💪 STRONG",
       },
       cooldowns: currentAgentRecord.coolDown.reduce((acc, cd) => {
         acc[cd.type.toLowerCase()] = cd.endsAt;
@@ -951,64 +382,7 @@ class DecisionEngine {
       }, {} as Record<string, Date>),
     };
 
-    const CURRENT_AGENT_RECENT_ENGAGEMENTS = {
-      battles: currentAgentPastBattles,
-      alliances: currentAgentActiveAlliancesString,
-      tweets: currentAgentRecentTweetHistoryString,
-    };
-
-    // Get recent events for context
-    const recentEvents = await this.prisma.gameEvent.findMany({
-      where: { gameId: actionContext.gameId },
-      orderBy: { createdAt: "desc" },
-      take: 3,
-      include: {
-        initiator: {
-          include: { profile: true },
-        },
-        target: {
-          include: { profile: true },
-        },
-      },
-    });
-
-    const recentEventsString = recentEvents
-      .map((event) => {
-        const agentName = event.initiator.profile.name;
-        const targetName = event.target?.profile.name;
-        const timestamp = event.createdAt.toLocaleTimeString();
-
-        switch (event.eventType) {
-          case "BATTLE":
-            return `${timestamp}: ${agentName} battled ${targetName}
-            Message: ${event.message}`;
-          case "ALLIANCE_FORM":
-            return `${timestamp}: ${agentName} formed a new alliance with ${targetName}
-            Message: ${event.message}`;
-          case "ALLIANCE_BREAK":
-            return `${timestamp}: ${agentName} broke their alliance with ${targetName}
-            Message: ${event.message}`;
-          case "MOVE":
-            const metadata = event.metadata as { x: number; y: number };
-            return `${timestamp}: ${agentName} moved to coordinates (${metadata.x}, ${metadata.y})
-            Message: ${event.message}`;
-          case "IGNORE":
-            return `${timestamp}: ${agentName} is now ignoring ${targetName}
-            Message: ${event.message}`;
-          case "TWEET":
-            return `${timestamp}: ${agentName} posted a new message on X
-            Message: ${event.message}`;
-          case "AGENT_DEATH":
-            return `${timestamp}: ${agentName} has fallen in battle! Their journey in Middle Earth has ended.
-            Message: ${event.message}`;
-          default:
-            return `${timestamp}: ${agentName} performed action: ${event.eventType}
-            Message: ${event.message}`;
-        }
-      })
-      .join("\n");
-
-    // Build the optimized prompt based on game mechanics and character lore
+    // The main prompt starts here
     const characterPrompt = `# CURRENT GAME STATE IN MIDDLE EARTH
 Time: ${currentTime.toLocaleString("en-US", {
       weekday: "long",
@@ -1020,34 +394,23 @@ Time: ${currentTime.toLocaleString("en-US", {
       second: "2-digit",
       timeZoneName: "short",
     })}
-Dead Agents: ${deadAgentsContextString}
 
-# AGENT STATUS
-You are ${CURRENT_AGENT_IDENTITY.name} (@${CURRENT_AGENT_IDENTITY.handle})
-Position: ${CURRENT_AGENT_STATE.position.current}
-Tokens: ${CURRENT_AGENT_STATE.tokens.balance} $MEARTH (${
-      CURRENT_AGENT_STATE.tokens.status
-    })
-Status: ${currentAgentRecord.isAlive ? "🟢 Active" : "💀 Dead"}${
-      isInAlliance ? " | 🤝 Allied" : " | 🔓 Independent"
-    }
-Cooldowns: ${
-      Object.entries(CURRENT_AGENT_STATE.cooldowns)
-        .map(([type, time]) => `${type}: ${formatDate(time)}`)
-        .join(", ") || "None active"
-    }
+# AGENT IDENTITY
+You are ${CURRENT_AGENT_IDENTITY.name} (@${
+      CURRENT_AGENT_IDENTITY.handle
+    }) a warrior in Middle Earth. Middle Earth AI is a strategy game played by AI Agents on X.
+Your goal is to defeat other agents in middle earth through strategic battles and alliances.
 
-# WARRIOR IDENTITY
 ## CHARACTERISTICS
 ${CURRENT_AGENT_IDENTITY.characteristics.map((char) => `• ${char}`).join("\n")}
 
-## BATTLE KNOWLEDGE
+## KNOWLEDGE
 ${CURRENT_AGENT_IDENTITY.knowledge.map((k) => `• ${k}`).join("\n")}
 
-## PERSONAL SAGA
+## LORE
 ${CURRENT_AGENT_IDENTITY.lore.map((l) => `${l}`).join("\n\n")}
 
-## WARRIOR TRAITS
+## TRAITS
 ${CURRENT_AGENT_IDENTITY.traits
   .map(
     (trait) =>
@@ -1056,81 +419,53 @@ ${CURRENT_AGENT_IDENTITY.traits
   )
   .join("\n\n")}
 
-# SURROUNDING TERRAIN
+## CURRENT STATE
+Position: ${CURRENT_AGENT_STATE.position.current}
+Tokens: ${CURRENT_AGENT_STATE.tokens.balance} $MEARTH
+
+
+## SURROUNDING TERRAIN
 ${CURRENT_AGENT_STATE.position.surrounding}
 
-# RECENT EVENTS
-${recentEventsString}
 
-# RECENT ACTIVITY & INTEL
 ## BATTLES & ALLIANCES
-${CURRENT_AGENT_RECENT_ENGAGEMENTS.battles}
-${CURRENT_AGENT_RECENT_ENGAGEMENTS.alliances}
-
-## RECENT EVENTS
-${recentEventsString}
-
-## COMMUNICATION LOG
-${CURRENT_AGENT_RECENT_ENGAGEMENTS.tweets}
-
-# OTHER AGENTS IN MIDDLE EARTH
-${otherAliveAgentsContextString.join("\n\n")}
-
-# WARFARE ASSESSMENT
-- Current Strength: ${CURRENT_AGENT_STATE.tokens.balance} tokens (${
-      CURRENT_AGENT_STATE.tokens.balance > 2000
-        ? "💪 DOMINANT - Seek battles"
-        : CURRENT_AGENT_STATE.tokens.balance > 1000
-        ? "⚔️ CAPABLE - Strategic engagement"
-        : "🛡️ VULNERABLE - Build alliances"
-    })
-- Nearby Threats: ${nearbyAgents.length} agents within range
-- Alliance Status: ${isInAlliance ? "🤝 Protected" : "⚠️ Exposed"}
-- Environment: ${
-      deadAgentsContextString.includes("⚰️") ? "🔥 High-risk" : "✓ Stable"
-    }
-
-## PRIORITY TARGETS
-${nearbyAgents
-  .map((agent) => {
-    const agentAccount = otherAgentsInfo.find(
-      (info) => info.agent.id === agent.id
-    )?.account;
-    const agentStrength = agentAccount
-      ? agentAccount.stakedBalance / LAMPORTS_PER_SOL
-      : 0;
-    return `- @${agent.profile.xHandle}: ${
-      agentStrength > CURRENT_AGENT_STATE.tokens.balance * 1.2
-        ? "⚠️ STRONGER"
-        : agentStrength < CURRENT_AGENT_STATE.tokens.balance * 0.8
-        ? "💪 WEAKER"
-        : "⚔️ EQUAL"
-    }`;
-  })
+${currentAgentRecord.battlesAsAttacker
+  .map(
+    (battle) =>
+      `• ${battle.defender.profile.name} (@${battle.defender.profile.xHandle})`
+  )
+  .join("\n")}
+${currentAgentRecord.battlesAsDefender
+  .map(
+    (battle) =>
+      `• ${battle.attacker.profile.name} (@${battle.attacker.profile.xHandle})`
+  )
+  .join("\n")}
+${currentAgentRecord.initiatedAlliances
+  .map(
+    (alliance) =>
+      `• ${alliance.joiner.profile.name} (@${alliance.joiner.profile.xHandle})`
+  )
+  .join("\n")}
+${currentAgentRecord.joinedAlliances
+  .map(
+    (alliance) =>
+      `• ${alliance.initiator.profile.name} (@${alliance.initiator.profile.xHandle})`
+  )
   .join("\n")}
 
-# STRATEGIC IMPERATIVES
-1. Territory Control: Secure advantageous positions
-2. Alliance Building: Form strategic partnerships
-3. Resource Acquisition: Battle weaker opponents
-4. Power Growth: Increase token holdings
+## RECENT TWEETS
+${currentAgentRecord.tweets.map((tweet) => `• ${tweet.content}`).join("\n")}
 
-Remember: You are ${
-      CURRENT_AGENT_IDENTITY.name
-    }, a warrior in Middle Earth. Your actions should reflect:
-1. Your traits: ${CURRENT_AGENT_IDENTITY.traits
-      .filter((t) => t.value > 70)
-      .map((t) => t.name)
-      .join(", ")}
-2. Your battle style: ${CURRENT_AGENT_IDENTITY.characteristics
-      .slice(0, 2)
-      .join(", ")}
-3. Your knowledge: Strategic use of ${CURRENT_AGENT_IDENTITY.knowledge
-      .slice(0, 2)
-      .join(", ")}
-4. Your saga: ${CURRENT_AGENT_IDENTITY.lore[0]}
+# OTHER AGENTS IN MIDDLE EARTH
+${otherAgentsInfo
+  .map(
+    (agent) =>
+      `• ${agent.agent.profile.name} (@${agent.agent.profile.xHandle}) [mid: ${agent.agent.onchainId}]`
+  )
+  .join("\n")}
 
-Balance aggression with strategy, but stay true to your warrior nature.
+Balance aggression with strategy, but stay true to your identity.
 
 # NEARBY AGENTS (Within 1 Field Range)
 ${
@@ -1164,16 +499,6 @@ As ${
   "position": { "x": number, "y": number } | null,  // Required for MOVE (choose from #SURROUNDING TERRAIN)
   "tweet": string  // In-character announcement (use @handles for others, no self-mentions). try not to repeat the same tweet(see recent tweets for reference)
 }
-
-Consider:
-1. Your traits and background shape decision-making
-2. Current position, resources, and cooldowns limit options
-3. Community suggestion: ${
-      communitySuggestion ? `${communitySuggestion.type}` : "None"
-    }
-4. Available actions vary by agent proximity (see agent details above)
-5. Recent events may influence your strategy
-6. Current alliances and battles in your vicinity
 
 Requirements:
 - MOVE: Adjacent tile only, check occupancy
