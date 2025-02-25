@@ -60,7 +60,7 @@ class DecisionEngine {
       communitySuggestion
     );
     console.log("🤖 Testing Prompt", prompt);
-    return;
+    // return;
 
     console.info("🤖 Generated AI response 🔥🔥🔥");
     console.info(prompt);
