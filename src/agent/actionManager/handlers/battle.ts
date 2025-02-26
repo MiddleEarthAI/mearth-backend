@@ -642,7 +642,7 @@ export class BattleHandler {
 
     let sideAWins: boolean;
 
-    if (totalTokens.isZero()) {
+    if (Number(totalTokens) === 0) {
       // Use number of agents as fallback when no tokens
       const sideACount = sideA.ally ? 2 : 1;
       const sideBCount = sideB.ally ? 2 : 1;
