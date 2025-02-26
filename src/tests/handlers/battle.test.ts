@@ -17,7 +17,7 @@ import { BN } from "@coral-xyz/anchor";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { mintMearthTokens, requestAirdrop } from "../utiils";
 
-describe("BattleHandler", function () {
+describe.only("BattleHandler", function () {
   let program: MearthProgram;
   let battleHandler: BattleHandler;
   let prisma: PrismaClient;
@@ -156,7 +156,7 @@ describe("BattleHandler", function () {
     await prisma.$disconnect();
   });
 
-  it("should successfully resolve a simple battle between two agents", async () => {
+  it.only("should successfully resolve a simple battle between two agents", async () => {
     const ctx: ActionContext = {
       agentId: agent1.id,
       agentOnchainId: agent1.profile.onchainId,

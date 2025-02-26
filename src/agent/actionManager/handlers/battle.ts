@@ -9,19 +9,18 @@ import {
 } from "@/utils/program";
 import { AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "@/config/env";
-import { BN } from "@coral-xyz/anchor";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 interface BattleSide {
-  agent: AgentAccount & { vaultBalance: number };
-  ally: (AgentAccount & { vaultBalance: number }) | null;
+  agent: AgentAccount & { vaultBalance: bigint };
+  ally: (AgentAccount & { vaultBalance: bigint }) | null;
 }
 
 interface BattleOutcome {
   winner: "sideA" | "sideB";
   percentageLost: number;
-  totalTokensAtStake: number;
+  totalTokensAtStake: bigint;
   agentsToDie: number[];
 }
 
@@ -67,7 +66,7 @@ export class BattleHandler {
             new PublicKey(solanaConfig.tokenMint),
             agentAuthority.publicKey
           );
-          const vaultBalance = new BN(vault.amount).div(LAMPORTS_PER_SOL);
+          const vaultBalance = vault.amount / BigInt(LAMPORTS_PER_SOL); // we are dealing with bigints here
           return { ...agent, vaultBalance };
         })(),
         (async () => {
@@ -82,7 +81,7 @@ export class BattleHandler {
             new PublicKey(solanaConfig.tokenMint),
             agentAuthority.publicKey
           );
-          const vaultBalance = new BN(vault.amount).div(LAMPORTS_PER_SOL);
+          const vaultBalance = vault.amount / BigInt(LAMPORTS_PER_SOL); // we are dealing with bigints here
           return { ...agent, vaultBalance };
         })(),
       ]);
@@ -108,7 +107,10 @@ export class BattleHandler {
                 await this.program.provider.connection.getBalance(
                   allyVault.address
                 );
-              return { ...allyAccount, vaultBalance: allyVaultBalance };
+              return {
+                ...allyAccount,
+                vaultBalance: BigInt(allyVaultBalance),
+              };
             })()
           : null,
         defenderAccountData.allianceWith
@@ -130,7 +132,10 @@ export class BattleHandler {
                 await this.program.provider.connection.getBalance(
                   allyVault.address
                 );
-              return { ...allyAccount, vaultBalance: allyVaultBalance };
+              return {
+                ...allyAccount,
+                vaultBalance: BigInt(allyVaultBalance),
+              };
             })()
           : null,
       ]);
@@ -630,19 +635,19 @@ export class BattleHandler {
     sideB: BattleSide
   ): Promise<BattleOutcome> {
     // getting the agents vault balances
-    const sideATokens = new BN(sideA.agent.vaultBalance).add(
-      sideA.ally ? new BN(sideA.ally.vaultBalance) : new BN(0)
-    );
+    const sideATokens =
+      sideA.agent.vaultBalance +
+      (sideA.ally ? sideA.ally.vaultBalance : BigInt(0));
 
-    const sideBTokens = new BN(sideB.agent.vaultBalance).add(
-      sideB.ally ? new BN(sideB.ally.vaultBalance) : new BN(0)
-    );
+    const sideBTokens =
+      sideB.agent.vaultBalance +
+      (sideB.ally ? sideB.ally.vaultBalance : BigInt(0));
 
-    const totalTokens = sideATokens.add(sideBTokens);
+    const totalTokens = sideATokens + sideBTokens;
 
     let sideAWins: boolean;
 
-    if (Number(totalTokens) === 0) {
+    if (totalTokens === BigInt(0)) {
       // Use number of agents as fallback when no tokens
       const sideACount = sideA.ally ? 2 : 1;
       const sideBCount = sideB.ally ? 2 : 1;
@@ -653,7 +658,7 @@ export class BattleHandler {
       const rand = Math.random();
       sideAWins = rand < sideAProbability;
     } else {
-      const sideAProbability = sideATokens.div(totalTokens);
+      const sideAProbability = sideATokens / totalTokens;
       const rand = Math.random();
       sideAWins = rand < sideAProbability;
     }
@@ -666,11 +671,11 @@ export class BattleHandler {
     const deathChance = gameConfig.mechanics.deathChance / 100;
 
     if (Math.random() < deathChance) {
-      agentsToDie.push(Number(losingSide.agent.id));
+      agentsToDie.push(losingSide.agent.id);
     }
 
     if (losingSide.ally && Math.random() < deathChance) {
-      agentsToDie.push(Number(losingSide.ally.id));
+      agentsToDie.push(losingSide.ally.id);
     }
 
     console.log("Battle outcome:::::::::::::::", {
@@ -683,7 +688,7 @@ export class BattleHandler {
     return {
       winner: sideAWins ? "sideA" : "sideB",
       percentageLost,
-      totalTokensAtStake: totalTokens.toNumber(),
+      totalTokensAtStake: totalTokens,
       agentsToDie,
     };
   }
