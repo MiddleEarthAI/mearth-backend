@@ -11,7 +11,7 @@ import { AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { BN } from "@coral-xyz/anchor";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
-import { PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 interface BattleSide {
   agent: AgentAccount & { vaultBalance: number };
@@ -67,8 +67,7 @@ export class BattleHandler {
             new PublicKey(solanaConfig.tokenMint),
             agentAuthority.publicKey
           );
-          const vaultBalance =
-            await this.program.provider.connection.getBalance(vault.address);
+          const vaultBalance = new BN(vault.amount).div(LAMPORTS_PER_SOL);
           return { ...agent, vaultBalance };
         })(),
         (async () => {
@@ -83,8 +82,7 @@ export class BattleHandler {
             new PublicKey(solanaConfig.tokenMint),
             agentAuthority.publicKey
           );
-          const vaultBalance =
-            await this.program.provider.connection.getBalance(vault.address);
+          const vaultBalance = new BN(vault.amount).div(LAMPORTS_PER_SOL);
           return { ...agent, vaultBalance };
         })(),
       ]);
@@ -243,6 +241,30 @@ export class BattleHandler {
             },
           });
 
+          const winner =
+            outcome.winner === "sideA"
+              ? attackerRecord.profile.xHandle
+              : defenderRecord.profile.xHandle;
+          const loser =
+            outcome.winner === "sideA"
+              ? defenderRecord.profile.xHandle
+              : attackerRecord.profile.xHandle;
+
+          const loserTokens =
+            outcome.winner === "sideA"
+              ? sideB.agent.vaultBalance
+              : sideA.agent.vaultBalance;
+
+          let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of @${loser} (${loserTokens}) tokens lost in the clash!`;
+
+          if (outcome.agentsToDie.length > 0) {
+            message += ` 💀 ${
+              outcome.agentsToDie.length === 1
+                ? "A warrior has"
+                : "Warriors have"
+            } fallen in battle!`;
+          }
+
           // Create battle event
           const battleEvent = await prisma.gameEvent.create({
             data: {
@@ -250,11 +272,7 @@ export class BattleHandler {
               eventType: "BATTLE",
               initiatorId: ctx.agentId,
               targetId: defenderRecord.id,
-              message: this.createBattleMessage(
-                attackerRecord.profile.xHandle,
-                defenderRecord.profile.xHandle,
-                outcome
-              ),
+              message,
               metadata: {
                 battleId: battle.id,
                 battleType: battleType,
@@ -668,24 +686,5 @@ export class BattleHandler {
       totalTokensAtStake: totalTokens.toNumber(),
       agentsToDie,
     };
-  }
-
-  private createBattleMessage(
-    attackerHandle: string,
-    defenderHandle: string,
-    outcome: BattleOutcome
-  ): string {
-    const winner = outcome.winner === "sideA" ? attackerHandle : defenderHandle;
-    const loser = outcome.winner === "sideA" ? defenderHandle : attackerHandle;
-
-    let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of @${loser} tokens lost in the clash!`;
-
-    if (outcome.agentsToDie.length > 0) {
-      message += ` 💀 ${
-        outcome.agentsToDie.length === 1 ? "A warrior has" : "Warriors have"
-      } fallen in battle!`;
-    }
-
-    return message;
   }
 }
