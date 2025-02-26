@@ -175,6 +175,10 @@ const env = cleanEnv(process.env, {
   AGENT_ACTION_INTERVAL: num({
     desc: "Game state update interval in milliseconds",
   }),
+  AGENT_INIT_GAP_DELAY: num({
+    // default: 900000, // 15 minutes in milliseconds
+    desc: "Delay between agent initializations in milliseconds",
+  }),
   GAME_CLEANUP_INTERVAL: num({
     default: 900, // 15 minutes in seconds
     desc: "Game cleanup interval in milliseconds",
@@ -337,6 +341,7 @@ export const twitterConfig = {
 export const gameConfig = {
   mapDiameter: env.GAME_MAP_DIAMETER,
   actionInterval: env.AGENT_ACTION_INTERVAL,
+  agentInitGapDelay: env.AGENT_INIT_GAP_DELAY,
   battleCheckInterval: env.BATTLE_CHECK_INTERVAL,
   cleanupInterval: env.GAME_CLEANUP_INTERVAL,
   dailyRewardTokens: env.DAILY_REWARD_TOKENS,
