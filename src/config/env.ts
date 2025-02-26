@@ -173,7 +173,6 @@ const env = cleanEnv(process.env, {
     desc: "Diameter of the game map",
   }),
   AGENT_ACTION_INTERVAL: num({
-    default: 3600, // 1 hour in seconds
     desc: "Game state update interval in milliseconds",
   }),
   GAME_CLEANUP_INTERVAL: num({
