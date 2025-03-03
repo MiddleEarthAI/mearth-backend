@@ -27,3 +27,6 @@ build/
 Thumbs.db 
 
 src/templates/
+
+# Custom scripts for local development only
+src/scripts/agent-actions.ts

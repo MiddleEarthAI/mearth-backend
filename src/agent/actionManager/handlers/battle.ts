@@ -11,6 +11,7 @@ import { AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { MEARTH_DECIMALS } from "@/constants";
 
 interface BattleSide {
   agent: AgentAccount & { vaultBalance: bigint };
@@ -66,7 +67,7 @@ export class BattleHandler {
             new PublicKey(solanaConfig.tokenMint),
             agentAuthority.publicKey
           );
-          const vaultBalance = vault.amount / BigInt(LAMPORTS_PER_SOL); // we are dealing with bigints here
+          const vaultBalance = vault.amount / BigInt(MEARTH_DECIMALS); // we are dealing with bigints here
           return { ...agent, vaultBalance };
         })(),
         (async () => {

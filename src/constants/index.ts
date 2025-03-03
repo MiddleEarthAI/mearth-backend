@@ -837,3 +837,4 @@ export function getRandomCoordinatesWithTerrainType() {
   return { x, y, terrainType };
 }
 export const validCoordinatesArray = Array.from(validCoordinates);
+export const MEARTH_DECIMALS = 6;
