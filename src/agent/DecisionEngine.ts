@@ -17,6 +17,7 @@ import { formatDate } from "@/utils";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { connection, getAgentVault } from "@/utils/program";
 import { BN } from "@coral-xyz/anchor";
+import { MEARTH_DECIMALS } from "@/constants";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -452,7 +453,7 @@ his/her current status:
 Position: ${compassDirection} at (${agentMaptile?.x}, ${agentMaptile?.y})
 Terrain: ${agentMaptile?.terrainType} 
 Token Balance: ${new BN(otherAgentVault.amount).div(
-          new BN(LAMPORTS_PER_SOL)
+          new BN(MEARTH_DECIMALS)
         )} $MEARTH
 
 his/her recent tweets:
@@ -678,7 +679,7 @@ Status: OUT OF RANGE - ALL ACTIONS LOCKED
         surrounding: currentAgentSurroundingTerrainInfoString,
       },
       tokens: {
-        balance: new BN(currentAgentVault.amount).div(new BN(LAMPORTS_PER_SOL)),
+        balance: new BN(currentAgentVault.amount).div(new BN(MEARTH_DECIMALS)),
       },
       cooldowns: currentAgentRecord.coolDown.reduce((acc, cd) => {
         acc[cd.type.toLowerCase()] = cd.endsAt;
