@@ -262,8 +262,8 @@ export class GameManager implements IGameManager {
     });
 
     const profiles = await this.prisma.agentProfile.findMany();
-    const adjacentTiles = await this.getAdjacentEmptyTiles(6, 22);
-    console.log("adjacentTiles", adjacentTiles);
+    // const adjacentTiles = await this.getAdjacentEmptyTiles(6, 22);
+    // console.log("adjacentTiles", adjacentTiles);
 
     return Promise.all(
       profiles.map(async (profile, index) => {
@@ -275,27 +275,27 @@ export class GameManager implements IGameManager {
         );
 
         console.info("🎯 Finding spawn location...");
-        // const spawnTile = await this.prisma.mapTile
-        //   .findMany({
-        //     where: {
-        //       agent: null,
-        //     },
-        //     orderBy: {
-        //       id: "asc",
-        //     },
-        //     take: 1,
-        //     skip: Math.floor(
-        //       Math.random() *
-        //         (await this.prisma.mapTile.count({
-        //           where: {
-        //             agent: null,
-        //           },
-        //         }))
-        //     ),
-        //   })
-        //   .then((tiles) => tiles[0]);
+        const spawnTile = await this.prisma.mapTile
+          .findMany({
+            where: {
+              agent: null,
+            },
+            orderBy: {
+              id: "asc",
+            },
+            take: 1,
+            skip: Math.floor(
+              Math.random() *
+                (await this.prisma.mapTile.count({
+                  where: {
+                    agent: null,
+                  },
+                }))
+            ),
+          })
+          .then((tiles) => tiles[0]);
 
-        const spawnTile = adjacentTiles[profile.onchainId - 1];
+        // const spawnTile = adjacentTiles[profile.onchainId - 1];
 
         console.info(`🔗 Registering agent on-chain...`);
 

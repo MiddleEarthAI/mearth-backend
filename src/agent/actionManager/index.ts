@@ -7,11 +7,11 @@ import { MovementHandler } from "./handlers/movement";
 import { AllianceHandler } from "./handlers/alliance";
 import { IgnoreHandler } from "./handlers/ignore";
 import { getGamePDA } from "@/utils/pda";
-import { logger } from "@/utils/logger";
 
 /**
  * Manages the execution and validation of game actions
  */
+
 export class ActionManager {
   private readonly battleHandler: BattleHandler;
   private readonly movementHandler: MovementHandler;

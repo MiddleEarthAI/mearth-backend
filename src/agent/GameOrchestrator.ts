@@ -17,6 +17,7 @@ import { BN } from "@coral-xyz/anchor";
 import { ActionManager } from "./actionManager";
 import { gameConfig } from "@/config/env";
 import { TwitterInteraction } from "@/types/twitter";
+import { twitterInteractions } from "@/tests/data/twitter-interactions";
 
 /**
  * Service for managing AI agentData behavior and decision making
@@ -439,6 +440,8 @@ export class GameOrchestrator {
             timestamp: "desc",
           },
         });
+        twitterInteractions.interactions;
+
         let interactions: TwitterInteraction[] = [];
         if (agentTweet?.conversationId) {
           // Check for new interactions

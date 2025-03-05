@@ -6,6 +6,7 @@ import {
   UserV2,
 } from "twitter-api-v2";
 import { twitterConfig } from "@/config/env";
+import { twitterInteractions } from "@/tests/data/twitter-interactions";
 
 export type AgentId = "1" | "2" | "3" | "4";
 
