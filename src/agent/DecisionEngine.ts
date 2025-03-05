@@ -924,12 +924,14 @@ ${(() => {
 })()}
 
 Your active cooldowns - you must account for them when making decisions:
-${Object.entries(CURRENT_AGENT_STATE.cooldowns)
-  .map(
-    ([type, endsAt]) =>
-      `${type}: you can't ${type} until it's over at ${endsAt}`
-  )
-  .join("\n")}
+${
+  Object.entries(CURRENT_AGENT_STATE.cooldowns)
+    .map(
+      ([type, endsAt]) =>
+        `${type}: you can't ${type} until it's over at ${endsAt}`
+    )
+    .join("\n") || "No active cooldowns"
+}
 
 ### Fellow AI Agents in Middle Earth - You must aim to defeat these agents with the best of your strategies
 #### Dead agents context
@@ -968,13 +970,23 @@ ${communitySuggestion || "No community suggestions"}
 TASK:
 As ${
       CURRENT_AGENT_IDENTITY.name
-    }, generate ONE strategic action in this format(return only the JSON object, nothing else). YOu must strictly follow the #game rules and #game status. and stay true to your character
+    }, decide your next action by returning only a json object in this format:
 {
   "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE", // see (Other Agents in Middle Earth) for the possible actions
   "targetId": number | null,  // Agent's MID for interactions
   "position": { "x": number, "y": number } | null,  // Required ONLY for MOVE
-  "tweet": string  // In-character announcement (use @handles for others, no self-mentions). try not to repeat the same tweet(see recent tweets for reference)
+  "tweet": string  // In-character announcement
 }
+
+Task Requirements:
+- You must strictly obey the cooldowns and restrictions per agent interactions.
+- You must strictly follow the #game rules and #game status.
+- You must stay true to your character.
+- You must generate ONE strategic action in the given format.
+- No hash tags or emojies in tweets.
+- Do not repeat the same tweet(see your recent tweets for reference).
+- use @handles for others, no self-mentions.
+- You must return only the JSON object, nothing else.
 `;
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> THE MAIN PROMPT ENDS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
