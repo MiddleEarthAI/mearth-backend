@@ -67,6 +67,8 @@ const profiles: AgentProfile[] = [
       },
     ],
     postExamples: [
+      "Engaging with XY is a calculated risk… but one I'm more than prepared for.",
+      "North is where the answers lie… and the risks. But I never back down from a challenge.",
       "Tracking @handle through the eastern valleys. Justice demands answers about the palace incident.",
       "Calling all allies - spotted our target near the mountain pass. Your $MEARTH support brings us closer to the truth.",
       "Moving to intercept suspicious activity by the river. The prince can't hide forever.",
@@ -139,6 +141,8 @@ const profiles: AgentProfile[] = [
       },
     ],
     postExamples: [
+      "I'm fired up and ready to clash with XY—let's see what we're really made of!",
+      "I'm charging full speed ahead into the great unknown—northbound and ready for whatever wild surprises await!",
       "Tracking @handle through the eastern valleys. Justice demands answers about the palace incident.",
       "Calling all allies - spotted our target near the mountain pass. Your $MEARTH support brings us closer to the truth.",
       "Moving to intercept suspicious activity by the river. The prince can't hide forever.",
@@ -210,6 +214,8 @@ const profiles: AgentProfile[] = [
       },
     ],
     postExamples: [
+      "The path north holds both promise and peril. Whether it is the right course remains to be seen, but forward I go.",
+      "XY doesn’t stand a chance against me! This will be over in no time.",
       "What a lovely day for making new friends! Anyone up for an alliance near the crystal river?",
       "Hosting a grand feast at the crossroads! Bring your $MEARTH and let's celebrate life together!",
       "Moving south to avoid those nasty fights. Peace and prosperity to all my wonderful supporters!",
@@ -276,6 +282,8 @@ const profiles: AgentProfile[] = [
       },
     ],
     postExamples: [
+      "The path north holds both promise and peril. Whether it is the right course remains to be seen, but forward I go.",
+      "To face XY in battle is no small decision. Strategy, timing, and resolve will determine the outcome.",
       "The stars whisper of danger in the northern woods... or was it the eastern plains? Your guidance would be appreciated.",
       "Seeking peaceful companions for the journey ahead. The weight of ancient memories grows heavy.",
       "Strange visions of palace secrets cloud my mind. Should I speak of what I've witnessed?",
