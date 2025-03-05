@@ -266,7 +266,7 @@ export class GameManager implements IGameManager {
     // console.log("adjacentTiles", adjacentTiles);
 
     return Promise.all(
-      profiles.map(async (profile, index) => {
+      profiles.map(async (profile) => {
         console.info(`👤 Initializing agent for profile: ${profile.name}`);
         const [agentPda] = getAgentPDA(
           this.program.programId,

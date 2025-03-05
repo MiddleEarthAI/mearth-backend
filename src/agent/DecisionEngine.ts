@@ -758,6 +758,40 @@ Note: While direct interactions are blocked, you can use this time to communicat
       }, {} as Record<string, Date>),
     };
 
+    // Create a more detailed cooldown context with remaining time and explanations
+    const cooldownDetails = currentAgentRecord.coolDown.map((cd) => {
+      const remainingTimeMs = cd.endsAt.getTime() - currentTime.getTime();
+      const remainingMinutes = Math.ceil(remainingTimeMs / (1000 * 60));
+
+      // Provide specific context based on cooldown type
+      let explanation = "";
+      switch (cd.type) {
+        case "Battle":
+          explanation =
+            "You cannot initiate or participate in any battles until this cooldown expires.";
+          break;
+        case "Alliance":
+          explanation =
+            "You cannot form new alliances until this cooldown expires.";
+          break;
+        case "Move":
+          explanation =
+            "You cannot move to a new position until this cooldown expires.";
+          break;
+        case "Ignore":
+          explanation =
+            "You cannot use the ignore action until this cooldown expires.";
+          break;
+      }
+
+      return {
+        type: cd.type,
+        endsAt: cd.endsAt,
+        remainingMinutes,
+        explanation,
+      };
+    });
+
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> THE MAIN PROMPT STARTS HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     const characterPrompt = `# MIDDLE EARTH AI
 ## About
@@ -925,12 +959,26 @@ ${(() => {
 
 Your active cooldowns - you must account for them when making decisions:
 ${
-  Object.entries(CURRENT_AGENT_STATE.cooldowns)
-    .map(
-      ([type, endsAt]) =>
-        `${type}: you can't ${type} until it's over at ${endsAt}`
-    )
-    .join("\n") || "No active cooldowns"
+  cooldownDetails.length > 0
+    ? cooldownDetails
+        .map(
+          (cd) =>
+            `• ${cd.type} COOLDOWN: Expires at ${formatDate(cd.endsAt)} (${
+              cd.remainingMinutes
+            } minutes remaining)
+   ${cd.explanation}
+   IMPORTANT: ${
+     cd.type === "Battle"
+       ? "You CANNOT initiate battles with any agent until this expires."
+       : cd.type === "Alliance"
+       ? "You CANNOT form new alliances with any agent until this expires."
+       : cd.type === "Move"
+       ? "You CANNOT move to a new position until this expires."
+       : "You CANNOT use the ignore action until this expires."
+   }`
+        )
+        .join("\n\n")
+    : "No active cooldowns - all action types are available to you based on other game conditions."
 }
 
 ### Fellow AI Agents in Middle Earth - You must aim to defeat these agents with the best of your strategies
@@ -980,7 +1028,7 @@ As ${
 
 Task Requirements:
 - You must strictly obey the cooldowns and restrictions per agent interactions.
-- You must strictly favor Battle actions over other actions when possible.
+- You must strictly favor Battle action over other actions when possible.
 - You must strictly not fight your alliance partners.
 - You must strictly follow the #game rules and #game status.
 - You must stay true to your character.
