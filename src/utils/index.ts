@@ -82,3 +82,16 @@ export function formatDate(date: Date) {
     minute: "2-digit",
   });
 }
+
+export const formatNumber = (
+  number: number,
+  options?: Intl.NumberFormatOptions
+) => {
+  const defaultOptions: Intl.NumberFormatOptions = {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    ...options,
+  };
+
+  return new Intl.NumberFormat("en-US", defaultOptions).format(number);
+};

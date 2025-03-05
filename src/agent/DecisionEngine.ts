@@ -1022,7 +1022,7 @@ As ${
   "tweet": string  // In-character announcement
 }
 
-Task Requirements:
+Task Requirements and Rules (You must strictly obey these rules):
 - You must strictly obey the cooldowns and restrictions per agent interactions.
 - You must strictly favor Battle action over other actions when possible.
 - You must strictly not fight your alliance partners.

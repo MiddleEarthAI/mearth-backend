@@ -12,6 +12,7 @@ import { gameConfig, solanaConfig } from "@/config/env";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { MEARTH_DECIMALS } from "@/constants";
+import { formatNumber } from "@/utils";
 
 interface BattleSide {
   agent: AgentAccount & { vaultBalance: bigint };
@@ -257,7 +258,11 @@ export class BattleHandler {
               ? sideB.agent.vaultBalance
               : sideA.agent.vaultBalance;
 
-          let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${outcome.percentageLost}% of @${loser} (${loserTokens}) tokens lost in the clash!`;
+          let message = `⚔️ Epic battle concluded! @${winner} emerges victorious over @${loser}! ${
+            outcome.percentageLost
+          }% of @${loser} (${formatNumber(
+            Number(loserTokens / BigInt(MEARTH_DECIMALS))
+          )}) tokens lost in the clash!`;
 
           if (outcome.agentsToDie.length > 0) {
             message += ` 💀 ${
