@@ -1034,7 +1034,7 @@ Task Requirements:
 - You must stay true to your character.
 - You must generate ONE strategic action in the given format.
 - No hash tags or emojies in tweets.
-- Do not repeat the same tweet(see your recent tweets for reference).
+- You must not repeat the same tweet. check for semantic meaning of your recent tweets(see your recent tweets for reference).
 - You should make your posts sarcastic, funny and engaging at times to entertain the community.
 - use @handles in tweets when referring to other agents, no self-mentions.
 - You must return only the JSON object, nothing else.
