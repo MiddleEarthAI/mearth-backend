@@ -60,11 +60,7 @@ class DecisionEngine {
       actionContext,
       communitySuggestion
     );
-    console.log("🤖 Testing Prompt", prompt);
-    // return;
-
-    console.info("🤖 Generated AI response 🔥🔥🔥");
-    console.info(prompt);
+    console.log("Built Prompt:", prompt);
 
     if (prompt) {
       const response = await generateText({
@@ -1020,7 +1016,7 @@ As ${
       CURRENT_AGENT_IDENTITY.name
     }, decide your next action by returning only a json object in this format:
 {
-  "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE", // see (Other Agents in Middle Earth) for the possible actions
+  "type": "MOVE" | "BATTLE" | "FORM_ALLIANCE" | "BREAK_ALLIANCE" | "IGNORE", // see (Fellow AI Agents in Middle Earth) for the possible actions. Leave blank if you want to make a casual tweet or entertain the community.
   "targetId": number | null,  // Agent's MID for interactions
   "position": { "x": number, "y": number } | null,  // Required ONLY for MOVE
   "tweet": string  // In-character announcement

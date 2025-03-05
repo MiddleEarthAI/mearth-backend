@@ -54,6 +54,16 @@ export class ActionManager {
       await this.validateGameState(ctx);
 
       // Execute appropriate action
+      // if there is no action specified, that means the agent wants to make a tweet and not take any action
+      if (!action.type) {
+        return {
+          success: true,
+          feedback: {
+            isValid: true,
+            error: undefined,
+          },
+        };
+      }
       switch (action.type) {
         case "BATTLE":
           return this.battleHandler.handle(ctx, action);
