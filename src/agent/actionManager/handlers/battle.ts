@@ -445,17 +445,17 @@ export class BattleHandler {
                   ? defenderAccountData.allianceWith!
                   : attackerAccountData.allianceWith!,
                 leaderAToken: isAttackerWinner
-                  ? attackerRecord?.authorityAssociatedTokenAddress
-                  : defenderRecord?.authorityAssociatedTokenAddress,
+                  ? attackerRecord?.vault
+                  : defenderRecord?.vault,
                 partnerAToken: isAttackerWinner
-                  ? attackerAllyRecord?.authorityAssociatedTokenAddress
-                  : defenderAllyRecord?.authorityAssociatedTokenAddress,
+                  ? attackerAllyRecord?.vault
+                  : defenderAllyRecord?.vault,
                 leaderBToken: isAttackerWinner
-                  ? defenderRecord?.authorityAssociatedTokenAddress
-                  : attackerRecord?.authorityAssociatedTokenAddress,
+                  ? defenderRecord?.vault
+                  : attackerRecord?.vault,
                 partnerBToken: isAttackerWinner
-                  ? defenderAllyRecord?.authorityAssociatedTokenAddress
-                  : attackerAllyRecord?.authorityAssociatedTokenAddress,
+                  ? defenderAllyRecord?.vault
+                  : attackerAllyRecord?.vault,
                 leaderAAuthority: isAttackerWinner
                   ? attackerAuthorityKeypair.publicKey
                   : defenderAuthorityKeypair.publicKey,
@@ -479,13 +479,14 @@ export class BattleHandler {
               ])
               .rpc();
           } else if (battleType === "AgentVsAlliance") {
+            // determine the solo agent
             const isAttackerSingle = !attackerAllyAccount;
 
             const singleAgent = isAttackerSingle ? attackerPda : defenderPda;
 
             const singleAgentToken = isAttackerSingle
-              ? attackerRecord.authorityAssociatedTokenAddress
-              : defenderRecord.authorityAssociatedTokenAddress;
+              ? attackerRecord.vault
+              : defenderRecord.vault;
             const singleAgentAuthorityKeypair = isAttackerSingle
               ? attackerAuthorityKeypair
               : defenderAuthorityKeypair;
@@ -501,11 +502,11 @@ export class BattleHandler {
               : attackerAccountData.allianceWith!;
 
             const allianceLeaderToken = isAttackerSingle
-              ? defenderRecord.authorityAssociatedTokenAddress
-              : attackerRecord.authorityAssociatedTokenAddress;
+              ? defenderRecord.vault
+              : attackerRecord.vault;
             const alliancePartnerToken = isAttackerSingle
-              ? defenderAllyRecord?.authorityAssociatedTokenAddress!
-              : attackerAllyRecord?.authorityAssociatedTokenAddress!;
+              ? defenderAllyRecord?.vault!
+              : attackerAllyRecord?.vault!;
 
             tx = await this.program.methods
               .resolveBattleAgentVsAlliance(
@@ -544,11 +545,11 @@ export class BattleHandler {
                 winner: isAttackerWinner ? attackerPda : defenderPda,
                 loser: isAttackerWinner ? defenderPda : attackerPda,
                 winnerToken: isAttackerWinner
-                  ? attackerRecord.authorityAssociatedTokenAddress
-                  : defenderRecord.authorityAssociatedTokenAddress,
+                  ? attackerRecord.vault
+                  : defenderRecord.vault,
                 loserToken: isAttackerWinner
-                  ? defenderRecord.authorityAssociatedTokenAddress
-                  : attackerRecord.authorityAssociatedTokenAddress,
+                  ? defenderRecord.vault
+                  : attackerRecord.vault,
                 loserAuthority: isAttackerWinner
                   ? defenderAuthorityKeypair.publicKey
                   : attackerAuthorityKeypair.publicKey,
