@@ -1035,6 +1035,7 @@ Task Requirements:
 - You must generate ONE strategic action in the given format.
 - No hash tags or emojies in tweets.
 - Do not repeat the same tweet(see your recent tweets for reference).
+- You should make your posts sarcastic, funny and engaging at times to entertain the community.
 - use @handles for others, no self-mentions.
 - You must return only the JSON object, nothing else.
 `;
