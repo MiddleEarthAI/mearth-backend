@@ -980,6 +980,7 @@ As ${
 
 Task Requirements:
 - You must strictly obey the cooldowns and restrictions per agent interactions.
+- You must strictly favor Battle actions over other actions when possible.
 - You must strictly follow the #game rules and #game status.
 - You must stay true to your character.
 - You must generate ONE strategic action in the given format.
