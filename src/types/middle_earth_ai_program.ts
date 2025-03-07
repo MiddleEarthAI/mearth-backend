@@ -5,1324 +5,1677 @@
  * IDL can be found at `target/idl/middle_earth_ai_program.json`.
  */
 export type MiddleEarthAiProgram = {
-  address: "6DSSNV3bHaCn8RF6VD64Y7mBX1Uh2T9gUcaEW1U9J2Yx";
-  metadata: {
-    name: "middleEarthAiProgram";
-    version: "0.1.0";
-    spec: "0.1.0";
-    description: "Created with Anchor";
-  };
-  instructions: [
+  "address": "6DSSNV3bHaCn8RF6VD64Y7mBX1Uh2T9gUcaEW1U9J2Yx",
+  "metadata": {
+    "name": "middleEarthAiProgram",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
     {
-      name: "breakAlliance";
-      discriminator: [139, 100, 147, 25, 204, 14, 156, 151];
-      accounts: [
+      "name": "breakAlliance",
+      "discriminator": [
+        139,
+        100,
+        147,
+        25,
+        204,
+        14,
+        156,
+        151
+      ],
+      "accounts": [
         {
-          name: "initiator";
-          docs: [
+          "name": "initiator",
+          "docs": [
             "The initiating agent (mutable and signed) that wants to break the alliance."
-          ];
-          writable: true;
+          ],
+          "writable": true
         },
         {
-          name: "targetAgent";
-          docs: ["The allied (or target) agent for the alliance."];
-          writable: true;
+          "name": "targetAgent",
+          "docs": [
+            "The allied (or target) agent for the alliance."
+          ],
+          "writable": true
         },
         {
-          name: "game";
-          docs: ["The global game state holding the alliance list."];
-          writable: true;
-          relations: ["initiator", "targetAgent"];
+          "name": "game",
+          "docs": [
+            "The global game state holding the alliance list."
+          ],
+          "writable": true,
+          "relations": [
+            "initiator",
+            "targetAgent"
+          ]
         },
         {
-          name: "authority";
-          docs: ["The signer for the initiating agent."];
-          writable: true;
-          signer: true;
-          relations: ["initiator"];
+          "name": "authority",
+          "docs": [
+            "The signer for the initiating agent."
+          ],
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "initiator"
+          ]
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: "claimStakingRewards";
-      discriminator: [229, 141, 170, 69, 111, 94, 6, 72];
-      accounts: [
+      "name": "claimStakingRewards",
+      "discriminator": [
+        229,
+        141,
+        170,
+        69,
+        111,
+        94,
+        6,
+        72
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
-          writable: true;
-          relations: ["agent"];
+          "name": "game",
+          "writable": true,
+          "relations": [
+            "agent"
+          ]
         },
         {
-          name: "stakeInfo";
-          writable: true;
-          pda: {
-            seeds: [
+          "name": "stakeInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
               {
-                kind: "const";
-                value: [115, 116, 97, 107, 101];
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  107,
+                  101
+                ]
               },
               {
-                kind: "account";
-                path: "agent";
+                "kind": "account",
+                "path": "agent"
               },
               {
-                kind: "account";
-                path: "authority";
+                "kind": "account",
+                "path": "authority"
               }
-            ];
-          };
+            ]
+          }
         },
         {
-          name: "mint";
+          "name": "mint"
         },
         {
-          name: "rewardsVault";
-          writable: true;
+          "name": "rewardsVault",
+          "writable": true
         },
         {
-          name: "stakerDestination";
-          writable: true;
+          "name": "stakerDestination",
+          "writable": true
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         },
         {
-          name: "rewardsAuthority";
-          writable: true;
-          signer: true;
+          "name": "rewardsAuthority",
+          "writable": true,
+          "signer": true
         },
         {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: "endGame";
-      discriminator: [224, 135, 245, 99, 67, 175, 121, 252];
-      accounts: [
+      "name": "endGame",
+      "discriminator": [
+        224,
+        135,
+        245,
+        99,
+        67,
+        175,
+        121,
+        252
+      ],
+      "accounts": [
         {
-          name: "game";
-          writable: true;
+          "name": "game",
+          "writable": true
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
-          relations: ["game"];
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "game"
+          ]
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: "formAlliance";
-      discriminator: [113, 30, 47, 217, 83, 151, 0, 174];
-      accounts: [
+      "name": "formAlliance",
+      "discriminator": [
+        113,
+        30,
+        47,
+        217,
+        83,
+        151,
+        0,
+        174
+      ],
+      "accounts": [
         {
-          name: "initiator";
-          docs: ["The initiating agent (must be mutable and signed)."];
-          writable: true;
+          "name": "initiator",
+          "docs": [
+            "The initiating agent (must be mutable and signed)."
+          ],
+          "writable": true
         },
         {
-          name: "targetAgent";
-          docs: [
+          "name": "targetAgent",
+          "docs": [
             "The target agent that the initiator wants to form an alliance with."
-          ];
-          writable: true;
+          ],
+          "writable": true
         },
         {
-          name: "game";
-          docs: ["The global game state holding the alliance list."];
-          writable: true;
-          relations: ["initiator", "targetAgent"];
+          "name": "game",
+          "docs": [
+            "The global game state holding the alliance list."
+          ],
+          "writable": true,
+          "relations": [
+            "initiator",
+            "targetAgent"
+          ]
         },
         {
-          name: "authority";
-          docs: ["The signer for the initiating agent."];
-          writable: true;
-          signer: true;
-          relations: ["initiator"];
+          "name": "authority",
+          "docs": [
+            "The signer for the initiating agent."
+          ],
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "initiator"
+          ]
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: "initializeGame";
-      discriminator: [44, 62, 102, 247, 126, 208, 130, 215];
-      accounts: [
+      "name": "initializeGame",
+      "discriminator": [
+        44,
+        62,
+        102,
+        247,
+        126,
+        208,
+        130,
+        215
+      ],
+      "accounts": [
         {
-          name: "game";
-          writable: true;
-          pda: {
-            seeds: [
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
               {
-                kind: "const";
-                value: [103, 97, 109, 101];
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
               },
               {
-                kind: "arg";
-                path: "gameId";
+                "kind": "arg",
+                "path": "gameId"
               }
-            ];
-          };
+            ]
+          }
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         },
         {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "gameId";
-          type: "u32";
+          "name": "gameId",
+          "type": "u32"
         },
         {
-          name: "bump";
-          type: "u8";
+          "name": "bump",
+          "type": "u8"
         }
-      ];
+      ]
     },
     {
-      name: "initializeStake";
-      discriminator: [33, 175, 216, 4, 116, 130, 164, 177];
-      accounts: [
+      "name": "initializeStake",
+      "discriminator": [
+        33,
+        175,
+        216,
+        4,
+        116,
+        130,
+        164,
+        177
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
-          writable: true;
-          relations: ["agent"];
+          "name": "game",
+          "writable": true,
+          "relations": [
+            "agent"
+          ]
         },
         {
-          name: "stakeInfo";
-          writable: true;
-          pda: {
-            seeds: [
+          "name": "stakeInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
               {
-                kind: "const";
-                value: [115, 116, 97, 107, 101];
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  107,
+                  101
+                ]
               },
               {
-                kind: "account";
-                path: "agent";
+                "kind": "account",
+                "path": "agent"
               },
               {
-                kind: "account";
-                path: "authority";
+                "kind": "account",
+                "path": "authority"
               }
-            ];
-          };
+            ]
+          }
         },
         {
-          name: "stakerSource";
-          writable: true;
+          "name": "stakerSource",
+          "writable": true
         },
         {
-          name: "agentVault";
-          writable: true;
+          "name": "agentVault",
+          "writable": true
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         },
         {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "depositAmount";
-          type: "u64";
+          "name": "depositAmount",
+          "type": "u64"
         }
-      ];
+      ]
     },
     {
-      name: "killAgent";
-      discriminator: [152, 243, 180, 237, 215, 248, 160, 57];
-      accounts: [
+      "name": "killAgent",
+      "discriminator": [
+        152,
+        243,
+        180,
+        237,
+        215,
+        248,
+        160,
+        57
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
+          "name": "game"
         },
         {
-          name: "authority";
-          docs: ["The caller must be the game authority."];
-          writable: true;
-          signer: true;
-          relations: ["agent"];
+          "name": "authority",
+          "docs": [
+            "The caller must be the game authority."
+          ],
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "agent"
+          ]
         }
-      ];
-      args: [];
+      ],
+      "args": []
     },
     {
-      name: "moveAgent";
-      discriminator: [48, 110, 55, 44, 181, 65, 102, 207];
-      accounts: [
+      "name": "moveAgent",
+      "discriminator": [
+        48,
+        110,
+        55,
+        44,
+        181,
+        65,
+        102,
+        207
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
-          relations: ["agent"];
+          "name": "game",
+          "relations": [
+            "agent"
+          ]
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "newX";
-          type: "i32";
+          "name": "newX",
+          "type": "i32"
         },
         {
-          name: "newY";
-          type: "i32";
+          "name": "newY",
+          "type": "i32"
         },
         {
-          name: "terrain";
-          type: {
-            defined: {
-              name: "terrainType";
-            };
-          };
+          "name": "terrain",
+          "type": {
+            "defined": {
+              "name": "terrainType"
+            }
+          }
         }
-      ];
+      ]
     },
     {
-      name: "registerAgent";
-      docs: ["Registers a new Agent in the game (init + list registration)."];
-      discriminator: [135, 157, 66, 195, 2, 113, 175, 30];
-      accounts: [
+      "name": "registerAgent",
+      "docs": [
+        "Registers a new Agent in the game (init + list registration)."
+      ],
+      "discriminator": [
+        135,
+        157,
+        66,
+        195,
+        2,
+        113,
+        175,
+        30
+      ],
+      "accounts": [
         {
-          name: "game";
-          writable: true;
+          "name": "game",
+          "writable": true
         },
         {
-          name: "agent";
-          docs: ["The Agent account is initialized using PDA seeds."];
-          writable: true;
+          "name": "agent",
+          "docs": [
+            "The Agent account is initialized using PDA seeds."
+          ],
+          "writable": true
         },
         {
-          name: "authority";
-          docs: ["The caller must be the game authority."];
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "docs": [
+            "The caller must be the game authority."
+          ],
+          "writable": true,
+          "signer": true
         },
         {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "agentId";
-          type: "u8";
+          "name": "agentId",
+          "type": "u8"
         },
         {
-          name: "x";
-          type: "i32";
+          "name": "x",
+          "type": "i32"
         },
         {
-          name: "y";
-          type: "i32";
+          "name": "y",
+          "type": "i32"
         },
         {
-          name: "name";
-          type: "string";
+          "name": "name",
+          "type": "string"
         }
-      ];
+      ]
     },
     {
-      name: "resolveBattleAgentVsAlliance";
-      discriminator: [59, 240, 150, 171, 245, 203, 23, 134];
-      accounts: [
+      "name": "resolveBattleAgentVsAlliance",
+      "discriminator": [
+        59,
+        240,
+        150,
+        171,
+        245,
+        203,
+        23,
+        134
+      ],
+      "accounts": [
         {
-          name: "singleAgent";
-          writable: true;
+          "name": "singleAgent",
+          "writable": true
         },
         {
-          name: "allianceLeader";
-          writable: true;
+          "name": "allianceLeader",
+          "writable": true
         },
         {
-          name: "alliancePartner";
-          writable: true;
+          "name": "alliancePartner",
+          "writable": true
         },
         {
-          name: "game";
-          relations: ["singleAgent", "allianceLeader", "alliancePartner"];
+          "name": "game",
+          "relations": [
+            "singleAgent",
+            "allianceLeader",
+            "alliancePartner"
+          ]
         },
         {
-          name: "singleAgentToken";
-          writable: true;
+          "name": "singleAgentToken",
+          "writable": true
         },
         {
-          name: "allianceLeaderToken";
-          writable: true;
+          "name": "allianceLeaderToken",
+          "writable": true
         },
         {
-          name: "alliancePartnerToken";
-          writable: true;
+          "name": "alliancePartnerToken",
+          "writable": true
         },
         {
-          name: "singleAgentAuthority";
-          signer: true;
+          "name": "singleAgentAuthority",
+          "signer": true
         },
         {
-          name: "allianceLeaderAuthority";
-          signer: true;
+          "name": "allianceLeaderAuthority",
+          "signer": true
         },
         {
-          name: "alliancePartnerAuthority";
-          signer: true;
+          "name": "alliancePartnerAuthority",
+          "signer": true
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "percentLost";
-          type: "u8";
+          "name": "percentLost",
+          "type": "u8"
         },
         {
-          name: "agentIsWinner";
-          type: "bool";
+          "name": "agentIsWinner",
+          "type": "bool"
         }
-      ];
+      ]
     },
     {
-      name: "resolveBattleAllianceVsAlliance";
-      discriminator: [20, 169, 74, 19, 75, 163, 159, 134];
-      accounts: [
+      "name": "resolveBattleAllianceVsAlliance",
+      "discriminator": [
+        20,
+        169,
+        74,
+        19,
+        75,
+        163,
+        159,
+        134
+      ],
+      "accounts": [
         {
-          name: "leaderA";
-          writable: true;
+          "name": "leaderA",
+          "writable": true
         },
         {
-          name: "partnerA";
-          writable: true;
+          "name": "partnerA",
+          "writable": true
         },
         {
-          name: "leaderB";
-          writable: true;
+          "name": "leaderB",
+          "writable": true
         },
         {
-          name: "partnerB";
-          writable: true;
+          "name": "partnerB",
+          "writable": true
         },
         {
-          name: "game";
-          relations: ["leaderA", "partnerA", "leaderB", "partnerB"];
+          "name": "game",
+          "relations": [
+            "leaderA",
+            "partnerA",
+            "leaderB",
+            "partnerB"
+          ]
         },
         {
-          name: "leaderAToken";
-          writable: true;
+          "name": "leaderAToken",
+          "writable": true
         },
         {
-          name: "partnerAToken";
-          writable: true;
+          "name": "partnerAToken",
+          "writable": true
         },
         {
-          name: "leaderBToken";
-          writable: true;
+          "name": "leaderBToken",
+          "writable": true
         },
         {
-          name: "partnerBToken";
-          writable: true;
+          "name": "partnerBToken",
+          "writable": true
         },
         {
-          name: "leaderAAuthority";
-          signer: true;
+          "name": "leaderAAuthority",
+          "signer": true
         },
         {
-          name: "partnerAAuthority";
-          signer: true;
+          "name": "partnerAAuthority",
+          "signer": true
         },
         {
-          name: "leaderBAuthority";
-          signer: true;
+          "name": "leaderBAuthority",
+          "signer": true
         },
         {
-          name: "partnerBAuthority";
-          signer: true;
+          "name": "partnerBAuthority",
+          "signer": true
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "percentLost";
-          type: "u8";
+          "name": "percentLost",
+          "type": "u8"
         },
         {
-          name: "allianceAWins";
-          type: "bool";
+          "name": "allianceAWins",
+          "type": "bool"
         }
-      ];
+      ]
     },
     {
-      name: "resolveBattleSimple";
-      discriminator: [194, 166, 52, 185, 99, 39, 139, 37];
-      accounts: [
+      "name": "resolveBattleSimple",
+      "discriminator": [
+        194,
+        166,
+        52,
+        185,
+        99,
+        39,
+        139,
+        37
+      ],
+      "accounts": [
         {
-          name: "winner";
-          writable: true;
+          "name": "winner",
+          "writable": true
         },
         {
-          name: "loser";
-          writable: true;
+          "name": "loser",
+          "writable": true
         },
         {
-          name: "game";
-          relations: ["winner", "loser"];
+          "name": "game",
+          "relations": [
+            "winner",
+            "loser"
+          ]
         },
         {
-          name: "winnerToken";
-          writable: true;
+          "name": "winnerToken",
+          "writable": true
         },
         {
-          name: "loserToken";
-          writable: true;
+          "name": "loserToken",
+          "writable": true
         },
         {
-          name: "loserAuthority";
-          signer: true;
+          "name": "loserAuthority",
+          "signer": true
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "percentLoss";
-          type: "u8";
+          "name": "percentLoss",
+          "type": "u8"
         }
-      ];
+      ]
     },
     {
-      name: "setAgentCooldown";
-      docs: ["Allows a staker to initiate a 2-hour cooldown before unstaking."];
-      discriminator: [135, 110, 177, 130, 20, 228, 172, 214];
-      accounts: [
+      "name": "setAgentCooldown",
+      "docs": [
+        "Allows a staker to initiate a 2-hour cooldown before unstaking."
+      ],
+      "discriminator": [
+        135,
+        110,
+        177,
+        130,
+        20,
+        228,
+        172,
+        214
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
-          relations: ["agent"];
+          "name": "game",
+          "relations": [
+            "agent"
+          ]
         },
         {
-          name: "authority";
-          docs: ["The caller must be the game authority."];
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "docs": [
+            "The caller must be the game authority."
+          ],
+          "writable": true,
+          "signer": true
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "newCooldown";
-          type: "i64";
+          "name": "newCooldown",
+          "type": "i64"
         }
-      ];
+      ]
     },
     {
-      name: "stakeTokens";
-      discriminator: [136, 126, 91, 162, 40, 131, 13, 127];
-      accounts: [
+      "name": "stakeTokens",
+      "discriminator": [
+        136,
+        126,
+        91,
+        162,
+        40,
+        131,
+        13,
+        127
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
-          writable: true;
-          relations: ["agent"];
+          "name": "game",
+          "writable": true,
+          "relations": [
+            "agent"
+          ]
         },
         {
-          name: "stakeInfo";
-          writable: true;
-          pda: {
-            seeds: [
+          "name": "stakeInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
               {
-                kind: "const";
-                value: [115, 116, 97, 107, 101];
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  107,
+                  101
+                ]
               },
               {
-                kind: "account";
-                path: "agent";
+                "kind": "account",
+                "path": "agent"
               },
               {
-                kind: "account";
-                path: "authority";
+                "kind": "account",
+                "path": "authority"
               }
-            ];
-          };
+            ]
+          }
         },
         {
-          name: "stakerSource";
-          writable: true;
+          "name": "stakerSource",
+          "writable": true
         },
         {
-          name: "agentVault";
-          writable: true;
+          "name": "agentVault",
+          "writable": true
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         },
         {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "amount";
-          type: "u64";
+          "name": "amount",
+          "type": "u64"
         }
-      ];
+      ]
     },
     {
-      name: "unstakeTokens";
-      discriminator: [58, 119, 215, 143, 203, 223, 32, 86];
-      accounts: [
+      "name": "unstakeTokens",
+      "discriminator": [
+        58,
+        119,
+        215,
+        143,
+        203,
+        223,
+        32,
+        86
+      ],
+      "accounts": [
         {
-          name: "agent";
-          writable: true;
+          "name": "agent",
+          "writable": true
         },
         {
-          name: "game";
-          writable: true;
-          relations: ["agent"];
+          "name": "game",
+          "writable": true,
+          "relations": [
+            "agent"
+          ]
         },
         {
-          name: "stakeInfo";
-          writable: true;
-          pda: {
-            seeds: [
+          "name": "stakeInfo",
+          "writable": true,
+          "pda": {
+            "seeds": [
               {
-                kind: "const";
-                value: [115, 116, 97, 107, 101];
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  107,
+                  101
+                ]
               },
               {
-                kind: "account";
-                path: "agent";
+                "kind": "account",
+                "path": "agent"
               },
               {
-                kind: "account";
-                path: "authority";
+                "kind": "account",
+                "path": "authority"
               }
-            ];
-          };
+            ]
+          }
         },
         {
-          name: "agentVault";
-          writable: true;
+          "name": "agentVault",
+          "writable": true
         },
         {
-          name: "stakerDestination";
-          writable: true;
+          "name": "stakerDestination",
+          "writable": true
         },
         {
-          name: "authority";
-          writable: true;
-          signer: true;
+          "name": "authority",
+          "writable": true,
+          "signer": true
         },
         {
-          name: "gameAuthority";
-          docs: ["The game authority, who owns the vault"];
-          writable: true;
-          signer: true;
+          "name": "gameAuthority",
+          "docs": [
+            "The game authority, who owns the vault"
+          ],
+          "writable": true,
+          "signer": true
         },
         {
-          name: "systemProgram";
-          address: "11111111111111111111111111111111";
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         },
         {
-          name: "tokenProgram";
-          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "amount";
-          type: "u64";
+          "name": "amount",
+          "type": "u64"
         }
-      ];
+      ]
     },
     {
-      name: "updateDailyRewards";
-      discriminator: [235, 160, 223, 244, 149, 193, 160, 179];
-      accounts: [
+      "name": "updateDailyRewards",
+      "discriminator": [
+        235,
+        160,
+        223,
+        244,
+        149,
+        193,
+        160,
+        179
+      ],
+      "accounts": [
         {
-          name: "game";
-          writable: true;
+          "name": "game",
+          "writable": true
         },
         {
-          name: "authority";
-          signer: true;
+          "name": "authority",
+          "signer": true
         }
-      ];
-      args: [
+      ],
+      "args": [
         {
-          name: "newDailyReward";
-          type: "u64";
+          "name": "newDailyReward",
+          "type": "u64"
         }
-      ];
+      ]
     }
-  ];
-  accounts: [
+  ],
+  "accounts": [
     {
-      name: "agent";
-      discriminator: [47, 166, 112, 147, 155, 197, 86, 7];
+      "name": "agent",
+      "discriminator": [
+        47,
+        166,
+        112,
+        147,
+        155,
+        197,
+        86,
+        7
+      ]
     },
     {
-      name: "game";
-      discriminator: [27, 90, 166, 125, 74, 100, 121, 18];
+      "name": "game",
+      "discriminator": [
+        27,
+        90,
+        166,
+        125,
+        74,
+        100,
+        121,
+        18
+      ]
     },
     {
-      name: "stakeInfo";
-      discriminator: [66, 62, 68, 70, 108, 179, 183, 235];
+      "name": "stakeInfo",
+      "discriminator": [
+        66,
+        62,
+        68,
+        70,
+        108,
+        179,
+        183,
+        235
+      ]
     }
-  ];
-  events: [
+  ],
+  "events": [
     {
-      name: "agentMoved";
-      discriminator: [62, 208, 5, 94, 58, 167, 86, 68];
+      "name": "agentMoved",
+      "discriminator": [
+        62,
+        208,
+        5,
+        94,
+        58,
+        167,
+        86,
+        68
+      ]
     },
     {
-      name: "battleInitiated";
-      discriminator: [143, 241, 154, 163, 133, 237, 42, 247];
+      "name": "battleInitiated",
+      "discriminator": [
+        143,
+        241,
+        154,
+        163,
+        133,
+        237,
+        42,
+        247
+      ]
     },
     {
-      name: "battleResolved";
-      discriminator: [47, 156, 226, 94, 163, 176, 162, 241];
+      "name": "battleResolved",
+      "discriminator": [
+        47,
+        156,
+        226,
+        94,
+        163,
+        176,
+        162,
+        241
+      ]
     },
     {
-      name: "cooldownInitiated";
-      discriminator: [251, 119, 98, 184, 229, 163, 146, 86];
+      "name": "cooldownInitiated",
+      "discriminator": [
+        251,
+        119,
+        98,
+        184,
+        229,
+        163,
+        146,
+        86
+      ]
     },
     {
-      name: "dailyRewardUpdated";
-      discriminator: [147, 255, 214, 103, 150, 229, 42, 92];
+      "name": "dailyRewardUpdated",
+      "discriminator": [
+        147,
+        255,
+        214,
+        103,
+        150,
+        229,
+        42,
+        92
+      ]
     }
-  ];
-  errors: [
+  ],
+  "errors": [
     {
-      code: 6000;
-      name: "agentNotAlive";
-      msg: "Agent is not alive.";
+      "code": 6000,
+      "name": "notEnoughShares",
+      "msg": "Not Enough Shares"
     },
     {
-      code: 6001;
-      name: "movementCooldown";
-      msg: "Movement is on cooldown.";
+      "code": 6001,
+      "name": "multiplicationError",
+      "msg": "Multiplication Error"
     },
     {
-      code: 6002;
-      name: "outOfBounds";
-      msg: "Agent is out of map bounds.";
+      "code": 6002,
+      "name": "divisionError",
+      "msg": "Division Error"
     },
     {
-      code: 6003;
-      name: "battleInProgress";
-      msg: "Battle is currently in progress.";
+      "code": 6003,
+      "name": "subtractionError",
+      "msg": "Subtraction Error"
     },
     {
-      code: 6004;
-      name: "battleCooldown";
-      msg: "Battle is on cooldown.";
+      "code": 6004,
+      "name": "additionError",
+      "msg": "Addition Error"
     },
     {
-      code: 6005;
-      name: "reentrancyGuard";
-      msg: "Reentrancy attempt detected.";
+      "code": 6005,
+      "name": "agentNotAlive",
+      "msg": "Agent is not alive."
     },
     {
-      code: 6006;
-      name: "allianceCooldown";
-      msg: "Alliance is on cooldown.";
+      "code": 6006,
+      "name": "movementCooldown",
+      "msg": "Movement is on cooldown."
     },
     {
-      code: 6007;
-      name: "notEnoughTokens";
-      msg: "Not enough tokens for battle.";
+      "code": 6007,
+      "name": "outOfBounds",
+      "msg": "Agent is out of map bounds."
     },
     {
-      code: 6008;
-      name: "maxStakeExceeded";
-      msg: "Stake amount exceeds maximum allowed.";
+      "code": 6008,
+      "name": "battleInProgress",
+      "msg": "Battle is currently in progress."
     },
     {
-      code: 6009;
-      name: "claimCooldown";
-      msg: "Cannot claim rewards yet.";
+      "code": 6009,
+      "name": "battleCooldown",
+      "msg": "Battle is on cooldown."
     },
     {
-      code: 6010;
-      name: "invalidTerrain";
-      msg: "Invalid terrain movement.";
+      "code": 6010,
+      "name": "reentrancyGuard",
+      "msg": "Reentrancy attempt detected."
     },
     {
-      code: 6011;
-      name: "tokenTransferError";
-      msg: "Invalid token transfer.";
+      "code": 6011,
+      "name": "allianceCooldown",
+      "msg": "Alliance is on cooldown."
     },
     {
-      code: 6012;
-      name: "insufficientFunds";
-      msg: "Insufficient Funds Provided.";
+      "code": 6012,
+      "name": "notEnoughTokens",
+      "msg": "Not enough tokens for battle."
     },
     {
-      code: 6013;
-      name: "unauthorized";
-      msg: "Unauthorized action.";
+      "code": 6013,
+      "name": "maxStakeExceeded",
+      "msg": "Stake amount exceeds maximum allowed."
     },
     {
-      code: 6014;
-      name: "ignoreCooldown";
-      msg: "Cooldown is still active.";
+      "code": 6014,
+      "name": "claimCooldown",
+      "msg": "Cannot claim rewards yet."
     },
     {
-      code: 6015;
-      name: "invalidAlliancePartner";
-      msg: "Invalid alliance partner.";
+      "code": 6015,
+      "name": "invalidTerrain",
+      "msg": "Invalid terrain movement."
     },
     {
-      code: 6016;
-      name: "allianceAlreadyExists";
-      msg: "An active alliance already exists.";
+      "code": 6016,
+      "name": "tokenTransferError",
+      "msg": "Invalid token transfer."
     },
     {
-      code: 6017;
-      name: "noAllianceToBreak";
-      msg: "No active alliance to break.";
+      "code": 6017,
+      "name": "insufficientFunds",
+      "msg": "Insufficient Funds Provided."
     },
     {
-      code: 6018;
-      name: "maxAgentLimitReached";
-      msg: "Maximum number of agents reached.";
+      "code": 6018,
+      "name": "unauthorized",
+      "msg": "Unauthorized action."
     },
     {
-      code: 6019;
-      name: "agentAlreadyExists";
-      msg: "Agent already exists.";
+      "code": 6019,
+      "name": "ignoreCooldown",
+      "msg": "Cooldown is still active."
     },
     {
-      code: 6020;
-      name: "nameTooLong";
-      msg: "Agent name is too long.";
+      "code": 6020,
+      "name": "invalidAlliancePartner",
+      "msg": "Invalid alliance partner."
     },
     {
-      code: 6021;
-      name: "cooldownNotOver";
-      msg: "You must wait until cooldown ends.";
+      "code": 6021,
+      "name": "allianceAlreadyExists",
+      "msg": "An active alliance already exists."
     },
     {
-      code: 6022;
-      name: "gameNotActive";
-      msg: "Game is Inactive";
+      "code": 6022,
+      "name": "noAllianceToBreak",
+      "msg": "No active alliance to break."
     },
     {
-      code: 6023;
-      name: "invalidAmount";
-      msg: "Invalid amount specified.";
+      "code": 6023,
+      "name": "maxAgentLimitReached",
+      "msg": "Maximum number of agents reached."
     },
     {
-      code: 6024;
-      name: "invalidBump";
-      msg: "Invalid bump.";
+      "code": 6024,
+      "name": "agentAlreadyExists",
+      "msg": "Agent already exists."
     },
     {
-      code: 6025;
-      name: "noRewardsToClaim";
-      msg: "No rewards to claim.";
+      "code": 6025,
+      "name": "nameTooLong",
+      "msg": "Agent name is too long."
     },
     {
-      code: 6026;
-      name: "insufficientRewards";
-      msg: "Insufficient rewards to complete this action.";
+      "code": 6026,
+      "name": "cooldownNotOver",
+      "msg": "You must wait until cooldown ends."
     },
     {
-      code: 6027;
-      name: "cooldownAlreadyActive";
-      msg: "Cooldown is already active.";
+      "code": 6027,
+      "name": "gameNotActive",
+      "msg": "Game is Inactive"
     },
     {
-      code: 6028;
-      name: "battleNotStarted";
-      msg: "Battle has not started yet ";
+      "code": 6028,
+      "name": "invalidAmount",
+      "msg": "Invalid amount specified."
     },
     {
-      code: 6029;
-      name: "battleAlreadyStarted";
-      msg: "Battle has already started ";
+      "code": 6029,
+      "name": "invalidBump",
+      "msg": "Invalid bump."
     },
     {
-      code: 6030;
-      name: "battleNotReadyToResolve";
-      msg: "Battle not ready to resolve";
+      "code": 6030,
+      "name": "noRewardsToClaim",
+      "msg": "No rewards to claim."
+    },
+    {
+      "code": 6031,
+      "name": "insufficientRewards",
+      "msg": "Insufficient rewards to complete this action."
+    },
+    {
+      "code": 6032,
+      "name": "cooldownAlreadyActive",
+      "msg": "Cooldown is already active."
+    },
+    {
+      "code": 6033,
+      "name": "battleNotStarted",
+      "msg": "Battle has not started yet "
+    },
+    {
+      "code": 6034,
+      "name": "battleAlreadyStarted",
+      "msg": "Battle has already started "
+    },
+    {
+      "code": 6035,
+      "name": "battleNotReadyToResolve",
+      "msg": "Battle not ready to resolve"
     }
-  ];
-  types: [
+  ],
+  "types": [
     {
-      name: "agent";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "agent",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "game";
-            type: "pubkey";
+            "name": "game",
+            "type": "pubkey"
           },
           {
-            name: "authority";
-            type: "pubkey";
+            "name": "authority",
+            "type": "pubkey"
           },
           {
-            name: "id";
-            type: "u8";
+            "name": "id",
+            "type": "u8"
           },
           {
-            name: "x";
-            type: "i32";
+            "name": "x",
+            "type": "i32"
           },
           {
-            name: "y";
-            type: "i32";
+            "name": "y",
+            "type": "i32"
           },
           {
-            name: "isAlive";
-            type: "bool";
+            "name": "isAlive",
+            "type": "bool"
           },
           {
-            name: "lastMove";
-            type: "i64";
+            "name": "lastMove",
+            "type": "i64"
           },
           {
-            name: "lastBattle";
-            type: "i64";
+            "name": "lastBattle",
+            "type": "i64"
           },
           {
-            name: "stakedBalance";
-            type: "u128";
+            "name": "stakedBalance",
+            "type": "u128"
           },
           {
-            name: "allianceWith";
-            type: {
-              option: "pubkey";
-            };
+            "name": "allianceWith",
+            "type": {
+              "option": "pubkey"
+            }
           },
           {
-            name: "allianceTimestamp";
-            type: "i64";
+            "name": "allianceTimestamp",
+            "type": "i64"
           },
           {
-            name: "tokenBalance";
-            type: "u64";
+            "name": "tokenBalance",
+            "type": "u64"
           },
           {
-            name: "lastRewardClaim";
-            type: "i64";
+            "name": "lastRewardClaim",
+            "type": "i64"
           },
           {
-            name: "totalShares";
-            type: "u128";
+            "name": "totalShares",
+            "type": "u128"
           },
           {
-            name: "lastAttack";
-            type: "i64";
+            "name": "lastAttack",
+            "type": "i64"
           },
           {
-            name: "lastIgnore";
-            type: "i64";
+            "name": "lastIgnore",
+            "type": "i64"
           },
           {
-            name: "lastAlliance";
-            type: "i64";
+            "name": "lastAlliance",
+            "type": "i64"
           },
           {
-            name: "nextMoveTime";
-            type: "i64";
+            "name": "nextMoveTime",
+            "type": "i64"
           },
           {
-            name: "lastAllianceAgent";
-            type: {
-              option: "pubkey";
-            };
+            "name": "lastAllianceAgent",
+            "type": {
+              "option": "pubkey"
+            }
           },
           {
-            name: "lastAllianceBroken";
-            type: "i64";
+            "name": "lastAllianceBroken",
+            "type": "i64"
           },
           {
-            name: "battleStartTime";
-            type: {
-              option: "i64";
-            };
+            "name": "battleStartTime",
+            "type": {
+              "option": "i64"
+            }
           },
           {
-            name: "vaultBump";
-            type: "u8";
+            "name": "vaultBump",
+            "type": "u8"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "agentInfo";
-      docs: ["Holds basic information for an agent."];
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "agentInfo",
+      "docs": [
+        "Holds basic information for an agent."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "key";
-            type: "pubkey";
+            "name": "key",
+            "type": "pubkey"
           },
           {
-            name: "name";
-            type: "string";
+            "name": "name",
+            "type": "string"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "agentMoved";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "agentMoved",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "agentId";
-            type: "u8";
+            "name": "agentId",
+            "type": "u8"
           },
           {
-            name: "oldX";
-            type: "i32";
+            "name": "oldX",
+            "type": "i32"
           },
           {
-            name: "oldY";
-            type: "i32";
+            "name": "oldY",
+            "type": "i32"
           },
           {
-            name: "newX";
-            type: "i32";
+            "name": "newX",
+            "type": "i32"
           },
           {
-            name: "newY";
-            type: "i32";
+            "name": "newY",
+            "type": "i32"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "alliance";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "alliance",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "agent1";
-            type: "pubkey";
+            "name": "agent1",
+            "type": "pubkey"
           },
           {
-            name: "agent2";
-            type: "pubkey";
+            "name": "agent2",
+            "type": "pubkey"
           },
           {
-            name: "formedAt";
-            type: "i64";
+            "name": "formedAt",
+            "type": "i64"
           },
           {
-            name: "isActive";
-            type: "bool";
+            "name": "isActive",
+            "type": "bool"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "battleInitiated";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "battleInitiated",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "agentId";
-            type: "u8";
+            "name": "agentId",
+            "type": "u8"
           },
           {
-            name: "opponentAgentId";
-            type: "u8";
+            "name": "opponentAgentId",
+            "type": "u8"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "battleResolved";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "battleResolved",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "winnerId";
-            type: "u8";
+            "name": "winnerId",
+            "type": "u8"
           },
           {
-            name: "loserId";
-            type: "u8";
+            "name": "loserId",
+            "type": "u8"
           },
           {
-            name: "transferAmount";
-            type: "u64";
+            "name": "transferAmount",
+            "type": "u64"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "cooldownInitiated";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "cooldownInitiated",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "stakeInfo";
-            type: "pubkey";
+            "name": "stakeInfo",
+            "type": "pubkey"
           },
           {
-            name: "cooldownEndsAt";
-            type: "i64";
+            "name": "cooldownEndsAt",
+            "type": "i64"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "dailyRewardUpdated";
-      docs: ["Optional events"];
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "dailyRewardUpdated",
+      "docs": [
+        "Optional events"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "newDailyReward";
-            type: "u64";
+            "name": "newDailyReward",
+            "type": "u64"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "game";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "game",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "gameId";
-            type: "u64";
+            "name": "gameId",
+            "type": "u64"
           },
           {
-            name: "authority";
-            type: "pubkey";
+            "name": "authority",
+            "type": "pubkey"
           },
           {
-            name: "tokenMint";
-            type: "pubkey";
+            "name": "tokenMint",
+            "type": "pubkey"
           },
           {
-            name: "rewardsVault";
-            type: "pubkey";
+            "name": "rewardsVault",
+            "type": "pubkey"
           },
           {
-            name: "mapDiameter";
-            type: "u32";
+            "name": "mapDiameter",
+            "type": "u32"
           },
           {
-            name: "isActive";
-            type: "bool";
+            "name": "isActive",
+            "type": "bool"
           },
           {
-            name: "lastUpdate";
-            type: "i64";
+            "name": "lastUpdate",
+            "type": "i64"
           },
           {
-            name: "bump";
-            type: "u8";
+            "name": "bump",
+            "type": "u8"
           },
           {
-            name: "dailyRewardTokens";
-            type: "u64";
+            "name": "dailyRewardTokens",
+            "type": "u64"
           },
           {
-            name: "alliances";
-            type: {
-              vec: {
-                defined: {
-                  name: "alliance";
-                };
-              };
-            };
+            "name": "alliances",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "alliance"
+                }
+              }
+            }
           },
           {
-            name: "agents";
-            type: {
-              vec: {
-                defined: {
-                  name: "agentInfo";
-                };
-              };
-            };
+            "name": "agents",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "agentInfo"
+                }
+              }
+            }
           },
           {
-            name: "totalStakeAccounts";
-            type: {
-              vec: {
-                defined: {
-                  name: "stakerStake";
-                };
-              };
-            };
+            "name": "totalStakeAccounts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "stakerStake"
+                }
+              }
+            }
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "stakeInfo";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "stakeInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "agent";
-            docs: ["The Agent (vault) this stake is associated with."];
-            type: "pubkey";
+            "name": "agent",
+            "docs": [
+              "The Agent (vault) this stake is associated with."
+            ],
+            "type": "pubkey"
           },
           {
-            name: "staker";
-            docs: ["The staker’s public key."];
-            type: "pubkey";
+            "name": "staker",
+            "docs": [
+              "The staker’s public key."
+            ],
+            "type": "pubkey"
           },
           {
-            name: "amount";
-            docs: ["The amount of tokens the user has deposited."];
-            type: "u64";
+            "name": "amount",
+            "docs": [
+              "The amount of tokens the user has deposited."
+            ],
+            "type": "u64"
           },
           {
-            name: "shares";
-            docs: ["The number of shares the user holds."];
-            type: "u128";
+            "name": "shares",
+            "docs": [
+              "The number of shares the user holds."
+            ],
+            "type": "u128"
           },
           {
-            name: "lastRewardTimestamp";
-            docs: [
+            "name": "lastRewardTimestamp",
+            "docs": [
               "The last time (Unix timestamp) this staker claimed rewards."
-            ];
-            type: "i64";
+            ],
+            "type": "i64"
           },
           {
-            name: "cooldownEndsAt";
-            docs: ["The Unix timestamp when the cooldown ends."];
-            type: "i64";
+            "name": "cooldownEndsAt",
+            "docs": [
+              "The Unix timestamp when the cooldown ends."
+            ],
+            "type": "i64"
           },
           {
-            name: "isInitialized";
-            docs: [
+            "name": "isInitialized",
+            "docs": [
               "Indicates whether the stake_info account has been initialized."
-            ];
-            type: "bool";
+            ],
+            "type": "bool"
           },
           {
-            name: "padding";
-            docs: ["Padding to align to 8 bytes"];
-            type: {
-              array: ["u8", 7];
-            };
+            "name": "padding",
+            "docs": [
+              "Padding to align to 8 bytes"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "stakerStake";
-      type: {
-        kind: "struct";
-        fields: [
+      "name": "stakerStake",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: "staker";
-            type: "pubkey";
+            "name": "staker",
+            "type": "pubkey"
           },
           {
-            name: "totalStake";
-            type: "u64";
+            "name": "totalStake",
+            "type": "u64"
           }
-        ];
-      };
+        ]
+      }
     },
     {
-      name: "terrainType";
-      docs: [
+      "name": "terrainType",
+      "docs": [
         "Define terrain types that affect movement.",
         "Note: Make sure to declare the enum as public."
-      ];
-      type: {
-        kind: "enum";
-        variants: [
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
           {
-            name: "plain";
+            "name": "plain"
           },
           {
-            name: "mountain";
+            "name": "mountain"
           },
           {
-            name: "river";
+            "name": "river"
           }
-        ];
-      };
+        ]
+      }
     }
-  ];
+  ]
 };
