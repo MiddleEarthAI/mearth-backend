@@ -89,9 +89,6 @@ const env = cleanEnv(process.env, {
   MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY: str({
     desc: "Private key for the game wallet",
   }),
-  MIDDLE_EARTH_AI_REWARDS_AUTHORITY_PRIVATE_KEY: str({
-    desc: "Private key for the rewards wallet",
-  }),
   MEARTH_TOKEN_MINT: str({
     desc: "Token mint address for the Middle Earth game token",
   }),
@@ -151,10 +148,7 @@ const env = cleanEnv(process.env, {
     default: 900, // 15 minutes in seconds
     desc: "Game cleanup interval in milliseconds",
   }),
-  DAILY_REWARD_TOKENS: num({
-    default: 500000,
-    desc: "Number of tokens awarded daily",
-  }),
+
   MAX_RETRIES: num({
     default: 3,
     desc: "Maximum number of retry attempts for operations",
@@ -275,7 +269,6 @@ export const gameConfig = {
   actionInterval: env.AGENT_ACTION_INTERVAL,
   agentInitGapDelay: env.AGENT_INIT_GAP_DELAY,
   cleanupInterval: env.GAME_CLEANUP_INTERVAL,
-  dailyRewardTokens: env.DAILY_REWARD_TOKENS,
   maxRetries: env.MAX_RETRIES,
   mechanics: {
     battle: {

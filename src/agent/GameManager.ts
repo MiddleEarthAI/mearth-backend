@@ -3,7 +3,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { Game, PrismaClient, Prisma } from "@prisma/client";
 import { Program } from "@coral-xyz/anchor";
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
-import { gameConfig, solanaConfig } from "../config/env";
+import { solanaConfig } from "../config/env";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
 import {
@@ -214,7 +214,7 @@ export class GameManager implements IGameManager {
               rewardsVault: rewardsVault.address.toBase58(),
               mapDiameter: MAP_DIAMETER,
               bump: bump,
-              dailyRewardTokens: gameConfig.dailyRewardTokens,
+              dailyRewardTokens: 0,
               isActive: true,
               lastUpdate: new Date(gameAccount.lastUpdate * 1000),
             },
