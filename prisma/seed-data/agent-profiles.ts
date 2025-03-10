@@ -215,7 +215,7 @@ const profiles: AgentProfile[] = [
     ],
     postExamples: [
       "The path north holds both promise and peril. Whether it is the right course remains to be seen, but forward I go.",
-      "XY doesn’t stand a chance against me! This will be over in no time.",
+      "XY doesn't stand a chance against me! This will be over in no time.",
       "What a lovely day for making new friends! Anyone up for an alliance near the crystal river?",
       "Hosting a grand feast at the crossroads! Bring your $MEARTH and let's celebrate life together!",
       "Moving south to avoid those nasty fights. Peace and prosperity to all my wonderful supporters!",
@@ -352,6 +352,41 @@ async function seedAgentProfiles() {
     await prisma.$disconnect();
   }
 }
+
+// async function createVault() {
+//   // Get game authority wallet
+//   const gameAuthority = await getMiddleEarthAiAuthorityWallet();
+//   const connection = new Connection(solanaConfig.rpcUrl);
+
+//   // Create token mint if not exists
+//   const tokenMint = new PublicKey(solanaConfig.tokenMint);
+
+//   // Create vault account
+//   const vaultKeypair = Keypair.generate();
+//   const size = AccountLayout.span;
+//   const lamports = await connection.getMinimumBalanceForRentExemption(size);
+
+//   // Create and initialize vault account owned by game authority
+//   const createVaultIx = SystemProgram.createAccount({
+//     fromPubkey: gameAuthority.keypair.publicKey,
+//     newAccountPubkey: vaultKeypair.publicKey,
+//     space: size,
+//     lamports,
+//     programId: TOKEN_PROGRAM_ID,
+//   });
+
+//   const initVaultIx = createInitializeAccountInstruction(
+//     vaultKeypair.publicKey,
+//     tokenMint,
+//     gameAuthority.keypair.publicKey,
+//     TOKEN_PROGRAM_ID
+//   );
+
+//   const tx = new Transaction().add(createVaultIx, initVaultIx);
+//   await connection.sendTransaction(tx, [gameAuthority.keypair, vaultKeypair]);
+
+//   return vaultKeypair.publicKey.toString();
+// }
 
 // Execute the seed function if this file is run directly
 if (require.main === module) {

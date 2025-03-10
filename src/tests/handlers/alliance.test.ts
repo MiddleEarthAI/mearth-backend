@@ -8,16 +8,10 @@ import {
   BreakAllianceAction,
 } from "@/types";
 import { Keypair } from "@solana/web3.js";
-import {
-  getAgentAuthorityKeypair,
-  getProgram,
-  getMiddleEarthAiAuthorityWallet,
-} from "@/utils/program";
+import { getProgram, getMiddleEarthAiAuthorityWallet } from "@/utils/program";
 import { GameManager } from "@/agent/GameManager";
 import { describe, it, before, after } from "mocha";
 import { AgentAccount, GameAccount } from "@/types/program";
-import { solanaConfig } from "@/config/env";
-import { requestAirdrop } from "../utiils";
 
 describe("AllianceHandler", function () {
   let allianceHandler: AllianceHandler;
@@ -29,16 +23,15 @@ describe("AllianceHandler", function () {
   let activeGameAccount: GameAccount;
   let agent1: AgentWithProfile;
   let agent1Account: AgentAccount;
-  let agent1Keypair: Keypair;
+
   let agent2: AgentWithProfile;
   let agent2Account: AgentAccount;
-  let agent2Keypair: Keypair;
+
   let agent3: AgentWithProfile;
   let agent3Account: AgentAccount;
-  let agent3Keypair: Keypair;
+
   let agent4: AgentWithProfile;
   let agent4Account: AgentAccount;
-  let agent4Keypair: Keypair;
 
   before(async function () {
     prisma = new PrismaClient();
@@ -66,16 +59,12 @@ describe("AllianceHandler", function () {
     activeGameAccount = gameInfo.gameAccount;
     agent1 = gameInfo.agents[0].agent;
     agent1Account = gameInfo.agents[0].account;
-    agent1Keypair = await getAgentAuthorityKeypair(agent1.profile.onchainId);
     agent2 = gameInfo.agents[1].agent;
     agent2Account = gameInfo.agents[1].account;
-    agent2Keypair = await getAgentAuthorityKeypair(agent2.profile.onchainId);
     agent3 = gameInfo.agents[2].agent;
     agent3Account = gameInfo.agents[2].account;
-    agent3Keypair = await getAgentAuthorityKeypair(agent3.profile.onchainId);
     agent4 = gameInfo.agents[3].agent;
     agent4Account = gameInfo.agents[3].account;
-    agent4Keypair = await getAgentAuthorityKeypair(agent4.profile.onchainId);
   });
 
   it("should successfully form an alliance between two agents", async function () {

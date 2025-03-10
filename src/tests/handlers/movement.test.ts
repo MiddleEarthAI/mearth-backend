@@ -4,11 +4,7 @@ import { Game, PrismaClient } from "@prisma/client";
 import { AgentWithProfile, MearthProgram } from "@/types";
 import { ActionContext, MoveAction } from "@/types";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import {
-  getAgentAuthorityKeypair,
-  getMiddleEarthAiAuthorityWallet,
-  getProgram,
-} from "@/utils/program";
+import { getMiddleEarthAiAuthorityWallet, getProgram } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
 import { AgentAccount, GameAccount } from "@/types/program";
@@ -35,10 +31,6 @@ describe("MovementHandler", function () {
 
     //  airdrop authority wallets
     await requestAirdrop(gameAuthorityWallet.publicKey, 5);
-    for (const agent of [1, 2, 3, 4]) {
-      const agentKp = await getAgentAuthorityKeypair(agent);
-      await requestAirdrop(agentKp.publicKey, 5);
-    }
   });
 
   after(async function () {

@@ -2,6 +2,7 @@ import { mountains, rivers } from "@/constants";
 import { TerrainType } from "@prisma/client";
 import { plains } from "@/constants";
 import { prisma } from "@/config/prisma";
+import { solanaConfig } from "@/config/env";
 
 export function getAgentConfigById(id: number) {
   const config = {
@@ -95,3 +96,18 @@ export const formatNumber = (
 
   return new Intl.NumberFormat("en-US", defaultOptions).format(number);
 };
+
+export function getAgentTokenAccountAddress(id: number) {
+  switch (id) {
+    case 1:
+      return solanaConfig.ppTokenAccount;
+    case 2:
+      return solanaConfig.scTokenAccount;
+    case 3:
+      return solanaConfig.sgTokenAccount;
+    case 4:
+      return solanaConfig.wlTokenAccount;
+    default:
+      throw new Error(`Invalid agent ID: ${id}`);
+  }
+}

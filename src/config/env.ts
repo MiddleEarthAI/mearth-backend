@@ -82,57 +82,30 @@ const env = cleanEnv(process.env, {
     default: 0,
     desc: "Redis database number",
   }),
-
-  // Solana Configuration
-  SOLANA_NETWORK: str({
-    choices: ["mainnet-beta", "testnet", "devnet", "localnet"],
-    default: "devnet",
-    desc: "Solana network to connect to",
-  }),
   SOLANA_RPC_URL: url({
     desc: "Solana RPC endpoint URL",
     // example: "https://api.devnet.solana.com",
   }),
-  PROGRAM_ID: str({
-    desc: "Solana program ID for the game contract",
-    // example: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
-  }),
   MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY: str({
     desc: "Private key for the game wallet",
   }),
+  MIDDLE_EARTH_AI_REWARDS_AUTHORITY_PRIVATE_KEY: str({
+    desc: "Private key for the rewards wallet",
+  }),
   MEARTH_TOKEN_MINT: str({
     desc: "Token mint address for the Middle Earth game token",
-    // example: "6xxtS3cfzTAmuEQGHEh1CUUQwfDUPx5DZuAiyv32hous",
   }),
-  AGENT_AUTHORITY_1: str({
-    desc: "Private key for agent 1 (purrlockpaws)",
+  PP_TOKEN_ACCOUNT: str({
+    desc: "Token account for agent 1 (purrlockpaws)",
   }),
-  AGENT_AUTHORITY_2: str({
-    desc: "Private key for agent 2 (scootles)",
+  SC_TOKEN_ACCOUNT: str({
+    desc: "Token account for agent 2 (scootles)",
   }),
-  AGENT_AUTHORITY_3: str({
-    desc: "Private key for agent 3 (sirgullihop)",
+  SG_TOKEN_ACCOUNT: str({
+    desc: "Token account for agent 3 (sirgullihop)",
   }),
-  AGENT_AUTHORITY_4: str({
-    desc: "Private key for agent 4 (wanderleaf)",
-  }),
-
-  // Authentication & Security
-  JWT_SECRET: str({
-    desc: "Secret key for JWT token generation",
-  }),
-
-  CORS_ORIGIN: str({
-    default: "*",
-    desc: "Allowed CORS origin",
-  }),
-  PRIVY_APP_ID: str({
-    desc: "Privy App ID from your Privy dashboard",
-    example: "clx123abc",
-  }),
-  PRIVY_APP_SECRET: str({
-    desc: "Privy App Secret from your Privy dashboard",
-    example: "sk_privy_xxx",
+  WL_TOKEN_ACCOUNT: str({
+    desc: "Token account for agent 4 (wanderleaf)",
   }),
 
   // Twitter API Configuration
@@ -167,11 +140,6 @@ const env = cleanEnv(process.env, {
     desc: "Twitter access secret for agent 4",
   }),
 
-  // Game Configuration
-  GAME_MAP_DIAMETER: num({
-    default: 60,
-    desc: "Diameter of the game map",
-  }),
   AGENT_ACTION_INTERVAL: num({
     desc: "Game state update interval in milliseconds",
   }),
@@ -184,16 +152,12 @@ const env = cleanEnv(process.env, {
     desc: "Game cleanup interval in milliseconds",
   }),
   DAILY_REWARD_TOKENS: num({
-    default: 1000,
+    default: 500000,
     desc: "Number of tokens awarded daily",
   }),
   MAX_RETRIES: num({
     default: 3,
     desc: "Maximum number of retry attempts for operations",
-  }),
-  BATTLE_CHECK_INTERVAL: num({
-    default: 300, // 5 minutes in seconds
-    desc: "Interval in milliseconds for checking battles",
   }),
 
   // Game Mechanics Configuration
@@ -239,10 +203,7 @@ const env = cleanEnv(process.env, {
     default: 1,
     desc: "Fields per hour that an agent can move",
   }),
-  MAX_ADJACENT_MOVES: num({
-    default: 8,
-    desc: "Maximum number of adjacent fields an agent can move to",
-  }),
+
   MOUNTAIN_DELAY_TURNS: num({
     default: 2,
     desc: "Number of turns an agent is delayed when moving through mountains",
@@ -250,25 +211,6 @@ const env = cleanEnv(process.env, {
   RIVER_DELAY_TURNS: num({
     default: 1,
     desc: "Number of turns an agent is delayed when moving through rivers",
-  }),
-  INTERACTION_DISTANCE: num({
-    default: 1,
-    desc: "Distance at which agents can interact with each other",
-  }),
-
-  // Monitoring & Logging
-  LOG_LEVEL: str({
-    choices: ["error", "warn", "info", "debug"],
-    default: "info",
-    desc: "Application logging level",
-  }),
-  ENABLE_DEBUG_LOGGING: bool({
-    default: false,
-    desc: "Enable detailed debug logging",
-  }),
-  SENTRY_DSN: str({
-    default: "",
-    desc: "Sentry DSN for error tracking",
   }),
 });
 
@@ -297,22 +239,13 @@ export const redisConfig = {
 };
 
 export const solanaConfig = {
-  network: env.SOLANA_NETWORK,
   rpcUrl: env.SOLANA_RPC_URL,
-  programId: env.PROGRAM_ID,
   middleEarthAiAuthorityPrivateKey: env.MIDDLE_EARTH_AI_AUTHORITY_PRIVATE_KEY,
   tokenMint: env.MEARTH_TOKEN_MINT,
-  agentAuthority1: env.AGENT_AUTHORITY_1,
-  agentAuthority2: env.AGENT_AUTHORITY_2,
-  agentAuthority3: env.AGENT_AUTHORITY_3,
-  agentAuthority4: env.AGENT_AUTHORITY_4,
-};
-
-export const authConfig = {
-  jwtSecret: env.JWT_SECRET,
-  corsOrigin: env.CORS_ORIGIN,
-  privyAppId: env.PRIVY_APP_ID,
-  privyAppSecret: env.PRIVY_APP_SECRET,
+  ppTokenAccount: env.PP_TOKEN_ACCOUNT,
+  scTokenAccount: env.SC_TOKEN_ACCOUNT,
+  sgTokenAccount: env.SG_TOKEN_ACCOUNT,
+  wlTokenAccount: env.WL_TOKEN_ACCOUNT,
 };
 
 export const twitterConfig = {
@@ -339,10 +272,8 @@ export const twitterConfig = {
 };
 
 export const gameConfig = {
-  mapDiameter: env.GAME_MAP_DIAMETER,
   actionInterval: env.AGENT_ACTION_INTERVAL,
   agentInitGapDelay: env.AGENT_INIT_GAP_DELAY,
-  battleCheckInterval: env.BATTLE_CHECK_INTERVAL,
   cleanupInterval: env.GAME_CLEANUP_INTERVAL,
   dailyRewardTokens: env.DAILY_REWARD_TOKENS,
   maxRetries: env.MAX_RETRIES,
@@ -364,16 +295,8 @@ export const gameConfig = {
     },
     movement: {
       speed: env.MOVE_SPEED,
-      maxAdjacentMoves: env.MAX_ADJACENT_MOVES,
       mountainDelayTurns: env.MOUNTAIN_DELAY_TURNS,
       riverDelayTurns: env.RIVER_DELAY_TURNS,
-      interactionDistance: env.INTERACTION_DISTANCE,
     },
   },
-};
-
-export const monitoringConfig = {
-  logLevel: env.LOG_LEVEL,
-  enableDebugLogging: env.ENABLE_DEBUG_LOGGING,
-  sentryDsn: env.SENTRY_DSN,
 };

@@ -3,20 +3,17 @@ import { MearthProgram } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
-import {
-  getAgentAuthorityKeypair,
-  getMiddleEarthAiAuthorityWallet,
-} from "@/utils/program";
+import { getMiddleEarthAiAuthorityWallet } from "@/utils/program";
 import { AgentAccount } from "@/types/program";
-import { gameConfig, solanaConfig } from "@/config/env";
-import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
-import { PublicKey } from "@solana/web3.js";
+import { gameConfig } from "@/config/env";
+import { createTransferInstruction, getAccount } from "@solana/spl-token";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import { MEARTH_DECIMALS } from "@/constants";
-import { formatNumber } from "@/utils";
+import { formatNumber, getAgentTokenAccountAddress } from "@/utils";
 
 interface BattleSide {
-  agent: AgentAccount & { vaultBalance: bigint };
-  ally: (AgentAccount & { vaultBalance: bigint }) | null;
+  agent: AgentAccount & { vaultBalance: bigint; vault: string };
+  ally: (AgentAccount & { vaultBalance: bigint; vault: string }) | null;
 }
 
 interface BattleOutcome {
@@ -54,37 +51,32 @@ export class BattleHandler {
         gamePda,
         action.targetId
       );
-
+      // Get agent accounts and balances
       const [attackerAccountData, defenderAccountData] = await Promise.all([
         (async () => {
           const agent: AgentAccount = await this.program.account.agent.fetch(
             attackerPda
           );
-          const agentAuthority = await getAgentAuthorityKeypair(agent.id);
-          // Agent vault is agentAuthority ATA
-          const vault = await getOrCreateAssociatedTokenAccount(
+          const agentVaultAddress = getAgentTokenAccountAddress(agent.id);
+
+          const vault = await getAccount(
             this.program.provider.connection,
-            agentAuthority,
-            new PublicKey(solanaConfig.tokenMint),
-            agentAuthority.publicKey
+            new PublicKey(agentVaultAddress)
           );
           const vaultBalance = vault.amount / BigInt(MEARTH_DECIMALS); // we are dealing with bigints here
-          return { ...agent, vaultBalance };
+          return { ...agent, vaultBalance, vault: agentVaultAddress };
         })(),
         (async () => {
           const agent: AgentAccount = await this.program.account.agent.fetch(
             defenderPda
           );
-          const agentAuthority = await getAgentAuthorityKeypair(agent.id);
-          // Agent vault is agentAuthority ATA
-          const vault = await getOrCreateAssociatedTokenAccount(
+          const agentVaultAddress = getAgentTokenAccountAddress(agent.id);
+          const vault = await getAccount(
             this.program.provider.connection,
-            agentAuthority,
-            new PublicKey(solanaConfig.tokenMint),
-            agentAuthority.publicKey
+            new PublicKey(agentVaultAddress)
           );
           const vaultBalance = vault.amount / BigInt(MEARTH_DECIMALS); // we are dealing with bigints here
-          return { ...agent, vaultBalance };
+          return { ...agent, vaultBalance, vault: agentVaultAddress };
         })(),
       ]);
 
@@ -96,20 +88,19 @@ export class BattleHandler {
               const allyAccount = await this.program.account.agent.fetch(
                 attackerAccountData.allianceWith
               );
-              const allyAuthority = await getAgentAuthorityKeypair(
+              const allyVaultAddress = getAgentTokenAccountAddress(
                 allyAccount.id
               );
-              const allyVault = await getOrCreateAssociatedTokenAccount(
+              const allyVault = await getAccount(
                 this.program.provider.connection,
-                allyAuthority,
-                new PublicKey(solanaConfig.tokenMint),
-                allyAuthority.publicKey
+                new PublicKey(allyVaultAddress)
               );
               const allyVaultBalance =
                 allyVault.amount / BigInt(MEARTH_DECIMALS); // we are dealing with bigints here
               return {
                 ...allyAccount,
                 vaultBalance: allyVaultBalance,
+                vault: allyVaultAddress,
               };
             })()
           : null,
@@ -119,25 +110,24 @@ export class BattleHandler {
               const allyAccount = await this.program.account.agent.fetch(
                 defenderAccountData.allianceWith
               );
-              const allyAuthority = await getAgentAuthorityKeypair(
+              const allyVaultAddress = getAgentTokenAccountAddress(
                 allyAccount.id
               );
-              const allyVault = await getOrCreateAssociatedTokenAccount(
+              const allyVault = await getAccount(
                 this.program.provider.connection,
-                allyAuthority,
-                new PublicKey(solanaConfig.tokenMint),
-                allyAuthority.publicKey
+                new PublicKey(allyVaultAddress)
               );
               const allyVaultBalance =
                 allyVault.amount / BigInt(MEARTH_DECIMALS); // we are dealing with bigints here
               return {
                 ...allyAccount,
                 vaultBalance: allyVaultBalance,
+                vault: allyVaultAddress,
               };
             })()
           : null,
       ]);
-
+      // Get agent records
       const [
         attackerRecord,
         defenderRecord,
@@ -209,13 +199,6 @@ export class BattleHandler {
       const startTime = new Date();
 
       const gameAuthorityWallet = await getMiddleEarthAiAuthorityWallet();
-
-      const attackerAuthorityKeypair = await getAgentAuthorityKeypair(
-        attackerRecord.profile.onchainId
-      );
-      const defenderAuthorityKeypair = await getAgentAuthorityKeypair(
-        defenderRecord.profile.onchainId
-      );
 
       // Execute everything in a transaction
       await this.prisma.$transaction(
@@ -340,7 +323,7 @@ export class BattleHandler {
 
           // Create battle cooldowns for all participating agents
           const cooldownEndTime = new Date(
-            startTime.getTime() + gameConfig.mechanics.battle.duration
+            startTime.getTime() + gameConfig.mechanics.battle.duration * 1000
           );
 
           // Create cooldown for attacker
@@ -427,13 +410,6 @@ export class BattleHandler {
               throw new Error("Could not find the alliance records");
             }
 
-            const attackerAllyAuthority = await getAgentAuthorityKeypair(
-              attackerAllyRecord.profile.onchainId
-            );
-            const defenderAllyAuthority = await getAgentAuthorityKeypair(
-              defenderAllyRecord.profile.onchainId
-            );
-
             const isAttackerWinner = outcome.winner === "sideA";
             tx = await this.program.methods
               .resolveBattleAllianceVsAlliance(
@@ -462,26 +438,20 @@ export class BattleHandler {
                   ? defenderAllyRecord?.vault
                   : attackerAllyRecord?.vault,
                 leaderAAuthority: isAttackerWinner
-                  ? attackerAuthorityKeypair.publicKey
-                  : defenderAuthorityKeypair.publicKey,
+                  ? gameAuthorityWallet.keypair.publicKey
+                  : gameAuthorityWallet.keypair.publicKey,
                 partnerAAuthority: isAttackerWinner
-                  ? attackerAllyAuthority.publicKey
-                  : defenderAllyAuthority.publicKey,
+                  ? gameAuthorityWallet.keypair.publicKey
+                  : gameAuthorityWallet.keypair.publicKey,
                 leaderBAuthority: isAttackerWinner
-                  ? defenderAuthorityKeypair.publicKey
-                  : attackerAuthorityKeypair.publicKey,
+                  ? gameAuthorityWallet.keypair.publicKey
+                  : gameAuthorityWallet.keypair.publicKey,
                 partnerBAuthority: isAttackerWinner
-                  ? defenderAllyAuthority.publicKey
-                  : attackerAllyAuthority.publicKey,
+                  ? gameAuthorityWallet.keypair.publicKey
+                  : gameAuthorityWallet.keypair.publicKey,
                 authority: gameAuthorityWallet.keypair.publicKey,
               })
-              .signers([
-                attackerAuthorityKeypair,
-                defenderAuthorityKeypair,
-                attackerAllyAuthority,
-                defenderAllyAuthority,
-                gameAuthorityWallet.keypair,
-              ])
+              .signers([gameAuthorityWallet.keypair])
               .rpc();
           } else if (battleType === "AgentVsAlliance") {
             // determine the solo agent
@@ -493,14 +463,14 @@ export class BattleHandler {
               ? attackerRecord.vault
               : defenderRecord.vault;
             const singleAgentAuthorityKeypair = isAttackerSingle
-              ? attackerAuthorityKeypair
-              : defenderAuthorityKeypair;
+              ? gameAuthorityWallet.keypair
+              : gameAuthorityWallet.keypair;
             const allianceLeaderAuthorityKeypair = isAttackerSingle
-              ? defenderAuthorityKeypair
-              : attackerAuthorityKeypair;
+              ? gameAuthorityWallet.keypair
+              : gameAuthorityWallet.keypair;
             const alliancePartnerAuthorityKeypair = isAttackerSingle
-              ? attackerAuthorityKeypair
-              : defenderAuthorityKeypair;
+              ? gameAuthorityWallet.keypair
+              : gameAuthorityWallet.keypair;
             const allianceLeader = isAttackerSingle ? defenderPda : attackerPda;
             const alliancePartner = isAttackerSingle
               ? defenderAccountData.allianceWith!
@@ -556,23 +526,17 @@ export class BattleHandler {
                   ? defenderRecord.vault
                   : attackerRecord.vault,
                 loserAuthority: isAttackerWinner
-                  ? defenderAuthorityKeypair.publicKey
-                  : attackerAuthorityKeypair.publicKey,
+                  ? gameAuthorityWallet.keypair.publicKey
+                  : gameAuthorityWallet.keypair.publicKey,
                 authority: gameAuthorityWallet.keypair.publicKey,
               })
-              .signers([
-                gameAuthorityWallet.keypair,
-                // the loser authority keypair
-                isAttackerWinner
-                  ? defenderAuthorityKeypair
-                  : attackerAuthorityKeypair,
-              ])
+              .signers([gameAuthorityWallet.keypair])
               .rpc();
           }
 
           // Kill the agents that died
 
-          console.log("Killing agents onchain....................", {
+          console.log("Killing agents onchain if any....................", {
             outcome,
           });
           await Promise.all(
@@ -593,12 +557,74 @@ export class BattleHandler {
                 })
                 .signers([gameAuthorityWallet.keypair])
                 .rpc();
+              // Transfer all tokens from dead agent to winner(s)
+              const deadAgentVaultAddress =
+                getAgentTokenAccountAddress(agentId);
+              const deadAgentVault = await getAccount(
+                this.program.provider.connection,
+                new PublicKey(deadAgentVaultAddress)
+              );
+
+              // Determine winner vault(s) to distribute tokens to
+              const winnerVaults = [];
+              if (outcome.winner === "sideA") {
+                winnerVaults.push(sideA.agent.vault);
+                if (sideA.ally) winnerVaults.push(sideA.ally.vault);
+              } else {
+                winnerVaults.push(sideB.agent.vault);
+                if (sideB.ally) winnerVaults.push(sideB.ally.vault);
+              }
+
+              // Calculate tokens per winner
+              const tokensPerWinner =
+                deadAgentVault.amount / BigInt(winnerVaults.length);
+
+              // Transfer tokens to each winner using latest Solana methods
+              const connection = this.program.provider.connection;
+
+              await Promise.all(
+                winnerVaults.map(async (winnerVault) => {
+                  const transaction = new Transaction().add(
+                    createTransferInstruction(
+                      new PublicKey(deadAgentVaultAddress),
+                      new PublicKey(winnerVault),
+                      gameAuthorityWallet.keypair.publicKey,
+                      tokensPerWinner
+                    )
+                  );
+
+                  const latestBlockhash = await connection.getLatestBlockhash();
+                  transaction.recentBlockhash = latestBlockhash.blockhash;
+                  transaction.feePayer = gameAuthorityWallet.keypair.publicKey;
+
+                  transaction.sign(gameAuthorityWallet.keypair);
+                  const rawTransaction = transaction.serialize();
+
+                  const signature = await connection.sendRawTransaction(
+                    rawTransaction,
+                    {
+                      skipPreflight: false,
+                      preflightCommitment: "confirmed",
+                      maxRetries: 3,
+                    }
+                  );
+
+                  await connection.confirmTransaction(
+                    {
+                      signature,
+                      blockhash: latestBlockhash.blockhash,
+                      lastValidBlockHeight:
+                        latestBlockhash.lastValidBlockHeight,
+                    },
+                    "confirmed"
+                  );
+                })
+              );
 
               return { battle, battleEvent, tx };
             })
           );
         },
-
         {
           isolationLevel: "Serializable",
           maxWait: 120000, // 2 minutes
@@ -691,7 +717,7 @@ export class BattleHandler {
     return {
       winner: sideAWins ? "sideA" : "sideB",
       percentageLost,
-      totalTokensAtStake: totalTokens,
+      totalTokensAtStake: totalTokens / BigInt(MEARTH_DECIMALS),
       agentsToDie,
     };
   }

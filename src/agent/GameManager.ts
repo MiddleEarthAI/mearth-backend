@@ -1,19 +1,17 @@
-import { generateGameId } from "@/utils";
+import { generateGameId, getAgentTokenAccountAddress } from "@/utils";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { Game, PrismaClient, Prisma } from "@prisma/client";
 import { Program } from "@coral-xyz/anchor";
 import { MiddleEarthAiProgram } from "@/types/middle_earth_ai_program";
-import { GameAccount, AgentAccount } from "@/types/program";
 import { gameConfig, solanaConfig } from "../config/env";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
 import {
-  getAgentAuthorityKeypair,
-  getAgentVault,
   getMiddleEarthAiAuthorityWallet,
   getRewardsVault,
 } from "@/utils/program";
 import { GameInfo } from "@/types";
+import { MAP_DIAMETER } from "@/constants";
 
 const { BN } = anchor;
 
@@ -214,7 +212,7 @@ export class GameManager implements IGameManager {
               authority: gameAuthWallet.keypair.publicKey.toString(),
               tokenMint: solanaConfig.tokenMint,
               rewardsVault: rewardsVault.address.toBase58(),
-              mapDiameter: gameConfig.mapDiameter,
+              mapDiameter: MAP_DIAMETER,
               bump: bump,
               dailyRewardTokens: gameConfig.dailyRewardTokens,
               isActive: true,
@@ -320,19 +318,18 @@ export class GameManager implements IGameManager {
         const agentAccount = await this.program.account.agent.fetch(agentPda);
 
         console.info(`💾 Creating agent database record...`);
-
-        const agentVault = await getAgentVault(profile.onchainId);
+        const vault = getAgentTokenAccountAddress(profile.onchainId);
 
         const agentDb = await this.prisma.agent.create({
           data: {
-            vault: agentVault.address.toString(),
+            vault: vault,
+            authorityAssociatedTokenAddress: vault,
             onchainId: profile.onchainId,
             pda: agentPda.toString(),
             gameId: dbGame.id,
             mapTileId: spawnTile.id,
             profileId: profile.id,
             authority: gameAuthWallet.keypair.publicKey.toString(),
-            authorityAssociatedTokenAddress: agentVault.address.toString(),
             isAlive: true,
           },
           include: {

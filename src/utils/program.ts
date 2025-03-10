@@ -79,45 +79,45 @@ export const connection = () => {
   });
 };
 
-export async function getAgentAuthorityKeypair(agentOnchainId: number) {
-  let privateKeyString = "";
-  switch (agentOnchainId) {
-    case 1:
-      privateKeyString = solanaConfig.agentAuthority1;
-      break;
-    case 2:
-      privateKeyString = solanaConfig.agentAuthority2;
-      break;
-    case 3:
-      privateKeyString = solanaConfig.agentAuthority3;
-      break;
-    case 4:
-      privateKeyString = solanaConfig.agentAuthority4;
-      break;
-    default:
-      throw new Error(`Invalid agent onchain ID: ${agentOnchainId}`);
-  }
+// export async function getAgentAuthorityKeypair(agentOnchainId: number) {
+//   let privateKeyString = "";
+//   switch (agentOnchainId) {
+//     case 1:
+//       privateKeyString = solanaConfig.agentAuthority1;
+//       break;
+//     case 2:
+//       privateKeyString = solanaConfig.agentAuthority2;
+//       break;
+//     case 3:
+//       privateKeyString = solanaConfig.agentAuthority3;
+//       break;
+//     case 4:
+//       privateKeyString = solanaConfig.agentAuthority4;
+//       break;
+//     default:
+//       throw new Error(`Invalid agent onchain ID: ${agentOnchainId}`);
+//   }
 
-  if (!privateKeyString) {
-    throw new Error(`AGENT_AUTHORITY_${agentOnchainId} is not set`);
-  }
+//   if (!privateKeyString) {
+//     throw new Error(`AGENT_AUTHORITY_${agentOnchainId} is not set`);
+//   }
 
-  const privateKey = bs58.decode(privateKeyString);
-  const keypair = Keypair.fromSecretKey(privateKey);
-  return keypair;
-}
+//   const privateKey = bs58.decode(privateKeyString);
+//   const keypair = Keypair.fromSecretKey(privateKey);
+//   return keypair;
+// }
 
-export async function getAgentVault(agentOnchainId: number) {
-  const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
-  const agentVault = await getOrCreateAssociatedTokenAccount(
-    connection(),
-    agentAuthorityKeypair,
-    new PublicKey(solanaConfig.tokenMint),
-    agentAuthorityKeypair.publicKey,
-    false
-  );
-  return agentVault;
-}
+// export async function getAgentVault(agentOnchainId: number) {
+//   const agentAuthorityKeypair = await getAgentAuthorityKeypair(agentOnchainId);
+//   const agentVault = await getOrCreateAssociatedTokenAccount(
+//     connection(),
+//     agentAuthorityKeypair,
+//     new PublicKey(solanaConfig.tokenMint),
+//     agentAuthorityKeypair.publicKey,
+//     false
+//   );
+//   return agentVault;
+// }
 
 export async function getRewardsVault() {
   const mearthTokenMint = solanaConfig.tokenMint;

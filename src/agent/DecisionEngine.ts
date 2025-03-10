@@ -14,10 +14,11 @@ import { GameAction, MearthProgram } from "@/types";
 import { getAgentPDA, getGamePDA } from "@/utils/pda";
 import { ActionContext } from "@/types";
 import { formatDate } from "@/utils";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { connection, getAgentVault } from "@/utils/program";
+
 import { BN } from "@coral-xyz/anchor";
 import { MEARTH_DECIMALS } from "@/constants";
+import { getAccount, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 
 /**
  * DecisionEngine class handles the decision making process for AI agents
@@ -103,7 +104,6 @@ class DecisionEngine {
     const currentAgentAccount = await this.program.account.agent.fetch(
       agentPda
     );
-    const currentAgentVault = await getAgentVault(actionContext.agentOnchainId);
 
     if (!currentAgentAccount) {
       return { prompt: "", actionContext };
@@ -229,6 +229,11 @@ class DecisionEngine {
       console.log("currentAgentRecord not found or not alive");
       return { prompt: "", actionContext };
     }
+
+    const currentAgentVault = await getAccount(
+      this.program.provider.connection,
+      new PublicKey(currentAgentRecord.vault)
+    );
 
     const currentAgentMaptile = currentAgentRecord.mapTile;
     console.info("Current position", { currentAgentMaptile });
@@ -368,8 +373,9 @@ ${deathContext}
     const otherAliveAgentsContextString = await Promise.all(
       otherAgentsInfo.map(async (thisAgentInfo) => {
         const thisAgentMaptile = thisAgentInfo.agent.mapTile;
-        const thisAgentVault = await getAgentVault(
-          thisAgentInfo.agent.onchainId
+        const thisAgentVault = await getAccount(
+          this.program.provider.connection,
+          new PublicKey(thisAgentInfo.agent.vault)
         );
 
         // Check if this agent is closer to the current agent

@@ -16,7 +16,7 @@ import { createServer } from "http";
 
 import { expressCspHeader, NONE, SELF } from "express-csp-header";
 import { ActionManager } from "@/agent/actionManager";
-import { authConfig, serverConfig } from "./config/env";
+import { serverConfig } from "./config/env";
 
 const app = express();
 const server = createServer(app);
@@ -120,7 +120,7 @@ app.use((req, res, next) => {
 // CORS configuration - Strict
 app.use(
   cors({
-    origin: authConfig.corsOrigin?.split(","),
+    origin: false, // Disable all origins
     methods: ["GET"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,

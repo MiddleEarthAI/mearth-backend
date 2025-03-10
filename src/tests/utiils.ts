@@ -1,12 +1,24 @@
 import { solanaConfig } from "@/config/env";
+import { getMiddleEarthAiAuthorityWallet } from "@/utils/program";
 import {
   createMint,
   mintTo,
   getOrCreateAssociatedTokenAccount,
+  AccountLayout,
 } from "@solana/spl-token";
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
-
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  sendAndConfirmTransaction,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
+import {
+  createInitializeAccountInstruction,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
+import fs from "fs";
 
 import { Connection } from "@solana/web3.js";
 

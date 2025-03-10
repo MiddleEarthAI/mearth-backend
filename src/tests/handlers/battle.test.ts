@@ -1,13 +1,9 @@
 import { expect } from "chai";
 import { BattleHandler } from "@/agent/actionManager/handlers/battle";
 import { Game, PrismaClient } from "@prisma/client";
-import { AgentWithProfile, GameInfo, MearthProgram } from "@/types";
+import { AgentWithProfile, MearthProgram } from "@/types";
 import { ActionContext, BattleAction } from "@/types";
-import {
-  getAgentAuthorityKeypair,
-  getMiddleEarthAiAuthorityWallet,
-  getProgram,
-} from "@/utils/program";
+import { getMiddleEarthAiAuthorityWallet, getProgram } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
@@ -16,6 +12,7 @@ import { AgentAccount } from "@/types/program";
 import { BN } from "@coral-xyz/anchor";
 import { gameConfig, solanaConfig } from "@/config/env";
 import { mintMearthTokens, requestAirdrop } from "../utiils";
+import { getAgentTokenAccountAddress } from "@/utils";
 
 describe.only("BattleHandler", function () {
   let program: MearthProgram;
@@ -28,19 +25,14 @@ describe.only("BattleHandler", function () {
   let agent2: AgentWithProfile;
   let agent3: AgentWithProfile;
   let agent4: AgentWithProfile;
-  let agent1Account: AgentAccount;
-  let agent2Account: AgentAccount;
-  let agent3Account: AgentAccount;
-  let agent4Account: AgentAccount;
-  let agent1AuthorityKeypair: Keypair;
-  let agent2AuthorityKeypair: Keypair;
-  let agent3AuthorityKeypair: Keypair;
-  let agent4AuthorityKeypair: Keypair;
+  // let agent1Account: AgentAccount;
+  // let agent2Account: AgentAccount;
+  // let agent3Account: AgentAccount;
+  // let agent4Account: AgentAccount;
   let user1 = Keypair.generate();
   let user1Ata: Account;
   let user2 = Keypair.generate();
   let user2Ata: Account;
-  let mearthMint: PublicKey;
 
   before(async function () {
     // Initialize test dependencies
@@ -83,34 +75,10 @@ describe.only("BattleHandler", function () {
     );
 
     // Mint MEARTH tokens to users
-    await mintMearthTokens(
-      gameAuthority,
-      user1.publicKey,
-      1_000_000_000_000_000
-    );
-    await mintMearthTokens(
-      gameAuthority,
-      user2.publicKey,
-      1_000_000_000_000_000
-    );
+    await mintMearthTokens(gameAuthority, user1.publicKey, 1_000_000);
+    await mintMearthTokens(gameAuthority, user2.publicKey, 1_000_000);
 
-    // Airdrop SOL to agent authorities
-    for (const id of [1, 2, 3, 4]) {
-      const authority = await getAgentAuthorityKeypair(id);
-      await requestAirdrop(authority.publicKey);
-    }
-
-    mearthMint = mint;
-
-    // Mint initial MEARTH tokens to agent vaults
-    for (const id of [1, 2, 3, 4]) {
-      const authority = await getAgentAuthorityKeypair(id);
-      await mintMearthTokens(
-        gameAuthority,
-        authority.publicKey,
-        10_000_000_000
-      );
-    }
+    // await mintMearthTokens(gameAuthority, gameAuthority.publicKey, 100_000);
   });
 
   beforeEach(async function () {
@@ -128,19 +96,15 @@ describe.only("BattleHandler", function () {
     agent3 = gameInfo.agents[2].agent;
     agent4 = gameInfo.agents[3].agent;
 
-    agent1Account = gameInfo.agents[0].account;
-    agent2Account = gameInfo.agents[1].account;
-    agent3Account = gameInfo.agents[2].account;
-    agent4Account = gameInfo.agents[3].account;
+    // agent1Account = gameInfo.agents[0].account;
+    // agent2Account = gameInfo.agents[1].account;
+    // agent3Account = gameInfo.agents[2].account;
+    // agent4Account = gameInfo.agents[3].account;
 
-    agent1AuthorityKeypair = await getAgentAuthorityKeypair(1);
-    agent2AuthorityKeypair = await getAgentAuthorityKeypair(2);
-    agent3AuthorityKeypair = await getAgentAuthorityKeypair(3);
-    agent4AuthorityKeypair = await getAgentAuthorityKeypair(4);
-
+    // stake random amount for each agent
     for (const agent of [agent1, agent2, agent3, agent4]) {
       await program.methods
-        .initializeStake(new BN(Math.random() * 1_000_000_000_000))
+        .initializeStake(new BN(Math.random() * 100_000))
         .accounts({
           agent: agent.pda,
           authority: user1.publicKey,
@@ -202,7 +166,7 @@ describe.only("BattleHandler", function () {
       initiator: agent2.pda,
       targetAgent: agent3.pda,
       game: activeGame.pda,
-      authority: agent2AuthorityKeypair.publicKey.toBase58(),
+      authority: gameAuthority.publicKey.toBase58(),
     });
     // Create alliance
     await program.methods

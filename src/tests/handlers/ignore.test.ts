@@ -3,11 +3,7 @@ import { IgnoreHandler } from "@/agent/actionManager/handlers/ignore";
 import { PrismaClient } from "@prisma/client";
 import { AgentWithProfile, GameInfo, MearthProgram } from "@/types";
 import { ActionContext, IgnoreAction } from "@/types";
-import {
-  getProgram,
-  getAgentAuthorityKeypair,
-  getMiddleEarthAiAuthorityWallet,
-} from "@/utils/program";
+import { getProgram, getMiddleEarthAiAuthorityWallet } from "@/utils/program";
 import { describe, it, before, after } from "mocha";
 import { GameManager } from "@/agent/GameManager";
 import { AgentAccount } from "@/types/program";
@@ -40,12 +36,6 @@ describe("IgnoreHandler", function () {
 
     // Request airdrop for game authority
     await requestAirdrop(gameAuthority.publicKey, 2);
-
-    for (const id of [1, 2, 3, 4]) {
-      const authority = await getAgentAuthorityKeypair(id);
-      await requestAirdrop(authority.publicKey, 2);
-      await mintMearthTokens(gameAuthority, authority.publicKey, 1000000000);
-    }
 
     // Create MEARTH token mint
     const { mint } = await mintMearthTokens(

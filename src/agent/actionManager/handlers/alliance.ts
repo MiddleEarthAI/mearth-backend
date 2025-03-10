@@ -10,10 +10,7 @@ import { getAgentPDA, getGamePDA } from "@/utils/pda";
 
 import { gameConfig } from "@/config/env";
 import { ActionHandler } from "../types";
-import {
-  getAgentAuthorityKeypair,
-  getMiddleEarthAiAuthorityWallet,
-} from "@/utils/program";
+import { getMiddleEarthAiAuthorityWallet } from "@/utils/program";
 
 export class AllianceHandler
   implements ActionHandler<FormAllianceAction | BreakAllianceAction>

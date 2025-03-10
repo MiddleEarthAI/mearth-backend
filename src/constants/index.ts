@@ -838,3 +838,4 @@ export function getRandomCoordinatesWithTerrainType() {
 }
 export const validCoordinatesArray = Array.from(validCoordinates);
 export const MEARTH_DECIMALS = 6;
+export const MAP_DIAMETER = 120;
